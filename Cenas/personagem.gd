@@ -7,16 +7,13 @@ extends CharacterBody2D
 @export var player_gravity: int
 var transformando: bool
 var jump_count: int
-var form: String = "normal"  # Formas: "normal", "bubble"
+
 
 func _physics_process(delta: float) -> void:
 	# Verifica se o botão para transformação foi pressionado
-	if Input.is_action_just_pressed("ui_accept"):
-		transformando = true
-		transform()
-		
-
+	# Player_sprite.trans()
 	# Adiciona a gravidade e movimentação
+	trans()	
 	horizontal_moviment_env()
 	vertical_moviment_env()
 	gravity(delta)
@@ -35,36 +32,23 @@ func vertical_moviment_env() -> void:
 		jump_count += 1
 		velocity.y = jump_speed
 	#print(velocity)
-
+func trans() -> void:
+	#var cond: bool = not transformando
+	if Input.is_action_just_pressed("ui_accept") and not transformando:
+		transformando = true
+		Player_sprite.transformacaoOn  = true
+		
+		
 func gravity(delta: float) -> void:
 	velocity.y += delta * player_gravity
 	if velocity.y >= player_gravity:
 		velocity.y = player_gravity
 
 # Método de transformação
-func transform() -> void:
-	if form == "normal" and transformando == true:
-		# Executa a animação de transformação para "bubble"
-		Player_sprite.mudarforma()
-		#Player_sprite.animation.play("Transform")
-		
-		#wait aPlayer_sprite.animation.animation_finished  # Aguarda a animação "Transform"
-		
-		# Muda para a forma "bubble" e ajusta as propriedades
-		#form = "bubble"
-		#speed = 150
-		#jump_speed = -300
-		#player_gravity = 800
-		#Player_sprite.animation.play("Bubble_only")
 
-	elif form == "bubble":
-		# Executa a animação de transformação de volta para "normal"
-		Player_sprite.animation.play("Transform2")
-		await Player_sprite.animation.animation_finished  # Aguarda a animação "Transform2"
-		
-		# Volta para a forma "normal" e ajusta as propriedades
-		form = "normal"
-		speed = 200
-		jump_speed = -400
-		player_gravity = 1000
-		Player_sprite.animation.play("Idle")
+
+
+#func _on_animation_finished(anim_name: StringName) -> void:
+#	if (anim_name == "Walk"):
+###		print("gay")
+#		pass # Replace with function body.
