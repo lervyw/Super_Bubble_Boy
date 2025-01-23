@@ -2,15 +2,15 @@ extends CharacterBody2D
 
 @export var speed: float = 100.0 # Velocidade de movimento
 @export var move_range: float = 200.0 # Distância máxima que o inimigo percorre em cada direção
-@export var start_direction: int = 1 # Direção inicial (1 = direita, -1 = esquerda)
+@export var start_direction: bool = true # Direção inicial (true = direita, false = esquerda)
 
 var start_position: Vector2
 var direction: int
 
 func _ready() -> void:
-	# Salva a posição inicial e define a direção inicial
+	# Salva a posição inicial e define a direção inicial com base no bool
 	start_position = position
-	direction = start_direction
+	direction = 1 if start_direction else -1
 
 func _physics_process(delta: float) -> void:
 	# Movimenta o inimigo na direção atual

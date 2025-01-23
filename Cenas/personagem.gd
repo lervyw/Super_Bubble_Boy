@@ -5,6 +5,7 @@ extends CharacterBody2D
 @export var speed: int
 @export var jump_speed: int
 @export var player_gravity: int
+@export var respawn_position: Vector2
 var transformando: bool
 var jump_count: int
 
@@ -54,6 +55,18 @@ func gravity(delta: float) -> void:
 		velocity.y = player_gravity
 
 # Método de transformação
+
+func die() -> void:
+	# Exibe um efeito visual ou som de morte, se necessário
+	print("O jogador morreu!") # Exemplo de mensagem para debug
+	# Desativa o controle temporariamente
+	set_physics_process(false)
+	# Restaura a posição inicial ou posição de respawn
+	position = respawn_position
+	# Reativa o controle
+	set_physics_process(true)
+
+
 
 
 
