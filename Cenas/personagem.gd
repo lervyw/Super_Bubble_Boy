@@ -1,4 +1,3 @@
-
 extends CharacterBody2D
 
 @onready var Player_sprite: Sprite2D = get_node("Textura")
