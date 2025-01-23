@@ -18,7 +18,7 @@ func Enter():
 func Update(delta: float):
 	if wander_time > 0:
 		wander_time -= delta
-	
+		print("rolinha")
 	else:
 		randomize_wander()
 

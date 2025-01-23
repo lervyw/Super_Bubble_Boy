@@ -8,6 +8,7 @@ extends CharacterBody2D
 var transformando: bool
 var jump_count: int
 
+	
 
 func _physics_process(delta: float) -> void:
 	# Verifica se o botão para transformação foi pressionado
@@ -29,15 +30,23 @@ func vertical_moviment_env() -> void:
 	if is_on_floor():
 		jump_count = 1
 	if Input.is_action_just_pressed("ui_select") and jump_count < 2:
-		jump_count += 1
-		velocity.y = jump_speed
+		if Player_sprite.estado == 0:
+			jump_count += 1
+			velocity.y = jump_speed
+		else:
+			velocity.y = jump_speed
 	#print(velocity)
 func trans() -> void:
 	#var cond: bool = not transformando
+	
 	if Input.is_action_just_pressed("ui_accept") and not transformando:
 		transformando = true
 		Player_sprite.transformacaoOn  = true
-		
+		if Player_sprite.transformacaoOn and transformando and Player_sprite.estado == 1:
+			Player_sprite.voltar()
+			#Player_sprite.estado = 0
+			
+			#Player_sprite.voltar()
 		
 func gravity(delta: float) -> void:
 	velocity.y += delta * player_gravity

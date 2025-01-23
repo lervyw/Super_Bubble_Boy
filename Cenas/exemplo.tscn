@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=4 uid="uid://ds0sxsjujlqah"]
+[gd_scene load_steps=4 format=4 uid="uid://ds0sxsjujlqah"]
 
 [ext_resource type="PackedScene" uid="uid://bef0sp8en86j5" path="res://Cenas/tilemerda.tscn" id="1_c17v2"]
 [ext_resource type="PackedScene" uid="uid://cyh3wd0bwwr2n" path="res://Cenas/personagem.tscn" id="2_5kqrc"]
+[ext_resource type="PackedScene" uid="uid://b51pl8i46sr00" path="res://Cenas/inimigo.tscn" id="3_w60js"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -10,3 +11,6 @@ tile_map_data = PackedByteArray("AAD4/wEAAAAAAAAAAAD5/wEAAAAAAAAAAAD6/wEAAAAAAAA
 
 [node name="Personagem" parent="." instance=ExtResource("2_5kqrc")]
 position = Vector2(-4, -31)
+
+[node name="Inimigo" parent="." instance=ExtResource("3_w60js")]
+position = Vector2(-93, -1)
