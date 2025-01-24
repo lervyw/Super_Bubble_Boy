@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=4 uid="uid://ctn4mci7ytorl"]
+[gd_scene load_steps=4 format=4 uid="uid://ctn4mci7ytorl"]
 
 [ext_resource type="PackedScene" uid="uid://bef0sp8en86j5" path="res://Cenas/tilemerda.tscn" id="1_b5kb6"]
 [ext_resource type="PackedScene" uid="uid://b4c0go7txpq08" path="res://Cenas/player.tscn" id="2_kvl0q"]
+[ext_resource type="PackedScene" uid="uid://d08t5t7tudtpk" path="res://Cenas/spikes_area.tscn" id="3_7618e"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -10,3 +11,8 @@ tile_map_data = PackedByteArray("AAD4/wEAAAAAAAAAAAD5/wEAAAAAAAAAAAD6/wEAAAAAAAA
 
 [node name="Player" parent="." instance=ExtResource("2_kvl0q")]
 position = Vector2(23, -78)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
+
+[node name="SpikesArea" parent="." instance=ExtResource("3_7618e")]
+position = Vector2(457, -39)

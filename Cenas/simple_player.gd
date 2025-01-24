@@ -154,7 +154,9 @@ func die() -> void:
 	# Desativa o controle temporariamente
 	set_physics_process(false)
 	# Restaura a posição inicial ou posição de respawn
-	player_health -1
+	position = respawn_position
+	animation.play("Transform2")
+	await animation.animation_finished
 	# Reativa o controle
 	set_physics_process(true)
 	
