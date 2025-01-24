@@ -491,6 +491,7 @@ _data = {
 }
 
 [node name="Personagem" type="CharacterBody2D" node_paths=PackedStringArray("animation", "animation_sprite")]
+collision_mask = 23
 script = ExtResource("1_vnwna")
 animation = NodePath("Animacao")
 animation_sprite = NodePath("Textura")

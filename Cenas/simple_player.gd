@@ -2,9 +2,14 @@ extends CharacterBody2D
 
 @export var animation: AnimationPlayer
 @export var animation_sprite: Sprite2D
+@export var player_health:= 3
+@export var max_health := 3
 
 const SPEED = 160.0
 const JUMP_VELOCITY = -400.0
+@export var max_lives: int = 3  # Máximo de vidas do jogador
+var current_lives: int
+@onready var life_bubbles: HBoxContainer = $HUD/HBoxContainer  # Referência ao container das bolhas
 
 var main_sm: LimboHSM
 var direction
@@ -135,12 +140,13 @@ func bolha_update(delta: float):
 		main_sm.dispatch(&"state_ended")
 	#	print(animation.current_animation)
 	
-func die() -> void:
+func damage() -> void:
 	# Exibe um efeito visual ou som de morte, se necessário
-	print("O jogador morreu!") # Exemplo de mensagem para debug
+	print("O jogador levou danp") # Exemplo de mensagem para debug
 	# Desativa o controle temporariamente
 	set_physics_process(false)
 	# Restaura a posição inicial ou posição de respawn
-	position = respawn_position
+	player_health -1
 	# Reativa o controle
 	set_physics_process(true)
+	
