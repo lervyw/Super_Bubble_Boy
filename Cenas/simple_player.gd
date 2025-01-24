@@ -8,10 +8,12 @@ const JUMP_VELOCITY = -400.0
 
 var main_sm: LimboHSM
 var direction
+var respawn_position
 	
 
 func _ready():
 	initiate_state_machine()
+	respawn_position = position
 
 func _physics_process(delta: float):
 	direction = Input.get_axis("ui_left", "ui_right")
@@ -117,3 +119,13 @@ func attack_update(delta: float):
 	#if animation.current_animation != "Transform":
 	#	main_sm.dispath(&"state_ended")
 	#	print(animation.current_animation)
+	
+func die() -> void:
+	# Exibe um efeito visual ou som de morte, se necessário
+	print("O jogador morreu!") # Exemplo de mensagem para debug
+	# Desativa o controle temporariamente
+	set_physics_process(false)
+	# Restaura a posição inicial ou posição de respawn
+	position = respawn_position
+	# Reativa o controle
+	set_physics_process(true)
