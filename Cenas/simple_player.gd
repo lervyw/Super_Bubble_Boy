@@ -50,8 +50,8 @@ func flip_sprite(direction):
 		animation_sprite.flip_h = true
 
 func tranformar():
-	if Input.is_action_just_released("attack") and transformacaoOn == true and transformado == false:
-		main_sm.dispatch(&"to_attack")
+	if Input.is_action_just_released("bolha") and transformacaoOn == true and transformado == false:
+		main_sm.dispatch(&"to_bolha")
 
 
 func initiate_state_machine():
@@ -62,13 +62,13 @@ func initiate_state_machine():
 	var walk_state = LimboState.new().named("walk").call_on_enter(walk_start).call_on_update(walk_update)
 	var jump_state = LimboState.new().named("jump").call_on_enter(jump_start).call_on_update(jump_update)
 	var fall_state = LimboState.new().named("fall").call_on_enter(fall_start).call_on_update(fall_update)
-	var attack_state = LimboState.new().named("attack").call_on_enter(attack_start).call_on_update(attack_update)
+	var bolha_state = LimboState.new().named("bolha").call_on_enter(bolha_start).call_on_update(bolha_update)
 	
 	main_sm.add_child(idle_state)
 	main_sm.add_child(walk_state)
 	main_sm.add_child(jump_state)
 	main_sm.add_child(fall_state)
-	main_sm.add_child(attack_state)
+	main_sm.add_child(bolha_state)
 	
 	main_sm.initial_state = idle_state
 
@@ -78,7 +78,7 @@ func initiate_state_machine():
 	main_sm.add_transition(walk_state, jump_state, &"to_jump")
 	main_sm.add_transition(walk_state, fall_state, &"to_fall")
 	main_sm.add_transition(jump_state, fall_state, &"to_fall")
-	main_sm.add_transition(main_sm.ANYSTATE, attack_state, &"to_attack")
+	main_sm.add_transition(main_sm.ANYSTATE, bolha_state, &"to_bolha")
 		
 	main_sm.initialize(self)
 	main_sm.set_active(true)
@@ -117,16 +117,16 @@ func fall_update(delta: float):
 		main_sm.dispatch(&"state_ended")
 
 
-func attack_start():
+func bolha_start():
 	#if transformacaoOn == false and transformado == false:
 	animation.play("Transform")
 	transformado = true
 	transformacaoOn = false
 	#animation.play("Transform")
 	
-func attack_update(delta: float):
+func bolha_update(delta: float):
 	#direction = 1
-	if Input.is_action_just_pressed("attack") and transformado == true and transformacaoOn == false:
+	if Input.is_action_just_pressed("bolha") and transformado == true and transformacaoOn == false:
 		animation.play("Transform2")
 		await animation.animation_finished
 		print("pica")
