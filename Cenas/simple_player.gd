@@ -23,30 +23,17 @@ func _ready():
 	respawn_position = position
 
 func _physics_process(delta: float):
-	print(main_sm.get_active_state())
 	direction = Input.get_axis("ui_left", "ui_right")
-
 	if direction:
 		velocity.x = direction * SPEED
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
-	# Add the gravity.
-	# Handle jump.
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
-		main_sm.dispatch(&"to_jump")
-		
-	#if Input.is_action_just_pressed("attack"):
-	#	main_sm.dispatch(&"to_attack")
-
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-		#main_sm.dispatch(&"to_fall")
-		
-			
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	
-	tranformar()
+	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+		main_sm.dispatch(&"to_jump")
+	if Input.is_action_just_pressed("bolha") and transformacaoOn == true and transformado == false:
+		main_sm.dispatch(&"transformar")
 	flip_sprite(direction)
 	move_and_slide()
 
@@ -56,9 +43,9 @@ func flip_sprite(direction):
 	elif direction == -1:
 		animation_sprite.flip_h = true
 
-func tranformar():
-	if Input.is_action_just_released("bolha") and transformacaoOn == true and transformado == false:
-		main_sm.dispatch(&"to_bolha")
+#func tranformar():
+#	if Input.is_action_just_released("bolha") and transformacaoOn == true and transformado == false:
+#		main_sm.dispatch(&"to_bolha")
 
 
 func initiate_state_machine():
@@ -70,22 +57,26 @@ func initiate_state_machine():
 	var jump_state = LimboState.new().named("jump").call_on_enter(jump_start).call_on_update(jump_update)
 	var fall_state = LimboState.new().named("fall").call_on_enter(fall_start).call_on_update(fall_update)
 	var bolha_state = LimboState.new().named("bolha").call_on_enter(bolha_start).call_on_update(bolha_update)
+
 	
 	main_sm.add_child(idle_state)
 	main_sm.add_child(walk_state)
 	main_sm.add_child(jump_state)
 	main_sm.add_child(fall_state)
 	main_sm.add_child(bolha_state)
+
 	
 	main_sm.initial_state = idle_state
 
 	main_sm.add_transition(idle_state, walk_state, &"to_walk")
 	main_sm.add_transition(main_sm.ANYSTATE, idle_state, &"state_ended")
-	main_sm.add_transition(idle_state, jump_state, &"to_jump")
+	main_sm.add_transition(idle_state, jump_state, &"to_jump")	
 	main_sm.add_transition(walk_state, jump_state, &"to_jump")
 	main_sm.add_transition(walk_state, fall_state, &"to_fall")
 	main_sm.add_transition(jump_state, fall_state, &"to_fall")
-	main_sm.add_transition(main_sm.ANYSTATE, bolha_state, &"to_bolha")
+	main_sm.add_transition(main_sm.ANYSTATE, bolha_state, &"transformar")
+	main_sm.add_transition(bolha_state, main_sm.ANYSTATE, &"destransformar")
+
 		
 	main_sm.initialize(self)
 	main_sm.set_active(true)
@@ -94,28 +85,36 @@ func initiate_state_machine():
 func idle_start():
 	animation.play("Idle")
 	transformacaoOn = true
-	await get_tree().create_timer(5).timeout
 	transformado = false
-			
+
 func idle_update(delta: float):
+			
 	if velocity.x != 0:
 		main_sm.dispatch(&"to_walk")
+	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+		main_sm.dispatch(&"to_jump")
+	if Input.is_action_just_pressed("bolha") and is_on_floor():
+		main_sm.dispatch(&"transformar")
 
 func walk_start():
 	animation.play("Walk")
+	print("tenis")
 func walk_update(delta: float):
 	if velocity.x == 0:
 		main_sm.dispatch(&"state_ended")
 
 func jump_start():
 	velocity.y = JUMP_VELOCITY
+	print("pulo")
 	if velocity.y < 0:
 		animation.play("Jump")
-		
+	
 func jump_update(delta: float):
 	if velocity.y > 0:
 		main_sm.dispatch(&"to_fall")
-		
+	if Input.is_action_just_pressed("bolha") and is_on_floor():
+		main_sm.dispatch(&"transformar")
+
 func fall_start():
 	animation.play("Fall")
 	
@@ -123,24 +122,33 @@ func fall_update(delta: float):
 	if is_on_floor():
 		main_sm.dispatch(&"state_ended")
 
-
 func bolha_start():
-	#if transformacaoOn == false and transformado == false:
 	animation.play("Transform")
+	await animation.animation_finished
+	print("paro")
+	animation.play("Bubble_only")
+	print("test")
 	transformado = true
 	transformacaoOn = false
-	#animation.play("Transform")
-	
+
 func bolha_update(delta: float):
-	#direction = 1
-	if Input.is_action_just_pressed("bolha") and transformado == true and transformacaoOn == false:
+	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+		print("pulando")
+		velocity.y = JUMP_VELOCITY
+	if velocity.x != 0:
+		print("andano")
+	if Input.is_action_just_pressed("bolha") and transformado == true:
 		animation.play("Transform2")
 		await animation.animation_finished
 		print("pica")
 		main_sm.dispatch(&"state_ended")
+
 	#	print(animation.current_animation)
 	
-func damage() -> void:
+
+
+func die() -> void:
+
 	# Exibe um efeito visual ou som de morte, se necessário
 	print("O jogador levou danp") # Exemplo de mensagem para debug
 	# Desativa o controle temporariamente

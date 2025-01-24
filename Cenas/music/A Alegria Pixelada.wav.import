@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bweoc5o508ai7"
+path="res://.godot/imported/A Alegria Pixelada.wav-fb0b78a6984a1a287d898376dc630f98.sample"
+
+[deps]
+
+source_file="res://Cenas/music/A Alegria Pixelada.wav"
+dest_files=["res://.godot/imported/A Alegria Pixelada.wav-fb0b78a6984a1a287d898376dc630f98.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

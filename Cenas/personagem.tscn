@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://Cenas/personagem.gd" id="1_on126"]
 [ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_d5ssy"]
-[ext_resource type="PackedScene" uid="uid://x38jbtnyjaxm" path="res://Cenas/Super_bubble.tscn" id="2_qdoiw"]
 [ext_resource type="Script" path="res://Cenas/textura.gd" id="3_xgj63"]
+[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="4_1cpgl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -63,6 +63,7 @@ tracks/3/keys = {
 [sub_resource type="Animation" id="Animation_pwxfo"]
 resource_name = "Bubble_only"
 length = 0.6
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -544,11 +545,12 @@ _data = {
 "Walk": SubResource("Animation_ksl43")
 }
 
-[node name="Personagem" type="CharacterBody2D"]
+[node name="Personagem" type="CharacterBody2D" node_paths=PackedStringArray("ambiente")]
 script = ExtResource("1_on126")
 speed = 100
 jump_speed = -320
 player_gravity = 600
+ambiente = NodePath("AudioStreamPlayer")
 
 [node name="Animacao" type="AnimationPlayer" parent="."]
 libraries = {
@@ -562,7 +564,6 @@ frame = 36
 script = ExtResource("3_xgj63")
 player = NodePath("..")
 animation = NodePath("../Animacao")
-super_scene = ExtResource("2_qdoiw")
 
 [node name="Colisao" type="CollisionShape2D" parent="."]
 position = Vector2(-1, 15)
@@ -571,6 +572,11 @@ shape = SubResource("RectangleShape2D_kadp1")
 [node name="Camera" type="Camera2D" parent="."]
 limit_bottom = 100
 drag_horizontal_enabled = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_1cpgl")
+volume_db = -24.0
+autoplay = true
 
 [connection signal="animation_finished" from="Animacao" to="." method="_on_animation_finished"]
 [connection signal="animation_finished" from="Animacao" to="Textura" method="_on_animacao_animation_finished"]
