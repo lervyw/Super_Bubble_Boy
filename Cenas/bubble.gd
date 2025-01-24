@@ -6,12 +6,11 @@ extends CharacterBody2D
 @export var player_gravity: int
 @export var respawn_position: Vector2
 #@onready var Super_Bubble = "res://Cenas/Super_bubble.tscn"
-#@export var super_scene: Resource  # Aqui você associa "super.tscn" pelo editor
+@onready var Super_Bubble_scene: PackedScene = preload("res://Cenas/Super_bubble.tscn")
+@export var super_scene: Resource  # Aqui você associa "super.tscn" pelo editor
 var estado: int =0
 var transformando: bool = false
-var transformando_super: bool
 var jump_count: int
-
 
 
 func _physics_process(delta: float) -> void:
@@ -23,9 +22,7 @@ func _physics_process(delta: float) -> void:
 	Player_sprite.animate(velocity)
 	print("estado: ", Player_sprite.estado)
 	print("esta transformando em tex: ", Player_sprite.transformacaoOn)
-	print("esta transformando super: ",transformando_super)
 	print("esta transformando em player: ",transformando, "\n")
-	
 func horizontal_moviment_env() -> void:
 	var input_direction: float = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 	velocity.x = input_direction * speed
@@ -37,54 +34,41 @@ func vertical_moviment_env() -> void:
 		if estado == 0:
 			jump_count += 1
 			velocity.y = jump_speed
-		elif estado == 1:
+		else:
 			velocity.y = jump_speed
-		
 	#print(velocity)
 	#print(velocity)
 func trans() -> void:
 	
-	if Input.is_action_just_pressed("forma1") and not transformando and not transformando_super :
+	if Input.is_action_just_pressed("forma1") and not transformando :
 		transformando1()
-		#set_physics_process(false)
+		
 	if Input.is_action_just_pressed("forma2") and not transformando :
 		transformando2()
-		#set_physics_process(false)
+		transformando = true
 		
 		
 func transformando1():
 	
 	if estado == 1:
-		Player_sprite.animation.play("Transform2")
-		
-		transformando = true
-		Player_sprite.transformacaoOn  = true	
-		#Player_sprite.
-		estado = 0
+		Player_sprite.voltar()
 	elif estado == 0:
-		Player_sprite.animation.play("Transform")
 		transformando = true
 		Player_sprite.transformacaoOn  = true	
-		estado = 1
 			#Player_sprite.estado = 0
 func transformando2():
-	#var super_scene_instance = super_scene.
-	transformando_super  = true
-	if estado == 1:
-		Player_sprite.animation.play("Transform3")
-		#Player_sprite.
-		estado = 3
-	elif estado == 0 and transformando_super == true:
-		Player_sprite.animation.play("Transform3")
-		estado = 3
-	#super_scene_instance.position = self.position
-	#get_parent().add_child(super_scene_instance)
-	#queue_free()
-	#estado = 3
-	#Player_sprite.animation.play("Transform3")
-		#transformando = true
-		#Player_sprite.transformacaoOn  = true	
-		
+	pass
+func voltar():
+	
+	if 	transformando == true and Player_sprite.transformacaoOn == true:
+		Player_sprite.animation.play("Transform2")
+		transformando = false
+		Player_sprite.transformacaoOn  = false
+		estado = 0
+		speed = 100
+		jump_speed = -320
+		player_gravity = 600	
+	
 		
 func gravity(delta: float) -> void:
 	velocity.y += delta * player_gravity
@@ -102,6 +86,8 @@ func die() -> void:
 	position = respawn_position
 	# Reativa o controle
 	set_physics_process(true)
+
+
 
 
 #func _on_animation_finished(anim_name: StringName) -> void:

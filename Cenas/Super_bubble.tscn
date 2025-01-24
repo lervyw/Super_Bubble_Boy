@@ -1,27 +1,27 @@
-[gd_scene load_steps=17 format=3 uid="uid://cyh3wd0bwwr2n"]
+[gd_scene load_steps=15 format=3 uid="uid://x38jbtnyjaxm"]
 
-[ext_resource type="Script" path="res://Cenas/personagem.gd" id="1_on126"]
-[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_d5ssy"]
-[ext_resource type="PackedScene" uid="uid://x38jbtnyjaxm" path="res://Cenas/Super_bubble.tscn" id="2_qdoiw"]
-[ext_resource type="Script" path="res://Cenas/textura.gd" id="3_xgj63"]
+[ext_resource type="Script" path="res://Cenas/super_bubble.gd" id="1_6puua"]
+[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_piyl3"]
+[ext_resource type="Script" path="res://Cenas/textura_super.gd" id="3_donw4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
-size = Vector2(19, 32)
+size = Vector2(39, 62)
 
 [sub_resource type="Animation" id="Animation_xbftm"]
 resource_name = "Born"
-length = 0.6
+length = 0.5
+loop_mode = 2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
+tracks/0/path = NodePath("Textura_super:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.133333, 0.233333, 0.333333, 0.433333),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 1,
-"values": [30, 31, 32, 33, 34, 35]
+"values": [1, 2, 3, 4, 5]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -45,7 +45,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.133333, 0.233333, 0.333333, 0.433333),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(7, 7), Vector2(12, 14), Vector2(19, 19), Vector2(19, 20), Vector2(19, 33)]
+"values": [Vector2(14, 13), Vector2(19, 20), Vector2(19, 19), Vector2(19, 20), Vector2(19, 33)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -54,26 +54,27 @@ tracks/3/path = NodePath("Colisao:position")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.233333, 0.333333, 0.433333, 0.533333),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.133333, 0.233333, 0.333333, 0.433333),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(-0.5, 9.5), Vector2(-1, 10), Vector2(-0.75, 10.25), Vector2(-1, 11), Vector2(-1, 16), Vector2(-1, 16)]
+"values": [Vector2(0, -7), Vector2(0, -7), Vector2(0, -6.5), Vector2(0, -7), Vector2(0, -1)]
 }
 
 [sub_resource type="Animation" id="Animation_pwxfo"]
 resource_name = "Bubble_only"
-length = 0.6
+length = 0.5
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
+tracks/0/path = NodePath("Textura_super:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.233333, 0.466667),
+"times": PackedFloat32Array(0, 0.166667, 0.333333),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [52, 53, 54]
+"values": [23, 24, 25]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -82,7 +83,7 @@ tracks/1/path = NodePath("Colisao:shape")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.5),
+"times": PackedFloat32Array(0, 0.333333),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1")]
@@ -94,10 +95,10 @@ tracks/2/path = NodePath("Colisao:shape:size")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.266667, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0, 0.166667),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(19, 21.5), Vector2(19, 20.5), Vector2(19, 21.2143)]
+"values": [Vector2(19, 21.5), Vector2(19, 20.5)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -106,10 +107,10 @@ tracks/3/path = NodePath("Colisao:position")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.266667, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0, 0.333333),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(-1, 9), Vector2(-1, 10), Vector2(-1, 9)]
+"values": [Vector2(0, -6.75), Vector2(0, -6.5)]
 }
 
 [sub_resource type="Animation" id="Animation_6q54a"]
@@ -119,14 +120,14 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
+tracks/0/path = NodePath("Textura_super:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.133333),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [44, 45]
+"values": [28, 29]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -150,7 +151,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(19, 31)]
+"values": [Vector2(27, 63)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -162,24 +163,24 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, 16)]
+"values": [Vector2(-2.5, 0.5)]
 }
 
 [sub_resource type="Animation" id="Animation_xymsx"]
 resource_name = "Idle"
-length = 0.4
+length = 0.5
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
+tracks/0/path = NodePath("Textura_super:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.233333),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [36, 37]
+"values": [16, 17]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -191,7 +192,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(19, 32)]
+"values": [Vector2(27, 65)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -203,7 +204,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, 16)]
+"values": [Vector2(-1.5, -0.5)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -220,18 +221,18 @@ tracks/3/keys = {
 
 [sub_resource type="Animation" id="Animation_3wnyl"]
 resource_name = "Jump"
-length = 0.5
+length = 0.3
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
+tracks/0/path = NodePath("Textura_super:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.166667),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [42, 43]
+"values": [26, 27]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -243,7 +244,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(14, 29.5)]
+"values": [Vector2(27, 60)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -255,7 +256,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(-1, 17)]
+"values": [Vector2(-2.5, 2)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -275,14 +276,14 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
+tracks/0/path = NodePath("Textura_super:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [36]
+"values": [17]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -306,7 +307,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(19, 32)]
+"values": [Vector2(39, 62)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -318,7 +319,31 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(-1, 15)]
+"values": [Vector2(-1.5, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Textura_super:texture")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("2_piyl3")]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Textura_super:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_4mgx1"]
@@ -327,14 +352,14 @@ length = 0.7
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
+tracks/0/path = NodePath("Textura_super:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [46, 47, 48, 49, 50, 51, 52]
+"values": [17, 18, 19, 20, 21, 22, 23]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -370,7 +395,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.7),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(-1, 16), Vector2(-1, 10)]
+"values": [Vector2(0, 0), Vector2(0, -6)]
 }
 
 [sub_resource type="Animation" id="Animation_7mbvf"]
@@ -379,14 +404,14 @@ length = 0.7
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
+tracks/0/path = NodePath("Textura_super:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [52, 51, 50, 49, 48, 47, 46]
+"values": [23, 22, 21, 20, 19, 18, 17]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -410,7 +435,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(19, 19), Vector2(19, 24.5), Vector2(19, 27.875), Vector2(19, 32), Vector2(19, 34), Vector2(19, 31.875), Vector2(19, 31.5)]
+"values": [Vector2(19, 19), Vector2(19, 19), Vector2(19, 19.75), Vector2(19, 20), Vector2(19, 20), Vector2(19, 25.75), Vector2(19, 31.5)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -422,76 +447,24 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0, 9), Vector2(-5.96046e-08, 11.75), Vector2(-1, 14.0625), Vector2(0, 16), Vector2(0, 15), Vector2(-1, 16.0625), Vector2(-1, 16)]
-}
-
-[sub_resource type="Animation" id="Animation_st8up"]
-resource_name = "Transform3"
-length = 1.6
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0.2),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0.2, 0.9, 1, 1.2, 1.33333),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(17, 29.5), Vector2(17, 32.75), Vector2(17, 40.75), Vector2(17, 55.75), Vector2(24, 61.75)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0.2, 0.9, 1, 1.2, 1.33333),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(0, 16), Vector2(0, 14.375), Vector2(0, 10.375), Vector2(0, 2.875), Vector2(-2, -0.125)]
+"values": [Vector2(0, -6), Vector2(0, -6), Vector2(0, -6.875), Vector2(0, -7), Vector2(0, -7), Vector2(0, -6.5), Vector2(0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_ksl43"]
 resource_name = "Walk"
-length = 0.4
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Textura:frame")
+tracks/0/path = NodePath("Textura_super:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [38, 39, 40, 41]
+"values": [18, 19, 20, 21, 22, 23]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -515,7 +488,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(17, 29.5)]
+"values": [Vector2(35.25, 61)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -527,7 +500,31 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, 16)]
+"values": [Vector2(-4, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Textura_super:texture")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("2_piyl3")]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Textura_super:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]
@@ -540,12 +537,11 @@ _data = {
 "RESET": SubResource("Animation_5o1sk"),
 "Transform": SubResource("Animation_4mgx1"),
 "Transform2": SubResource("Animation_7mbvf"),
-"Transform3": SubResource("Animation_st8up"),
 "Walk": SubResource("Animation_ksl43")
 }
 
-[node name="Personagem" type="CharacterBody2D"]
-script = ExtResource("1_on126")
+[node name="Super" type="CharacterBody2D"]
+script = ExtResource("1_6puua")
 speed = 100
 jump_speed = -320
 player_gravity = 600
@@ -555,17 +551,16 @@ libraries = {
 "": SubResource("AnimationLibrary_1mgau")
 }
 
-[node name="Textura" type="Sprite2D" parent="." node_paths=PackedStringArray("player", "animation")]
-texture = ExtResource("2_d5ssy")
+[node name="Textura_super" type="Sprite2D" parent="." node_paths=PackedStringArray("player", "animation")]
+texture = ExtResource("2_piyl3")
 hframes = 55
-frame = 36
-script = ExtResource("3_xgj63")
+frame = 17
+script = ExtResource("3_donw4")
 player = NodePath("..")
 animation = NodePath("../Animacao")
-super_scene = ExtResource("2_qdoiw")
 
 [node name="Colisao" type="CollisionShape2D" parent="."]
-position = Vector2(-1, 15)
+position = Vector2(-1.5, 1)
 shape = SubResource("RectangleShape2D_kadp1")
 
 [node name="Camera" type="Camera2D" parent="."]
@@ -573,4 +568,4 @@ limit_bottom = 100
 drag_horizontal_enabled = true
 
 [connection signal="animation_finished" from="Animacao" to="." method="_on_animation_finished"]
-[connection signal="animation_finished" from="Animacao" to="Textura" method="_on_animacao_animation_finished"]
+[connection signal="animation_finished" from="Animacao" to="Textura_super" method="_on_animacao_animation_finished"]
