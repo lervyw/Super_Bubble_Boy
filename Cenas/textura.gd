@@ -1,12 +1,12 @@
 # Script do Sprite2D para animações
-#textura
 extends Sprite2D
 @export var player: Node
 @export var animation: AnimationPlayer
 var transformacaoOn: bool
 var estado: int =0
-var form: String = "normal"  # Formas: "normal", "bubble"
-@export var super_scene: PackedScene
+#var form: String = "normal"  # Formas: "normal", "bubble"
+var super_bubble = preload("res://Cenas/Super_bubble.tscn").instantiate()
+#@export var super_scene: PackedScene
 
 func animate(direction: Vector2) -> void:
 	
@@ -104,8 +104,9 @@ func _on_animacao_animation_finished(anim_name: StringName) -> void:
 			print(estado)
 			#player.set_physics_process(true)
 		"Transform3":
-			estado = 0
+			
 			player.transformando_super = false
+			player.delete()
 			print("penis")
 			
 			# _instantiate_super_bubble()
