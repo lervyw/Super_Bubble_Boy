@@ -544,7 +544,7 @@ _data = {
 "Walk": SubResource("Animation_ksl43")
 }
 
-[node name="Personagem" type="CharacterBody2D" node_paths=PackedStringArray("animation", "animation_sprite")]
+[node name="Personagem" type="CharacterBody2D" node_paths=PackedStringArray("animation", "animation_sprite") groups=["player"]]
 script = ExtResource("1_vnwna")
 animation = NodePath("Animacao")
 animation_sprite = NodePath("Textura")

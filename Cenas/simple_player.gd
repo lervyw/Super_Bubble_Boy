@@ -103,14 +103,14 @@ func idle_update(delta: float):
 
 func walk_start():
 	animation.play("Walk")
-	print("tenis")
+	print("walk_start")
 func walk_update(delta: float):
 	if velocity.x == 0:
 		main_sm.dispatch(&"state_ended")
 
 func jump_start():
 	velocity.y = JUMP_VELOCITY
-	print("pulo")
+	print("jump_start")
 	if velocity.y < 0:
 		animation.play("Jump")
 	
@@ -130,22 +130,22 @@ func fall_update(delta: float):
 func bolha_start():
 	animation.play("Transform")
 	await animation.animation_finished
-	print("paro")
+	print("bolha_start")
 	animation.play("Bubble_only")
-	print("test")
 	transformado = true
 	transformacaoOn = false
+	print("transformado:true transformacaoOn: false")
 
 func bolha_update(delta: float):
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
-		print("pulando")
+		print("bolha update")
 		velocity.y = JUMP_VELOCITY
 	if velocity.x != 0:
-		print("andano")
+		print("bolha update walk")
 	if Input.is_action_just_pressed("bolha") and transformado == true:
 		animation.play("Transform2")
 		await animation.animation_finished
-		print("pica")
+		print("bolha update transform2")
 		main_sm.dispatch(&"state_ended")
 
 	#	print(animation.current_animation)
