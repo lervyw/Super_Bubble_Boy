@@ -115,10 +115,8 @@ func delete():
 	get_parent().add_child(Player_sprite.super_bubble)
 	#get_tree().root.add_child(Player_sprite.super_bubble)
 	self.queue_free()
-	
-	
-	
-#func _on_animation_finished(anim_name: StringName) -> void:
-#	if (anim_name == "Walk"):
-###		print("gay")
-#		pass # Replace with function body.
+
+func knockback(direction: int = -1): # O parâmetro `direction` indica para onde o jogador será empurrado (-1 para esquerda, 1 para direita)
+	var knockback_force: Vector2 = Vector2(direction * 800, -800) # Para trás na direção X e para cima na direção Y
+	velocity += knockback_force # Adiciona a força de knockback à velocidade atual
+	move_and_slide()

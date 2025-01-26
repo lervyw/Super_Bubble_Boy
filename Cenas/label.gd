@@ -1,13 +1,23 @@
-extends Label
+extends Node
 
-# Conectando o sinal no _ready
+@export var label: Label
+const MAX_HEALTH = 3
+var health := MAX_HEALTH
+
+
 func _ready() -> void:
-	# Verificando se o nó do jogador existe no caminho correto
-	var player = get_parent().get_node("flopster")  # Certifique-se de que o caminho está correto
-	if player:
-		# Conectando o sinal 'change_life' ao método '_on_life_changed' com Callable
-		player.connect("change_life", Callable(self, "_on_life_changed"))
+	set_health_label()
 
-# Método que atualiza o texto da Label com a nova quantidade de vidas
-func _on_life_changed(new_life: int) -> void:
-	text = "Vidas: %d" % new_life  # Atualiza o texto com a nova quantidade de vidas
+
+func set_health_label() -> void:
+	label.text = "LIFE IS: %s" % health
+
+func damage() -> void:
+	health -= 1
+	if health < 0:
+		health = MAX_HEALTH
+	set_health_label()
+	
+func restore() -> void:
+	health = 3
+	set_health_label()

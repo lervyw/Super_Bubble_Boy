@@ -155,6 +155,7 @@ func die() -> void: # metodo de morte do player
 	set_physics_process(false)
 	position = respawn_position
 	animation.play("Transform2")
+	player_health = 3
 	await animation.animation_finished
 	set_physics_process(true)
 	
@@ -168,10 +169,10 @@ func take_damage(amount: int): #metodo para o player levar dano
 	if player_health <= 0:
 		die()
 	
-#func knockback():
-	#var knockback_force: Vector2 = Vector2(-200, 200)
-	#velocity = knockback_force
-	#move_and_slide()
+func knockback(direction: int = -1): # O parâmetro `direction` indica para onde o jogador será empurrado (-1 para esquerda, 1 para direita)
+	var knockback_force: Vector2 = Vector2(direction * 800, -800) # Para trás na direção X e para cima na direção Y
+	velocity += knockback_force # Adiciona a força de knockback à velocidade atual
+	move_and_slide()
 
 
 func _on_area_2d_body_entered(body: Node2D) -> void:

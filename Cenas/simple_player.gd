@@ -6,6 +6,7 @@ extends CharacterBody2D
 @export var max_health := 3
 @export var is_invencible := false
 @export var lose_control := false
+@export var hud: CanvasLayer
 
 const SPEED = 160.0
 const JUMP_VELOCITY = -400.0
@@ -154,6 +155,7 @@ func take_damage(amount: int): #metodo para o player levar dano
 	lose_control = false
 	
 	player_health -= 1
+	hud.damage()
 	print("o jogador está com: ", player_health, " Vidas")
 	
 	if player_health <= 0:
@@ -174,6 +176,8 @@ func die() -> void:
 	# Restaura a posição inicial ou posição de respawn
 	position = respawn_position
 	animation.play("Transform2")
+	player_health = 3
+	hud.restore()
 	await animation.animation_finished
 	# Reativa o controle
 	set_physics_process(true)
