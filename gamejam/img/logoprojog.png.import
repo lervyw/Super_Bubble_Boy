@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blov3p54q6huf"
-path="res://.godot/imported/pino.png-65f06eced4dd638402130aab99509e43.ctex"
+uid="uid://dycq2nx5j5aj6"
+path="res://.godot/imported/logoprojog.png-89875f192bcfb13c3d2e35db68d69e0b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://gamejam/pino.png"
-dest_files=["res://.godot/imported/pino.png-65f06eced4dd638402130aab99509e43.ctex"]
+source_file="res://gamejam/img/logoprojog.png"
+dest_files=["res://.godot/imported/logoprojog.png-89875f192bcfb13c3d2e35db68d69e0b.ctex"]
 
 [params]
 

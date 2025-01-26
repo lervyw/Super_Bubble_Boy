@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://cke6lmawaog3o"]
+
+[ext_resource type="Texture2D" uid="uid://uuklv6teya1e" path="res://gamejam/img/LogoPrincipal.png" id="1_wobgl"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchor_left = -0.937
+anchor_right = 3.811
+anchor_bottom = 5.761
+offset_left = 299.84
+offset_right = -201.52
+offset_bottom = 0.0200195
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_wobgl")
+expand_mode = 1
+stretch_mode = 3

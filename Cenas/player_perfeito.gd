@@ -1,12 +1,13 @@
 extends CharacterBody2D
 #personagem 
-@onready var Player_sprite: Sprite2D = get_node("Textura")
-@export var speed: int
-@export var jump_speed: int
-@export var player_gravity: int
+@onready var Player_sprite: Sprite2D = get_node("Tex")
+@export var pai: Node
+var speed: int = 100
+var jump_speed: int = -320
+var player_gravity: int = 600
 @export var respawn_position: Vector2
 @export var ambiente: AudioStreamPlayer
-var estado: int =0
+#var estado: int = 0
 var transformando: bool = false
 var transformando_super: bool
 var jump_count: int
@@ -15,7 +16,7 @@ var jump_count: int
 
 func _physics_process(delta: float) -> void:
 	trans()	
-	tocar()
+
 	horizontal_moviment_env()
 	vertical_moviment_env()
 	gravity(delta)
@@ -25,19 +26,19 @@ func _physics_process(delta: float) -> void:
 	#print("esta transformando em tex: ", Player_sprite.transformacaoOn)
 	#print("esta transformando super: ",transformando_super)
 	#print("esta transformando em player: ",transformando, "\n")
-	print(" caminho ", self.get_path(), " estado ", estado)
+	print("no ", self.name, " caminho ", self.get_path())
 func horizontal_moviment_env() -> void:
 	var input_direction: float = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 	velocity.x = input_direction * speed
 
 func vertical_moviment_env() -> void:
-	if is_on_floor():
+	if is_on_floor() and pai.estado == 0:
 		jump_count = 1
 	if Input.is_action_just_pressed("ui_select") and jump_count < 2:
-		if estado == 0:
+		if pai.estado == 0:
 			jump_count += 1
 			velocity.y = jump_speed
-		elif estado == 1:
+		elif pai.estado == 1:
 			velocity.y = jump_speed
 		
 	#print(velocity)
@@ -54,18 +55,18 @@ func trans() -> void:
 		
 func transformando1():
 	
-	if estado == 1:
+	if pai.estado == 1:
 		Player_sprite.animation.play("Transform2")
 		
 		transformando = true
 		Player_sprite.transformacaoOn  = true	
 		#Player_sprite.
-		estado = 0
-	elif estado == 0:
+		pai.estado = 0
+	elif pai.estado == 0:
 		Player_sprite.animation.play("Transform")
 		transformando = true
 		Player_sprite.transformacaoOn  = true	
-		estado = 1
+		pai.estado = 1
 			#Player_sprite.estado = 0
 func transformando2():
 	#var super_scene_instance = super_scene.
@@ -86,11 +87,7 @@ func transformando2():
 	#Player_sprite.animation.play("Transform3")
 		#transformando = true
 		#Player_sprite.transformacaoOn  = true	
-func tocar():
-	#var audio_player = AudioStreamPlayer.new()
-	#audio_player.stream = music
-	#get_parent().add_child(audio_player)
-	ambiente.playing 	
+
 		
 func gravity(delta: float) -> void:
 	velocity.y += delta * player_gravity
@@ -109,7 +106,7 @@ func die() -> void:
 	# Reativa o controle
 	set_physics_process(true)
 
-func delete():
+#func delete():
 	#Player_sprite.super_bubble.transform = self.transform
 	Player_sprite.super_bubble.transform = self.transform
 	get_parent().add_child(Player_sprite.super_bubble)

@@ -1,12 +1,12 @@
 # Script do Sprite2D para animações
 extends Sprite2D
-@export var pai2: Node
+@export var pai: Node
 @export var player: Node
 @export var animation: AnimationPlayer
 var transformacaoOn: bool
 var estado: int =0
-var form: String = "normal"  # Formas: "normal", "bubble"
-var normal_bubble = preload("res://Cenas/personagem.tscn").instantiate()
+#var form: String = "normal"  # Formas: "normal", "bubble"
+var super_bubble = preload("res://Cenas/Super_bubble.tscn").instantiate()
 #@export var super_scene: PackedScene
 
 func animate(direction: Vector2) -> void:
@@ -14,14 +14,14 @@ func animate(direction: Vector2) -> void:
 	verify_position(direction)
 	if player.transformando_super  == true:
 		animation.play("Transform3")
-	elif player.transformando and transformacaoOn and estado == 0 and not player.transformando_super:
+	elif player.transformando and transformacaoOn and pai.estado == 0 and not player.transformando_super:
 		animation.play("Transform")
 		#set_physics_process(false)
 
 	
 	elif  direction.y != 0 and estado == 0:
 		vertical_behavior(direction)
-	elif pai2.estado == 0:
+	elif estado == 0:
 		horizontal_behavior(direction)
 	
 	#
@@ -102,15 +102,14 @@ func _on_animacao_animation_finished(anim_name: StringName) -> void:
 			estado = 0
 			voltar()	
 			print(transformacaoOn)
-			print(pai2.estado)
+			print(estado)
 			#player.set_physics_process(true)
 		"Transform3":
-			print("penis")
+			
 			player.transformando_super = false
-		
-			player.delete()
-			
-			
+			#player.delete()
+			pai.mudar()
+			print("penis")
 			
 			# _instantiate_super_bubble()
 			#pass

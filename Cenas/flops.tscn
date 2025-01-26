@@ -1,22 +1,22 @@
-[gd_scene load_steps=5 format=4 uid="uid://bd04djp2xqdt4"]
+[gd_scene load_steps=5 format=4 uid="uid://bieqx6hoegb5e"]
 
-[ext_resource type="PackedScene" uid="uid://bef0sp8en86j5" path="res://Cenas/tilemerda.tscn" id="1_fgodj"]
-[ext_resource type="PackedScene" uid="uid://b4c0go7txpq08" path="res://Cenas/player.tscn" id="2_8xgyn"]
-[ext_resource type="PackedScene" uid="uid://d08t5t7tudtpk" path="res://Cenas/spikes_area.tscn" id="3_a7jvm"]
-[ext_resource type="PackedScene" uid="uid://4v1mv6nx587x" path="res://Cenas/hud.tscn" id="5_sm12l"]
+[ext_resource type="PackedScene" uid="uid://bef0sp8en86j5" path="res://Cenas/tilemerda.tscn" id="1_gy2uc"]
+[ext_resource type="PackedScene" uid="uid://b4c0go7txpq08" path="res://Cenas/player.tscn" id="2_ytit0"]
+[ext_resource type="PackedScene" path="res://Cenas/spikes_area.tscn" id="3_jgpdh"]
+[ext_resource type="PackedScene" uid="uid://4v1mv6nx587x" path="res://Cenas/hud.tscn" id="4_6t1ir"]
 
 [node name="Node2D2" type="Node2D"]
 
-[node name="Tilemerda" parent="." instance=ExtResource("1_fgodj")]
+[node name="Tilemerda" parent="." instance=ExtResource("1_gy2uc")]
 tile_map_data = PackedByteArray("AAD4/wEAAAAAAAAAAAD5/wEAAAAAAAAAAAD6/wEAAAAAAAAAAAD7/wEAAAAAAAAAAAD8/wEAAAAAAAAAAAD9/wEAAAAAAAAAAAD+/wEAAAAAAAAAAAD//wEAAAAAAAAAAAAAAAEAAAAAAAAAAAABAAEAAAAAAAAAAAACAAEAAAAAAAAAAAADAAEAAAAAAAAAAAAEAAEAAAAAAAAAAAAFAAEAAAAAAAAAAAAGAAEAAAAAAAAAAAAHAAEAAAAAAAAAAAAIAAEAAAAAAAAAAAAJAAEAAAAAAAAAAAAKAAEAAAAAAAAAAAALAAEAAAAAAAAAAAALAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAMAP//AAAAAAAAAAD2//X/AAAAAAAAAAD2//b/AAAAAAAAAAD2//f/AAAAAAAAAAD2//j/AAAAAAAAAAD2//n/AAAAAAAAAAD2//r/AAAAAAAAAAD2//v/AAAAAAAAAAD2//z/AAAAAAAAAAD2//3/AAAAAAAAAAD2//7/AAAAAAAAAAD2////AAAAAAAAAAD2/wAAAAAAAAAAAAD2/wEAAAAAAAAAAAD3/wEAAAAAAAAAAAANAP//AAAAAAAAAAAOAP//AAAAAAAAAAAPAP//AAAAAAAAAAAQAP//AAAAAAAAAAARAP//AAAAAAAAAAASAP//AAAAAAAAAAATAP//AAAAAAAAAAAUAP//AAAAAAAAAAAUAP7/AAAAAAAAAAAVAP7/AAAAAAAAAAAWAP7/AAAAAAAAAAAXAP7/AAAAAAAAAAAYAP7/AAAAAAAAAAAZAP7/AAAAAAAAAAAaAP7/AAAAAAAAAAAbAP7/AAAAAAAAAAAcAP7/AAAAAAAAAAAdAP7/AAAAAAAAAAAeAP7/AAAAAAAAAAAfAP7/AAAAAAAAAAAgAP7/AAAAAAAAAAAhAP7/AAAAAAAAAAAMAP7/AAAAAAAAAAAMAP3/AAAAAAAAAAAMAPz/AAAAAAAAAAAMAPv/AAAAAAAAAAANAPv/AAAAAAAAAAAOAPv/AAAAAAAAAAAOAPz/AAAAAAAAAAAOAP3/AAAAAAAAAAAOAP7/AAAAAAAAAAANAPz/AAAAAAAAAAANAP3/AAAAAAAAAAANAP7/AAAAAAAAAAALAP7/AAAAAAAAAAAKAP//AAAAAAAAAAAKAAAAAAAAAAAAAAALAP//AAAAAAAAAAALAPz/AAAAAAAAAAALAP3/AAAAAAAAAAAKAP7/AAAAAAAAAAAJAP//AAAAAAAAAAAJAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAANAPr/AAAAAAAAAAAOAPr/AAAAAAAAAAAPAPr/AAAAAAAAAAAPAPv/AAAAAAAAAAAPAPz/AAAAAAAAAAAPAP3/AAAAAAAAAAAPAP7/AAAAAAAAAAAOAPn/AAAAAAAAAAAPAPn/AAAAAAAAAAAiAP7/AAAAAAAAAAAjAP7/AAAAAAAAAAAkAP7/AAAAAAAAAAAlAP7/AAAAAAAAAAAmAP7/AAAAAAAAAAAnAP7/AAAAAAAAAAAoAP7/AAAAAAAAAAApAP7/AAAAAAAAAAAqAP7/AAAAAAAAAAArAP7/AAAAAAAAAAAsAP7/AAAAAAAAAAAtAP7/AAAAAAAAAAAuAP7/AAAAAAAAAAAvAP7/AAAAAAAAAAAwAP7/AAAAAAAAAAA=")
 
-[node name="Personagem" parent="." instance=ExtResource("2_8xgyn")]
+[node name="Personagem" parent="." instance=ExtResource("2_ytit0")]
 position = Vector2(14, -34)
 player_health = null
 max_health = null
 
-[node name="SpikesArea" parent="." instance=ExtResource("3_a7jvm")]
+[node name="SpikesArea" parent="." instance=ExtResource("3_jgpdh")]
 
-[node name="HUD" parent="." instance=ExtResource("5_sm12l")]
+[node name="HUD" parent="." instance=ExtResource("4_6t1ir")]
 
 [editable path="HUD"]
