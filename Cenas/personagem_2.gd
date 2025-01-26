@@ -70,6 +70,11 @@ func transformando1():
 		transformando = true
 		Player_sprite.transformacaoOn  = true	
 		estado = 1
+	elif estado == 2:
+		Player_sprite.animation.play("Transform2")
+		transformando = true
+		Player_sprite.transformacaoOn  = true	
+		estado = 0
 			#Player_sprite.estado = 0
 func transformando2():
 	#var super_scene_instance = super_scene.
@@ -88,7 +93,9 @@ func transformando2():
 		estado = 2
 	elif estado == 2:
 		Player_sprite.animation.play("Transform2")
-		transformando_super  = false
+		transformando_super  = true
+		transformando = true
+		Player_sprite.transformacaoOn  = true	
 		estado = 0
 	
 	

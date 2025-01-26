@@ -75,10 +75,6 @@ nivel = NodePath("..")
 
 [node name="ParallaxBackground" parent="." instance=ExtResource("3_itj36")]
 
-[node name="saida" parent="." instance=ExtResource("4_cjrcr")]
-position = Vector2(435, 286)
-
-[node name="CollisionShape2D" parent="saida" index="0"]
-position = Vector2(-17590.8, 358.971)
-
-[editable path="saida"]
+[node name="saida" parent="." node_paths=PackedStringArray("pai") instance=ExtResource("4_cjrcr")]
+position = Vector2(465, 540)
+pai = NodePath("..")

@@ -7,7 +7,7 @@
 [ext_resource type="AudioStream" uid="uid://mvgqdg00a8pk" path="res://Cenas/music/Fabula-Herois-Tenebrosi.wav" id="5_46rfv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
-size = Vector2(19, 21.5)
+size = Vector2(19, 32)
 
 [sub_resource type="Animation" id="Animation_xbftm"]
 resource_name = "Born"

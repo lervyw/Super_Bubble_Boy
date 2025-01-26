@@ -25,10 +25,7 @@ func animate(direction: Vector2) -> void:
 	
 		
 		
-	if estado == 1 : 
-		player.speed = 50
-		player.jump_speed = -50
-		player.player_gravity = 50			
+			
 		
 		
 	
@@ -71,13 +68,20 @@ func voltar():
 		player.transformando = false
 		transformacaoOn  = false
 	
-	
-	player.speed = 100
-	player.jump_speed = -320
-	player.player_gravity = 600
-	
-
-	
+	if(estado == 0):
+		player.speed = 100
+		player.jump_speed = -320
+		player.player_gravity = 600
+	elif(estado == 1):
+		player.speed = 50
+		player.jump_speed = -50
+		player.player_gravity = 50	
+	elif(estado == 2):
+		player.speed = 100
+		player.jump_speed = -320
+		player.player_gravity = 600
+	elif(estado == 2):
+		estado = 0
 
 func _on_animacao_animation_finished(anim_name: StringName) -> void:
 	match anim_name:
