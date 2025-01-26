@@ -24,11 +24,6 @@ window/size/viewport_height=280
 window/size/mode=2
 window/stretch/mode="viewport"
 
-[global_group]
-
-enemy=""
-player=""
-
 [input]
 
 ui_accept={

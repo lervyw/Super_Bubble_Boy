@@ -172,3 +172,8 @@ func take_damage(amount: int): #metodo para o player levar dano
 	#var knockback_force: Vector2 = Vector2(-200, 200)
 	#velocity = knockback_force
 	#move_and_slide()
+
+
+func _on_area_2d_body_entered(body: Node2D) -> void:
+	if body.is_in_group("enemy"):
+		queue_free()

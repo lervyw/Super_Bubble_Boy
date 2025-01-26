@@ -22,6 +22,7 @@ func get_enemy_node():
 			while !agent.check_for_self(nodes.front()):
 				nodes.shuffle()
 			return nodes.front()
+
 func get_player_node():
 	var nodes: Array[Node] = agent.get_tree().get_nodes_in_group(group)
 	return nodes[0]

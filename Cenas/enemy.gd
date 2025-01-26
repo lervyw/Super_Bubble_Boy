@@ -18,25 +18,39 @@ func move(dir, speed):
 	handle_animation()
 	update_flip(dir)
 
-
 func update_flip(dir):
 	if abs(dir) == dir:
 		animation_sprite.flip_h = true
 	else:
 		animation_sprite.flip_h = false
 		
-
 func handle_animation():
 	if !is_on_floor():
 		animation_sprite.play("fall")
 		
-		if velocity.x != 0:
-			animation_sprite.play("walk")
-		else:
-			animation_sprite.play("idle")
+	if velocity.x != 0:
+		animation_sprite.play("walk")
+	else:
+		animation_sprite.play("idle")
 
 func check_for_self(node):
 	if node == self:
 		return true
 	else:
 		return false
+
+func play_attack(body):
+#	if body.group == "player":
+#		$CPUParticles2D.emitting = true
+#		await animation_sprite.animation_finished
+#		animation_sprite.visible = false
+#		await get_tree().create_timer(0.3).timeout
+#		self.queue_free()
+	pass
+
+func _on_area_2d_body_entered(body: Node2D) -> void:
+	if body.name == "player":
+		$CPUParticles2D.emitting = true
+		animation_sprite.visible = false
+		await get_tree().create_timer(0.3).timeout
+		self.queue_free()
