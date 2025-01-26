@@ -4,8 +4,6 @@ extends CharacterBody2D
 @export var animation_sprite: Sprite2D
 @export var player_health:= 3
 @export var max_health := 3
-@export var is_invencible := false
-@export var lose_control := false
 
 const SPEED = 160.0
 const JUMP_VELOCITY = -400.0
@@ -145,25 +143,23 @@ func bolha_update(delta: float):
 	#	print(animation.current_animation)
 	
 func take_damage(amount: int): #metodo para o player levar dano
-	if is_invencible && lose_control == false:
-		return
-
-	lose_control = true
-	knockback()
-	await get_tree().create_timer(0.5).timeout
-	lose_control = false
 	
+	knockback(direction)
 	player_health -= 1
 	print("o jogador está com: ", player_health, " Vidas")
 	
 	if player_health <= 0:
 		die()
 		
-func knockback(direction: int = -1): # O parâmetro `direction` indica para onde o jogador será empurrado (-1 para esquerda, 1 para direita)
-	var knockback_force: Vector2 = Vector2(direction * 800, -800) # Para trás na direção X e para cima na direção Y
-	velocity += knockback_force # Adiciona a força de knockback à velocidade atual
+func knockback(direction: int) -> void:
+	var knockback_force: Vector2
+	if direction == 1:  # Se o personagem estiver olhando para a direita
+		knockback_force = Vector2(-800, -800)  # Aplica o knockback para a esquerda (direção negativa)
+	elif direction == -1:  # Se o personagem estiver olhando para a esquerda
+		knockback_force = Vector2(800, -800)  # Aplica o knockback para a direita (direção positiva)
+	# Adiciona a força de knockback à velocidade
+	velocity += knockback_force
 	move_and_slide()
-
 	
 func die() -> void:
 
