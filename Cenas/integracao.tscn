@@ -1,25 +1,47 @@
-[gd_scene load_steps=3 format=4 uid="uid://ctn4mci7ytorl"]
+[gd_scene load_steps=8 format=4 uid="uid://ctn4mci7ytorl"]
 
 [ext_resource type="PackedScene" uid="uid://bef0sp8en86j5" path="res://Cenas/tilemerda.tscn" id="1_b5kb6"]
-[ext_resource type="PackedScene" uid="uid://b0oyvnakmfwra" path="res://Cenas/player_base.tscn" id="2_kvl0q"]
-[ext_resource type="PackedScene" uid="uid://bieqx6hoegb5e" path="res://Cenas/flops.tscn" id="3_7618e"]
-[ext_resource type="PackedScene" uid="uid://de43rflrq0fmd" path="res://Cenas/enemy.tscn" id="3_63g4f"]
+[ext_resource type="PackedScene" uid="uid://dcurysye5n3sq" path="res://Cenas/player_base.tscn" id="2_kvl0q"]
+[ext_resource type="Script" path="res://Cenas/spikes_area.gd" id="3_8rfgl"]
+[ext_resource type="Script" path="res://Cenas/simple_player.gd" id="3_nu3t0"]
+[ext_resource type="Texture2D" uid="uid://la8mvgkjgg8c" path="res://gamejam/Spika.png" id="4_veijb"]
+[ext_resource type="PackedScene" uid="uid://4v1mv6nx587x" path="res://Cenas/hud.tscn" id="6_62hcn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_26g5f"]
 
 [node name="Node2D" type="Node2D"]
 
 [node name="Tilemerda" parent="." instance=ExtResource("1_b5kb6")]
 tile_map_data = PackedByteArray("AAD4/wEAAAAAAAAAAAD5/wEAAAAAAAAAAAD6/wEAAAAAAAAAAAD7/wEAAAAAAAAAAAD8/wEAAAAAAAAAAAD9/wEAAAAAAAAAAAD+/wEAAAAAAAAAAAD//wEAAAAAAAAAAAAAAAEAAAAAAAAAAAABAAEAAAAAAAAAAAACAAEAAAAAAAAAAAADAAEAAAAAAAAAAAAEAAEAAAAAAAAAAAAFAAEAAAAAAAAAAAAGAAEAAAAAAAAAAAAHAAEAAAAAAAAAAAAIAAEAAAAAAAAAAAAJAAEAAAAAAAAAAAAKAAEAAAAAAAAAAAALAAEAAAAAAAAAAAALAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAMAP//AAAAAAAAAAD2//X/AAAAAAAAAAD2//b/AAAAAAAAAAD2//f/AAAAAAAAAAD2//j/AAAAAAAAAAD2//n/AAAAAAAAAAD2//r/AAAAAAAAAAD2//v/AAAAAAAAAAD2//z/AAAAAAAAAAD2//3/AAAAAAAAAAD2//7/AAAAAAAAAAD2////AAAAAAAAAAD2/wAAAAAAAAAAAAD2/wEAAAAAAAAAAAD3/wEAAAAAAAAAAAANAP//AAAAAAAAAAAOAP//AAAAAAAAAAAPAP//AAAAAAAAAAAQAP//AAAAAAAAAAARAP//AAAAAAAAAAASAP//AAAAAAAAAAATAP//AAAAAAAAAAAUAP//AAAAAAAAAAAUAP7/AAAAAAAAAAAVAP7/AAAAAAAAAAAWAP7/AAAAAAAAAAAXAP7/AAAAAAAAAAAYAP7/AAAAAAAAAAAZAP7/AAAAAAAAAAAaAP7/AAAAAAAAAAAbAP7/AAAAAAAAAAAcAP7/AAAAAAAAAAAdAP7/AAAAAAAAAAAeAP7/AAAAAAAAAAAfAP7/AAAAAAAAAAAgAP7/AAAAAAAAAAAhAP7/AAAAAAAAAAAMAP7/AAAAAAAAAAAMAP3/AAAAAAAAAAAMAPz/AAAAAAAAAAAMAPv/AAAAAAAAAAANAPv/AAAAAAAAAAAOAPv/AAAAAAAAAAAOAPz/AAAAAAAAAAAOAP3/AAAAAAAAAAAOAP7/AAAAAAAAAAANAPz/AAAAAAAAAAANAP3/AAAAAAAAAAANAP7/AAAAAAAAAAALAP7/AAAAAAAAAAAKAP//AAAAAAAAAAAKAAAAAAAAAAAAAAALAP//AAAAAAAAAAALAPz/AAAAAAAAAAALAP3/AAAAAAAAAAAKAP7/AAAAAAAAAAAJAP//AAAAAAAAAAAJAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAANAPr/AAAAAAAAAAAOAPr/AAAAAAAAAAAPAPr/AAAAAAAAAAAPAPv/AAAAAAAAAAAPAPz/AAAAAAAAAAAPAP3/AAAAAAAAAAAPAP7/AAAAAAAAAAAOAPn/AAAAAAAAAAAPAPn/AAAAAAAAAAAiAP7/AAAAAAAAAAAjAP7/AAAAAAAAAAAkAP7/AAAAAAAAAAAlAP7/AAAAAAAAAAAmAP7/AAAAAAAAAAAnAP7/AAAAAAAAAAAoAP7/AAAAAAAAAAApAP7/AAAAAAAAAAAqAP7/AAAAAAAAAAArAP7/AAAAAAAAAAAsAP7/AAAAAAAAAAAtAP7/AAAAAAAAAAAuAP7/AAAAAAAAAAAvAP7/AAAAAAAAAAAwAP7/AAAAAAAAAAA=")
 
-[node name="player" parent="." instance=ExtResource("2_kvl0q")]
+[node name="flopster" parent="." instance=ExtResource("2_kvl0q")]
 position = Vector2(23, -78)
-player_health = null
-max_health = null
 collision_layer = 2
+script = ExtResource("3_nu3t0")
+is_invencible = false
+lose_control = false
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
+[node name="Player#AnimationPlayer" type="AnimationPlayer" parent="."]
 
-[node name="SpikesArea" parent="." instance=ExtResource("3_7618e")]
-position = Vector2(457, -39)
+[node name="Area2D" type="Area2D" parent="."]
+position = Vector2(685, -40)
+scale = Vector2(0.504997, 0.500732)
+collision_layer = 3
+collision_mask = 3
+script = ExtResource("3_8rfgl")
 
-[node name="enemy3" parent="." instance=ExtResource("3_63g4f")]
-position = Vector2(548, -69)
+[node name="Sprite2D" type="Sprite2D" parent="Area2D"]
+texture_filter = 1
+texture_repeat = 2
+texture = ExtResource("4_veijb")
+region_enabled = true
+region_rect = Rect2(0, -0.073, 1444.91, 32.073)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_26g5f")
+
+[node name="HUD" parent="." instance=ExtResource("6_62hcn")]
+
+[connection signal="body_entered" from="Area2D" to="Area2D" method="_on_body_entered"]
+
+[editable path="HUD"]
