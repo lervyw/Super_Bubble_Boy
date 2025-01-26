@@ -25,7 +25,7 @@ func _physics_process(delta: float) -> void:
 	#print("esta transformando em tex: ", Player_sprite.transformacaoOn)
 	#print("esta transformando super: ",transformando_super)
 	#print("esta transformando em player: ",transformando, "\n")
-	print("no ", self.name, " caminho ", self.get_path())
+	print(" caminho ", self.get_path(), " estado ", estado)
 func horizontal_moviment_env() -> void:
 	var input_direction: float = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 	velocity.x = input_direction * speed

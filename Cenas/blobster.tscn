@@ -1,11 +1,8 @@
-[gd_scene load_steps=6 format=4 uid="uid://bd04djp2xqdt4"]
+[gd_scene load_steps=4 format=4 uid="uid://bd04djp2xqdt4"]
 
 [ext_resource type="PackedScene" uid="uid://bef0sp8en86j5" path="res://Cenas/tilemerda.tscn" id="1_fgodj"]
 [ext_resource type="PackedScene" uid="uid://b4c0go7txpq08" path="res://Cenas/player.tscn" id="2_8xgyn"]
-[ext_resource type="Script" path="res://Cenas/spikes_area.gd" id="3_gg4rd"]
-[ext_resource type="Texture2D" uid="uid://la8mvgkjgg8c" path="res://gamejam/Spika.png" id="4_bsp75"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_twqaj"]
+[ext_resource type="PackedScene" uid="uid://d0iy0mybr43p4" path="res://Cenas/spikes_area.tscn" id="3_t4sxu"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -15,19 +12,4 @@ tile_map_data = PackedByteArray("AAD4/wEAAAAAAAAAAAD5/wEAAAAAAAAAAAD6/wEAAAAAAAA
 [node name="Personagem" parent="." instance=ExtResource("2_8xgyn")]
 position = Vector2(14, -34)
 
-[node name="SpikesArea" type="Area2D" parent="."]
-position = Vector2(458, -39)
-scale = Vector2(0.427611, 0.427611)
-collision_layer = 2
-script = ExtResource("3_gg4rd")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikesArea"]
-shape = SubResource("RectangleShape2D_twqaj")
-
-[node name="Spika" type="Sprite2D" parent="SpikesArea"]
-texture_repeat = 2
-texture = ExtResource("4_bsp75")
-region_enabled = true
-region_rect = Rect2(0, 0.06, 639.92, 31.94)
-
-[connection signal="body_entered" from="SpikesArea" to="SpikesArea" method="_on_body_entered"]
+[node name="SpikesArea" parent="." instance=ExtResource("3_t4sxu")]

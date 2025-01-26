@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://c83hsue4tk3n4"]
+
+[ext_resource type="Script" path="res://Cenas/formas.gd" id="1_8rqpw"]
+[ext_resource type="PackedScene" uid="uid://d3xrf0yvjc4od" path="res://Cenas/personagem2.tscn" id="3_3k15b"]
+
+[node name="Formas" type="CharacterBody2D" node_paths=PackedStringArray("player_normal")]
+script = ExtResource("1_8rqpw")
+player_normal = NodePath("Personagem2")
+
+[node name="Personagem2" parent="." node_paths=PackedStringArray("pai") instance=ExtResource("3_3k15b")]
+pai = NodePath("..")
+
+[node name="Textura2" parent="Personagem2" index="1" node_paths=PackedStringArray("pai")]
+pai = NodePath("../..")
+
+[editable path="Personagem2"]

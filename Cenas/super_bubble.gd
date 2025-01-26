@@ -1,12 +1,13 @@
 extends CharacterBody2D
 #personagem 
 @onready var sprite: Sprite2D = get_node("Textura_super")
+@export var pai: Node
 @export var speed: int
 @export var jump_speed: int
 @export var player_gravity: int
 @export var respawn_position: Vector2
 @export var ambiente: AudioStreamPlayer
-var estado: int =0
+#var estado: int =0
 var transformando: bool = false
 var transformando_super: bool
 var jump_count: int
@@ -14,7 +15,8 @@ var jump_count: int
 
 
 func _physics_process(delta: float) -> void:
-	trans()	
+	
+	trans()
 	tocar()
 	horizontal_moviment_env()
 	vertical_moviment_env()
@@ -24,8 +26,8 @@ func _physics_process(delta: float) -> void:
 	#print("estado: ", Player_sprite.estado)
 	#print("esta transformando em tex: ", Player_sprite.transformacaoOn)
 	#print("esta transformando super: ",transformando_super)
-	#print("esta transformando em player: ",transformando, "\n")
-	print("no ", self.name, " caminho ", self.get_path())
+	print("esta transformando em player: ",transformando, "\n")
+	#print("no ", self.name, " caminho ", self.get_path())
 func horizontal_moviment_env() -> void:
 	var input_direction: float = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 	velocity.x = input_direction * speed
@@ -34,10 +36,10 @@ func vertical_moviment_env() -> void:
 	if is_on_floor():
 		jump_count = 1
 	if Input.is_action_just_pressed("ui_select") and jump_count < 2:
-		if estado == 0:
+		if pai.estado == 0:
 			jump_count += 1
 			velocity.y = jump_speed
-		elif estado == 1:
+		elif pai.estado == 1:
 			velocity.y = jump_speed
 		
 	#print(velocity)
@@ -54,18 +56,18 @@ func trans() -> void:
 		
 func transformando1():
 	
-	if estado == 1:
+	if pai.estado == 1:
 		sprite.animation.play("Transform2")
 		
 		transformando = true
 		sprite.transformacaoOn  = true	
 		#Player_sprite.
-		estado = 0
-	elif estado == 0:
+		pai.estado = 0
+	elif pai.estado == 0:
 		sprite.animation.play("Transform")
 		transformando = true
 		sprite.transformacaoOn  = true	
-		estado = 1
+		pai.estado = 1
 			#Player_sprite.estado = 0
 func transformando2():
 	#var super_scene_instance = super_scene.

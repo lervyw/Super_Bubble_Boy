@@ -1,5 +1,6 @@
 # Script do Sprite2D para animações
 extends Sprite2D
+@export var pai2: Node
 @export var player: Node
 @export var animation: AnimationPlayer
 var transformacaoOn: bool
@@ -20,7 +21,7 @@ func animate(direction: Vector2) -> void:
 	
 	elif  direction.y != 0 and estado == 0:
 		vertical_behavior(direction)
-	elif estado == 0:
+	elif pai2.estado == 0:
 		horizontal_behavior(direction)
 	
 	#
@@ -101,7 +102,7 @@ func _on_animacao_animation_finished(anim_name: StringName) -> void:
 			estado = 0
 			voltar()	
 			print(transformacaoOn)
-			print(estado)
+			print(pai2.estado)
 			#player.set_physics_process(true)
 		"Transform3":
 			print("penis")
