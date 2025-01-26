@@ -4,6 +4,8 @@ extends Node2D
 
 var enemies = 0
 var target = 40
+var inimigo = preload("res://Cenas/slime.tscn").instantiate()
+
 	# Gera 10 inimigos em posições aleatórias
 func _ready() -> void:
 	

@@ -107,7 +107,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"Fall",
-"speed": 2.0
+"speed": 20.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -362,7 +362,8 @@ shape = SubResource("RectangleShape2D_urgpx")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_vs7xd")
 animation = &"Fall"
-frame_progress = 0.0241267
+autoplay = "Fall"
+frame_progress = 0.81154
 flip_h = true
 
 [node name="chatboxSprite" type="Sprite2D" parent="AnimatedSprite2D"]

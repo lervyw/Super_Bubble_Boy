@@ -11,10 +11,11 @@ var player_gravity: int = 600
 var transformando: bool = false
 var transformando_super: bool = false
 var jump_count: int
-var Pode_Bolha: bool
-var Pode_Super: bool
+var Pode_Bolha: bool = false
+var Pode_Super: bool = false
 var dead: bool = false
 var on_hit: bool = false
+
 func _ready() -> void:
 	position.x = 350
 	position.y = 219
@@ -48,10 +49,10 @@ func vertical_moviment_env() -> void:
 	#print(velocity)
 func trans() -> void:
 	
-	if Input.is_action_just_pressed("forma1") and not transformando and not transformando_super and not Player_sprite.transformacaoOn :
+	if Input.is_action_just_pressed("forma1") and not transformando and not transformando_super and not Player_sprite.transformacaoOn and Pode_Bolha == true :
 		transformando1()
 		#set_physics_process(false)
-	if Input.is_action_just_pressed("forma2") and not transformando and not transformando_super and not Player_sprite.transformacaoOn :
+	if Input.is_action_just_pressed("forma2") and not transformando and not transformando_super and not Player_sprite.transformacaoOn and Pode_Super == true :
 		transformando2()
 		#set_physics_process(false)
 		
