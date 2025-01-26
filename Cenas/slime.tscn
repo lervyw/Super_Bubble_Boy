@@ -1,73 +1,73 @@
-[gd_scene load_steps=30 format=3 uid="uid://de43rflrq0fmd"]
+[gd_scene load_steps=31 format=3 uid="uid://orok10r1p86e"]
 
-[ext_resource type="Script" path="res://Cenas/enemy.gd" id="1_x67st"]
-[ext_resource type="Texture2D" uid="uid://gkstrwf0f3x4" path="res://gamejam/characters/balao.png" id="2_27ovu"]
-[ext_resource type="Texture2D" uid="uid://cephunyh8lku2" path="res://gamejam/characters/Slime-Sheet-Sheet.png" id="2_83o4h"]
-[ext_resource type="Texture2D" uid="uid://p868hysemgsd" path="res://gamejam/characters/balao2.png" id="3_g10ea"]
-[ext_resource type="BehaviorTree" uid="uid://cld0755cv40wn" path="res://ai/trees/enemy1.tres" id="5_dj0m2"]
+[ext_resource type="Script" path="res://Cenas/slime.gd" id="1_s1e20"]
+[ext_resource type="Texture2D" uid="uid://cephunyh8lku2" path="res://gamejam/characters/Slime-Sheet-Sheet.png" id="2_xo41o"]
+[ext_resource type="Texture2D" uid="uid://gkstrwf0f3x4" path="res://gamejam/characters/balao.png" id="3_5evs1"]
+[ext_resource type="Texture2D" uid="uid://p868hysemgsd" path="res://gamejam/characters/balao2.png" id="4_trh87"]
+[ext_resource type="BehaviorTree" uid="uid://cld0755cv40wn" path="res://ai/trees/enemy1.tres" id="5_jh7lu"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_c0wyr"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(1, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_t1fb1"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(33, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2883i"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(65, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_h1dc3"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(97, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_pdqt6"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(1, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_53g3y"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(33, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g0gup"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(65, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ovjk3"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(97, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lm813"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(1, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_spams"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(33, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lrbn5"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(65, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l0i44"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(97, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_usx6y"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(1, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5cr2a"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(33, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_adghu"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(65, 0, 28, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_50lqr"]
-atlas = ExtResource("2_83o4h")
+atlas = ExtResource("2_xo41o")
 region = Rect2(97, 0, 28, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_vs7xd"]
@@ -268,6 +268,9 @@ tracks/3/keys = {
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 
+[sub_resource type="Animation" id="Animation_ari7e"]
+resource_name = "padrao"
+
 [sub_resource type="Animation" id="Animation_3xr8w"]
 resource_name = "warning"
 tracks/0/type = "value"
@@ -323,6 +326,7 @@ tracks/3/keys = {
 _data = {
 "RESET": SubResource("Animation_dhdlb"),
 "chat": SubResource("Animation_5uklt"),
+"padrao": SubResource("Animation_ari7e"),
 "warning": SubResource("Animation_3xr8w")
 }
 
@@ -334,8 +338,8 @@ size = Vector2(22, 15.5)
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_pxbmi"]
 
-[node name="enemy" type="CharacterBody2D" groups=["enemy"]]
-script = ExtResource("1_x67st")
+[node name="slime" type="CharacterBody2D" groups=["enemy"]]
+script = ExtResource("1_s1e20")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
 emitting = false
@@ -349,20 +353,20 @@ scale_amount_max = 4.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_vs7xd")
-animation = &"Attack"
+animation = &"Fall"
 flip_h = true
 
 [node name="chatboxSprite" type="Sprite2D" parent="AnimatedSprite2D"]
 visible = false
 modulate = Color(1, 1, 1, 0)
 position = Vector2(5, -21)
-texture = ExtResource("2_27ovu")
+texture = ExtResource("3_5evs1")
 
 [node name="warningSprite" type="Sprite2D" parent="AnimatedSprite2D"]
 visible = false
 modulate = Color(1, 1, 1, 0)
 position = Vector2(3, -21)
-texture = ExtResource("3_g10ea")
+texture = ExtResource("4_trh87")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -380,7 +384,7 @@ position = Vector2(0, 7.75)
 shape = SubResource("RectangleShape2D_urgpx")
 
 [node name="BTPlayer" type="BTPlayer" parent="."]
-behavior_tree = ExtResource("5_dj0m2")
+behavior_tree = ExtResource("5_jh7lu")
 blackboard_plan = SubResource("BlackboardPlan_pxbmi")
 
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

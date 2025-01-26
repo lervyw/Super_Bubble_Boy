@@ -8,24 +8,28 @@ var player_gravity: int = 600
 @export var respawn_position: Vector2
 @export var ambiente: AudioStreamPlayer
 @export var opera: AudioStreamPlayer
-var estado: int = 0
 var transformando: bool = false
-var transformando_super: bool
+var transformando_super: bool = false
 var jump_count: int
-
-
-
+var Pode_Bolha: bool
+var Pode_Super: bool
+var dead: bool = false
+var on_hit: bool = false
+func _ready() -> void:
+	position.x = 288
+	position.y = 207
 func _physics_process(delta: float) -> void:
-	tocar()
+
 	trans()	
 	tocar()
-	horizontal_moviment_env()
 	vertical_moviment_env()
+	horizontal_moviment_env()
+	
 	gravity(delta)
 	move_and_slide()
 	Player_sprite.animate(velocity)
 	print("jump speed", jump_speed)
-	print("estado: ", Player_sprite.estado)
+	print("estado player: ", Player_sprite.estado)
 	print("esta transformando em tex: ", Player_sprite.transformacaoOn)
 	print("esta transformando super: ",transformando_super)
 	print("esta transformando em player: ",transformando, "\n")
@@ -38,65 +42,68 @@ func vertical_moviment_env() -> void:
 	if is_on_floor()  :
 		jump_count = 1
 	if Input.is_action_just_pressed("ui_select") and jump_count < 2:
-		if estado == 0 or estado ==2:
+		if Player_sprite.estado == 1:
+			velocity.y = jump_speed
+		elif Player_sprite.estado == 0 or Player_sprite.estado ==2:
 			jump_count += 1
 			velocity.y = jump_speed
-		elif estado == 1:
-			velocity.y = jump_speed
+		
 		
 	#print(velocity)
 	#print(velocity)
 func trans() -> void:
 	
-	if Input.is_action_just_pressed("forma1") and not transformando and not transformando_super :
+	if Input.is_action_just_pressed("forma1") and not transformando and not transformando_super and not Player_sprite.transformacaoOn :
 		transformando1()
 		#set_physics_process(false)
-	if Input.is_action_just_pressed("forma2") and not transformando and not transformando_super :
+	if Input.is_action_just_pressed("forma2") and not transformando and not transformando_super and not Player_sprite.transformacaoOn :
 		transformando2()
 		#set_physics_process(false)
 		
 		
 func transformando1():
 	
-	if estado == 1:
-		Player_sprite.animation.play("Transform2")
+	if Player_sprite.estado == 0:
 		
 		transformando = true
 		Player_sprite.transformacaoOn  = true	
+		
+		
+	
+	elif Player_sprite.estado == 1:
+		#Player_sprite.animation.play("Transform2")
+
+		transformando = true
+		Player_sprite.transformacaoOn  = true	
 		#Player_sprite.
-		estado = 0
-	elif estado == 0:
-		Player_sprite.animation.play("Transform")
+		
+	
+	elif Player_sprite.estado == 2:
+		#Player_sprite.animation.play("Transform4")
 		transformando = true
 		Player_sprite.transformacaoOn  = true	
-		estado = 1
-	elif estado == 2:
-		Player_sprite.animation.play("Transform2")
-		transformando = true
-		Player_sprite.transformacaoOn  = true	
-		estado = 0
+		
 			#Player_sprite.estado = 0
 func transformando2():
 	#var super_scene_instance = super_scene.
-	if estado == 1:
-		Player_sprite.animation.play("Transform3")
+	if Player_sprite.estado == 1:
+		#Player_sprite.animation.play("Transform3")
 		transformando_super  = true
 		transformando = true
 		Player_sprite.transformacaoOn  = true	
 		#Player_sprite.
-		estado = 2
-	elif estado == 0:
-		Player_sprite.animation.play("Transform3")
+		
+	elif Player_sprite.estado == 0:
+		#Player_sprite.animation.play("Transform3")
 		transformando_super  = true
 		transformando = true
 		Player_sprite.transformacaoOn  = true	
-		estado = 2
-	elif estado == 2:
-		Player_sprite.animation.play("Transform2")
+		
+	elif Player_sprite.estado == 2:
 		transformando_super  = true
 		transformando = true
 		Player_sprite.transformacaoOn  = true	
-		estado = 0
+		
 	
 	
 	
@@ -106,12 +113,17 @@ func tocar():
 	#var audio_player = AudioStreamPlayer.new()
 	#audio_player.stream = music
 	#get_parent().add_child(audio_player)
-	if(estado == 0 or estado == 1):
+
+	if (Player_sprite.estado != 2):
+		ambiente.stream_paused = false
 		ambiente.autoplay
 		ambiente.playing 	
-	if(estado == 2):
+		opera.stream_paused = true
+	else:
+		opera.stream_paused = false
 		opera.autoplay
 		opera.playing
+		ambiente.stream_paused = true
 		
 func gravity(delta: float) -> void:
 	velocity.y += delta * player_gravity

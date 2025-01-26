@@ -2,28 +2,46 @@
 extends Sprite2D
 @export var player: Node
 @export var animation: AnimationPlayer
+@export var stats: Node
+@export var nivel: Node
 var transformacaoOn: bool
-var estado: int =0
+var estado : int 
+
 #var form: String = "normal"  # Formas: "normal", "bubble"
 #@export var super_scene: PackedScene
 
 func animate(direction: Vector2) -> void:
 	
 	verify_position(direction)
-	if player.transformando_super  == true:
-		animation.play("Transform3")
-	elif player.transformando and transformacaoOn and estado == 0 and not player.transformando_super:
-		animation.play("Transform")
-		#set_physics_process(false)
-	
-	
+	if player.on_hit or player.dead:
+		hit_behavior()
+	elif player.transformando and transformacaoOn and not player.transformando_super and estado == 0:
+		animation.play("Normal_Bolha")
+	elif player.transformando and transformacaoOn and player.transformando_super and estado == 0 :
+		animation.play("Normal_Super")	##
+	elif player.transformando and transformacaoOn and not player.transformando_super and estado == 1 :
+		animation.play("Bolha_Normal")#
+	elif player.transformando and transformacaoOn and  player.transformando_super and estado == 1:
+		animation.play("Bolha_Super")#
+	elif player.transformando and transformacaoOn  and not player.transformando_super and estado == 2:
+		animation.play("Super_Bolha")
+	elif player.transformando and transformacaoOn  and  player.transformando_super and estado == 2:
+		animation.play("Super_Normal")
+	#Bolha_Super
+	#
 	elif  direction.y != 0 and estado != 1:
 		vertical_behavior(direction)
 	elif estado != 1:
 		horizontal_behavior(direction)
 		
 	
-		
+func hit_behavior():
+	#quando tiver a animaçao de super  trocar as animaçoes para S_Hit
+	player.set_physics_process(false)
+	if player.dead:
+		animation.play("Dead")
+	elif player.on_hit:
+		animation.play("Hit")
 		
 			
 		
@@ -63,11 +81,16 @@ func vertical_behavior(direction: Vector2) -> void:
 
 func voltar():
 	
-	if 	player.transformando == true and transformacaoOn == true:
-		
+	if 	player.transformando == true:
 		player.transformando = false
-		transformacaoOn  = false
-	
+		
+	if transformacaoOn == true:
+		transformacaoOn =false
+		
+	if player.transformando_super == true:
+		player.transformando_super = false
+		
+		
 	if(estado == 0):
 		player.speed = 100
 		player.jump_speed = -320
@@ -80,8 +103,7 @@ func voltar():
 		player.speed = 100
 		player.jump_speed = -320
 		player.player_gravity = 600
-	elif(estado == 2):
-		estado = 0
+	
 
 func _on_animacao_animation_finished(anim_name: StringName) -> void:
 	match anim_name:
@@ -89,30 +111,37 @@ func _on_animacao_animation_finished(anim_name: StringName) -> void:
 		
 			pass
 			
-		"Transform":
+		"Normal_Bolha":
 			estado = 1
 			animation.play("Bubble_only")
-			voltar()	
-			
-
-			
-		"Transform2":	
-			estado = 0
-			voltar()	
-			print(transformacaoOn)
-			print(estado)
-			
-		"Transform3":
+			voltar()			
+		"Normal_Super":
 			estado = 2
 			voltar()	
+			player.transformando_super = false	
+		"Bolha_Normal":			
+			estado = 0
+			voltar()	
+		"Bolha_Super":			
+			estado = 2
+			voltar()
+		"Super_Normal":
+			estado = 0
+			voltar()	
 			player.transformando_super = false
-			
-			print("penis")
-			
-			# _instantiate_super_bubble()
-			#pass
+		"Super_Bolha":
+			estado = 1
+			voltar()	
+			player.transformando_super = false
+
 		"Bubble_only":
 			if (estado ==1):
 				
 				pass
-		
+		"Hit":
+			player.on_hit = false
+			player.set_physics_process(true)
+			
+		"Dead":
+			nivel.reset_scene()
+			

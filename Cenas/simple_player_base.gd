@@ -176,4 +176,5 @@ func take_damage(amount: int): #metodo para o player levar dano
 
 func _on_area_2d_body_entered(body: Node2D) -> void:
 	if body.is_in_group("enemy"):
-		queue_free()
+		#queue_free()
+		pass

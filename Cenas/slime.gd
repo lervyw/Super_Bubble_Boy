@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 @onready var animation_sprite = $AnimatedSprite2D
-
+#@export var animate = AnimationPlayer
 const SPEED = 160.0
 const JUMP_VELOCITY = -400.0
 const gravity = 50
@@ -15,7 +15,7 @@ func _physics_process(delta):
 
 func move(dir, speed):
 	velocity.x = dir * speed
-	handle_animation()
+	#handle_animation()
 	update_flip(dir)
 
 func update_flip(dir):
@@ -24,7 +24,7 @@ func update_flip(dir):
 	else:
 		animation_sprite.flip_h = false
 		
-func handle_animation():
+#func handle_animation():
 	if !is_on_floor():
 		animation_sprite.play("fall")
 		
@@ -49,7 +49,8 @@ func play_attack(body):
 	pass
 
 func _on_area_2d_body_entered(body: Node2D) -> void:
-	if body.name == "player":
+	#if body.name == "player":
+	if body.is_in_group("player"):
 		$CPUParticles2D.emitting = true
 		animation_sprite.visible = false
 		await get_tree().create_timer(0.3).timeout

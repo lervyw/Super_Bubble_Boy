@@ -23,6 +23,7 @@ window/size/viewport_width=420
 window/size/viewport_height=280
 window/size/mode=2
 window/stretch/mode="viewport"
+window/stretch/aspect="expand"
 
 [input]
 
