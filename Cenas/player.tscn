@@ -1,7 +1,8 @@
-[gd_scene load_steps=15 format=3 uid="uid://b4c0go7txpq08"]
+[gd_scene load_steps=16 format=3 uid="uid://b4c0go7txpq08"]
 
 [ext_resource type="Script" path="res://Cenas/simple_player.gd" id="1_vnwna"]
-[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_nvs3k"]
+[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_6kpf2"]
+[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="3_fafjb"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -61,7 +62,7 @@ tracks/3/keys = {
 [sub_resource type="Animation" id="Animation_pwxfo"]
 resource_name = "Bubble_only"
 length = 0.6
-loop_mode = 2
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -96,7 +97,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.266667, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(19, 19), Vector2(19, 19), Vector2(19, 19)]
+"values": [Vector2(19, 21.5), Vector2(19, 20.5), Vector2(19, 21.2143)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -108,7 +109,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.266667, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(-1, 9), Vector2(-1, 9), Vector2(-1, 9)]
+"values": [Vector2(-1, 9), Vector2(-1, 10), Vector2(-1, 9)]
 }
 
 [sub_resource type="Animation" id="Animation_6q54a"]
@@ -514,7 +515,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(19, 32)]
+"values": [Vector2(17, 29.5)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -543,7 +544,7 @@ _data = {
 "Walk": SubResource("Animation_ksl43")
 }
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("animation", "animation_sprite")]
+[node name="Personagem" type="CharacterBody2D" node_paths=PackedStringArray("animation", "animation_sprite")]
 script = ExtResource("1_vnwna")
 animation = NodePath("Animacao")
 animation_sprite = NodePath("Textura")
@@ -554,7 +555,7 @@ libraries = {
 }
 
 [node name="Textura" type="Sprite2D" parent="."]
-texture = ExtResource("2_nvs3k")
+texture = ExtResource("2_6kpf2")
 hframes = 55
 frame = 36
 
@@ -565,6 +566,11 @@ shape = SubResource("RectangleShape2D_kadp1")
 [node name="Camera" type="Camera2D" parent="."]
 limit_bottom = 100
 drag_horizontal_enabled = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_fafjb")
+volume_db = -24.0
+autoplay = true
 
 [connection signal="animation_finished" from="Animacao" to="." method="_on_animation_finished"]
 [connection signal="animation_finished" from="Animacao" to="Textura" method="_on_animacao_animation_finished"]
