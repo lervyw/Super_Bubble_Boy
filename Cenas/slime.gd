@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 @onready var animation_sprite = $AnimatedSprite2D
 #@export var animate = AnimationPlayer
+@export var hit: Node
 const SPEED = 160.0
 const JUMP_VELOCITY = -400.0
 const gravity = 50
@@ -24,7 +25,7 @@ func update_flip(dir):
 	else:
 		animation_sprite.flip_h = false
 		
-#func handle_animation():
+func handle_animation():
 	if !is_on_floor():
 		animation_sprite.play("fall")
 		
@@ -51,7 +52,17 @@ func play_attack(body):
 func _on_area_2d_body_entered(body: Node2D) -> void:
 	#if body.name == "player":
 	if body.is_in_group("player"):
+		hit.set_deferred("monitoring", false)
 		$CPUParticles2D.emitting = true
 		animation_sprite.visible = false
 		await get_tree().create_timer(0.3).timeout
 		self.queue_free()
+
+
+func _on_hit_area_entered(area: Area2D) -> void:
+	pass
+	#if area.is_in_group("player"):
+	#	$CPUParticles2D.emitting = true
+	#	animation_sprite.visible = false
+	#	await get_tree().create_timer(0.3).timeout
+	#	self.queue_free()

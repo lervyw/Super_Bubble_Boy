@@ -1,10 +1,13 @@
-[gd_scene load_steps=31 format=3 uid="uid://orok10r1p86e"]
+[gd_scene load_steps=32 format=3 uid="uid://orok10r1p86e"]
 
 [ext_resource type="Script" path="res://Cenas/slime.gd" id="1_s1e20"]
 [ext_resource type="Texture2D" uid="uid://cephunyh8lku2" path="res://gamejam/characters/Slime-Sheet-Sheet.png" id="2_xo41o"]
 [ext_resource type="Texture2D" uid="uid://gkstrwf0f3x4" path="res://gamejam/characters/balao.png" id="3_5evs1"]
 [ext_resource type="Texture2D" uid="uid://p868hysemgsd" path="res://gamejam/characters/balao2.png" id="4_trh87"]
 [ext_resource type="BehaviorTree" uid="uid://cld0755cv40wn" path="res://ai/trees/enemy1.tres" id="5_jh7lu"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_urgpx"]
+size = Vector2(15, 26.5)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_c0wyr"]
 atlas = ExtResource("2_xo41o")
@@ -331,15 +334,16 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0uvtv"]
-size = Vector2(22, 14)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_urgpx"]
-size = Vector2(22, 15.5)
+size = Vector2(20, 3)
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_pxbmi"]
 
-[node name="slime" type="CharacterBody2D" groups=["enemy"]]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aq35j"]
+size = Vector2(24, 11)
+
+[node name="slime" type="CharacterBody2D" node_paths=PackedStringArray("hit") groups=["enemy"]]
 script = ExtResource("1_s1e20")
+hit = NodePath("Hit")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
 emitting = false
@@ -351,9 +355,14 @@ initial_velocity_min = 50.0
 initial_velocity_max = 150.0
 scale_amount_max = 4.0
 
+[node name="Collision" type="CollisionShape2D" parent="."]
+position = Vector2(1.5, 2.25)
+shape = SubResource("RectangleShape2D_urgpx")
+
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_vs7xd")
 animation = &"Fall"
+frame_progress = 0.0241267
 flip_h = true
 
 [node name="chatboxSprite" type="Sprite2D" parent="AnimatedSprite2D"]
@@ -376,15 +385,21 @@ libraries = {
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(0, -7)
+position = Vector2(2, -12.5)
 shape = SubResource("RectangleShape2D_0uvtv")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 7.75)
-shape = SubResource("RectangleShape2D_urgpx")
+one_way_collision = true
 
 [node name="BTPlayer" type="BTPlayer" parent="."]
 behavior_tree = ExtResource("5_jh7lu")
 blackboard_plan = SubResource("BlackboardPlan_pxbmi")
 
+[node name="Hit" type="Area2D" parent="." groups=["enemy"]]
+monitoring = false
+
+[node name="Collision" type="CollisionShape2D" parent="Hit"]
+position = Vector2(2, -5.5)
+shape = SubResource("RectangleShape2D_aq35j")
+debug_color = Color(0.523427, 0.573446, 0, 0.42)
+
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="area_entered" from="Hit" to="." method="_on_hit_area_entered"]

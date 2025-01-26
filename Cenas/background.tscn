@@ -47,3 +47,6 @@ motion_mirroring = Vector2(420, 0)
 offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("4_dhaf6")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.454524, 0.454524, 0.454524, 1)

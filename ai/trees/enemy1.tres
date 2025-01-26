@@ -1,4 +1,4 @@
-[gd_resource type="BehaviorTree" load_steps=27 format=3 uid="uid://cld0755cv40wn"]
+[gd_resource type="BehaviorTree" load_steps=21 format=3 uid="uid://cld0755cv40wn"]
 
 [ext_resource type="Script" path="res://ai/tasks/choose_random_pos.gd" id="1_hmhiq"]
 [ext_resource type="Script" path="res://ai/tasks/move_to_position.gd" id="2_gg3ln"]
@@ -6,9 +6,6 @@
 [ext_resource type="Script" path="res://ai/tasks/move_to_target.gd" id="4_llv7f"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_xuprq"]
-
-[sub_resource type="BTConsolePrint" id="BTConsolePrint_icp4n"]
-text = "random move"
 
 [sub_resource type="BTAction" id="BTAction_6bj2f"]
 script = ExtResource("1_hmhiq")
@@ -24,16 +21,9 @@ dir_var = &"dir"
 speed_var = 40
 tolerance = 25
 
-[sub_resource type="BTRandomWait" id="BTRandomWait_21w4u"]
-max_duration = 4.0
-
-[sub_resource type="BTSequence" id="BTSequence_iy6xx"]
-custom_name = "Idle Sequence"
-children = [SubResource("BTRandomWait_21w4u")]
-
 [sub_resource type="BTSequence" id="BTSequence_aiy13"]
 custom_name = "Random Move Sequence"
-children = [SubResource("BTConsolePrint_icp4n"), SubResource("BTAction_6bj2f"), SubResource("BTAction_ty3ho"), SubResource("BTSequence_iy6xx")]
+children = [SubResource("BTAction_6bj2f"), SubResource("BTAction_ty3ho")]
 
 [sub_resource type="BTProbability" id="BTProbability_lxcfq"]
 children = [SubResource("BTSequence_aiy13")]
@@ -49,20 +39,12 @@ target_var = &"target"
 speed_var = 100
 tolerance = 25
 
-[sub_resource type="BBNode" id="BBNode_molkm"]
-saved_value = NodePath("AnimationPlayer")
-resource_name = "AnimationPlayer"
-
-[sub_resource type="BTPlayAnimation" id="BTPlayAnimation_3u6na"]
-animation_player = SubResource("BBNode_molkm")
-animation_name = &"warning"
-
 [sub_resource type="BTWait" id="BTWait_i4m8n"]
 duration = 3.0
 
 [sub_resource type="BTSequence" id="BTSequence_tevvh"]
 custom_name = "Move To Player"
-children = [SubResource("BTAction_eie0b"), SubResource("BTAction_n6abj"), SubResource("BTPlayAnimation_3u6na"), SubResource("BTWait_i4m8n")]
+children = [SubResource("BTAction_eie0b"), SubResource("BTAction_n6abj"), SubResource("BTWait_i4m8n")]
 
 [sub_resource type="BTProbability" id="BTProbability_yly27"]
 run_chance = 0.8
@@ -82,12 +64,9 @@ tolerance = 30
 [sub_resource type="BTWait" id="BTWait_wbmpl"]
 duration = 2.0
 
-[sub_resource type="BTConsolePrint" id="BTConsolePrint_f2f8r"]
-text = "moving to enemy"
-
 [sub_resource type="BTSequence" id="BTSequence_4v6ih"]
 custom_name = "Move To Enemy Sequence"
-children = [SubResource("BTAction_ldpwj"), SubResource("BTAction_yj8i3"), SubResource("BTWait_wbmpl"), SubResource("BTConsolePrint_f2f8r")]
+children = [SubResource("BTAction_ldpwj"), SubResource("BTAction_yj8i3"), SubResource("BTWait_wbmpl")]
 
 [sub_resource type="BTProbability" id="BTProbability_2t2t4"]
 run_chance = 0.1

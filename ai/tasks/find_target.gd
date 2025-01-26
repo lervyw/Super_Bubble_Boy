@@ -25,4 +25,6 @@ func get_enemy_node():
 
 func get_player_node():
 	var nodes: Array[Node] = agent.get_tree().get_nodes_in_group(group)
-	return nodes[0]
+	#return SUCCESS
+	#return nodes[0]
+	pass

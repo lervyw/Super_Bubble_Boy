@@ -16,8 +16,8 @@ var Pode_Super: bool
 var dead: bool = false
 var on_hit: bool = false
 func _ready() -> void:
-	position.x = 288
-	position.y = 207
+	position.x = 350
+	position.y = 219
 func _physics_process(delta: float) -> void:
 
 	trans()	
@@ -28,11 +28,6 @@ func _physics_process(delta: float) -> void:
 	gravity(delta)
 	move_and_slide()
 	Player_sprite.animate(velocity)
-	print("jump speed", jump_speed)
-	print("estado player: ", Player_sprite.estado)
-	print("esta transformando em tex: ", Player_sprite.transformacaoOn)
-	print("esta transformando super: ",transformando_super)
-	print("esta transformando em player: ",transformando, "\n")
 	
 func horizontal_moviment_env() -> void:
 	var input_direction: float = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
