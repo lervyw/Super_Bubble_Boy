@@ -1,8 +1,8 @@
 [gd_scene load_steps=3 format=4 uid="uid://ctn4mci7ytorl"]
 
 [ext_resource type="PackedScene" uid="uid://bef0sp8en86j5" path="res://Cenas/tilemerda.tscn" id="1_b5kb6"]
-[ext_resource type="PackedScene" uid="uid://b4c0go7txpq08" path="res://Cenas/player.tscn" id="2_kvl0q"]
-[ext_resource type="PackedScene" uid="uid://d08t5t7tudtpk" path="res://Cenas/spikes_area.tscn" id="3_7618e"]
+[ext_resource type="PackedScene" uid="uid://b0oyvnakmfwra" path="res://Cenas/player_base.tscn" id="2_kvl0q"]
+[ext_resource type="PackedScene" uid="uid://bieqx6hoegb5e" path="res://Cenas/flops.tscn" id="3_7618e"]
 [ext_resource type="PackedScene" uid="uid://de43rflrq0fmd" path="res://Cenas/enemy.tscn" id="3_63g4f"]
 
 [node name="Node2D" type="Node2D"]
