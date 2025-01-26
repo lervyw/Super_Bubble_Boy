@@ -143,5 +143,7 @@ func _on_animacao_animation_finished(anim_name: StringName) -> void:
 			player.set_physics_process(true)
 			
 		"Dead":
-			nivel.reset_scene()
+#			nivel.reset_scene()
+			get_tree().reload_current_scene()
+
 			

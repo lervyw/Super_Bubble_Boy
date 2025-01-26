@@ -49,14 +49,14 @@ func play_attack(body):
 #		self.queue_free()
 	pass
 
-func _on_area_2d_body_entered(body: Node2D) -> void:
+#func _on_area_2d_body_entered(area: Area2D) -> void:
 	#if body.name == "player":
-	if body.is_in_group("player"):
-		hit.set_deferred("monitoring", false)
-		$CPUParticles2D.emitting = true
-		animation_sprite.visible = false
-		await get_tree().create_timer(0.3).timeout
-		self.queue_free()
+#	if area.is_in_group("player"):
+#		hit.set_deferred("monitoring", false)
+#		$CPUParticles2D.emitting = true
+#		animation_sprite.visible = false
+#		await get_tree().create_timer(0.3).timeout
+#		self.queue_free()
 
 
 func _on_hit_area_entered(area: Area2D) -> void:
@@ -66,3 +66,13 @@ func _on_hit_area_entered(area: Area2D) -> void:
 	#	animation_sprite.visible = false
 	#	await get_tree().create_timer(0.3).timeout
 	#	self.queue_free()
+
+
+func _on_area_2d_area_entered(area: Area2D) -> void:
+	#if body.name == "player":
+	if area.is_in_group("player"):
+		hit.set_deferred("monitoring", false)
+		$CPUParticles2D.emitting = true
+		animation_sprite.visible = false
+		await get_tree().create_timer(0.3).timeout
+		self.queue_free()

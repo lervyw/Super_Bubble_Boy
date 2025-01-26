@@ -7,7 +7,7 @@
 [ext_resource type="BehaviorTree" uid="uid://cld0755cv40wn" path="res://ai/trees/enemy1.tres" id="5_jh7lu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_urgpx"]
-size = Vector2(15, 26.5)
+size = Vector2(15, 15.5)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_c0wyr"]
 atlas = ExtResource("2_xo41o")
@@ -334,7 +334,7 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0uvtv"]
-size = Vector2(20, 3)
+size = Vector2(24, 3)
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_pxbmi"]
 
@@ -356,7 +356,7 @@ initial_velocity_max = 150.0
 scale_amount_max = 4.0
 
 [node name="Collision" type="CollisionShape2D" parent="."]
-position = Vector2(1.5, 2.25)
+position = Vector2(1.5, 7.75)
 shape = SubResource("RectangleShape2D_urgpx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -387,7 +387,6 @@ libraries = {
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2(2, -12.5)
 shape = SubResource("RectangleShape2D_0uvtv")
-one_way_collision = true
 
 [node name="BTPlayer" type="BTPlayer" parent="."]
 behavior_tree = ExtResource("5_jh7lu")
@@ -397,9 +396,9 @@ blackboard_plan = SubResource("BlackboardPlan_pxbmi")
 monitoring = false
 
 [node name="Collision" type="CollisionShape2D" parent="Hit"]
-position = Vector2(2, -5.5)
+position = Vector2(2, 6)
 shape = SubResource("RectangleShape2D_aq35j")
 debug_color = Color(0.523427, 0.573446, 0, 0.42)
 
-[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
 [connection signal="area_entered" from="Hit" to="." method="_on_hit_area_entered"]

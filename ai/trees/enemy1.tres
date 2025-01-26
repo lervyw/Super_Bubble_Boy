@@ -40,7 +40,6 @@ speed_var = 100
 tolerance = 25
 
 [sub_resource type="BTWait" id="BTWait_i4m8n"]
-duration = 3.0
 
 [sub_resource type="BTSequence" id="BTSequence_tevvh"]
 custom_name = "Move To Player"
@@ -62,7 +61,6 @@ speed_var = 60
 tolerance = 30
 
 [sub_resource type="BTWait" id="BTWait_wbmpl"]
-duration = 2.0
 
 [sub_resource type="BTSequence" id="BTSequence_4v6ih"]
 custom_name = "Move To Enemy Sequence"
