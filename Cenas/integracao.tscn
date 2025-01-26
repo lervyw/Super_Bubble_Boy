@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=4 uid="uid://ctn4mci7ytorl"]
+[gd_scene load_steps=3 format=4 uid="uid://ctn4mci7ytorl"]
 
 [ext_resource type="PackedScene" uid="uid://bef0sp8en86j5" path="res://Cenas/tilemerda.tscn" id="1_b5kb6"]
 [ext_resource type="PackedScene" uid="uid://b4c0go7txpq08" path="res://Cenas/player.tscn" id="2_kvl0q"]

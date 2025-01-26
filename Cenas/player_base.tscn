@@ -1,8 +1,8 @@
-[gd_scene load_steps=17 format=3 uid="uid://b4c0go7txpq08"]
+[gd_scene load_steps=17 format=3 uid="uid://b0oyvnakmfwra"]
 
-[ext_resource type="Script" path="res://Cenas/simple_player.gd" id="1_vnwna"]
-[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_6kpf2"]
-[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="3_fafjb"]
+[ext_resource type="Script" path="res://Cenas/simple_player_base.gd" id="1_lwoif"]
+[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_gas84"]
+[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="3_kax13"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -547,8 +547,8 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f1fp0"]
 size = Vector2(19, 20)
 
-[node name="Personagem" type="CharacterBody2D" node_paths=PackedStringArray("animation", "animation_sprite") groups=["player"]]
-script = ExtResource("1_vnwna")
+[node name="Player_base" type="CharacterBody2D" node_paths=PackedStringArray("animation", "animation_sprite") groups=["player"]]
+script = ExtResource("1_lwoif")
 animation = NodePath("Animacao")
 animation_sprite = NodePath("Textura")
 
@@ -558,7 +558,7 @@ libraries = {
 }
 
 [node name="Textura" type="Sprite2D" parent="."]
-texture = ExtResource("2_6kpf2")
+texture = ExtResource("2_gas84")
 hframes = 55
 frame = 36
 
@@ -571,7 +571,7 @@ limit_bottom = 100
 drag_horizontal_enabled = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_fafjb")
+stream = ExtResource("3_kax13")
 volume_db = -24.0
 autoplay = true
 
