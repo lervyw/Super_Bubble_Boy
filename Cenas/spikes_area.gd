@@ -10,6 +10,6 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _on_body_entered(body):
-	if body.name == "Player" && body.has_method("die"):
-		body.die()
+	if body.name == "Personagem" && body.has_method("take_damage"):
+		body.take_damage(1)
 	

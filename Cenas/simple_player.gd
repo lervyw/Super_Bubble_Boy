@@ -2,13 +2,13 @@ extends CharacterBody2D
 
 @export var animation: AnimationPlayer
 @export var animation_sprite: Sprite2D
-@export var player_health:= 3
-@export var max_health := 3
+@export var player_health:= 3 #vida do player
+@export var max_health := 3 #vida maxima
+#var is_invincible: bool = false
+
 
 const SPEED = 160.0
 const JUMP_VELOCITY = -400.0
-@export var max_lives: int = 3  # Máximo de vidas do jogador
-var current_lives: int
 @onready var life_bubbles: HBoxContainer = $HUD/HBoxContainer  # Referência ao container das bolhas
 
 var main_sm: LimboHSM
@@ -16,9 +16,14 @@ var direction
 var respawn_position
 var transformacaoOn: bool
 var transformado: bool 
-	
+
+signal change_life(player_health) #sinalizador de mundança de vida do player
 
 func _ready():
+	var hud = get_parent().get_node("HUD") #muita 
+	connect("change_life", Callable(hud, "on_life_changed"))# porra
+	emit_signal("change_life", max_health) # pro caraio do HUD
+	
 	initiate_state_machine()
 	respawn_position = position
 
@@ -144,19 +149,26 @@ func bolha_update(delta: float):
 		main_sm.dispatch(&"state_ended")
 
 	#	print(animation.current_animation)
-	
 
-
-func die() -> void:
-
-	# Exibe um efeito visual ou som de morte, se necessário
-	print("O jogador levou danp") # Exemplo de mensagem para debug
-	# Desativa o controle temporariamente
+func die() -> void: # metodo de morte do player
+	print("o jogador mamou")
 	set_physics_process(false)
-	# Restaura a posição inicial ou posição de respawn
 	position = respawn_position
 	animation.play("Transform2")
 	await animation.animation_finished
-	# Reativa o controle
 	set_physics_process(true)
 	
+func take_damage(amount: int): #metodo para o player levar dano
+	#if is_invencible = false
+	#	return
+	player_health -= 1
+	print("o jogador está com: ", player_health, " Vidas")
+	emit_signal("change_life", player_health)
+	#knockback()
+	if player_health <= 0:
+		die()
+	
+#func knockback():
+	#var knockback_force: Vector2 = Vector2(-200, 200)
+	#velocity = knockback_force
+	#move_and_slide()

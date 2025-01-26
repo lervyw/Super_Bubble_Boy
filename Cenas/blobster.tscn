@@ -12,7 +12,11 @@ tile_map_data = PackedByteArray("AAD4/wEAAAAAAAAAAAD5/wEAAAAAAAAAAAD6/wEAAAAAAAA
 
 [node name="Personagem" parent="." instance=ExtResource("2_8xgyn")]
 position = Vector2(14, -34)
+player_health = null
+max_health = null
 
 [node name="SpikesArea" parent="." instance=ExtResource("3_a7jvm")]
 
 [node name="HUD" parent="." instance=ExtResource("5_sm12l")]
+
+[editable path="HUD"]

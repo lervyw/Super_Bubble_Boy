@@ -11,6 +11,8 @@ tile_map_data = PackedByteArray("AAD4/wEAAAAAAAAAAAD5/wEAAAAAAAAAAAD6/wEAAAAAAAA
 
 [node name="Player" parent="." instance=ExtResource("2_kvl0q")]
 position = Vector2(23, -78)
+player_health = null
+max_health = null
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
 

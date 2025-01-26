@@ -6,23 +6,24 @@
 [node name="HUD" type="CanvasLayer"]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-anchors_preset = -1
-anchor_right = 0.125
-anchor_bottom = 0.222222
-offset_right = 90.0
-offset_bottom = 3.8147e-05
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -148.0
+grow_horizontal = 2
+grow_vertical = 2
 scale = Vector2(2.46579, 1.06374)
-size_flags_horizontal = 3
-size_flags_vertical = 3
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="Holder" type="Control" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("1_6j5rc")
 
-[node name="life" type="TextureRect" parent="HBoxContainer/Holder"]
-layout_mode = 0
+[node name="Bubble" type="TextureRect" parent="HBoxContainer/Holder"]
+layout_mode = 1
 offset_right = 8.0
-offset_bottom = 8.0
+offset_bottom = 9.0
 texture = ExtResource("1_4phti")
 stretch_mode = 1
