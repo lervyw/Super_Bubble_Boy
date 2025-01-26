@@ -4,12 +4,11 @@ extends CharacterBody2D
 @export var animation_sprite: Sprite2D
 @export var player_health:= 3
 @export var max_health := 3
+@export var is_invencible := false
+@export var lose_control := false
 
 const SPEED = 160.0
 const JUMP_VELOCITY = -400.0
-@export var max_lives: int = 3  # Máximo de vidas do jogador
-var current_lives: int
-@onready var life_bubbles: HBoxContainer = $HUD/HBoxContainer  # Referência ao container das bolhas
 
 var main_sm: LimboHSM
 var direction
@@ -145,12 +144,31 @@ func bolha_update(delta: float):
 
 	#	print(animation.current_animation)
 	
+func take_damage(amount: int): #metodo para o player levar dano
+	if is_invencible && lose_control == false:
+		return
 
+	lose_control = true
+	knockback()
+	await get_tree().create_timer(0.5).timeout
+	lose_control = false
+	
+	player_health -= 1
+	print("o jogador está com: ", player_health, " Vidas")
+	
+	if player_health <= 0:
+		die()
+		
+func knockback(direction: int = -1): # O parâmetro `direction` indica para onde o jogador será empurrado (-1 para esquerda, 1 para direita)
+	var knockback_force: Vector2 = Vector2(direction * 800, -800) # Para trás na direção X e para cima na direção Y
+	velocity += knockback_force # Adiciona a força de knockback à velocidade atual
+	move_and_slide()
 
+	
 func die() -> void:
 
 	# Exibe um efeito visual ou som de morte, se necessário
-	print("O jogador levou danp") # Exemplo de mensagem para debug
+	print("O jogador morreu") # Exemplo de mensagem para debug
 	# Desativa o controle temporariamente
 	set_physics_process(false)
 	# Restaura a posição inicial ou posição de respawn
@@ -159,4 +177,3 @@ func die() -> void:
 	await animation.animation_finished
 	# Reativa o controle
 	set_physics_process(true)
-	

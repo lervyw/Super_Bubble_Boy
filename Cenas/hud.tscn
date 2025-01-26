@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://4v1mv6nx587x"]
 
-[ext_resource type="Texture2D" uid="uid://gomyjgnqky8" path="res://gamejam/bubble/VidaBolha 2.png" id="1_4phti"]
-[ext_resource type="Script" path="res://Cenas/lifeholder.gd" id="1_6j5rc"]
+[ext_resource type="Texture2D" uid="uid://b1ui6vclleonv" path="res://gamejam/bubble/VidaBolha.png" id="2_hek4y"]
+[ext_resource type="Script" path="res://Cenas/label.gd" id="3_w4trd"]
 
 [node name="HUD" type="CanvasLayer"]
 
@@ -19,11 +19,22 @@ size_flags_vertical = 4
 [node name="Holder" type="Control" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("1_6j5rc")
 
 [node name="Bubble" type="TextureRect" parent="HBoxContainer/Holder"]
+texture_filter = 1
 layout_mode = 1
 offset_right = 8.0
 offset_bottom = 9.0
-texture = ExtResource("1_4phti")
+scale = Vector2(0.865075, 1.75739)
+texture = ExtResource("2_hek4y")
 stretch_mode = 1
+
+[node name="Label" type="Label" parent="HBoxContainer/Holder"]
+layout_mode = 0
+offset_left = 15.4109
+offset_top = 2.82024
+offset_right = 55.4109
+offset_bottom = 25.8202
+scale = Vector2(0.4899, 0.888391)
+text = "00"
+script = ExtResource("3_w4trd")
