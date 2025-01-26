@@ -1,21 +1,22 @@
 extends Node2D
 @export var player: Node
 var inimigo = preload("res://Cenas/slime.tscn").instantiate()
-var enemy_instance = inimigo
+
 	# Gera 10 inimigos em posições aleatórias
 func _ready() -> void:
-	
+	pass
 	for i in range(100):
 		spawn_enemy()
-		add_child(enemy_instance)
+		
+		
+		
 func spawn_enemy():
 	#5500
-	
-	
+	var enemy_instance = inimigo
 	var random_x = randf_range(35,200)
-	enemy_instance.position = Vector2(random_x, -609)
-		
-	print ("inimigo pica")
+	inimigo.position = Vector2(random_x, -609)
+	add_child(inimigo)
+	#print ("inimigo pica")
 
 	#var enemy_instance = inimigo
 	

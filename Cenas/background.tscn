@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://barbuh5nxkp2a"]
+[gd_scene load_steps=7 format=3 uid="uid://barbuh5nxkp2a"]
 
-[ext_resource type="Texture2D" uid="uid://rqtenx3ou800" path="res://gamejam/img/background/fundo/0.png" id="1_6ujw6"]
 [ext_resource type="Script" path="res://Cenas/background.gd" id="1_wpxlq"]
 [ext_resource type="Texture2D" uid="uid://qqcnd70hc2c1" path="res://gamejam/img/background/fundo/arvores_3.png" id="2_uhqxv"]
+[ext_resource type="Texture2D" uid="uid://mo1epw1uuxm8" path="res://gamejam/img/background/fundo/00.png" id="2_xfjhv"]
+[ext_resource type="Texture2D" uid="uid://qebivfjepou2" path="res://gamejam/img/background/fundo/1.png" id="2_yw0n6"]
 [ext_resource type="Texture2D" uid="uid://dqyr5d12lulap" path="res://gamejam/img/background/fundo/arvore_2.png" id="3_vx3ae"]
 [ext_resource type="Texture2D" uid="uid://2g18p4rbmec3" path="res://gamejam/img/background/fundo/arvore_1.png" id="4_dhaf6"]
 
@@ -17,7 +18,7 @@ motion_mirroring = Vector2(420, 280)
 [node name="TextureRect" type="TextureRect" parent="Layer3"]
 offset_right = 40.0
 offset_bottom = 40.0
-texture = ExtResource("1_6ujw6")
+texture = ExtResource("2_yw0n6")
 
 [node name="Layer4" type="ParallaxLayer" parent="."]
 position = Vector2(0, 19)
@@ -48,5 +49,15 @@ offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("4_dhaf6")
 
+[node name="Layer5" type="ParallaxLayer" parent="."]
+motion_mirroring = Vector2(420, 0)
+
+[node name="TextureRect" type="TextureRect" parent="Layer5"]
+offset_left = -3.0
+offset_top = 279.0
+offset_right = 417.0
+offset_bottom = 559.0
+texture = ExtResource("2_xfjhv")
+
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0.454524, 0.454524, 0.454524, 1)
+color = Color(0.617455, 0.617455, 0.617455, 1)
