@@ -17,8 +17,9 @@ var dead: bool = false
 var on_hit: bool = false
 
 func _ready() -> void:
-	position.x = 350
-	position.y = 219
+	#position.x = 350
+	#position.y = 219
+	pass
 func _physics_process(delta: float) -> void:
 
 	trans()	
