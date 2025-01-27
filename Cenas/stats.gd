@@ -28,10 +28,10 @@ func update_helth(type: String, value: int):
 				player.on_hit = true
 				#player.attacking = false
 			
-func _process(delta: float) -> void:
-	if Input.is_action_just_pressed("ui_down"):
-		update_helth("Decrease", 1)
-
+#func _process(delta: float) -> void:
+#	if Input.is_action_just_pressed("ui_down"):
+#		update_helth("Decrease", 1)
+#		pass
 
 func _on_colisao_area(area: Area2D) -> void:
 	#if area.name == "EnemyAttackArea":

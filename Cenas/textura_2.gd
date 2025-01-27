@@ -40,9 +40,12 @@ func hit_behavior():
 	player.set_physics_process(false)
 	if player.dead:
 		animation.play("Dead")
-	elif player.on_hit:
+	elif player.on_hit and estado ==0 :
 		animation.play("Hit")
-		
+	elif player.on_hit and estado == 1:
+		animation.play("Hit_Bolha")
+	elif player.on_hit and estado == 2:
+		animation.play("Hit_Super")
 			
 		
 		
@@ -92,16 +95,16 @@ func voltar():
 		
 		
 	if(estado == 0):
-		player.speed = 100
+		player.speed = 150
 		player.jump_speed = -320
-		player.player_gravity = 600
+		player.player_gravity = 400
 	elif(estado == 1):
 		player.speed = 50
 		player.jump_speed = -50
 		player.player_gravity = 50	
 	elif(estado == 2):
 		player.speed = 100
-		player.jump_speed = -320
+		player.jump_speed = -420
 		player.player_gravity = 600
 	
 
@@ -145,5 +148,10 @@ func _on_animacao_animation_finished(anim_name: StringName) -> void:
 		"Dead":
 #			nivel.reset_scene()
 			get_tree().reload_current_scene()
-
-			
+		"Hit_Bolha":
+			player.on_hit = false
+			player.set_physics_process(true)
+			animation.play("Bubble_only")
+		"Hit_Super":
+			player.on_hit = false
+			player.set_physics_process(true)

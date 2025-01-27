@@ -19,11 +19,15 @@ var on_hit: bool = false
 
 
 func _ready() -> void:
-	#position.x = 350
-	#position.y = 219
-	pass
+	position.x = 350
+	position.y = 219
+	
+	ambiente.autoplay
+	ambiente.playing 	
+	opera.stream_paused = true
+	
 func _physics_process(delta: float) -> void:
-
+	
 	trans()	
 	tocar()
 	vertical_moviment_env()

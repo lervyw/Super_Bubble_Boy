@@ -46,12 +46,21 @@ text = "obrigado por jogar"
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 0
-offset_left = 287.0
-offset_top = 83.0
-offset_right = 493.0
-offset_bottom = 278.0
+offset_left = 283.0
+offset_top = 63.0
+offset_right = 489.0
+offset_bottom = 258.0
 texture = ExtResource("4_ov38y")
 expand_mode = 1
+
+[node name="Label" type="Label" parent="TextureRect"]
+layout_mode = 0
+offset_left = 43.0
+offset_top = 138.0
+offset_right = 236.0
+offset_bottom = 187.0
+text = "BY:
+Iguana GameDev"
 
 [node name="Label2" type="Label" parent="."]
 layout_mode = 0
@@ -69,5 +78,5 @@ Filipe Levy
 Programação:
 Judá Matheo
 
-Programação
+Programação e Hud
 Riquelme Nascimento"

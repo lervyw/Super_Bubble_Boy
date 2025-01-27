@@ -1,7 +1,7 @@
 extends Node2D
 @export var player: Node
 @export var inimigo: PackedScene
-
+@export var status: Node
 var enemies = 0
 var target = 20
 #var inimigo = preload("res://Cenas/slime.tscn").instantiate()
@@ -21,7 +21,7 @@ func spawn_enemy():
 	var random_x = randf_range(35,5500)
 	var enemy_instance = inimigo.instantiate()
 	add_child(enemy_instance)
-	enemy_instance.position = Vector2(random_x, -609)
+	enemy_instance.position = Vector2(random_x, -654)
 		
 	#print ("inimigo pica")
 	
@@ -43,7 +43,7 @@ func reset_scene():
 	#get_tree().root.add_child(Player_sprite.super_bubble)
 	#self.queue_free()
 	
-		
+	status.update_helth("Decrease", 1)
 	player.position.x = 288
 	player.position.y = 207
 	

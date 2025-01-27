@@ -67,7 +67,9 @@ func _on_area_2d_body_entered(body: Node2D) -> void:
 		if life <= 0:			
 			animation_sprite.visible = false
 			await get_tree().create_timer(0.3).timeout
-			self.queue_free()
+			get_tree().change_scene_to_file("res://Cenas/Final_Credits.tscn")
+			#self.queue_free()
+			
 
 
 func _on_hit_area_entered(area: Area2D) -> void:

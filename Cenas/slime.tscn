@@ -7,7 +7,7 @@
 [ext_resource type="BehaviorTree" uid="uid://cld0755cv40wn" path="res://ai/trees/enemy1.tres" id="5_jh7lu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_urgpx"]
-size = Vector2(15, 15.5)
+size = Vector2(15, 25.5)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_c0wyr"]
 atlas = ExtResource("2_xo41o")
@@ -357,7 +357,7 @@ initial_velocity_max = 150.0
 scale_amount_max = 4.0
 
 [node name="Collision" type="CollisionShape2D" parent="."]
-position = Vector2(1.5, 7.75)
+position = Vector2(1.5, 2.75)
 shape = SubResource("RectangleShape2D_urgpx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

@@ -1,0 +1,44 @@
+[gd_scene load_steps=3 format=3 uid="uid://nmyisap4c30m"]
+
+[ext_resource type="Script" path="res://Cenas/timer.gd" id="1_mscsn"]
+[ext_resource type="Texture2D" uid="uid://bh6pwhjdnuxc5" path="res://gamejam/img/background/fundo/tempo.png" id="2_qk432"]
+
+[node name="Timer" type="CanvasLayer" node_paths=PackedStringArray("tempo")]
+script = ExtResource("1_mscsn")
+tempo = NodePath("HBoxContainer/Holder/TimerLabel")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -148.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2.46579, 1.06374)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Holder" type="Control" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Bubble" type="TextureRect" parent="HBoxContainer/Holder"]
+texture_filter = 1
+layout_mode = 1
+offset_left = 78.6766
+offset_top = 10.3409
+offset_right = 94.6766
+offset_bottom = 26.3409
+scale = Vector2(0.865075, 1.75739)
+texture = ExtResource("2_qk432")
+stretch_mode = 1
+
+[node name="TimerLabel" type="Label" parent="HBoxContainer/Holder"]
+layout_mode = 0
+offset_left = 92.4653
+offset_top = 12.221
+offset_right = 133.465
+offset_bottom = 35.221
+scale = Vector2(0.4899, 0.888391)
+text = "03:00
+"

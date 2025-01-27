@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://d3xrf0yvjc4od"]
+[gd_scene load_steps=35 format=3 uid="uid://d3xrf0yvjc4od"]
 
 [ext_resource type="Script" path="res://Cenas/personagem_2.gd" id="1_8lf2a"]
 [ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_wnukd"]
@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://cyso1bpcnueg1" path="res://Cenas/hud2.tscn" id="7_17xri"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
-size = Vector2(19, 21.5)
+size = Vector2(19, 32)
 
 [sub_resource type="Animation" id="Animation_7mbvf"]
 resource_name = "Bolha_Normal"
@@ -320,6 +320,38 @@ tracks/0/keys = {
 "values": [42, 44]
 }
 
+[sub_resource type="Animation" id="Animation_pgcbb"]
+resource_name = "Hit_Bolha"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Textura2:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [32, 31]
+}
+
+[sub_resource type="Animation" id="Animation_o5fcr"]
+resource_name = "Hit_Super"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Textura2:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [27, 28]
+}
+
 [sub_resource type="Animation" id="Animation_xymsx"]
 resource_name = "Idle"
 length = 0.4
@@ -529,6 +561,9 @@ tracks/3/keys = {
 "values": [Vector2(0, 16), Vector2(0, 14.375), Vector2(0, 10.375), Vector2(0, 2.875), Vector2(-2, -0.125)]
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3udnp"]
+size = Vector2(18, 2)
+
 [sub_resource type="Animation" id="Animation_5o1sk"]
 length = 0.001
 tracks/0/type = "value"
@@ -590,6 +625,54 @@ tracks/4/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [9.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("ColisaoArea/Collision2:shape:size")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(20, 31)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Matador/ColisorMatador:shape")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [SubResource("RectangleShape2D_3udnp")]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Matador/ColisorMatador:shape:size")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(18, 2)]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Matador/ColisorMatador:position")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 31)]
 }
 
 [sub_resource type="Animation" id="Animation_16yd1"]
@@ -694,6 +777,54 @@ tracks/3/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(38, 62)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("ColisaoArea/Collision2:shape:size")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(20, 31)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Matador/ColisorMatador:shape")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [SubResource("RectangleShape2D_3udnp")]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Matador/ColisorMatador:shape:size")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(18, 2)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Matador/ColisorMatador:position")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 31)]
 }
 
 [sub_resource type="Animation" id="Animation_jyvfb"]
@@ -865,6 +996,8 @@ _data = {
 "Dead": SubResource("Animation_iduop"),
 "Fall": SubResource("Animation_6q54a"),
 "Hit": SubResource("Animation_4y30l"),
+"Hit_Bolha": SubResource("Animation_pgcbb"),
+"Hit_Super": SubResource("Animation_o5fcr"),
 "Idle": SubResource("Animation_xymsx"),
 "Jump": SubResource("Animation_3wnyl"),
 "Normal_Bolha": SubResource("Animation_4mgx1"),
@@ -882,9 +1015,6 @@ _data = {
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bll10"]
 size = Vector2(20, 31)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_3udnp"]
-size = Vector2(16, 2)
 
 [node name="Personagem2" type="CharacterBody2D" node_paths=PackedStringArray("ambiente", "opera", "hud") groups=["player"]]
 script = ExtResource("1_8lf2a")
