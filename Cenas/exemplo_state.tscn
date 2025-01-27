@@ -18,7 +18,4 @@ position = Vector2(128, 208)
 [node name="SpikesArea" parent="." instance=ExtResource("4_ygupj")]
 position = Vector2(435, 286)
 
-[node name="CollisionShape2D" parent="SpikesArea" index="0"]
-position = Vector2(1523.58, 20.915)
-
 [editable path="SpikesArea"]
