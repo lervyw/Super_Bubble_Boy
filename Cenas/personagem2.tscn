@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://cyso1bpcnueg1" path="res://Cenas/hud2.tscn" id="7_17xri"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
-size = Vector2(19, 32)
+size = Vector2(19, 21.5)
 
 [sub_resource type="Animation" id="Animation_7mbvf"]
 resource_name = "Bolha_Normal"

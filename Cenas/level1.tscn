@@ -75,7 +75,7 @@ position = Vector2(5575, -891)
 player = NodePath("../Personagem2")
 
 [node name="bubble_up2" parent="." node_paths=PackedStringArray("player") instance=ExtResource("10_h5nj6")]
-position = Vector2(1484, 108)
+position = Vector2(381, 228)
 player = NodePath("../Personagem2")
 
 [node name="tiles" type="TileMapLayer" parent="."]
