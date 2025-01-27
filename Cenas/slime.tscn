@@ -386,6 +386,12 @@ libraries = {
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+light_mask = 4
+position = Vector2(2, -12.5)
+shape = SubResource("RectangleShape2D_0uvtv")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Area2D"]
+light_mask = 4
 position = Vector2(2, -12.5)
 shape = SubResource("RectangleShape2D_0uvtv")
 
@@ -397,6 +403,7 @@ blackboard_plan = SubResource("BlackboardPlan_pxbmi")
 monitoring = false
 
 [node name="Collision" type="CollisionShape2D" parent="Hit"]
+light_mask = 4
 position = Vector2(2, 6)
 shape = SubResource("RectangleShape2D_aq35j")
 debug_color = Color(0.523427, 0.573446, 0, 0.42)

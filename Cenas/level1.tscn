@@ -1,7 +1,8 @@
-[gd_scene load_steps=16 format=4 uid="uid://bmeqa3g35tp1i"]
+[gd_scene load_steps=17 format=4 uid="uid://bmeqa3g35tp1i"]
 
 [ext_resource type="Script" path="res://Cenas/level_1.gd" id="1_aby8y"]
 [ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://gamejam/img/tiles/pedra.png" id="1_djts0"]
+[ext_resource type="PackedScene" uid="uid://orok10r1p86e" path="res://Cenas/slime.tscn" id="2_7sm1u"]
 [ext_resource type="PackedScene" uid="uid://d3xrf0yvjc4od" path="res://Cenas/personagem2.tscn" id="2_csolo"]
 [ext_resource type="Texture2D" uid="uid://blov3p54q6huf" path="res://gamejam/img/tiles/pino.png" id="2_rrx48"]
 [ext_resource type="PackedScene" uid="uid://barbuh5nxkp2a" path="res://Cenas/background.tscn" id="3_itj36"]
@@ -67,6 +68,7 @@ sources/3 = SubResource("TileSetAtlasSource_rfofu")
 [node name="level1" type="Node2D" node_paths=PackedStringArray("player")]
 script = ExtResource("1_aby8y")
 player = NodePath("Personagem2")
+inimigo = ExtResource("2_7sm1u")
 
 [node name="BubbleUp1" parent="." node_paths=PackedStringArray("player") instance=ExtResource("9_y3u1x")]
 position = Vector2(5575, -891)
@@ -86,11 +88,8 @@ tile_set = SubResource("TileSet_spx7c")
 position = Vector2(467, 384)
 pai = NodePath("..")
 
+[node name="slime" parent="." instance=ExtResource("2_7sm1u")]
+position = Vector2(569, 214)
+
 [node name="Personagem2" parent="." node_paths=PackedStringArray("nivel") instance=ExtResource("2_csolo")]
-position = Vector2(329, 188)
 nivel = NodePath("..")
-
-[node name="Textura2" parent="Personagem2" index="1" node_paths=PackedStringArray("nivel")]
-nivel = NodePath("../..")
-
-[editable path="Personagem2"]

@@ -3,8 +3,8 @@ extends Node2D
 @export var inimigo: PackedScene
 
 var enemies = 0
-var target = 40
-var inimigo = preload("res://Cenas/slime.tscn").instantiate()
+var target = 20
+#var inimigo = preload("res://Cenas/slime.tscn").instantiate()
 
 	# Gera 10 inimigos em posições aleatórias
 func _ready() -> void:
@@ -18,7 +18,7 @@ func spawn_enemy():
 	#5500
 	
 	
-	var random_x = randf_range(35,250)
+	var random_x = randf_range(35,5500)
 	var enemy_instance = inimigo.instantiate()
 	add_child(enemy_instance)
 	enemy_instance.position = Vector2(random_x, -609)

@@ -5,7 +5,7 @@ extends CharacterBody2D
 @export var player_health:= 3 #vida do player
 @export var max_health := 3 #vida maxima
 #var is_invincible: bool = false
-
+@export var hud: CanvasLayer
 
 const SPEED = 160.0
 const JUMP_VELOCITY = -400.0

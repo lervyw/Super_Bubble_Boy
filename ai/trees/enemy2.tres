@@ -1,0 +1,78 @@
+[gd_resource type="BehaviorTree" load_steps=21 format=3 uid="uid://brtxih3ptab8m"]
+
+[ext_resource type="Script" path="res://ai/tasks/choose_random_pos.gd" id="1_x0frh"]
+[ext_resource type="Script" path="res://ai/tasks/move_to_position.gd" id="2_wddku"]
+[ext_resource type="Script" path="res://ai/tasks/find_target.gd" id="3_utjxg"]
+[ext_resource type="Script" path="res://ai/tasks/move_to_target.gd" id="4_65xkb"]
+
+[sub_resource type="BlackboardPlan" id="BlackboardPlan_xuprq"]
+
+[sub_resource type="BTAction" id="BTAction_6bj2f"]
+script = ExtResource("1_x0frh")
+range_min_in_dir = 10.0
+range_max_in_dir = 40.0
+position_var = &"pos"
+dir_var = &"dir"
+
+[sub_resource type="BTAction" id="BTAction_ty3ho"]
+script = ExtResource("2_wddku")
+target_pos_var = &"pos"
+dir_var = &"dir"
+speed_var = 40
+tolerance = 25
+
+[sub_resource type="BTSequence" id="BTSequence_aiy13"]
+custom_name = "Random Move Sequence"
+children = [SubResource("BTAction_6bj2f"), SubResource("BTAction_ty3ho")]
+
+[sub_resource type="BTProbability" id="BTProbability_lxcfq"]
+children = [SubResource("BTSequence_aiy13")]
+
+[sub_resource type="BTAction" id="BTAction_eie0b"]
+script = ExtResource("3_utjxg")
+group = &"player"
+target_var = &"target"
+
+[sub_resource type="BTAction" id="BTAction_n6abj"]
+script = ExtResource("4_65xkb")
+target_var = &"target"
+speed_var = 100
+tolerance = 25
+
+[sub_resource type="BTWait" id="BTWait_i4m8n"]
+
+[sub_resource type="BTSequence" id="BTSequence_tevvh"]
+custom_name = "Move To Player"
+children = [SubResource("BTAction_eie0b"), SubResource("BTAction_n6abj"), SubResource("BTWait_i4m8n")]
+
+[sub_resource type="BTProbability" id="BTProbability_yly27"]
+run_chance = 0.8
+children = [SubResource("BTSequence_tevvh")]
+
+[sub_resource type="BTAction" id="BTAction_ldpwj"]
+script = ExtResource("3_utjxg")
+group = &"enemy"
+target_var = &"target"
+
+[sub_resource type="BTAction" id="BTAction_yj8i3"]
+script = ExtResource("4_65xkb")
+target_var = &"target"
+speed_var = 60
+tolerance = 30
+
+[sub_resource type="BTWait" id="BTWait_wbmpl"]
+
+[sub_resource type="BTSequence" id="BTSequence_4v6ih"]
+custom_name = "Move To Enemy Sequence"
+children = [SubResource("BTAction_ldpwj"), SubResource("BTAction_yj8i3"), SubResource("BTWait_wbmpl")]
+
+[sub_resource type="BTProbability" id="BTProbability_2t2t4"]
+run_chance = 0.1
+children = [SubResource("BTSequence_4v6ih")]
+
+[sub_resource type="BTSelector" id="BTSelector_nf4mv"]
+children = [SubResource("BTProbability_lxcfq"), SubResource("BTProbability_yly27"), SubResource("BTProbability_2t2t4")]
+
+[resource]
+blackboard_plan = SubResource("BlackboardPlan_xuprq")
+root_task = SubResource("BTSelector_nf4mv")

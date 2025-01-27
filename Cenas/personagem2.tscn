@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://d3xrf0yvjc4od"]
+[gd_scene load_steps=33 format=3 uid="uid://d3xrf0yvjc4od"]
 
 [ext_resource type="Script" path="res://Cenas/personagem_2.gd" id="1_8lf2a"]
 [ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_wnukd"]
@@ -6,6 +6,7 @@
 [ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="4_i8fp7"]
 [ext_resource type="AudioStream" uid="uid://mvgqdg00a8pk" path="res://Cenas/music/Fabula-Herois-Tenebrosi.wav" id="5_46rfv"]
 [ext_resource type="Script" path="res://Cenas/stats.gd" id="6_r67yl"]
+[ext_resource type="PackedScene" uid="uid://cyso1bpcnueg1" path="res://Cenas/hud2.tscn" id="7_17xri"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -882,10 +883,14 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bll10"]
 size = Vector2(20, 31)
 
-[node name="Personagem2" type="CharacterBody2D" node_paths=PackedStringArray("ambiente", "opera") groups=["player"]]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3udnp"]
+size = Vector2(16, 2)
+
+[node name="Personagem2" type="CharacterBody2D" node_paths=PackedStringArray("ambiente", "opera", "hud") groups=["player"]]
 script = ExtResource("1_8lf2a")
 ambiente = NodePath("Ambiente")
 opera = NodePath("Opera")
+hud = NodePath("HUD")
 
 [node name="Animacao" type="AnimationPlayer" parent="."]
 libraries = {
@@ -934,6 +939,15 @@ one_shot = true
 [node name="Collision2" type="CollisionShape2D" parent="ColisaoArea"]
 position = Vector2(0, 16.5)
 shape = SubResource("RectangleShape2D_bll10")
+
+[node name="Matador" type="Area2D" parent="." groups=["player"]]
+
+[node name="ColisorMatador" type="CollisionShape2D" parent="Matador"]
+position = Vector2(0, 31)
+shape = SubResource("RectangleShape2D_3udnp")
+
+[node name="HUD" parent="." node_paths=PackedStringArray("status") instance=ExtResource("7_17xri")]
+status = NodePath("../Stats")
 
 [connection signal="animation_finished" from="Animacao" to="." method="_on_animation_finished"]
 [connection signal="animation_finished" from="Animacao" to="Textura2" method="_on_animacao_animation_finished"]

@@ -15,6 +15,8 @@ var Pode_Bolha: bool = false
 var Pode_Super: bool = false
 var dead: bool = false
 var on_hit: bool = false
+@export var hud: CanvasLayer
+
 
 func _ready() -> void:
 	position.x = 350
@@ -139,6 +141,7 @@ func die() -> void:
 	# Reativa o controle
 	set_physics_process(true)
 
+
 func delete():
 	#Player_sprite.super_bubble.transform = self.transform
 	Player_sprite.super_bubble.transform = self.transform
@@ -150,3 +153,6 @@ func knockback(direction: int = -1): # O parâmetro `direction` indica para onde
 	var knockback_force: Vector2 = Vector2(direction * 800, -800) # Para trás na direção X e para cima na direção Y
 	velocity += knockback_force # Adiciona a força de knockback à velocidade atual
 	move_and_slide()
+	
+
+		
