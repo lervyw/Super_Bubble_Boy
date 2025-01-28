@@ -101,7 +101,7 @@ position = Vector2(3656, -542)
 nivel = NodePath("..")
 
 [node name="boss" parent="." instance=ExtResource("12_fdens")]
-position = Vector2(-1372, 148)
+position = Vector2(-1140, 176)
 
 [node name="Timer" parent="." node_paths=PackedStringArray("player") instance=ExtResource("13_tb1qe")]
 player = NodePath("../Personagem2")

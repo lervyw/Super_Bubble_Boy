@@ -11,8 +11,8 @@ var player_gravity: int = 600
 var transformando: bool = false
 var transformando_super: bool = false
 var jump_count: int
-var Pode_Bolha: bool = false
-var Pode_Super: bool = false
+var Pode_Bolha: bool = true
+var Pode_Super: bool = true
 var dead: bool = false
 var on_hit: bool = false
 @export var hud: CanvasLayer
