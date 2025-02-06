@@ -1,9 +1,9 @@
 [gd_scene load_steps=32 format=3 uid="uid://orok10r1p86e"]
 
-[ext_resource type="Script" path="res://Cenas/slime.gd" id="1_s1e20"]
-[ext_resource type="Texture2D" uid="uid://cephunyh8lku2" path="res://gamejam/characters/Slime-Sheet-Sheet.png" id="2_xo41o"]
-[ext_resource type="Texture2D" uid="uid://gkstrwf0f3x4" path="res://gamejam/characters/balao.png" id="3_5evs1"]
-[ext_resource type="Texture2D" uid="uid://p868hysemgsd" path="res://gamejam/characters/balao2.png" id="4_trh87"]
+[ext_resource type="Script" path="res://scripts/slime.gd" id="1_4p1wq"]
+[ext_resource type="Texture2D" uid="uid://cephunyh8lku2" path="res://sprites/characters/Slime-Sheet-Sheet.png" id="2_xo41o"]
+[ext_resource type="Texture2D" uid="uid://gkstrwf0f3x4" path="res://sprites/characters/balao.png" id="3_5evs1"]
+[ext_resource type="Texture2D" uid="uid://p868hysemgsd" path="res://sprites/characters/balao2.png" id="4_trh87"]
 [ext_resource type="BehaviorTree" uid="uid://cld0755cv40wn" path="res://ai/trees/enemy1.tres" id="5_jh7lu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_urgpx"]
@@ -343,7 +343,7 @@ size = Vector2(24, 11)
 
 [node name="slime" type="CharacterBody2D" node_paths=PackedStringArray("hit") groups=["enemy"]]
 collision_layer = 4
-script = ExtResource("1_s1e20")
+script = ExtResource("1_4p1wq")
 hit = NodePath("Hit")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
@@ -388,12 +388,7 @@ libraries = {
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 light_mask = 4
-position = Vector2(2, -12.5)
-shape = SubResource("RectangleShape2D_0uvtv")
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Area2D"]
-light_mask = 4
-position = Vector2(2, -12.5)
+position = Vector2(2, -11)
 shape = SubResource("RectangleShape2D_0uvtv")
 
 [node name="BTPlayer" type="BTPlayer" parent="."]

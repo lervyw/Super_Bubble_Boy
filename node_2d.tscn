@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://ntsn30fgaanf"]
+
+[ext_resource type="Script" path="res://node_2d.gd" id="1_on0j8"]
+[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="2_gktyl"]
+
+[node name="Node2D" type="Node2D" node_paths=PackedStringArray("audio")]
+script = ExtResource("1_on0j8")
+audio = NodePath("AudioStreamPlayer")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_gktyl")

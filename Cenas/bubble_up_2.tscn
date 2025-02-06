@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://dva0fgxakbmyh"]
 
-[ext_resource type="Script" path="res://bubble_up_2.gd" id="1_5ijqw"]
-[ext_resource type="Texture2D" uid="uid://cp73pytuhq6qb" path="res://gamejam/bubble/bubble_upgrade2.png" id="2_6qje2"]
+[ext_resource type="Script" path="res://scripts/bubble_up_2.gd" id="1_usyni"]
+[ext_resource type="Texture2D" uid="uid://cp73pytuhq6qb" path="res://sprites/bubble/bubble_upgrade2.png" id="2_6qje2"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_a86wb"]
 atlas = ExtResource("2_6qje2")
@@ -71,7 +71,8 @@ animations = [{
 size = Vector2(12, 23)
 
 [node name="bubble_up2" type="Area2D"]
-script = ExtResource("1_5ijqw")
+position = Vector2(105, 49)
+script = ExtResource("1_usyni")
 
 [node name="Animated" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_jxqr4")

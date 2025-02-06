@@ -1,10 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://4v1mv6nx587x"]
 
-[ext_resource type="Texture2D" uid="uid://b1ui6vclleonv" path="res://gamejam/bubble/VidaBolha.png" id="2_hek4y"]
-[ext_resource type="Script" path="res://Cenas/label.gd" id="3_w4trd"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="1_uow6a"]
+[ext_resource type="Texture2D" uid="uid://b1ui6vclleonv" path="res://sprites/bubble/VidaBolha.png" id="2_hek4y"]
 
 [node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("label")]
-script = ExtResource("3_w4trd")
+script = ExtResource("1_uow6a")
 label = NodePath("HBoxContainer/Holder/Label")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
