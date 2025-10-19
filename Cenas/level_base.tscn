@@ -1,14 +1,16 @@
 [gd_scene load_steps=15 format=4 uid="uid://cjm3fq0tgumew"]
 
-[ext_resource type="Script" path="res://Cenas/level_1.gd" id="1_4sxxu"]
-[ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://gamejam/img/tiles/pedra.png" id="2_sgoki"]
+[ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://sprites/img/tiles/pedra.png" id="2_sgoki"]
 [ext_resource type="PackedScene" uid="uid://orok10r1p86e" path="res://Cenas/slime.tscn" id="2_xldgp"]
-[ext_resource type="Texture2D" uid="uid://blov3p54q6huf" path="res://gamejam/img/tiles/pino.png" id="3_ogwbe"]
-[ext_resource type="Texture2D" uid="uid://bvewddx6eaukb" path="res://gamejam/img/tiles/terra.png" id="4_5ggi2"]
-[ext_resource type="Texture2D" uid="uid://d3pn8mdjdg1b3" path="res://gamejam/img/tiles/terra_grama.png" id="5_efpbi"]
+[ext_resource type="Texture2D" uid="uid://blov3p54q6huf" path="res://sprites/img/tiles/pino.png" id="3_ogwbe"]
+[ext_resource type="Texture2D" uid="uid://bvewddx6eaukb" path="res://sprites/img/tiles/terra.png" id="4_5ggi2"]
+[ext_resource type="Texture2D" uid="uid://d3pn8mdjdg1b3" path="res://sprites/img/tiles/terra_grama.png" id="5_efpbi"]
 [ext_resource type="PackedScene" uid="uid://barbuh5nxkp2a" path="res://Cenas/background.tscn" id="6_86oy0"]
 [ext_resource type="PackedScene" uid="uid://nfm81ywuusso" path="res://Cenas/saida.tscn" id="7_nnri0"]
 [ext_resource type="PackedScene" uid="uid://cgwfscoeur0u2" path="res://Cenas/personagem_base.tscn" id="8_0ekfv"]
+
+[sub_resource type="Resource" id="Resource_83c4b"]
+metadata/__load_path__ = "res://Cenas/level_1.gd"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_he0a0"]
 texture = ExtResource("2_sgoki")
@@ -64,7 +66,7 @@ sources/2 = SubResource("TileSetAtlasSource_mi658")
 sources/3 = SubResource("TileSetAtlasSource_rfofu")
 
 [node name="level1" type="Node2D" node_paths=PackedStringArray("player")]
-script = ExtResource("1_4sxxu")
+script = SubResource("Resource_83c4b")
 player = NodePath("Personagem2")
 inimigo = ExtResource("2_xldgp")
 

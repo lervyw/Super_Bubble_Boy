@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dl8qu8g07860s"]
 
-[ext_resource type="Script" path="res://scripts/intro.gd" id="1_novn4"]
+[ext_resource type="Script" uid="uid://cluebdwpdpyn0" path="res://scripts/intro.gd" id="1_novn4"]
 [ext_resource type="Texture2D" uid="uid://dhjaruc8dbs22" path="res://sprites/img/background/fundo/preto2.png" id="2_uk30s"]
 
 [node name="intro" type="Control"]

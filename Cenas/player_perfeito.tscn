@@ -1,6 +1,7 @@
 [gd_scene load_steps=14 format=3 uid="uid://cgowkxqeyyr7v"]
 
-[ext_resource type="Script" path="res://Cenas/player_perfeito.gd" id="1_sxe2a"]
+[sub_resource type="Resource" id="Resource_87xc5"]
+metadata/__load_path__ = "res://Cenas/player_perfeito.gd"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -410,20 +411,20 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]
 _data = {
-"Born": SubResource("Animation_xbftm"),
-"Bubble_only": SubResource("Animation_pwxfo"),
-"Fall": SubResource("Animation_6q54a"),
-"Idle": SubResource("Animation_xymsx"),
-"Jump": SubResource("Animation_3wnyl"),
-"RESET": SubResource("Animation_5o1sk"),
-"Transform": SubResource("Animation_4mgx1"),
-"Transform2": SubResource("Animation_7mbvf"),
-"Transform3": SubResource("Animation_st8up"),
-"Walk": SubResource("Animation_ksl43")
+&"Born": SubResource("Animation_xbftm"),
+&"Bubble_only": SubResource("Animation_pwxfo"),
+&"Fall": SubResource("Animation_6q54a"),
+&"Idle": SubResource("Animation_xymsx"),
+&"Jump": SubResource("Animation_3wnyl"),
+&"RESET": SubResource("Animation_5o1sk"),
+&"Transform": SubResource("Animation_4mgx1"),
+&"Transform2": SubResource("Animation_7mbvf"),
+&"Transform3": SubResource("Animation_st8up"),
+&"Walk": SubResource("Animation_ksl43")
 }
 
 [node name="Player_perfeito" type="CharacterBody2D"]
-script = ExtResource("1_sxe2a")
+script = SubResource("Resource_87xc5")
 
 [node name="Animacao" type="AnimationPlayer" parent="."]
 libraries = {

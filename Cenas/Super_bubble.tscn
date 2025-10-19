@@ -1,9 +1,10 @@
 [gd_scene load_steps=16 format=3 uid="uid://x38jbtnyjaxm"]
 
-[ext_resource type="Script" path="res://Cenas/super_bubble.gd" id="1_6puua"]
-[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_piyl3"]
-[ext_resource type="Script" path="res://Cenas/textura_super.gd" id="3_donw4"]
-[ext_resource type="AudioStream" uid="uid://mvgqdg00a8pk" path="res://Cenas/music/Fabula-Herois-Tenebrosi.wav" id="4_y5ygc"]
+[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://sprites/bubble/super_bubble-Sheet3.png" id="2_piyl3"]
+[ext_resource type="AudioStream" uid="uid://mvgqdg00a8pk" path="res://music/Fabula-Herois-Tenebrosi.wav" id="4_y5ygc"]
+
+[sub_resource type="Resource" id="Resource_4uwrk"]
+metadata/__load_path__ = "res://Cenas/super_bubble.gd"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(43, 62)
@@ -530,19 +531,22 @@ tracks/5/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]
 _data = {
-"Born": SubResource("Animation_xbftm"),
-"Bubble_only": SubResource("Animation_pwxfo"),
-"Fall": SubResource("Animation_6q54a"),
-"Idle": SubResource("Animation_xymsx"),
-"Jump": SubResource("Animation_3wnyl"),
-"RESET": SubResource("Animation_5o1sk"),
-"Transform": SubResource("Animation_4mgx1"),
-"Transform3": SubResource("Animation_7mbvf"),
-"Walk": SubResource("Animation_ksl43")
+&"Born": SubResource("Animation_xbftm"),
+&"Bubble_only": SubResource("Animation_pwxfo"),
+&"Fall": SubResource("Animation_6q54a"),
+&"Idle": SubResource("Animation_xymsx"),
+&"Jump": SubResource("Animation_3wnyl"),
+&"RESET": SubResource("Animation_5o1sk"),
+&"Transform": SubResource("Animation_4mgx1"),
+&"Transform3": SubResource("Animation_7mbvf"),
+&"Walk": SubResource("Animation_ksl43")
 }
 
+[sub_resource type="Resource" id="Resource_syfnf"]
+metadata/__load_path__ = "res://Cenas/textura_super.gd"
+
 [node name="Super" type="CharacterBody2D" node_paths=PackedStringArray("ambiente")]
-script = ExtResource("1_6puua")
+script = SubResource("Resource_4uwrk")
 speed = 100
 jump_speed = -320
 player_gravity = 600
@@ -557,7 +561,7 @@ libraries = {
 texture = ExtResource("2_piyl3")
 hframes = 55
 frame = 17
-script = ExtResource("3_donw4")
+script = SubResource("Resource_syfnf")
 player = NodePath("..")
 animation = NodePath("../Animacao")
 

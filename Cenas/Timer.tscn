@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://nmyisap4c30m"]
 
-[ext_resource type="Script" path="res://scripts/timer.gd" id="1_e7nk4"]
+[ext_resource type="Script" uid="uid://prrpevhblj12" path="res://scripts/timer.gd" id="1_e7nk4"]
 [ext_resource type="Texture2D" uid="uid://bh6pwhjdnuxc5" path="res://sprites/img/background/fundo/tempo.png" id="2_qk432"]
 
 [node name="Timer" type="CanvasLayer" node_paths=PackedStringArray("tempo")]

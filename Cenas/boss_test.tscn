@@ -1,16 +1,18 @@
 [gd_scene load_steps=17 format=4 uid="uid://jgfqkrwtd2yw"]
 
-[ext_resource type="Script" path="res://Cenas/level_1.gd" id="1_tujk2"]
 [ext_resource type="PackedScene" uid="uid://vysepubj3l5h" path="res://Cenas/bubble_up_1.tscn" id="2_0j6eg"]
 [ext_resource type="PackedScene" uid="uid://dva0fgxakbmyh" path="res://Cenas/bubble_up_2.tscn" id="3_1cqqk"]
-[ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://gamejam/img/tiles/pedra.png" id="4_beve8"]
-[ext_resource type="Texture2D" uid="uid://blov3p54q6huf" path="res://gamejam/img/tiles/pino.png" id="5_80icm"]
-[ext_resource type="Texture2D" uid="uid://bvewddx6eaukb" path="res://gamejam/img/tiles/terra.png" id="6_j5ku6"]
-[ext_resource type="Texture2D" uid="uid://d3pn8mdjdg1b3" path="res://gamejam/img/tiles/terra_grama.png" id="7_hln2w"]
+[ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://sprites/img/tiles/pedra.png" id="4_beve8"]
+[ext_resource type="Texture2D" uid="uid://blov3p54q6huf" path="res://sprites/img/tiles/pino.png" id="5_80icm"]
+[ext_resource type="Texture2D" uid="uid://bvewddx6eaukb" path="res://sprites/img/tiles/terra.png" id="6_j5ku6"]
+[ext_resource type="Texture2D" uid="uid://d3pn8mdjdg1b3" path="res://sprites/img/tiles/terra_grama.png" id="7_hln2w"]
 [ext_resource type="PackedScene" uid="uid://barbuh5nxkp2a" path="res://Cenas/background.tscn" id="8_jsa8m"]
 [ext_resource type="PackedScene" uid="uid://nfm81ywuusso" path="res://Cenas/saida.tscn" id="9_54sfu"]
 [ext_resource type="PackedScene" uid="uid://d3xrf0yvjc4od" path="res://Cenas/personagem2.tscn" id="10_efy4y"]
 [ext_resource type="PackedScene" uid="uid://2bsj0rjvtl73" path="res://Cenas/boss.tscn" id="11_ohsks"]
+
+[sub_resource type="Resource" id="Resource_5aaom"]
+metadata/__load_path__ = "res://Cenas/level_1.gd"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_he0a0"]
 texture = ExtResource("4_beve8")
@@ -66,7 +68,7 @@ sources/2 = SubResource("TileSetAtlasSource_mi658")
 sources/3 = SubResource("TileSetAtlasSource_rfofu")
 
 [node name="level1" type="Node2D" node_paths=PackedStringArray("player")]
-script = ExtResource("1_tujk2")
+script = SubResource("Resource_5aaom")
 player = NodePath("Personagem2")
 
 [node name="BubbleUp1" parent="." node_paths=PackedStringArray("player") instance=ExtResource("2_0j6eg")]

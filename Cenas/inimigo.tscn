@@ -1,11 +1,6 @@
 [gd_scene load_steps=18 format=3 uid="uid://b51pl8i46sr00"]
 
-[ext_resource type="Script" path="res://Cenas/inimigo.gd" id="1_6i0bk"]
-[ext_resource type="Texture2D" uid="uid://b71ha5mcxiq6v" path="res://gamejam/bubble/bubble_spritesheet-Sheet.png" id="2_3rbci"]
-[ext_resource type="Script" path="res://Cenas/textura.gd" id="3_6sl1i"]
-[ext_resource type="Script" path="res://Cenas/state_machine.gd" id="4_ujp4d"]
-[ext_resource type="Script" path="res://Cenas/States/idleplayer.gd" id="5_vljyc"]
-[ext_resource type="Script" path="res://Cenas/States/followplayer.gd" id="6_30b5o"]
+[ext_resource type="Texture2D" uid="uid://b71ha5mcxiq6v" path="res://sprites/bubble/bubble_spritesheet-Sheet.png" id="2_3rbci"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -482,16 +477,31 @@ tracks/3/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]
 _data = {
-"Born": SubResource("Animation_xbftm"),
-"Bubble_only": SubResource("Animation_pwxfo"),
-"Fall": SubResource("Animation_6q54a"),
-"Idle": SubResource("Animation_xymsx"),
-"Jump": SubResource("Animation_3wnyl"),
-"RESET": SubResource("Animation_5o1sk"),
-"Transform": SubResource("Animation_4mgx1"),
-"Transform2": SubResource("Animation_7mbvf"),
-"Walk": SubResource("Animation_ksl43")
+&"Born": SubResource("Animation_xbftm"),
+&"Bubble_only": SubResource("Animation_pwxfo"),
+&"Fall": SubResource("Animation_6q54a"),
+&"Idle": SubResource("Animation_xymsx"),
+&"Jump": SubResource("Animation_3wnyl"),
+&"RESET": SubResource("Animation_5o1sk"),
+&"Transform": SubResource("Animation_4mgx1"),
+&"Transform2": SubResource("Animation_7mbvf"),
+&"Walk": SubResource("Animation_ksl43")
 }
+
+[sub_resource type="Resource" id="Resource_r4xcy"]
+metadata/__load_path__ = "res://Cenas/textura.gd"
+
+[sub_resource type="Resource" id="Resource_y60ay"]
+metadata/__load_path__ = "res://Cenas/state_machine.gd"
+
+[sub_resource type="Resource" id="Resource_duo5w"]
+metadata/__load_path__ = "res://Cenas/States/idleplayer.gd"
+
+[sub_resource type="Resource" id="Resource_rdsc4"]
+metadata/__load_path__ = "res://Cenas/States/followplayer.gd"
+
+[sub_resource type="Resource" id="Resource_hkocf"]
+metadata/__load_path__ = "res://Cenas/inimigo.gd"
 
 [node name="Inimigo" type="CharacterBody2D"]
 
@@ -504,7 +514,7 @@ libraries = {
 texture = ExtResource("2_3rbci")
 hframes = 26
 frame = 6
-script = ExtResource("3_6sl1i")
+script = SubResource("Resource_r4xcy")
 player = NodePath("..")
 animation = NodePath("../Animacao")
 
@@ -513,19 +523,19 @@ position = Vector2(0.5, 0)
 shape = SubResource("RectangleShape2D_kadp1")
 
 [node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
-script = ExtResource("4_ujp4d")
+script = SubResource("Resource_y60ay")
 initial_state = NodePath("Walk")
 
 [node name="Idle" type="Node" parent="StateMachine" node_paths=PackedStringArray("enemy")]
-script = ExtResource("5_vljyc")
+script = SubResource("Resource_duo5w")
 enemy = NodePath("../..")
 
 [node name="Follow" type="Node" parent="StateMachine" node_paths=PackedStringArray("enemy")]
-script = ExtResource("6_30b5o")
+script = SubResource("Resource_rdsc4")
 enemy = NodePath("../..")
 
 [node name="Walk" type="Node" parent="StateMachine" node_paths=PackedStringArray("enemy")]
-script = ExtResource("1_6i0bk")
+script = SubResource("Resource_hkocf")
 enemy = NodePath("../..")
 
 [connection signal="animation_finished" from="Animacao" to="." method="_on_animation_finished"]

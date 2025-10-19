@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://nfm81ywuusso"]
 
-[ext_resource type="Script" path="res://scripts/saida.gd" id="1_mjiy0"]
+[ext_resource type="Script" uid="uid://djv20rs0wgcty" path="res://scripts/saida.gd" id="1_mjiy0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_twqaj"]
 size = Vector2(162152, 231.519)

@@ -1,9 +1,9 @@
 [gd_resource type="BehaviorTree" load_steps=21 format=3 uid="uid://cld0755cv40wn"]
 
-[ext_resource type="Script" path="res://ai/tasks/choose_random_pos.gd" id="1_hmhiq"]
-[ext_resource type="Script" path="res://ai/tasks/move_to_position.gd" id="2_gg3ln"]
-[ext_resource type="Script" path="res://ai/tasks/find_target.gd" id="3_u71t8"]
-[ext_resource type="Script" path="res://ai/tasks/move_to_target.gd" id="4_llv7f"]
+[ext_resource type="Script" uid="uid://c24ly1dsqess" path="res://ai/tasks/choose_random_pos.gd" id="1_hmhiq"]
+[ext_resource type="Script" uid="uid://nk03qssbwsha" path="res://ai/tasks/move_to_position.gd" id="2_gg3ln"]
+[ext_resource type="Script" uid="uid://bppwxasqe1pdw" path="res://ai/tasks/find_target.gd" id="3_u71t8"]
+[ext_resource type="Script" uid="uid://wogxo268cxfq" path="res://ai/tasks/move_to_target.gd" id="4_llv7f"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_xuprq"]
 
@@ -11,14 +11,9 @@
 script = ExtResource("1_hmhiq")
 range_min_in_dir = 10.0
 range_max_in_dir = 40.0
-position_var = &"pos"
-dir_var = &"dir"
 
 [sub_resource type="BTAction" id="BTAction_ty3ho"]
 script = ExtResource("2_gg3ln")
-target_pos_var = &"pos"
-dir_var = &"dir"
-speed_var = 40
 tolerance = 25
 
 [sub_resource type="BTSequence" id="BTSequence_aiy13"]
@@ -31,11 +26,9 @@ children = [SubResource("BTSequence_aiy13")]
 [sub_resource type="BTAction" id="BTAction_eie0b"]
 script = ExtResource("3_u71t8")
 group = &"player"
-target_var = &"target"
 
 [sub_resource type="BTAction" id="BTAction_n6abj"]
 script = ExtResource("4_llv7f")
-target_var = &"target"
 speed_var = 100
 tolerance = 25
 
@@ -52,12 +45,9 @@ children = [SubResource("BTSequence_tevvh")]
 [sub_resource type="BTAction" id="BTAction_ldpwj"]
 script = ExtResource("3_u71t8")
 group = &"enemy"
-target_var = &"target"
 
 [sub_resource type="BTAction" id="BTAction_yj8i3"]
 script = ExtResource("4_llv7f")
-target_var = &"target"
-speed_var = 60
 tolerance = 30
 
 [sub_resource type="BTWait" id="BTWait_wbmpl"]

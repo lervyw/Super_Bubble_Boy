@@ -1,8 +1,10 @@
 [gd_scene load_steps=17 format=3 uid="uid://dcurysye5n3sq"]
 
-[ext_resource type="Script" path="res://Cenas/simple_player_base.gd" id="1_lwoif"]
-[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_gas84"]
-[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="3_kax13"]
+[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://sprites/bubble/super_bubble-Sheet3.png" id="2_gas84"]
+[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://music/A Alegria Pixelada.wav" id="3_kax13"]
+
+[sub_resource type="Resource" id="Resource_0bc0t"]
+metadata/__load_path__ = "res://Cenas/simple_player_base.gd"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -532,23 +534,23 @@ tracks/3/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]
 _data = {
-"Born": SubResource("Animation_xbftm"),
-"Bubble_only": SubResource("Animation_pwxfo"),
-"Fall": SubResource("Animation_6q54a"),
-"Idle": SubResource("Animation_xymsx"),
-"Jump": SubResource("Animation_3wnyl"),
-"RESET": SubResource("Animation_5o1sk"),
-"Transform": SubResource("Animation_4mgx1"),
-"Transform2": SubResource("Animation_7mbvf"),
-"Transform3": SubResource("Animation_st8up"),
-"Walk": SubResource("Animation_ksl43")
+&"Born": SubResource("Animation_xbftm"),
+&"Bubble_only": SubResource("Animation_pwxfo"),
+&"Fall": SubResource("Animation_6q54a"),
+&"Idle": SubResource("Animation_xymsx"),
+&"Jump": SubResource("Animation_3wnyl"),
+&"RESET": SubResource("Animation_5o1sk"),
+&"Transform": SubResource("Animation_4mgx1"),
+&"Transform2": SubResource("Animation_7mbvf"),
+&"Transform3": SubResource("Animation_st8up"),
+&"Walk": SubResource("Animation_ksl43")
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f1fp0"]
 size = Vector2(19, 20)
 
 [node name="Player_base" type="CharacterBody2D" node_paths=PackedStringArray("animation", "animation_sprite") groups=["player"]]
-script = ExtResource("1_lwoif")
+script = SubResource("Resource_0bc0t")
 animation = NodePath("Animacao")
 animation_sprite = NodePath("Textura")
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=27 format=3 uid="uid://2bsj0rjvtl73"]
 
-[ext_resource type="Script" path="res://scripts/boss.gd" id="1_faq14"]
+[ext_resource type="Script" uid="uid://dal4xk7p4hxxg" path="res://scripts/boss.gd" id="1_faq14"]
 [ext_resource type="Texture2D" uid="uid://c3o25ywjj2vb8" path="res://sprites/characters/boss-Sheet.png" id="2_cmtw4"]
 [ext_resource type="Texture2D" uid="uid://gkstrwf0f3x4" path="res://sprites/characters/balao.png" id="3_8citt"]
 [ext_resource type="Texture2D" uid="uid://p868hysemgsd" path="res://sprites/characters/balao2.png" id="4_385ap"]
@@ -301,10 +301,10 @@ tracks/3/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_e261w"]
 _data = {
-"RESET": SubResource("Animation_dhdlb"),
-"chat": SubResource("Animation_5uklt"),
-"padrao": SubResource("Animation_ari7e"),
-"warning": SubResource("Animation_3xr8w")
+&"RESET": SubResource("Animation_dhdlb"),
+&"chat": SubResource("Animation_5uklt"),
+&"padrao": SubResource("Animation_ari7e"),
+&"warning": SubResource("Animation_3xr8w")
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0uvtv"]
@@ -354,7 +354,7 @@ texture = ExtResource("4_385ap")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_e261w")
+&"": SubResource("AnimationLibrary_e261w")
 }
 
 [node name="Area2D" type="Area2D" parent="."]

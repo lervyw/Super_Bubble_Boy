@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Super_bubble"
 run/main_scene="res://Cenas/Title.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/image="res://gamejam/img/logoprojog.png"
 config/icon="res://icon_bubble.svg"

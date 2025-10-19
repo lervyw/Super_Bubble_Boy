@@ -1,11 +1,11 @@
 [gd_scene load_steps=47 format=3 uid="uid://d3xrf0yvjc4od"]
 
-[ext_resource type="Script" path="res://scripts/personagem_2.gd" id="1_gcfgo"]
+[ext_resource type="Script" uid="uid://dkwo33107g2du" path="res://scripts/personagem_2.gd" id="1_gcfgo"]
 [ext_resource type="Texture2D" uid="uid://cs1ebyya2wbsk" path="res://sprites/bubble/super_bubble-Sheet.png" id="2_ue1vv"]
-[ext_resource type="Script" path="res://scripts/textura_2.gd" id="3_4lyvx"]
+[ext_resource type="Script" uid="uid://v0eyg00wkgit" path="res://scripts/textura_2.gd" id="3_4lyvx"]
 [ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://music/A Alegria Pixelada.wav" id="4_i8fp7"]
 [ext_resource type="AudioStream" uid="uid://mvgqdg00a8pk" path="res://music/Fabula-Herois-Tenebrosi.wav" id="5_46rfv"]
-[ext_resource type="Script" path="res://scripts/stats.gd" id="6_jb0f0"]
+[ext_resource type="Script" uid="uid://cjd6j1k3j6ebg" path="res://scripts/stats.gd" id="6_jb0f0"]
 [ext_resource type="PackedScene" uid="uid://4v1mv6nx587x" path="res://Cenas/hud.tscn" id="7_cyb7e"]
 
 [sub_resource type="Animation" id="Animation_enrab"]
@@ -1312,40 +1312,40 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]
 _data = {
-"B_dead": SubResource("Animation_enrab"),
-"Bolha_Normal": SubResource("Animation_7mbvf"),
-"Bolha_Super": SubResource("Animation_smwxs"),
-"Born": SubResource("Animation_xbftm"),
-"Bubble_only": SubResource("Animation_pwxfo"),
-"Dead_normal": SubResource("Animation_iduop"),
-"Fall": SubResource("Animation_6q54a"),
-"Hit": SubResource("Animation_4y30l"),
-"Hit_Bolha": SubResource("Animation_pgcbb"),
-"Hit_Super": SubResource("Animation_o5fcr"),
-"Idle": SubResource("Animation_xymsx"),
-"Jump": SubResource("Animation_3wnyl"),
-"N_c_loop": SubResource("Animation_0402r"),
-"Normal dash": SubResource("Animation_5uh3w"),
-"Normal_Bolha": SubResource("Animation_4mgx1"),
-"Normal_Super": SubResource("Animation_st8up"),
-"Normal_crouch": SubResource("Animation_bs6g0"),
-"RESET": SubResource("Animation_5o1sk"),
-"S_Fall": SubResource("Animation_16yd1"),
-"S_Idle": SubResource("Animation_8sp25"),
-"S_Jump": SubResource("Animation_1pssk"),
-"S_Walk": SubResource("Animation_yb2mi"),
-"S_attack": SubResource("Animation_tbc0f"),
-"S_crouch": SubResource("Animation_txa1y"),
-"S_crouch_attack": SubResource("Animation_3hyso"),
-"S_dead": SubResource("Animation_fw0s2"),
-"S_jump_attack": SubResource("Animation_4khn8"),
-"S_parry": SubResource("Animation_wmo0c"),
-"Super_Bolha": SubResource("Animation_jyvfb"),
-"Super_Normal": SubResource("Animation_wptxv"),
-"T_attack": SubResource("Animation_mdi5i"),
-"Transform5": SubResource("Animation_6o3ec"),
-"Walk": SubResource("Animation_ksl43"),
-"dash": SubResource("Animation_n1uy8")
+&"B_dead": SubResource("Animation_enrab"),
+&"Bolha_Normal": SubResource("Animation_7mbvf"),
+&"Bolha_Super": SubResource("Animation_smwxs"),
+&"Born": SubResource("Animation_xbftm"),
+&"Bubble_only": SubResource("Animation_pwxfo"),
+&"Dead_normal": SubResource("Animation_iduop"),
+&"Fall": SubResource("Animation_6q54a"),
+&"Hit": SubResource("Animation_4y30l"),
+&"Hit_Bolha": SubResource("Animation_pgcbb"),
+&"Hit_Super": SubResource("Animation_o5fcr"),
+&"Idle": SubResource("Animation_xymsx"),
+&"Jump": SubResource("Animation_3wnyl"),
+&"N_c_loop": SubResource("Animation_0402r"),
+&"Normal dash": SubResource("Animation_5uh3w"),
+&"Normal_Bolha": SubResource("Animation_4mgx1"),
+&"Normal_Super": SubResource("Animation_st8up"),
+&"Normal_crouch": SubResource("Animation_bs6g0"),
+&"RESET": SubResource("Animation_5o1sk"),
+&"S_Fall": SubResource("Animation_16yd1"),
+&"S_Idle": SubResource("Animation_8sp25"),
+&"S_Jump": SubResource("Animation_1pssk"),
+&"S_Walk": SubResource("Animation_yb2mi"),
+&"S_attack": SubResource("Animation_tbc0f"),
+&"S_crouch": SubResource("Animation_txa1y"),
+&"S_crouch_attack": SubResource("Animation_3hyso"),
+&"S_dead": SubResource("Animation_fw0s2"),
+&"S_jump_attack": SubResource("Animation_4khn8"),
+&"S_parry": SubResource("Animation_wmo0c"),
+&"Super_Bolha": SubResource("Animation_jyvfb"),
+&"Super_Normal": SubResource("Animation_wptxv"),
+&"T_attack": SubResource("Animation_mdi5i"),
+&"Transform5": SubResource("Animation_6o3ec"),
+&"Walk": SubResource("Animation_ksl43"),
+&"dash": SubResource("Animation_n1uy8")
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bll10"]
@@ -1358,7 +1358,7 @@ opera = NodePath("Opera")
 
 [node name="Animacao" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_1mgau")
+&"": SubResource("AnimationLibrary_1mgau")
 }
 
 [node name="Textura2" type="Sprite2D" parent="." node_paths=PackedStringArray("player", "animation", "stats")]
