@@ -1,9 +1,9 @@
 [gd_resource type="BehaviorTree" load_steps=21 format=3 uid="uid://cld0755cv40wn"]
 
-[ext_resource type="Script" uid="uid://c24ly1dsqess" path="res://ai/tasks/choose_random_pos.gd" id="1_hmhiq"]
-[ext_resource type="Script" uid="uid://nk03qssbwsha" path="res://ai/tasks/move_to_position.gd" id="2_gg3ln"]
-[ext_resource type="Script" uid="uid://bppwxasqe1pdw" path="res://ai/tasks/find_target.gd" id="3_u71t8"]
-[ext_resource type="Script" uid="uid://wogxo268cxfq" path="res://ai/tasks/move_to_target.gd" id="4_llv7f"]
+[ext_resource type="Script" uid="uid://dc4t125pdp7l4" path="res://ai/tasks/choose_random_pos.gd" id="1_hmhiq"]
+[ext_resource type="Script" uid="uid://cruiplpetioe2" path="res://ai/tasks/move_to_position.gd" id="2_gg3ln"]
+[ext_resource type="Script" uid="uid://dpu6fl4hadhpw" path="res://ai/tasks/find_target.gd" id="3_u71t8"]
+[ext_resource type="Script" uid="uid://clossmhasi1aq" path="res://ai/tasks/move_to_target.gd" id="4_llv7f"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_xuprq"]
 
