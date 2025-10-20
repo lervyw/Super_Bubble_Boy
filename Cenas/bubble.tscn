@@ -1,8 +1,9 @@
 [gd_scene load_steps=15 format=3 uid="uid://bi10utbot1suq"]
 
-[ext_resource type="Script" path="res://Cenas/bubble.gd" id="1_xs5y5"]
-[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_oameu"]
-[ext_resource type="Script" path="res://Cenas/textura_bubble.gd" id="3_j8265"]
+[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://sprites/bubble/super_bubble-Sheet3.png" id="2_oameu"]
+
+[sub_resource type="Resource" id="Resource_kld1r"]
+metadata/__load_path__ = "res://Cenas/bubble.gd"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -529,19 +530,22 @@ tracks/5/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]
 _data = {
-"Born": SubResource("Animation_xbftm"),
-"Bubble_only": SubResource("Animation_pwxfo"),
-"Fall": SubResource("Animation_6q54a"),
-"Idle": SubResource("Animation_xymsx"),
-"Jump": SubResource("Animation_3wnyl"),
-"RESET": SubResource("Animation_5o1sk"),
-"Transform": SubResource("Animation_4mgx1"),
-"Transform2": SubResource("Animation_7mbvf"),
-"Walk": SubResource("Animation_ksl43")
+&"Born": SubResource("Animation_xbftm"),
+&"Bubble_only": SubResource("Animation_pwxfo"),
+&"Fall": SubResource("Animation_6q54a"),
+&"Idle": SubResource("Animation_xymsx"),
+&"Jump": SubResource("Animation_3wnyl"),
+&"RESET": SubResource("Animation_5o1sk"),
+&"Transform": SubResource("Animation_4mgx1"),
+&"Transform2": SubResource("Animation_7mbvf"),
+&"Walk": SubResource("Animation_ksl43")
 }
 
+[sub_resource type="Resource" id="Resource_s0ffi"]
+metadata/__load_path__ = "res://Cenas/textura_bubble.gd"
+
 [node name="Bubble" type="CharacterBody2D"]
-script = ExtResource("1_xs5y5")
+script = SubResource("Resource_kld1r")
 
 [node name="Animacao" type="AnimationPlayer" parent="."]
 libraries = {
@@ -552,7 +556,7 @@ libraries = {
 texture = ExtResource("2_oameu")
 hframes = 55
 frame = 6
-script = ExtResource("3_j8265")
+script = SubResource("Resource_s0ffi")
 
 [node name="Colisao" type="CollisionShape2D" parent="."]
 position = Vector2(0.5, 0)

@@ -1,11 +1,11 @@
 [gd_scene load_steps=32 format=3 uid="uid://cgwfscoeur0u2"]
 
-[ext_resource type="Script" path="res://Cenas/personagem_2.gd" id="1_h1b7n"]
-[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_8uqbu"]
-[ext_resource type="Script" path="res://Cenas/textura_2.gd" id="3_7smws"]
-[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="4_cnt5c"]
-[ext_resource type="AudioStream" uid="uid://mvgqdg00a8pk" path="res://Cenas/music/Fabula-Herois-Tenebrosi.wav" id="5_nptr8"]
-[ext_resource type="Script" path="res://Cenas/stats.gd" id="6_umr2e"]
+[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://sprites/bubble/super_bubble-Sheet3.png" id="2_8uqbu"]
+[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://music/A Alegria Pixelada.wav" id="4_cnt5c"]
+[ext_resource type="AudioStream" uid="uid://mvgqdg00a8pk" path="res://music/Fabula-Herois-Tenebrosi.wav" id="5_nptr8"]
+
+[sub_resource type="Resource" id="Resource_jdm6a"]
+metadata/__load_path__ = "res://Cenas/personagem_2.gd"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -857,27 +857,33 @@ tracks/3/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]
 _data = {
-"Bolha_Normal": SubResource("Animation_7mbvf"),
-"Bolha_Super": SubResource("Animation_smwxs"),
-"Born": SubResource("Animation_xbftm"),
-"Bubble_only": SubResource("Animation_pwxfo"),
-"Dead": SubResource("Animation_iduop"),
-"Fall": SubResource("Animation_6q54a"),
-"Hit": SubResource("Animation_4y30l"),
-"Idle": SubResource("Animation_xymsx"),
-"Jump": SubResource("Animation_3wnyl"),
-"Normal_Bolha": SubResource("Animation_4mgx1"),
-"Normal_Super": SubResource("Animation_st8up"),
-"RESET": SubResource("Animation_5o1sk"),
-"S_Fall": SubResource("Animation_16yd1"),
-"S_Idle": SubResource("Animation_8sp25"),
-"S_Jump": SubResource("Animation_1pssk"),
-"S_Walk": SubResource("Animation_yb2mi"),
-"Super_Bolha": SubResource("Animation_jyvfb"),
-"Super_Normal": SubResource("Animation_wptxv"),
-"Transform5": SubResource("Animation_6o3ec"),
-"Walk": SubResource("Animation_ksl43")
+&"Bolha_Normal": SubResource("Animation_7mbvf"),
+&"Bolha_Super": SubResource("Animation_smwxs"),
+&"Born": SubResource("Animation_xbftm"),
+&"Bubble_only": SubResource("Animation_pwxfo"),
+&"Dead": SubResource("Animation_iduop"),
+&"Fall": SubResource("Animation_6q54a"),
+&"Hit": SubResource("Animation_4y30l"),
+&"Idle": SubResource("Animation_xymsx"),
+&"Jump": SubResource("Animation_3wnyl"),
+&"Normal_Bolha": SubResource("Animation_4mgx1"),
+&"Normal_Super": SubResource("Animation_st8up"),
+&"RESET": SubResource("Animation_5o1sk"),
+&"S_Fall": SubResource("Animation_16yd1"),
+&"S_Idle": SubResource("Animation_8sp25"),
+&"S_Jump": SubResource("Animation_1pssk"),
+&"S_Walk": SubResource("Animation_yb2mi"),
+&"Super_Bolha": SubResource("Animation_jyvfb"),
+&"Super_Normal": SubResource("Animation_wptxv"),
+&"Transform5": SubResource("Animation_6o3ec"),
+&"Walk": SubResource("Animation_ksl43")
 }
+
+[sub_resource type="Resource" id="Resource_mbrpp"]
+metadata/__load_path__ = "res://Cenas/textura_2.gd"
+
+[sub_resource type="Resource" id="Resource_mvvq7"]
+metadata/__load_path__ = "res://Cenas/stats.gd"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bll10"]
 size = Vector2(18, 31)
@@ -886,7 +892,7 @@ size = Vector2(18, 31)
 size = Vector2(16, 2)
 
 [node name="Personagem2" type="CharacterBody2D" node_paths=PackedStringArray("ambiente", "opera") groups=["player"]]
-script = ExtResource("1_h1b7n")
+script = SubResource("Resource_jdm6a")
 ambiente = NodePath("Ambiente")
 opera = NodePath("Opera")
 
@@ -899,7 +905,7 @@ libraries = {
 texture = ExtResource("2_8uqbu")
 hframes = 55
 frame = 36
-script = ExtResource("3_7smws")
+script = SubResource("Resource_mbrpp")
 player = NodePath("..")
 animation = NodePath("../Animacao")
 stats = NodePath("../Stats")
@@ -923,7 +929,7 @@ volume_db = -29.982
 autoplay = true
 
 [node name="Stats" type="Node" parent="." node_paths=PackedStringArray("player", "collision_area", "invecibilidade")]
-script = ExtResource("6_umr2e")
+script = SubResource("Resource_mvvq7")
 player = NodePath("..")
 collision_area = NodePath("../ColisaoArea")
 invecibilidade = NodePath("Invencibilidade")

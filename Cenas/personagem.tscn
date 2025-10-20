@@ -1,9 +1,10 @@
 [gd_scene load_steps=17 format=3 uid="uid://cyh3wd0bwwr2n"]
 
-[ext_resource type="Script" path="res://Cenas/personagem.gd" id="1_on126"]
-[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://gamejam/bubble/super_bubble-Sheet3.png" id="2_d5ssy"]
-[ext_resource type="Script" path="res://Cenas/textura.gd" id="3_xgj63"]
-[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="4_1cpgl"]
+[ext_resource type="Texture2D" uid="uid://b2j3p6vhb23ay" path="res://sprites/bubble/super_bubble-Sheet3.png" id="2_d5ssy"]
+[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://music/A Alegria Pixelada.wav" id="4_1cpgl"]
+
+[sub_resource type="Resource" id="Resource_ns5cc"]
+metadata/__load_path__ = "res://Cenas/personagem.gd"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
 size = Vector2(19, 32)
@@ -533,20 +534,23 @@ tracks/3/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]
 _data = {
-"Born": SubResource("Animation_xbftm"),
-"Bubble_only": SubResource("Animation_pwxfo"),
-"Fall": SubResource("Animation_6q54a"),
-"Idle": SubResource("Animation_xymsx"),
-"Jump": SubResource("Animation_3wnyl"),
-"RESET": SubResource("Animation_5o1sk"),
-"Transform": SubResource("Animation_4mgx1"),
-"Transform2": SubResource("Animation_7mbvf"),
-"Transform3": SubResource("Animation_st8up"),
-"Walk": SubResource("Animation_ksl43")
+&"Born": SubResource("Animation_xbftm"),
+&"Bubble_only": SubResource("Animation_pwxfo"),
+&"Fall": SubResource("Animation_6q54a"),
+&"Idle": SubResource("Animation_xymsx"),
+&"Jump": SubResource("Animation_3wnyl"),
+&"RESET": SubResource("Animation_5o1sk"),
+&"Transform": SubResource("Animation_4mgx1"),
+&"Transform2": SubResource("Animation_7mbvf"),
+&"Transform3": SubResource("Animation_st8up"),
+&"Walk": SubResource("Animation_ksl43")
 }
 
+[sub_resource type="Resource" id="Resource_214ja"]
+metadata/__load_path__ = "res://Cenas/textura.gd"
+
 [node name="Personagem" type="CharacterBody2D" node_paths=PackedStringArray("ambiente")]
-script = ExtResource("1_on126")
+script = SubResource("Resource_ns5cc")
 speed = 100
 jump_speed = -320
 player_gravity = 600
@@ -561,7 +565,7 @@ libraries = {
 texture = ExtResource("2_d5ssy")
 hframes = 55
 frame = 36
-script = ExtResource("3_xgj63")
+script = SubResource("Resource_214ja")
 player = NodePath("..")
 animation = NodePath("../Animacao")
 

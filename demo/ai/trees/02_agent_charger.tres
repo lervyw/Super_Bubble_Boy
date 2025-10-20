@@ -1,10 +1,10 @@
 [gd_resource type="BehaviorTree" load_steps=28 format=3 uid="uid://ylife72ym5et"]
 
-[ext_resource type="Script" path="res://demo/ai/tasks/get_first_in_group.gd" id="1_657p6"]
-[ext_resource type="Script" path="res://demo/ai/tasks/select_flanking_pos.gd" id="2_t3udh"]
-[ext_resource type="Script" path="res://demo/ai/tasks/arrive_pos.gd" id="3_u2ra5"]
-[ext_resource type="Script" path="res://demo/ai/tasks/face_target.gd" id="4_xwjl7"]
-[ext_resource type="Script" path="res://demo/ai/tasks/move_forward.gd" id="5_ucvak"]
+[ext_resource type="Script" uid="uid://deeohbhupf07o" path="res://demo/ai/tasks/get_first_in_group.gd" id="1_657p6"]
+[ext_resource type="Script" uid="uid://btl3h2r1g2r65" path="res://demo/ai/tasks/select_flanking_pos.gd" id="2_t3udh"]
+[ext_resource type="Script" uid="uid://blmd2kaexgo56" path="res://demo/ai/tasks/arrive_pos.gd" id="3_u2ra5"]
+[ext_resource type="Script" uid="uid://bjt7qxbonhkd" path="res://demo/ai/tasks/face_target.gd" id="4_xwjl7"]
+[ext_resource type="Script" uid="uid://dp1yfk0xbigao" path="res://demo/ai/tasks/move_forward.gd" id="5_ucvak"]
 
 [sub_resource type="BlackboardPlan" id="BlackboardPlan_qd806"]
 var/speed/name = &"speed"
@@ -37,12 +37,9 @@ children = [SubResource("BTPlayAnimation_ha2ag"), SubResource("BTRandomWait_cedq
 [sub_resource type="BTAction" id="BTAction_pp23y"]
 script = ExtResource("1_657p6")
 group = &"player"
-output_var = &"target"
 
 [sub_resource type="BTAction" id="BTAction_pmvd0"]
 script = ExtResource("2_t3udh")
-target_var = &"target"
-flank_side = 0
 range_min = 500
 range_max = 600
 position_var = &"flank_pos"
@@ -59,9 +56,6 @@ blend = 0.1
 [sub_resource type="BTAction" id="BTAction_87mi0"]
 script = ExtResource("3_u2ra5")
 target_position_var = &"flank_pos"
-speed_var = &"speed"
-tolerance = 50.0
-avoid_var = &""
 
 [sub_resource type="BTTimeLimit" id="BTTimeLimit_is5ag"]
 time_limit = 3.0
@@ -73,7 +67,6 @@ children = [SubResource("BTAction_pp23y"), SubResource("BTAction_pmvd0"), SubRes
 
 [sub_resource type="BTAction" id="BTAction_q5g4a"]
 script = ExtResource("4_xwjl7")
-target_var = &"target"
 
 [sub_resource type="BBNode" id="BBNode_bfijg"]
 saved_value = NodePath("AnimationPlayer")
