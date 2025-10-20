@@ -11,14 +11,9 @@
 script = ExtResource("3_wqfmn")
 range_min_in_dir = 20.0
 range_max_in_dir = 60.0
-position_var = &"pos"
-dir_var = &"dir"
 
 [sub_resource type="BTAction" id="BTAction_21r5e"]
 script = ExtResource("4_pl3ex")
-target_pos_var = &"pos"
-dir_var = &"dir"
-speed_var = 40
 tolerance = 25
 
 [sub_resource type="BBNode" id="BBNode_t0utu"]
@@ -40,11 +35,9 @@ children = [SubResource("BTSequence_rduy8")]
 [sub_resource type="BTAction" id="BTAction_kpbk3"]
 script = ExtResource("3_gbs5r")
 group = &"player"
-target_var = &"target"
 
 [sub_resource type="BTAction" id="BTAction_4y15t"]
 script = ExtResource("4_brl11")
-target_var = &"target"
 speed_var = 200
 tolerance = 25
 
@@ -62,12 +55,9 @@ children = [SubResource("BTSequence_tk8jh")]
 [sub_resource type="BTAction" id="BTAction_o6we3"]
 script = ExtResource("3_gbs5r")
 group = &"enemy"
-target_var = &"target"
 
 [sub_resource type="BTAction" id="BTAction_0obrv"]
 script = ExtResource("4_brl11")
-target_var = &"target"
-speed_var = 60
 tolerance = 30
 
 [sub_resource type="BTWait" id="BTWait_di7r7"]

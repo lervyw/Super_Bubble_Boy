@@ -345,6 +345,8 @@ size = Vector2(24, 11)
 collision_layer = 4
 script = ExtResource("1_4p1wq")
 hit = NodePath("Hit")
+detection_range = 100.0
+chase_speed = 100.0
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
 emitting = false
@@ -355,6 +357,7 @@ gravity = Vector2(0, 0)
 initial_velocity_min = 50.0
 initial_velocity_max = 150.0
 scale_amount_max = 4.0
+color = Color(0.1254902, 0.8509804, 0, 1)
 
 [node name="Collision" type="CollisionShape2D" parent="."]
 position = Vector2(1.5, 2.75)
