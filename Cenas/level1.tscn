@@ -98,7 +98,7 @@ player = NodePath("../Personagem2")
 status = NodePath("../Personagem2/Stats")
 
 [node name="boss" parent="." instance=ExtResource("12_1m8e4")]
-position = Vector2(405, 159)
+position = Vector2(-1544, 152)
 
 [node name="Timer" parent="." node_paths=PackedStringArray("player") instance=ExtResource("13_tb1qe")]
 player = NodePath("../Personagem2")

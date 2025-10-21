@@ -1,6 +1,6 @@
 [gd_resource type="BehaviorTree" load_steps=23 format=3 uid="uid://bijkguk88q1nc"]
 
-[ext_resource type="Script" uid="uid://dpu6fl4hadhpw" path="res://ai/tasks/find_target.gd" id="3_gbs5r"]
+[ext_resource type="Script" uid="uid://bppwxasqe1pdw" path="res://ai/tasks/find_target.gd" id="3_gbs5r"]
 [ext_resource type="Script" uid="uid://dc4t125pdp7l4" path="res://ai/tasks/choose_random_pos.gd" id="3_wqfmn"]
 [ext_resource type="Script" uid="uid://clossmhasi1aq" path="res://ai/tasks/move_to_target.gd" id="4_brl11"]
 [ext_resource type="Script" uid="uid://cruiplpetioe2" path="res://ai/tasks/move_to_position.gd" id="4_pl3ex"]

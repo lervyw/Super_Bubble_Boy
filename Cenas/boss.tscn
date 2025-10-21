@@ -1,13 +1,12 @@
-[gd_scene load_steps=27 format=3 uid="uid://2bsj0rjvtl73"]
+[gd_scene load_steps=25 format=3 uid="uid://2bsj0rjvtl73"]
 
 [ext_resource type="Script" uid="uid://dal4xk7p4hxxg" path="res://scripts/boss.gd" id="1_faq14"]
 [ext_resource type="Texture2D" uid="uid://c3o25ywjj2vb8" path="res://sprites/characters/boss-Sheet.png" id="2_cmtw4"]
 [ext_resource type="Texture2D" uid="uid://gkstrwf0f3x4" path="res://sprites/characters/balao.png" id="3_8citt"]
 [ext_resource type="Texture2D" uid="uid://p868hysemgsd" path="res://sprites/characters/balao2.png" id="4_385ap"]
-[ext_resource type="BehaviorTree" uid="uid://bijkguk88q1nc" path="res://ai/trees/boss.tres" id="5_e6x0j"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_urgpx"]
-size = Vector2(85, 90)
+size = Vector2(85, 75)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yrq18"]
 atlas = ExtResource("2_cmtw4")
@@ -308,18 +307,14 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0uvtv"]
-size = Vector2(59, 14.5)
-
-[sub_resource type="BlackboardPlan" id="BlackboardPlan_pxbmi"]
+size = Vector2(85, 28.25)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_aq35j"]
-size = Vector2(85, 58)
+size = Vector2(85, 57)
 
-[node name="boss" type="CharacterBody2D" node_paths=PackedStringArray("hit_area", "damage_area") groups=["enemy"]]
+[node name="boss" type="CharacterBody2D" groups=["enemy"]]
 collision_layer = 2
 script = ExtResource("1_faq14")
-hit_area = NodePath("HitArea")
-damage_area = NodePath("DamageArea")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
 emitting = false
@@ -333,7 +328,7 @@ scale_amount_max = 4.0
 color = Color(0.992157, 0, 0, 1)
 
 [node name="Collision" type="CollisionShape2D" parent="."]
-position = Vector2(-5.5, 17)
+position = Vector2(-5.5, 9.5)
 shape = SubResource("RectangleShape2D_urgpx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -362,18 +357,14 @@ libraries = {
 [node name="HitArea" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea"]
-position = Vector2(-13.5, -36)
+position = Vector2(-5.5, -29.875)
 shape = SubResource("RectangleShape2D_0uvtv")
-
-[node name="BTPlayer" type="BTPlayer" parent="."]
-behavior_tree = ExtResource("5_e6x0j")
-blackboard_plan = SubResource("BlackboardPlan_pxbmi")
 
 [node name="DamageArea" type="Area2D" parent="." groups=["enemy"]]
 monitoring = false
 
 [node name="Collision" type="CollisionShape2D" parent="DamageArea"]
-position = Vector2(-5.5, 18)
+position = Vector2(-5.5, 17.5)
 shape = SubResource("RectangleShape2D_aq35j")
 debug_color = Color(0.523427, 0.573446, 0, 0.42)
 
