@@ -1,6 +1,6 @@
 extends Area2D
-@onready var collision_shape_2d: CollisionShape2D = $CollisionShape2D
-@onready var spika: Sprite2D = $Spika
+@export var collision_shape_2d: CollisionShape2D
+@export var spika: Sprite2D
 @export var pai : Node
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -4,6 +4,8 @@ extends Sprite2D
 @export var animation: AnimationPlayer
 @export var stats: Node
 @export var nivel: Node
+@export var attack_area: Area2D  # Conecte a Area2D no editor
+
 var transformacaoOn: bool
 var estado : int 
 var crouch_off: bool = false
@@ -13,9 +15,7 @@ var crouch_off: bool = false
 func animate(direction: Vector2) -> void:
 	
 	verify_position(direction)
-	
-	
-	
+
 	
 	if player.on_hit or player.dead:
 		hit_behavior()
@@ -77,21 +77,25 @@ func hit_behavior():
 		animation.play("B_dead")
 	elif player.on_hit and estado ==0 :
 		animation.play("Hit")
+		await animation.animation_finished  # espera a animação terminar
+		player.on_hit = false
+		player.set_physics_process(true)
+
 	elif player.on_hit and estado == 1:
 		animation.play("Hit_Bolha")
 	elif player.on_hit and estado == 2:
 		animation.play("Hit_Super")
 			
-		
-		
 	
-		
-		
 func verify_position(direction: Vector2) -> void:
 	if direction.x > 0:
 		flip_h = false
+		if attack_area:
+			attack_area.scale.x = 1  # Normal
 	elif direction.x < 0:
 		flip_h = true
+		if attack_area:
+			attack_area.scale.x = -1  # Flipado
 
 func horizontal_behavior(direction: Vector2) -> void:
 	if(player.transformando_super == false and estado == 0):
@@ -104,6 +108,7 @@ func horizontal_behavior(direction: Vector2) -> void:
 			animation.play("S_Walk")
 		else :
 			animation.play("S_Idle")
+			
 func vertical_behavior(direction: Vector2) -> void:
 	if(estado == 0):
 		if direction.y > 0 :
@@ -115,7 +120,6 @@ func vertical_behavior(direction: Vector2) -> void:
 			animation.play("S_Fall")
 		elif direction.y < 0 :
 			animation.play("S_Jump")
-		
 
 func voltar():
 	

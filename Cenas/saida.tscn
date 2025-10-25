@@ -5,11 +5,12 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_twqaj"]
 size = Vector2(162152, 231.519)
 
-[node name="saida" type="Area2D"]
+[node name="saida" type="Area2D" node_paths=PackedStringArray("collision_shape_2d")]
 position = Vector2(458, -39)
 scale = Vector2(0.427611, 0.427611)
 collision_layer = 2
 script = ExtResource("1_mjiy0")
+collision_shape_2d = NodePath("Collision")
 
 [node name="Collision" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_twqaj")

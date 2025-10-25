@@ -23,9 +23,6 @@ tracks/0/keys = {
 "values": [42, 43, 44, 45, 46, 47, 48, 49]
 }
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
-size = Vector2(19, 32)
-
 [sub_resource type="Animation" id="Animation_7mbvf"]
 resource_name = "Bolha_Normal"
 length = 0.7
@@ -36,46 +33,10 @@ tracks/0/path = NodePath("Textura2:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
+"times": PackedFloat32Array(0.1, 0.2, 0.3, 0.4, 0.5, 0.56666666, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [42, 41, 40, 39, 38, 38, 37]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(19, 19), Vector2(19, 24.5), Vector2(19, 27.875), Vector2(19, 32), Vector2(19, 34), Vector2(19, 31.875), Vector2(19, 31.5)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(0, 9), Vector2(-5.96046e-08, 11.75), Vector2(-1, 14.0625), Vector2(0, 16), Vector2(0, 15), Vector2(-1, 16.0625), Vector2(-1, 16)]
+"values": [41, 40, 39, 38, 38, 42, 37]
 }
 
 [sub_resource type="Animation" id="Animation_smwxs"]
@@ -93,90 +54,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.133333),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.233333, 0.266667, 0.333333, 0.5, 0.6, 0.7, 0.9, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(18, 18), Vector2(12, 12), Vector2(7, 7), Vector2(7, 12.3334), Vector2(7, 23), Vector2(7, 30), Vector2(15, 39), Vector2(30, 51), Vector2(30, 57), Vector2(30, 63)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.233333, 0.266667, 0.333333, 0.5, 0.6, 0.7, 0.9, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(0, 10), Vector2(0, 10), Vector2(-0.5, 9.5), Vector2(-0.5, 12.1667), Vector2(-0.5, 17.5), Vector2(-0.5, 14), Vector2(-0.5, 9.5), Vector2(-1, 6.5), Vector2(-1, 3.5), Vector2(-1, 0.5)]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("ColisaoArea/Collision2:shape:size")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.266667, 0.6, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(20, 20), Vector2(12, 13), Vector2(12, 25.5), Vector2(20, 32), Vector2(29, 51.25)]
-}
-tracks/5/type = "value"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath("ColisaoArea/Collision2:position")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.266667, 0.6, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(0, 10), Vector2(0, 16.25), Vector2(0, 16.25), Vector2(1.5, 6.625)]
-}
-tracks/6/type = "value"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("Matador/ColisorMatador:shape:size")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.266667),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector2(18, 2), Vector2(9, 3), Vector2(9, 3)]
-}
-tracks/7/type = "value"
-tracks/7/imported = false
-tracks/7/enabled = true
-tracks/7/path = NodePath("Matador/ColisorMatador:position")
-tracks/7/interp = 1
-tracks/7/loop_wrap = true
-tracks/7/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.266667, 0.6),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(-1, 19), Vector2(-0.5, 14), Vector2(-1, 27), Vector2(-1, 27)]
-}
 
 [sub_resource type="Animation" id="Animation_xbftm"]
 resource_name = "Born"
@@ -193,45 +70,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [0, 1, 2, 3, 4, 5]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.233333, 0.333333, 0.433333),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.233333, 0.333333, 0.433333),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(7, 7), Vector2(12, 14), Vector2(19, 19), Vector2(19, 20), Vector2(19, 33)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.233333, 0.333333, 0.433333, 0.533333),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(-0.5, 9.5), Vector2(-1, 10), Vector2(-0.75, 10.25), Vector2(-1, 11), Vector2(-1, 16), Vector2(-1, 16)]
-}
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_6r4oj"]
-radius = 8.06226
 
 [sub_resource type="Animation" id="Animation_pwxfo"]
 resource_name = "Bubble_only"
@@ -248,54 +86,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [42, 43]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("CircleShape2D_6r4oj")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(19, 21.5)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 10)]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("Colisao:shape:radius")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [8.06226]
 }
 
 [sub_resource type="Animation" id="Animation_iduop"]
@@ -330,42 +120,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [8, 9]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(19, 31.5)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 16.25)]
-}
 
 [sub_resource type="Animation" id="Animation_4y30l"]
 resource_name = "Hit"
@@ -398,30 +152,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [43, 42]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape:size")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0.2),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(17.5, 18.5)]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:position")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0.2),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-0.75, 9.75)]
-}
 
 [sub_resource type="Animation" id="Animation_o5fcr"]
 resource_name = "Hit_Super"
@@ -437,42 +167,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [92, 93]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(32, 64)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_xymsx"]
@@ -491,42 +185,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [10, 11]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape:size")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(19.5, 31)]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:position")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-0.25, 16.5)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:shape")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
-}
 
 [sub_resource type="Animation" id="Animation_3wnyl"]
 resource_name = "Jump"
@@ -542,42 +200,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [6, 7]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape:size")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(18, 29.75)]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:position")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-1, 16.875)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:shape")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
 }
 
 [sub_resource type="Animation" id="Animation_0402r"]
@@ -628,42 +250,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [37, 38, 39, 40, 41, 42]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.7),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.7),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(18, 32), Vector2(18, 20)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.7),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(-1, 16), Vector2(-1, 10)]
-}
 
 [sub_resource type="Animation" id="Animation_st8up"]
 resource_name = "Normal_Super"
@@ -679,42 +265,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0.2),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0.2, 0.9, 1, 1.2, 1.33333),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(17, 29.5), Vector2(17, 32.75), Vector2(17, 40.75), Vector2(17, 55.75), Vector2(24, 61.75)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0.2, 0.9, 1, 1.2, 1.33333),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(0, 16), Vector2(0, 14.375), Vector2(0, 10.375), Vector2(0, 2.875), Vector2(-2, -0.125)]
 }
 
 [sub_resource type="Animation" id="Animation_bs6g0"]
@@ -733,9 +283,6 @@ tracks/0/keys = {
 "values": [11, 13, 16]
 }
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_3udnp"]
-size = Vector2(18, 2)
-
 [sub_resource type="Animation" id="Animation_5o1sk"]
 length = 0.001
 tracks/0/type = "value"
@@ -749,114 +296,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [6]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(19, 32)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-1, 15)]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("Colisao:shape:radius")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [9.0]
-}
-tracks/5/type = "value"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath("ColisaoArea/Collision2:shape:size")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(20, 31)]
-}
-tracks/6/type = "value"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("Matador/ColisorMatador:shape")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_3udnp")]
-}
-tracks/7/type = "value"
-tracks/7/imported = false
-tracks/7/enabled = true
-tracks/7/path = NodePath("Matador/ColisorMatador:shape:size")
-tracks/7/interp = 1
-tracks/7/loop_wrap = true
-tracks/7/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(18, 2)]
-}
-tracks/8/type = "value"
-tracks/8/imported = false
-tracks/8/enabled = true
-tracks/8/path = NodePath("Matador/ColisorMatador:position")
-tracks/8/interp = 1
-tracks/8/loop_wrap = true
-tracks/8/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 31)]
-}
-tracks/9/type = "value"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath("ColisaoArea/Collision2:position")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 10)]
 }
 
 [sub_resource type="Animation" id="Animation_16yd1"]
@@ -925,90 +364,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [67, 68, 69, 70, 71, 72]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:position")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-2, 1)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:shape:size")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(38, 62)]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("ColisaoArea/Collision2:shape:size")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(20, 31)]
-}
-tracks/5/type = "value"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath("Matador/ColisorMatador:shape")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_3udnp")]
-}
-tracks/6/type = "value"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("Matador/ColisorMatador:shape:size")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(18, 2)]
-}
-tracks/7/type = "value"
-tracks/7/imported = false
-tracks/7/enabled = true
-tracks/7/path = NodePath("Matador/ColisorMatador:position")
-tracks/7/interp = 1
-tracks/7/loop_wrap = true
-tracks/7/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 31)]
 }
 
 [sub_resource type="Animation" id="Animation_tbc0f"]
@@ -1121,42 +476,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [64, 63, 62, 61, 60, 60, 59, 58, 57, 56, 55, 54]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(57, 63), Vector2(46, 57), Vector2(36, 51), Vector2(33, 42), Vector2(24, 33), Vector2(14, 25), Vector2(14, 23), Vector2(7, 7), Vector2(12, 12), Vector2(19, 19)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(-1.5, 0.5), Vector2(0, 3.5), Vector2(-2, 6.5), Vector2(-0.5, 11), Vector2(0, 15.5), Vector2(-1, 18.5), Vector2(-1, 17.5), Vector2(-0.5, 9.5), Vector2(0, 10), Vector2(0.5, 9.5)]
-}
 
 [sub_resource type="Animation" id="Animation_wptxv"]
 resource_name = "Super_Normal"
@@ -1172,42 +491,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [65, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 1.6),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1"), SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.233333, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.6),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(57, 63), Vector2(51.1667, 62.8177), Vector2(49.5, 56.7656), Vector2(47, 50.6875), Vector2(44.5, 41.6094), Vector2(23, 32.5313), Vector2(14, 25.4531), Vector2(14.3333, 25.9028), Vector2(7, 8.05556), Vector2(12, 11.5833), Vector2(20, 19), Vector2(19.4, 24.75), Vector2(18.8, 30.5), Vector2(18.2, 30.1667), Vector2(17, 30.75)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.233333, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.6),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(-1.5, 0.5), Vector2(-1.28125, 0.408854), Vector2(-1.21875, 3.38281), Vector2(-1.125, 6.34375), Vector2(-1.03125, 10.8047), Vector2(0.5, 15.2656), Vector2(-1, 18.7266), Vector2(-0.888889, 18.4236), Vector2(-0.5, 8.97222), Vector2(-1.78814e-07, 10.2083), Vector2(1, 9.5), Vector2(0.8, 12.625), Vector2(0.6, 15.75), Vector2(0.4, 15.8333), Vector2(0, 16.625)]
 }
 
 [sub_resource type="Animation" id="Animation_mdi5i"]
@@ -1256,42 +539,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [10, 18, 19, 20]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Colisao:shape")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [SubResource("RectangleShape2D_kadp1")]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Colisao:shape:size")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(18.5, 31)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Colisao:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-0.75, 16.5)]
 }
 
 [sub_resource type="Animation" id="Animation_n1uy8"]
@@ -1348,20 +595,32 @@ _data = {
 &"dash": SubResource("Animation_n1uy8")
 }
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bll10"]
-size = Vector2(20, 31)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
+size = Vector2(18.5, 31)
 
-[node name="Personagem2" type="CharacterBody2D" node_paths=PackedStringArray("ambiente", "opera") groups=["player"]]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bll10"]
+size = Vector2(21, 20.375)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3udnp"]
+size = Vector2(18, 2)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x33ej"]
+size = Vector2(20, 30)
+
+[node name="Personagem2" type="CharacterBody2D" node_paths=PackedStringArray("ambiente", "opera", "hud", "attack_area", "attack_shape")]
 script = ExtResource("1_gcfgo")
 ambiente = NodePath("Ambiente")
 opera = NodePath("Opera")
+hud = NodePath("HUD")
+attack_area = NodePath("AttackArea")
+attack_shape = NodePath("AttackArea/CollisionShape2D")
 
 [node name="Animacao" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_1mgau")
 }
 
-[node name="Textura2" type="Sprite2D" parent="." node_paths=PackedStringArray("player", "animation", "stats")]
+[node name="Textura2" type="Sprite2D" parent="." node_paths=PackedStringArray("player", "animation", "stats", "attack_area")]
 texture = ExtResource("2_ue1vv")
 hframes = 11
 vframes = 10
@@ -1370,9 +629,10 @@ script = ExtResource("3_4lyvx")
 player = NodePath("..")
 animation = NodePath("../Animacao")
 stats = NodePath("../Stats")
+attack_area = NodePath("../AttackArea")
 
 [node name="Colisao" type="CollisionShape2D" parent="."]
-position = Vector2(-1, 15)
+position = Vector2(-0.75, 16.5)
 shape = SubResource("RectangleShape2D_kadp1")
 
 [node name="Camera" type="Camera2D" parent="."]
@@ -1389,32 +649,45 @@ stream = ExtResource("5_46rfv")
 volume_db = -29.982
 autoplay = true
 
-[node name="Stats" type="Node" parent="." node_paths=PackedStringArray("player", "collision_area", "invecibilidade")]
+[node name="Stats" type="Node" parent="." node_paths=PackedStringArray("piscar_timer", "player", "collision_area", "invecibilidade", "textura")]
 script = ExtResource("6_jb0f0")
+piscar_timer = NodePath("piscar_timer")
 player = NodePath("..")
 collision_area = NodePath("../ColisaoArea")
 invecibilidade = NodePath("Invencibilidade")
+textura = NodePath("../Textura2")
 
 [node name="Invencibilidade" type="Timer" parent="Stats"]
 one_shot = true
 
+[node name="piscar_timer" type="Timer" parent="Stats"]
+wait_time = 0.1
+
 [node name="ColisaoArea" type="Area2D" parent="." groups=["player"]]
-visible = false
+position = Vector2(-1, 5)
 
 [node name="Collision2" type="CollisionShape2D" parent="ColisaoArea"]
-position = Vector2(0, 10)
+position = Vector2(0.5, 4.8125)
 shape = SubResource("RectangleShape2D_bll10")
 
-[node name="Matador" type="Area2D" parent="." groups=["player"]]
+[node name="Matador" type="Area2D" parent="." groups=["killer"]]
 
 [node name="ColisorMatador" type="CollisionShape2D" parent="Matador"]
-position = Vector2(0, 31)
+position = Vector2(-1, 33)
 shape = SubResource("RectangleShape2D_3udnp")
 
 [node name="HUD" parent="." node_paths=PackedStringArray("status") instance=ExtResource("7_cyb7e")]
 status = NodePath("../Stats")
 
+[node name="AttackArea" type="Area2D" parent="." groups=["killer"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(19, 15)
+shape = SubResource("RectangleShape2D_x33ej")
+
 [connection signal="animation_finished" from="Animacao" to="." method="_on_animation_finished"]
 [connection signal="animation_finished" from="Animacao" to="Textura2" method="_on_animacao_animation_finished"]
 [connection signal="timeout" from="Stats/Invencibilidade" to="Stats" method="_on_invencibilidade_timeout"]
+[connection signal="timeout" from="Stats/piscar_timer" to="Stats" method="_on_piscar_timer_timeout"]
 [connection signal="area_entered" from="ColisaoArea" to="Stats" method="_on_colisao_area"]
+[connection signal="area_entered" from="Matador" to="Stats" method="_on_matador_area_entered"]

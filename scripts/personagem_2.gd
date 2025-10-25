@@ -5,6 +5,12 @@ extends CharacterBody2D
 @export var ambiente: AudioStreamPlayer
 @export var opera: AudioStreamPlayer
 @export var hud: CanvasLayer
+
+@export var attack_area: Area2D
+@export var attack_shape: CollisionShape2D
+
+var facing_right = true
+
 var speed: int = 150 #variavel de velocidade do personagem
 var jump_speed: int = -320 # força pra levar pra cima
 var player_gravity: int = 400#gravidade normal
@@ -20,16 +26,20 @@ var parry: bool = false
 var crouching: bool = false
 var pode_abaixar: bool = true
 var dash: bool = false
+
+
 func _ready() -> void:
 	#position.x = 350
 	#position.y = 219
-	
 	ambiente.autoplay
-	ambiente.playing 	
+	ambiente.playing
 	opera.stream_paused = true
+	attack_area.monitoring = false
+	attack_shape.disabled = true
+
 	
 func _physics_process(delta: float) -> void: #main
-	print(attacking, " ",crouching," ", dash)
+	#print(attacking, " ",crouching," ", dash)
 	
 	action()	
 	tocar()
@@ -44,13 +54,10 @@ func horizontal_moviment_env() -> void:
 	var input_direction: float = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 	if Player_sprite.estado == 0 and dash:
 		velocity.x = input_direction * speed * 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
-	
 	elif (not crouching ):
-		
 		velocity.x = input_direction * speed
 	elif crouching:
 		velocity.x = 0
-	
 
 func vertical_moviment_env() -> void:
 	if is_on_floor()  :
@@ -82,12 +89,11 @@ func action() -> void:
 		
 		
 	if Input.is_action_just_pressed("attack") and not attacking and not crouching and is_on_floor() and Player_sprite.estado != 1:
-		attacking = true
-		set_physics_process(false)
+		#attacking = true
+		attack()
+		#set_physics_process(false)
 		
-		
-
-		
+	
 	if Input.is_action_just_pressed("forma1") and not transformando and Pode_Bolha == true :
 		
 		transformando = true
@@ -98,12 +104,6 @@ func action() -> void:
 		transformando_super  = true
 		transformando = true
 		set_physics_process(false)
-		
-		
-
-	
-	
-	
 
 func tocar():
 
@@ -146,10 +146,37 @@ func delete():
 	#get_tree().root.add_child(Player_sprite.super_bubble)
 	self.queue_free()
 
-func knockback(direction: int = -1): # O parâmetro `direction` indica para onde o jogador será empurrado (-1 para esquerda, 1 para direita)
-	var knockback_force: Vector2 = Vector2(direction * 800, -800) # Para trás na direção X e para cima na direção Y
-	velocity += knockback_force # Adiciona a força de knockback à velocidade atual
-	move_and_slide()
+func knockback():
+	var direction = 1 if Player_sprite.flip_h else -1
+	var knockback_distance = 50  # distância em pixels
+	var knockback_duration = 0.2  # tempo em segundos
 	
+	var target_position = global_position + Vector2(direction * knockback_distance, -10)  # leve flutuação para cima
+	
+	var tween = create_tween()
+	tween.tween_property(self, "global_position", target_position, knockback_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
-		
+	
+func attack() -> void:
+	attacking = true
+	# Pausa controle, mas NÃO pausa a física inteira
+	set_process_input(false)
+	
+	# Ativa a área de ataque
+	attack_area.monitoring = true
+	attack_shape.disabled = false
+	
+	# Toca animação (se houver)
+	if Player_sprite.has_method("play"):
+		Player_sprite.play("attack")
+	
+	# Duração do ataque (em segundos)
+	await get_tree().create_timer(0.3).timeout
+	
+	# Desativa a área novamente
+	attack_area.monitoring = false
+	attack_shape.disabled = true
+	
+	# Libera o controle
+	set_process_input(true)
+	attacking = false

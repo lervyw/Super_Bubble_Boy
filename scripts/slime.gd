@@ -2,10 +2,10 @@ extends CharacterBody2D
 
 @onready var animation_sprite = $AnimatedSprite2D
 @export var hit: Node
-@export var detection_range: float = 300.0 # Distancia de deteccao do inimigo
-@export var chase_speed: float = 160.0 # Velocidade ao perseguir player
+@export var detection_range: float = 100.0 # Distancia de deteccao do inimigo
+@export var chase_speed: float = 100 # Velocidade ao perseguir player
 
-const SPEED = 160.0
+const SPEED = 80
 const JUMP_VELOCITY = -400.0
 const gravity = 50
 
@@ -47,7 +47,7 @@ func chase_player():
 	var distance = global_position.distance_to(player.global_position)
 	
 	#Para de perseguir se muito proximo ao player
-	if distance < 30:
+	if distance < 5:
 		velocity.x = 5
 		return
 	
@@ -109,16 +109,15 @@ func play_attack(body):
 
 
 func _on_hit_area_entered(area: Area2D) -> void:
-	pass
-	#if area.is_in_group("player"):
-	#	$CPUParticles2D.emitting = true
-	#	animation_sprite.visible = false
-	#	await get_tree().create_timer(0.3).timeout
-	#	self.queue_free()
+	if area.is_in_group("killer"):
+		$CPUParticles2D.emitting = true
+		animation_sprite.visible = false
+		await get_tree().create_timer(0.3).timeout
+		self.queue_free()
 
 
 func _on_area_2d_area_entered(area: Area2D) -> void:
-	if area.is_in_group("player"):
+	if area.is_in_group("killer"):
 		hit.set_deferred("monitoring", false)
 		$CPUParticles2D.emitting = true
 		animation_sprite.visible = false
