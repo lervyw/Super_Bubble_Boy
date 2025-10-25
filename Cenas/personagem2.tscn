@@ -596,7 +596,7 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
-size = Vector2(18.5, 31)
+size = Vector2(18, 31)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bll10"]
 size = Vector2(19, 20.375)
@@ -607,7 +607,7 @@ size = Vector2(18, 2)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x33ej"]
 size = Vector2(20, 30)
 
-[node name="Personagem2" type="CharacterBody2D" node_paths=PackedStringArray("ambiente", "opera", "hud", "attack_area", "attack_shape")]
+[node name="Personagem2" type="CharacterBody2D" node_paths=PackedStringArray("ambiente", "opera", "hud", "attack_area", "attack_shape") groups=["player"]]
 script = ExtResource("1_gcfgo")
 ambiente = NodePath("Ambiente")
 opera = NodePath("Opera")
@@ -632,7 +632,7 @@ stats = NodePath("../Stats")
 attack_area = NodePath("../AttackArea")
 
 [node name="Colisao" type="CollisionShape2D" parent="."]
-position = Vector2(-0.75, 16.5)
+position = Vector2(-1, 16.5)
 shape = SubResource("RectangleShape2D_kadp1")
 
 [node name="Camera" type="Camera2D" parent="."]

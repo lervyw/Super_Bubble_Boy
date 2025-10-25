@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=4 uid="uid://bmeqa3g35tp1i"]
+[gd_scene load_steps=21 format=4 uid="uid://bmeqa3g35tp1i"]
 
 [ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://sprites/img/tiles/pedra.png" id="1_djts0"]
 [ext_resource type="Script" uid="uid://b32be5wkrk8lo" path="res://scripts/level_1.gd" id="1_o25p7"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://dva0fgxakbmyh" path="res://Cenas/bubble_up_2.tscn" id="10_h5nj6"]
 [ext_resource type="PackedScene" uid="uid://2bsj0rjvtl73" path="res://Cenas/boss.tscn" id="12_1m8e4"]
 [ext_resource type="PackedScene" uid="uid://nmyisap4c30m" path="res://Cenas/Timer.tscn" id="13_tb1qe"]
+[ext_resource type="Script" uid="uid://b1aagtojwf2p8" path="res://Cenas/water.gd" id="14_d0psv"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_he0a0"]
 texture = ExtResource("1_djts0")
@@ -67,8 +68,9 @@ sources/1 = SubResource("TileSetAtlasSource_5wbp2")
 sources/2 = SubResource("TileSetAtlasSource_mi658")
 sources/3 = SubResource("TileSetAtlasSource_rfofu")
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_10gu2"]
+
 [node name="level1" type="Node2D" node_paths=PackedStringArray("player", "status")]
-position = Vector2(183, 8)
 script = ExtResource("1_o25p7")
 player = NodePath("Personagem2")
 inimigo = ExtResource("2_7sm1u")
@@ -104,5 +106,16 @@ position = Vector2(-1081, 163)
 
 [node name="Timer" parent="." node_paths=PackedStringArray("player") instance=ExtResource("13_tb1qe")]
 player = NodePath("../Personagem2")
+
+[node name="Area2D" type="Area2D" parent="."]
+position = Vector2(836, 193)
+scale = Vector2(10.92, 5.9199977)
+script = ExtResource("14_d0psv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_10gu2")
+
+[connection signal="body_entered" from="Area2D" to="Area2D" method="_on_body_entered"]
+[connection signal="body_exited" from="Area2D" to="Area2D" method="_on_body_exited"]
 
 [editable path="Personagem2"]

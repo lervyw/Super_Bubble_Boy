@@ -10,7 +10,6 @@ extends CharacterBody2D
 @export var attack_shape: CollisionShape2D
 
 var facing_right = true
-
 var speed: int = 150 #variavel de velocidade do personagem
 var jump_speed: int = -300 # força pra levar pra cima
 var player_gravity: int = 500#gravidade normal
@@ -27,6 +26,10 @@ var crouching: bool = false
 var pode_abaixar: bool = true
 var dash: bool = false
 
+var in_water: bool = false
+var swim_speed: float = 100.0
+var water_gravity: float = 100.0
+
 
 func _ready() -> void:
 	#position.x = 350
@@ -40,15 +43,37 @@ func _ready() -> void:
 	
 func _physics_process(delta: float) -> void: #main
 	#print(attacking, " ",crouching," ", dash)
-	
-	action()	
+#	if dead:
+#		return
+
+	action()
 	tocar()
-	vertical_moviment_env()
-	horizontal_moviment_env()
-	
-	gravity(delta)
+
+	if in_water:
+		swim_physics(delta)
+	else:
+		vertical_moviment_env()
+		horizontal_moviment_env()
+		gravity(delta)
+
 	move_and_slide()
 	Player_sprite.animate(velocity)
+	
+
+func swim_physics(delta: float) -> void:
+	var input_x = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
+	var input_y = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
+
+	var input_vector = Vector2(input_x, input_y).normalized()
+	velocity = input_vector * swim_speed
+
+	# Simula leve empuxo e resistência
+	velocity.y += water_gravity * delta
+	velocity *= 0.9  # resistência da água
+
+	# Aqui você pode trocar animação ou som
+	if Player_sprite.has_method("play"):
+		Player_sprite.play("swim")
 	
 func horizontal_moviment_env() -> void:
 	var input_direction: float = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
