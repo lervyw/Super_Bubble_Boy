@@ -3,9 +3,9 @@ extends CharacterBody2D
 @onready var animation_sprite = $AnimatedSprite2D
 @export var hit: Node
 @export var detection_range: float = 100.0 # Distancia de deteccao do inimigo
-@export var chase_speed: float = 100 # Velocidade ao perseguir player
+@export var chase_speed: float = 40 # Velocidade ao perseguir player
 
-const SPEED = 80
+const SPEED = 20
 const JUMP_VELOCITY = -400.0
 const gravity = 50
 

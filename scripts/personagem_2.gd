@@ -12,8 +12,8 @@ extends CharacterBody2D
 var facing_right = true
 
 var speed: int = 150 #variavel de velocidade do personagem
-var jump_speed: int = -320 # força pra levar pra cima
-var player_gravity: int = 400#gravidade normal
+var jump_speed: int = -300 # força pra levar pra cima
+var player_gravity: int = 500#gravidade normal
 var transformando: bool = false #variavel para transformaçao nao loopar
 var transformando_super: bool = false #variavel para transformaçao nao loopar
 var jump_count: int #limitador de pulo
@@ -163,7 +163,7 @@ func attack() -> void:
 	set_process_input(false)
 	
 	# Ativa a área de ataque
-	attack_area.monitoring = true
+	attack_area.monitoring = false
 	attack_shape.disabled = false
 	
 	# Toca animação (se houver)
@@ -174,7 +174,7 @@ func attack() -> void:
 	await get_tree().create_timer(0.3).timeout
 	
 	# Desativa a área novamente
-	attack_area.monitoring = false
+	attack_area.monitoring = true
 	attack_shape.disabled = true
 	
 	# Libera o controle

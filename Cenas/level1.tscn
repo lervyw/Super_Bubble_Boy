@@ -87,6 +87,8 @@ pai = NodePath("..")
 [node name="Personagem2" parent="." instance=ExtResource("2_csolo")]
 position = Vector2(232, 156)
 
+[node name="CollisionShape2D" parent="Personagem2/AttackArea" index="0" groups=["killer"]]
+
 [node name="BubbleUp1" parent="." node_paths=PackedStringArray("player", "status") instance=ExtResource("9_y3u1x")]
 position = Vector2(3845, -770)
 player = NodePath("../Personagem2")

@@ -64,7 +64,7 @@ func _on_piscar_timer_timeout() -> void:
 	if blink_count < MAX_BLINKS:
 		blink_count += 1
 		textura.visible = not textura.visible
-		textura.modulate = Color(1, 0.5, 0.5) if blink_count % 2 == 0 else Color(1, 1, 1)
+		textura.modulate = Color(1, 1, 1) if blink_count % 2 == 0 else Color(1, 1, 1)
 	else:
 		piscar_timer.stop()
 		textura.visible = true
