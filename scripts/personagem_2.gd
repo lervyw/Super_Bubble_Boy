@@ -1,15 +1,15 @@
 extends CharacterBody2D
 #script pro personagem, interage com outros scripts e mexe com a fisica do personagem
 @onready var Player_sprite: Sprite2D = get_node("Textura2") #cria um objeto no Nó Textura2, onde o script de Textura altera as animações
-@export var nivel: Node #cria um objeto no Nó nível
-@export var ambiente: AudioStreamPlayer
-@export var opera: AudioStreamPlayer
-@export var hud: CanvasLayer
+@export var nivel: Node #cria um objeto no Nó nível / serve para resetar quando morrer
+@export var ambiente: AudioStreamPlayer #toca a musica calma
+@export var opera: AudioStreamPlayer #toca musica epica
+@export var hud: CanvasLayer # hud
 
-@export var attack_area: Area2D
-@export var attack_shape: CollisionShape2D
+@export var attack_area: Area2D # area do ataque
+@export var attack_shape: CollisionShape2D #colisao do ataque
 
-var facing_right = true
+var facing_right = true #saber se esta olhando para frente
 var speed: int = 150 #variavel de velocidade do personagem
 var jump_speed: int = -300 # força pra levar pra cima
 var player_gravity: int = 500#gravidade normal
