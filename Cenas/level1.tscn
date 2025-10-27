@@ -89,15 +89,13 @@ pai = NodePath("..")
 [node name="Personagem2" parent="." instance=ExtResource("2_csolo")]
 position = Vector2(232, 156)
 
-[node name="CollisionShape2D" parent="Personagem2/AttackArea" index="0" groups=["killer"]]
-
 [node name="BubbleUp1" parent="." node_paths=PackedStringArray("player", "status") instance=ExtResource("9_y3u1x")]
-position = Vector2(3845, -770)
+position = Vector2(347, 198)
 player = NodePath("../Personagem2")
 status = NodePath("../Personagem2/Stats")
 
 [node name="bubble_up2" parent="." node_paths=PackedStringArray("player", "status") instance=ExtResource("10_h5nj6")]
-position = Vector2(828, -245)
+position = Vector2(112, 203)
 player = NodePath("../Personagem2")
 status = NodePath("../Personagem2/Stats")
 
@@ -117,5 +115,3 @@ shape = SubResource("RectangleShape2D_10gu2")
 
 [connection signal="body_entered" from="Area2D" to="Area2D" method="_on_body_entered"]
 [connection signal="body_exited" from="Area2D" to="Area2D" method="_on_body_exited"]
-
-[editable path="Personagem2"]

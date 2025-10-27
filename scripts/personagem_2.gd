@@ -1,207 +1,161 @@
 extends CharacterBody2D
-#script pro personagem, interage com outros scripts e mexe com a fisica do personagem
-@onready var Player_sprite: Sprite2D = get_node("Textura2") #cria um objeto no Nó Textura2, onde o script de Textura altera as animações
-@export var nivel: Node #cria um objeto no Nó nível / serve para resetar quando morrer
-@export var ambiente: AudioStreamPlayer #toca a musica calma
-@export var opera: AudioStreamPlayer #toca musica epica
-@export var hud: CanvasLayer # hud
 
-@export var attack_area: Area2D # area do ataque
-@export var attack_shape: CollisionShape2D #colisao do ataque
+# ----- ENUM DE ESTADOS -----
+enum State { IDLE, WALK, JUMP, ATTACK, CROUCH, DASH, TRANSFORM, DEAD }
+var state: State = State.IDLE
 
-var facing_right = true #saber se esta olhando para frente
-var speed: int = 150 #variavel de velocidade do personagem
-var jump_speed: int = -300 # força pra levar pra cima
-var player_gravity: int = 500#gravidade normal
-var transformando: bool = false #variavel para transformaçao nao loopar
-var transformando_super: bool = false #variavel para transformaçao nao loopar
-var jump_count: int #limitador de pulo
-var Pode_Bolha: bool = false
-var Pode_Super: bool = false
-var dead: bool = false
-var on_hit: bool = false
-var attacking: bool = false
-var parry: bool = false
-var crouching: bool = false
-var pode_abaixar: bool = true
-var dash: bool = false
+# ----- EXPORTS -----
+@export var speed := 150.0
+@export var jump_force := -350.0
+@export var gravity := 900.0
+@export var dash_speed := 400.0
+@export var dash_time := 0.2
+@export var animation_player: AnimationPlayer
 
-var in_water: bool = false
-var swim_speed: float = 100.0
-var water_gravity: float = 100.0
+# ----- VARIÁVEIS -----
+var dash_timer := 0.0
+var on_ground := false
 
-
-func _ready() -> void:
-	#position.x = 350
-	#position.y = 219
-	ambiente.autoplay
-	ambiente.playing
-	opera.stream_paused = true
-	attack_area.monitoring = false
-	attack_shape.disabled = true
-
-	
-func _physics_process(delta: float) -> void: #main
-	#print(attacking, " ",crouching," ", dash)
-#	if dead:
-#		return
-
-	action()
-	tocar()
-
-	if in_water:
-		swim_physics(delta)
-	else:
-		vertical_moviment_env()
-		horizontal_moviment_env()
-		gravity(delta)
-
+# ------------------------------------------------------------
+func _physics_process(delta: float) -> void:
+	handle_state(delta)
 	move_and_slide()
-	Player_sprite.animate(velocity)
-	
 
-func swim_physics(delta: float) -> void:
-	var input_x = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
-	var input_y = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
+# ------------------------------------------------------------
+func handle_state(delta: float) -> void:
+	on_ground = is_on_floor()
 
-	var input_vector = Vector2(input_x, input_y).normalized()
-	velocity = input_vector * swim_speed
+	match state:
+		State.IDLE:
+			idle_state(delta)
+		State.WALK:
+			walk_state(delta)
+		State.JUMP:
+			jump_state(delta)
+		State.ATTACK:
+			attack_state(delta)
+		State.CROUCH:
+			crouch_state(delta)
+		State.DASH:
+			dash_state(delta)
+		State.TRANSFORM:
+			transform_state(delta)
+		State.DEAD:
+			dead_state(delta)
 
-	# Simula leve empuxo e resistência
-	velocity.y += water_gravity * delta
-	velocity *= 0.9  # resistência da água
+# ------------------------------------------------------------
+# 🔹 IDLE
+func idle_state(delta: float) -> void:
+	animation_player.play("Idle")
+	velocity.y += gravity * delta
+	handle_horizontal_input()
 
-	# Aqui você pode trocar animação ou som
-	if Player_sprite.has_method("play"):
-		Player_sprite.play("swim")
-	
-func horizontal_moviment_env() -> void:
-	var input_direction: float = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
-	if Player_sprite.estado == 0 and dash:
-		velocity.x = input_direction * speed * 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
-	elif (not crouching ):
-		velocity.x = input_direction * speed
-	elif crouching:
-		velocity.x = 0
+	if Input.is_action_just_pressed("jump") and on_ground:
+		change_state(State.JUMP)
+	elif abs(Input.get_axis("ui_left", "ui_right")) > 0:
+		change_state(State.WALK)
+	elif Input.is_action_just_pressed("attack"):
+		change_state(State.ATTACK)
+	elif Input.is_action_pressed("crouch"):
+		change_state(State.CROUCH)
+	elif Input.is_action_just_pressed("dash"):
+		change_state(State.DASH)
 
-func vertical_moviment_env() -> void:
-	if is_on_floor()  :
-		jump_count = 1
-	if Input.is_action_just_pressed("ui_select") and not crouching:
-		if Player_sprite.estado == 1 :
-			velocity.y = jump_speed
-			
-		elif Player_sprite.estado != 1 and jump_count < 2:
-			jump_count += 1
-			velocity.y = jump_speed
-		
-			
-func action() -> void:
-
-	if Input.is_action_just_pressed("dash") and Player_sprite.estado == 0 and velocity.x != 0:
-		dash = true
-	if Input.is_action_pressed("up") and Input.is_action_just_pressed("attack"):
-		parry = true
-	if Input.is_action_pressed("down") and is_on_floor() and not attacking and not crouching and Player_sprite.estado != 1:
-		crouching = true 
-		pode_abaixar = false
-		
-	elif not Input.is_action_pressed("down") :
-		crouching = false
-		pode_abaixar = true
-		Player_sprite.crouch_off = true
-		
-		
-		
-	if Input.is_action_just_pressed("attack") and not attacking and not crouching and is_on_floor() and Player_sprite.estado != 1:
-		#attacking = true
-		attack()
-		#set_physics_process(false)
-		
-	
-	if Input.is_action_just_pressed("forma1") and not transformando and Pode_Bolha == true :
-		
-		transformando = true
-		set_physics_process(false)
-		
-	if Input.is_action_just_pressed("forma2") and not transformando and not transformando_super and Pode_Super == true :
-		
-		transformando_super  = true
-		transformando = true
-		set_physics_process(false)
-
-func tocar():
-
-	if (Player_sprite.estado != 2):
-		ambiente.stream_paused = false
-		
-		ambiente.autoplay
-		ambiente.playing 	
-		opera.stream_paused = true
-		
+# ------------------------------------------------------------
+# 🔹 WALK
+func walk_state(delta: float) -> void:
+	var dir := Input.get_axis("ui_left", "ui_right")
+	if dir != 0:
+		velocity.x = dir * speed
+		$Sprite2D.flip_h = dir < 0
+		animation_player.play("Walk")
 	else:
-		opera.stream_paused = false
-		opera.autoplay
-		opera.playing
-		ambiente.stream_paused = true
-		
-func gravity(delta: float) -> void:
-	velocity.y += delta * player_gravity
-	if velocity.y >= player_gravity:
-		velocity.y = player_gravity
+		change_state(State.IDLE)
 
-# Método de transformação
+	if Input.is_action_just_pressed("jump") and on_ground:
+		change_state(State.JUMP)
+	elif Input.is_action_just_pressed("attack"):
+		change_state(State.ATTACK)
+	elif Input.is_action_pressed("crouch"):
+		change_state(State.CROUCH)
+	elif Input.is_action_just_pressed("dash"):
+		change_state(State.DASH)
 
-func die() -> void:
-	# Exibe um efeito visual ou som de morte, se necessário
-	print("O jogador morreu!") # Exemplo de mensagem para debug
-	# Desativa o controle temporariamente
-	set_physics_process(false)
-	# Restaura a posição inicial ou posição de respawn
-	#position = respawn_position
-	nivel.reset_scene()
-	# Reativa o controle
-	set_physics_process(true)
+	velocity.y += gravity * delta
 
+# ------------------------------------------------------------
+# 🔹 JUMP
+func jump_state(delta: float) -> void:
+	if on_ground:
+		velocity.y = jump_force
+		animation_player.play("Jump")
+		on_ground = false
 
-func delete():
-	#Player_sprite.super_bubble.transform = self.transform
-	Player_sprite.super_bubble.transform = self.transform
-	get_parent().add_child(Player_sprite.super_bubble)
-	#get_tree().root.add_child(Player_sprite.super_bubble)
-	self.queue_free()
+	velocity.y += gravity * delta
 
-func knockback():
-	var direction = 1 if Player_sprite.flip_h else -1
-	var knockback_distance = 50  # distância em pixels
-	var knockback_duration = 0.2  # tempo em segundos
-	
-	var target_position = global_position + Vector2(direction * knockback_distance, -10)  # leve flutuação para cima
-	
-	var tween = create_tween()
-	tween.tween_property(self, "global_position", target_position, knockback_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if velocity.y > 0:
+		animation_player.play("Fall")
 
-	
-func attack() -> void:
-	attacking = true
-	# Pausa controle, mas NÃO pausa a física inteira
-	set_process_input(false)
-	
-	# Ativa a área de ataque
-	attack_area.monitoring = false
-	attack_shape.disabled = false
-	
-	# Toca animação (se houver)
-	if Player_sprite.has_method("play"):
-		Player_sprite.play("attack")
-	
-	# Duração do ataque (em segundos)
-	await get_tree().create_timer(0.3).timeout
-	
-	# Desativa a área novamente
-	attack_area.monitoring = true
-	attack_shape.disabled = true
-	
-	# Libera o controle
-	set_process_input(true)
-	attacking = false
+	handle_horizontal_input()
+
+	if is_on_floor():
+		change_state(State.IDLE)
+
+# ------------------------------------------------------------
+# 🔹 ATTACK
+func attack_state(delta: float) -> void:
+	velocity = Vector2.ZERO
+	animation_player.play("Attack")
+	await animation_player.animation_finished
+	change_state(State.IDLE)
+
+# ------------------------------------------------------------
+# 🔹 CROUCH
+func crouch_state(delta: float) -> void:
+	velocity.x = 0
+	animation_player.play("Crouch")
+	if not Input.is_action_pressed("crouch"):
+		change_state(State.IDLE)
+
+# ------------------------------------------------------------
+# 🔹 DASH
+func dash_state(delta: float) -> void:
+	if dash_timer <= 0.0:
+		dash_timer = dash_time
+		# pega -1, 0 ou 1
+		var dir := int(sign(Input.get_axis("ui_left", "ui_right")))
+		if dir == 0:
+			# ternário no estilo Python do GDScript
+			dir = -1 if $Sprite2D.flip_h else 1
+		velocity.x = dir * dash_speed
+		velocity.y = 0
+		animation_player.play("Dash")
+
+	dash_timer -= delta
+	if dash_timer <= 0:
+		change_state(State.IDLE)
+
+# ------------------------------------------------------------
+# 🔹 TRANSFORM
+func transform_state(delta: float) -> void:
+	velocity = Vector2.ZERO
+	animation_player.play("Transform")
+	await animation_player.animation_finished
+	change_state(State.IDLE)
+
+# ------------------------------------------------------------
+# 🔹 DEAD
+func dead_state(delta: float) -> void:
+	velocity = Vector2.ZERO
+	animation_player.play("Dead")
+
+# ------------------------------------------------------------
+func handle_horizontal_input() -> void:
+	var dir := Input.get_axis("ui_left", "ui_right")
+	velocity.x = dir * speed
+	if dir != 0:
+		$Sprite2D.flip_h = dir < 0
+
+# ------------------------------------------------------------
+func change_state(new_state: State) -> void:
+	state = new_state

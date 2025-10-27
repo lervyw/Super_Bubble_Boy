@@ -15,13 +15,14 @@ func _ready() -> void:
 		await get_tree().create_timer(0.3).timeout
 
 func spawn_enemy():
+	pass
 	#5500
 	
 	
-	var random_x = randf_range(35,5500)
-	var enemy_instance = inimigo.instantiate()
-	add_child(enemy_instance)
-	enemy_instance.position = Vector2(random_x, -654)
+	#var random_x = randf_range(35,5500)
+	#var enemy_instance = inimigo.instantiate()
+	#add_child(enemy_instance)
+	#enemy_instance.position = Vector2(random_x, -654)
 		
 	#print ("inimigo pica")
 	
