@@ -283,6 +283,22 @@ tracks/0/keys = {
 "values": [37, 38, 39, 40, 41, 42]
 }
 
+[sub_resource type="Animation" id="Animation_7mbvf"]
+resource_name = "Bolha_Normal"
+length = 0.7
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.1, 0.2, 0.3, 0.4, 0.5, 0.56666666, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [41, 40, 39, 38, 38, 42, 37]
+}
+
 [sub_resource type="Animation" id="Animation_st8up"]
 resource_name = "Normal_Super"
 length = 1.6
@@ -509,6 +525,23 @@ tracks/0/keys = {
 "values": [65, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51]
 }
 
+[sub_resource type="Animation" id="Animation_x33ej"]
+resource_name = "Swim"
+length = 0.3
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.166667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [8, 9]
+}
+
 [sub_resource type="Animation" id="Animation_6o3ec"]
 resource_name = "Transform5"
 tracks/0/type = "value"
@@ -539,39 +572,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [10, 18, 19, 20]
-}
-
-[sub_resource type="Animation" id="Animation_7mbvf"]
-resource_name = "Bolha_Normal"
-length = 0.7
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0.1, 0.2, 0.3, 0.4, 0.5, 0.56666666, 0.6),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [41, 40, 39, 38, 38, 42, 37]
-}
-
-[sub_resource type="Animation" id="Animation_x33ej"]
-resource_name = "Swim"
-length = 0.3
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.166667),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [8, 9]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1mgau"]

@@ -1,228 +1,170 @@
-# Script do Sprite2D para animações
 extends Sprite2D
+
 @export var player: Node
 @export var animation: AnimationPlayer
 @export var stats: Node
 @export var nivel: Node
-@export var attack_area: Area2D  # Conecte a Area2D no editor
+@export var attack_area: Area2D
 
-var transformacaoOn: bool
-var estado : int 
 var crouch_off: bool = false
-#var form: String = "normal"  # Formas: "normal", "bubble"
-#@export var super_scene: PackedScene
 
-func animate(direction: Vector2) -> void:
+# ---------------------------------------------------
+func _process(delta: float) -> void:
+	if not player:
+		return
 	
+	# Captura a direção atual (usada nas animações de movimento)
+	var direction := Vector2.ZERO
+	direction.x = Input.get_axis("ui_left", "ui_right")
+	direction.y = Input.get_axis("ui_up", "ui_down")
+
 	verify_position(direction)
+	update_animation(direction)
+# ---------------------------------------------------
 
-	
-	if player.on_hit or player.dead:
-		hit_behavior()
-	elif player.dash :
-		animation.play("dash")
-	elif player.transformando and not player.transformando_super and estado == 0:
-		animation.play("Normal_Bolha")
-		
-	elif player.transformando and player.transformando_super and estado == 0 :
-		animation.play("Normal_Super")	##
-		
-	elif player.transformando and not player.transformando_super and estado == 1 :
-		animation.play("Bolha_Normal")#
-		
-	elif player.transformando and  player.transformando_super and estado == 1:
-		animation.play("Bolha_Super")#
-		
-	elif player.transformando   and not player.transformando_super and estado == 2:
-		animation.play("Super_Bolha")
-		
-	elif player.transformando   and  player.transformando_super and estado == 2:
-		animation.play("Super_Normal")
-		
-	elif player.parry and estado == 2:
-		animation.play("S_parry")
-		
-	elif player.attacking and estado == 2:
-		animation.play("S_attack")
-		
-	elif player.attacking and estado == 0:
-		animation.play("T_attack")
-		
-	elif player.crouching and player.is_on_floor()  and estado == 0:
-		
-		animation.play("N_c_loop")
-		#player.set_physics_process(false)
-		crouch_off = false
-		
-	elif player.crouching  and estado == 2:
-		crouch_off = false
-		animation.play("S_crouch")
-		
-		
-	elif  direction.y != 0 and estado != 1:
-		vertical_behavior(direction)
-	elif estado != 1:
-		horizontal_behavior(direction)
-		
-func transform():
-	pass
-func hit_behavior():
-	#quando tiver a animaçao de super  trocar as animaçoes para S_Hit
-	player.set_physics_process(false)
-	if player.dead and estado == 0:
-		animation.play("Dead_normal")
-	elif player.dead and estado == 2:
-		animation.play("S_dead")
-	elif player.dead and estado== 1:
-		animation.play("B_dead")
-	elif player.on_hit and estado ==0 :
-		animation.play("Hit")
-		await animation.animation_finished  # espera a animação terminar
-		player.on_hit = false
-		player.set_physics_process(true)
+func update_animation(direction: Vector2) -> void:
+	match player.state:
+		player.State.TRANSFORM:
+			handle_transform_animation()
+		player.State.DEAD:
+			handle_death_animation()
+		player.State.ATTACK:
+			handle_attack_animation()
+		player.State.DASH:
+			animation.play("dash")
+		player.State.CROUCH:
+			handle_crouch_animation()
+		player.State.JUMP, player.State.WALK, player.State.IDLE:
+			handle_movement_animation(direction)
+		player.State.SWIM:
+			animation.play("Swim")
+		_:
+			pass
+# ---------------------------------------------------
 
-	elif player.on_hit and estado == 1:
-		animation.play("Hit_Bolha")
-	elif player.on_hit and estado == 2:
-		animation.play("Hit_Super")
-			
-	
+# 🔹 Movimento (Idle / Walk / Jump / Fall)
+func handle_movement_animation(direction: Vector2) -> void:
+	match player.form:
+		player.Form.NORMAL:
+			if not player.is_on_floor():
+				if direction.y > 0:
+					animation.play("Fall")
+				elif direction.y < 0:
+					animation.play("Jump")
+				else:
+					animation.play("Idle")
+			elif abs(direction.x) > 0:
+				animation.play("Walk")
+			else:
+				animation.play("Idle")
+
+		player.Form.BUBBLE:
+			animation.play("Bubble_only")
+
+		player.Form.SUPER:
+			if not player.is_on_floor():
+				if direction.y > 0:
+					animation.play("S_Fall")
+				elif direction.y < 0:
+					animation.play("S_Jump")
+				else:
+					animation.play("S_Idle")
+			elif abs(direction.x) > 0:
+				animation.play("S_Walk")
+			else:
+				animation.play("S_Idle")
+# ---------------------------------------------------
+
+# 🔹 Transformações (Normal <-> Bubble <-> Super)
+func handle_transform_animation() -> void:
+	var current_form = player.form
+	var target_form = player.target_form if "target_form" in player else null
+	var anim_name := ""
+
+	if target_form == null:
+		return
+
+	match [current_form, target_form]:
+		[player.Form.NORMAL, player.Form.BUBBLE]:
+			anim_name = "Normal_Bolha"
+		[player.Form.NORMAL, player.Form.SUPER]:
+			anim_name = "Normal_Super"
+		[player.Form.BUBBLE, player.Form.NORMAL]:
+			anim_name = "Bolha_Normal"
+		[player.Form.BUBBLE, player.Form.SUPER]:
+			anim_name = "Bolha_Super"
+		[player.Form.SUPER, player.Form.BUBBLE]:
+			anim_name = "Super_Bolha"
+		[player.Form.SUPER, player.Form.NORMAL]:
+			anim_name = "Super_Normal"
+		_:
+			anim_name = "Transform"
+
+	animation.play(anim_name)
+# ---------------------------------------------------
+
+# 🔹 Ataques
+func handle_attack_animation() -> void:
+	match player.form:
+		player.Form.SUPER:
+			animation.play("S_attack")
+		_:
+			animation.play("T_attack")
+# ---------------------------------------------------
+
+# 🔹 Agachar
+func handle_crouch_animation() -> void:
+	match player.form:
+		player.Form.SUPER:
+			animation.play("S_crouch")
+		player.Form.NORMAL:
+			animation.play("N_c_loop")
+		player.Form.BUBBLE:
+			animation.play("Bubble_only")
+# ---------------------------------------------------
+
+# 🔹 Morte
+func handle_death_animation() -> void:
+	match player.form:
+		player.Form.NORMAL:
+			animation.play("Dead_normal")
+		player.Form.BUBBLE:
+			animation.play("B_dead")
+		player.Form.SUPER:
+			animation.play("S_dead")
+# ---------------------------------------------------
+
+# 🔹 Espelhar sprite e área de ataque
 func verify_position(direction: Vector2) -> void:
 	if direction.x > 0:
 		flip_h = false
 		if attack_area:
-			attack_area.scale.x = 1  # Normal
+			attack_area.scale.x = 1
 	elif direction.x < 0:
 		flip_h = true
 		if attack_area:
-			attack_area.scale.x = -1  # Flipado
-
-func horizontal_behavior(direction: Vector2) -> void:
-	if(player.transformando_super == false and estado == 0):
-		if direction.x != 0:
-			animation.play("Walk")
-		else :
-			animation.play("Idle")
-	if estado == 2:
-		if direction.x != 0:
-			animation.play("S_Walk")
-		else :
-			animation.play("S_Idle")
-			
-func vertical_behavior(direction: Vector2) -> void:
-	if(estado == 0):
-		if direction.y > 0 :
-			animation.play("Fall")
-		elif direction.y < 0 :
-			animation.play("Jump")
-	elif(estado == 2):
-		if direction.y > 0 :
-			animation.play("S_Fall")
-		elif direction.y < 0 :
-			animation.play("S_Jump")
-
-func voltar():
-	
-	if 	player.transformando == true:
-		player.transformando = false
-		
-
-		
-	if player.transformando_super == true:
-		player.transformando_super = false
-		
-		
-	if(estado == 0):
-		player.speed = 150
-		player.jump_speed = -320
-		player.player_gravity = 400
-	elif(estado == 1):
-		player.speed = 50
-		player.jump_speed = -50
-		player.player_gravity = 50	
-	elif(estado == 2):
-		player.speed = 100
-		player.jump_speed = -420
-		player.player_gravity = 600
-	
+			attack_area.scale.x = -1
+# ---------------------------------------------------
 
 func _on_animacao_animation_finished(anim_name: StringName) -> void:
 	match anim_name:
-		"Walk":
-		
-			pass
-			
 		"Normal_Bolha":
-			estado = 1
-			animation.play("Bubble_only")
-			voltar()			
-			player.set_physics_process(true)
+			player.form = player.Form.BUBBLE
 		"Normal_Super":
-			estado = 2
-			voltar()	
-			player.transformando_super = false	
-			player.set_physics_process(true)
-		"Bolha_Normal":			
-			estado = 0
-			voltar()	
-			player.set_physics_process(true)
-		"Bolha_Super":			
-			estado = 2
-			voltar()
-			player.set_physics_process(true)
+			player.form = player.Form.SUPER
+		"Bolha_Normal":
+			player.form = player.Form.NORMAL
+		"Bolha_Super":
+			player.form = player.Form.SUPER
 		"Super_Normal":
-			estado = 0
-			voltar()	
-			player.transformando_super = false
-			player.set_physics_process(true)
+			player.form = player.Form.NORMAL
 		"Super_Bolha":
-			estado = 1
-			animation.play("Bubble_only")
-			voltar()	
-			player.transformando_super = false
-			player.set_physics_process(true)
-		"Bubble_only":
-			if (estado ==1):
-				
-				pass
-		"Hit":
+			player.form = player.Form.BUBBLE
+		"Hit", "Hit_Bolha", "Hit_Super":
 			player.on_hit = false
-			player.set_physics_process(true)
-			
-		"Dead_normal":
-#			nivel.reset_scene()
+		"Dead_normal", "S_dead", "B_dead":
 			get_tree().reload_current_scene()
-		"Hit_Bolha":
-			player.on_hit = false
-			player.set_physics_process(true)
-			animation.play("Bubble_only")
-		"Hit_Super":
-			player.on_hit = false
-			player.set_physics_process(true)
-		"S_dead":
-#			nivel.reset_scene()
-			get_tree().reload_current_scene()
-		"B_dead":
-#			nivel.reset_scene()
-			get_tree().reload_current_scene()
-		"T_attack":
-			player.attacking = false
-			player.set_physics_process(true)
-		"S_attack":
+		"T_attack", "S_attack", "S_parry", "dash":
 			player.set_physics_process(true)
 			player.attacking = false
-		"S_parry":
-			player.set_physics_process(true)
-			player.parry = false
-			player.attacking = false
-		"dash":
-			player.set_physics_process(true)
 			player.dash = false
-		#"Normal_crouch":
-		#	set_physics_process(false)
-		#	animation.play("N_c_loop")
-		#	player.crouching = false
-			
-		#"N_c_loop":
-		#	set_physics_process(false)
-		#	player.crouching = false

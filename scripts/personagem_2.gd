@@ -74,7 +74,16 @@ func handle_state(delta: float) -> void:
 # ------------------------------------------------------------
 # 🔹 IDLE
 func idle_state(delta: float) -> void:
-	animation_player.play("Idle")
+	
+	match form:
+		Form.NORMAL:
+			animation_player.play("Idle")
+		Form.BUBBLE:
+			animation_player.play("Bubble_Idle")
+		Form.SUPER:
+			animation_player.play("Super_Idle")
+			
+#	animation_player.play("Idle")
 	velocity.y += gravity * delta
 	handle_horizontal_input()
 
