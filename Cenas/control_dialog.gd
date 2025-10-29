@@ -3,9 +3,9 @@ extends Control
 
 @export var DialogBox: RichTextLabel
 @export var dialogs: Array[String] = [
-	"Texto1.",
-	"Texto2.",
-	"Texto3."
+	"Bom dia.",
+	"Eu estou devendo muit imposto.",
+	"A faço a conta fica aonde?."
 ]
 
 var current_dialog_index: int = 0

@@ -10,7 +10,7 @@ enum Form { NORMAL, BUBBLE, SUPER }
 @export var gravity := 900.0
 @export var dash_speed := 400.0
 @export var dash_time := 0.2
-@export var animation_player: AnimationPlayer  # ainda necessário para ataques e transformações
+@export var animation_player: AnimationPlayer
 
 # ----- VARIÁVEIS -----
 var dash_timer := 0.0
@@ -18,7 +18,7 @@ var on_ground := false
 var form: Form = Form.NORMAL
 var state: State = State.IDLE
 var in_water: bool = false
-var target_form: Form = Form.NORMAL  # usado nas animações de transformação
+var target_form: Form = Form.NORMAL
 
 var unlocked_forms = {
 	Form.NORMAL: true,
@@ -27,19 +27,25 @@ var unlocked_forms = {
 }
 
 # ------------------------------------------------------------
+func _ready() -> void:
+	# Conecta o sinal de ataque vindo do Textura2
+	if $Sprite2D.has_signal("attack_finished"):
+		$Sprite2D.attack_finished.connect(_on_attack_finished)
+
+# ------------------------------------------------------------
 func _physics_process(delta: float) -> void:
 	if in_water:
 		velocity.y += gravity * 0.2 * delta
 	else:
 		velocity.y += gravity * delta
-	
+
 	handle_state(delta)
 
 	if Input.is_action_just_pressed("forma1"):
 		try_transform(Form.BUBBLE)
 	elif Input.is_action_just_pressed("forma2"):
 		try_transform(Form.SUPER)
-	
+
 	move_and_slide()
 
 # ------------------------------------------------------------
@@ -114,19 +120,19 @@ func jump_state(delta: float) -> void:
 
 	handle_horizontal_input()
 
-	if velocity.y > 0:
-		# começa a cair
-		pass
-
 	if is_on_floor():
 		change_state(State.IDLE)
 
 # ------------------------------------------------------------
-# 🔹 ATTACK
+# 🔹 ATTACK (baseado em estado, sem booleanas)
 func attack_state(delta: float) -> void:
 	velocity = Vector2.ZERO
-	animation_player.play("Attack")  # ataque ainda é controlado manualmente
-	await animation_player.animation_finished
+	# Nada é chamado diretamente — o texture cuida da animação
+
+
+# Callback vem de texture_2.gd:
+func _on_attack_finished() -> void:
+	# Retorna ao idle quando a animação de ataque termina
 	change_state(State.IDLE)
 
 # ------------------------------------------------------------
