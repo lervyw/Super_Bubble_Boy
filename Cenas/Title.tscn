@@ -1,8 +1,9 @@
-[gd_scene load_steps=40 format=3 uid="uid://bxwaorviofm3w"]
+[gd_scene load_steps=41 format=3 uid="uid://bxwaorviofm3w"]
 
 [ext_resource type="Texture2D" uid="uid://bi03taar753" path="res://sprites/img/background/titulo/preto1.png" id="1_15gka"]
 [ext_resource type="Script" uid="uid://cx7ula7bxnjv4" path="res://scripts/title.gd" id="1_y12so"]
 [ext_resource type="Texture2D" uid="uid://bkhsbfwka4gqw" path="res://sprites/img/background/titulo/bg_4.png" id="2_77ghk"]
+[ext_resource type="PackedScene" uid="uid://bn46vc5m2w5an" path="res://Cenas/cutscene_test.tscn" id="2_j7fkm"]
 [ext_resource type="Texture2D" uid="uid://c1wvd3iu3i0gl" path="res://sprites/img/background/titulo/bg_5.png" id="4_r2t5r"]
 [ext_resource type="Texture2D" uid="uid://coh3wdrj77jd8" path="res://sprites/img/background/titulo/animacao/bg_3/bg_3-Sheet.png" id="5_mou5i"]
 [ext_resource type="Texture2D" uid="uid://ti17al0ug0d8" path="res://sprites/img/background/titulo/animacao/bg_2/bg_2-Sheet.png" id="6_ss2qd"]
@@ -211,7 +212,7 @@ Button/fonts/font = ExtResource("8_mcqsg")
 Button/styles/hover = SubResource("StyleBoxFlat_01s65")
 Button/styles/normal = SubResource("StyleBoxFlat_di2en")
 
-[node name="Control" type="Control"]
+[node name="Control" type="Control" node_paths=PackedStringArray("ambiente")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -219,6 +220,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_y12so")
+ambiente = NodePath("AudioStreamPlayer")
+cena_inicial = ExtResource("2_j7fkm")
 
 [node name="Bg_3" type="TextureRect" parent="."]
 layout_mode = 0
@@ -251,7 +254,7 @@ autoplay = "default"
 frame_progress = 0.569063
 
 [node name="Titulo" type="AnimatedSprite2D" parent="."]
-position = Vector2(287, 141)
+position = Vector2(238, 138)
 scale = Vector2(1.14048, 1)
 sprite_frames = SubResource("SpriteFrames_qxdjn")
 autoplay = "default"

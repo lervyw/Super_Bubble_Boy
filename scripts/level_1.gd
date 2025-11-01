@@ -1,55 +1,93 @@
 extends Node2D
-@export var player: Node
-@export var inimigo: PackedScene
-@export var status: Node
-var enemies = 0
-var target = 20
-#var inimigo = preload("res://Cenas/slime.tscn").instantiate()
 
-	# Gera 10 inimigos em posições aleatórias
+# Referências
+@export_group("References")
+@export var player: CharacterBody2D
+@export var stats: Node
+
+# Configurações de Checkpoint
+@export_group("Checkpoint")
+@export var checkpoint_position: Vector2 = Vector2(288, 207)
+@export var lose_health_on_death: bool = false
+
 func _ready() -> void:
+	print("🎮 Nível iniciado!")
 	
-	while enemies < target:
-		enemies += 1
-		spawn_enemy()
-		await get_tree().create_timer(0.3).timeout
+	if not player:
+		push_error("Player reference não definida!")
+		return
+	
+	if not stats:
+		push_warning("Stats reference não definida!")
+	
+	# As SpawnZones cuidam de si mesmas!
+	setup_spawn_zones()
 
-func spawn_enemy():
-	pass
-	#5500
+func setup_spawn_zones() -> void:
+	"""Configura referências automáticas nas spawn zones"""
+	var zones = get_tree().get_nodes_in_group("spawn_zone")
 	
-	
-	#var random_x = randf_range(35,5500)
-	#var enemy_instance = inimigo.instantiate()
-	#add_child(enemy_instance)
-	#enemy_instance.position = Vector2(random_x, -654)
-		
-	#print ("inimigo pica")
-	
+	for zone in zones:
+		if zone is SpawnZone:
+			# Injeta referências automaticamente
+			if not zone.player:
+				zone.player = player
+			
+			print("✅ SpawnZone '%s' configurada" % zone.name)
 
-	#var enemy_instance = inimigo
+func reset_scene() -> void:
+	"""LEGACY: Compatibilidade com sistema antigo"""
+	reset_player_position()
+
+func reset_player_position() -> void:
+	"""Reseta posição do player (checkpoint)"""
+	if not player:
+		push_error("Level: Player não encontrado!")
+		return
 	
+	print("🔄 Player respawnando no checkpoint")
 	
-	# Define uma posição aleatória no intervalo especificado
-	#var random_x = rand_range(35, 5500)
-	#enemy_instance.position = Vector2(random_x, -609)
+	player.global_position = checkpoint_position
+	player.velocity = Vector2.ZERO
 	
-	# Adiciona o inimigo como filho deste nó
-		
-		
-		
-func reset_scene():
-	#inimigo.transform = self.transform
-	#get_parent().add_child(Player_sprite.super_bubble)
-	#get_tree().root.add_child(Player_sprite.super_bubble)
-	#self.queue_free()
+	if player.has_method("change_state"):
+		player.change_state(player.State.IDLE)
 	
-	status.update_helth("Decrease", 1)
-	player.position.x = 288
-	player.position.y = 207
+	if lose_health_on_death and stats:
+		stats.update_health("Decrease", 1)
+		print("💔 -1 HP por morte")
 	
-	# Obtém o nome atual da cena
-	#if (player.dead):
-	#	var current_scene = get_tree().current_scene
-	# Reinicia a cena carregando-a novamente
-	#	get_tree().reload_current_scene()
+	# Garante vida mínima
+	if stats and stats.current_health <= 0:
+		stats.current_health = 1
+		stats.emit_signal("health_changed", stats.current_health, stats.max_health)
+
+# ===== CONTROLE DE SPAWN ZONES (OPCIONAL) =====
+
+func activate_zone(zone_name: String) -> void:
+	"""Ativa uma spawn zone específica"""
+	var zone = get_node_or_null(zone_name)
+	if zone and zone.has_method("activate"):
+		zone.activate()
+
+func deactivate_zone(zone_name: String) -> void:
+	"""Desativa uma spawn zone"""
+	var zone = get_node_or_null(zone_name)
+	if zone and zone.has_method("deactivate"):
+		zone.deactivate()
+
+func clear_all_zones() -> void:
+	"""Limpa todos os inimigos de todas as zonas"""
+	for zone in get_tree().get_nodes_in_group("spawn_zone"):
+		if zone.has_method("clear_all_enemies"):
+			zone.clear_all_enemies()
+
+# ===== DEBUG =====
+
+func _input(event: InputEvent) -> void:
+	if not OS.is_debug_build():
+		return
+	
+	if event.is_action_pressed("ui_page_down"):
+		print("🧪 [DEBUG] Limpar todas as zonas")
+		clear_all_zones()

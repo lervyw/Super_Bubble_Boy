@@ -1,13 +1,12 @@
-[gd_scene load_steps=27 format=3 uid="uid://2bsj0rjvtl73"]
+[gd_scene load_steps=26 format=3 uid="uid://2bsj0rjvtl73"]
 
 [ext_resource type="Script" uid="uid://dal4xk7p4hxxg" path="res://scripts/boss.gd" id="1_faq14"]
 [ext_resource type="Texture2D" uid="uid://c3o25ywjj2vb8" path="res://sprites/characters/boss-Sheet.png" id="2_cmtw4"]
 [ext_resource type="Texture2D" uid="uid://gkstrwf0f3x4" path="res://sprites/characters/balao.png" id="3_8citt"]
 [ext_resource type="Texture2D" uid="uid://p868hysemgsd" path="res://sprites/characters/balao2.png" id="4_385ap"]
-[ext_resource type="BehaviorTree" uid="uid://bijkguk88q1nc" path="res://ai/trees/boss.tres" id="5_e6x0j"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_urgpx"]
-size = Vector2(77, 86)
+size = Vector2(83, 92)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yrq18"]
 atlas = ExtResource("2_cmtw4")
@@ -80,7 +79,29 @@ animations = [{
 "texture": SubResource("AtlasTexture_5qrbe")
 }],
 "loop": true,
-"name": &"Fall",
+"name": &"death",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dsboo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5qrbe")
+}],
+"loop": true,
+"name": &"fall",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dsboo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5qrbe")
+}],
+"loop": true,
+"name": &"hurt",
 "speed": 10.0
 }, {
 "frames": [{
@@ -100,8 +121,25 @@ animations = [{
 "texture": SubResource("AtlasTexture_nh62n")
 }],
 "loop": true,
-"name": &"Idle",
+"name": &"idle",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yrq18")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pkrqx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nendy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ojjr6")
+}],
+"loop": true,
+"name": &"jump",
+"speed": 4.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -114,7 +152,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_csuej")
 }],
 "loop": true,
-"name": &"Walk",
+"name": &"walk",
 "speed": 3.0
 }]
 
@@ -245,6 +283,10 @@ tracks/3/keys = {
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 
+[sub_resource type="Animation" id="Animation_xu6nh"]
+resource_name = "hurt"
+loop_mode = 1
+
 [sub_resource type="Animation" id="Animation_ari7e"]
 resource_name = "padrao"
 
@@ -303,6 +345,7 @@ tracks/3/keys = {
 _data = {
 &"RESET": SubResource("Animation_dhdlb"),
 &"chat": SubResource("Animation_5uklt"),
+&"hurt": SubResource("Animation_xu6nh"),
 &"padrao": SubResource("Animation_ari7e"),
 &"warning": SubResource("Animation_3xr8w")
 }
@@ -310,14 +353,16 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0uvtv"]
 size = Vector2(85, 3)
 
-[sub_resource type="BlackboardPlan" id="BlackboardPlan_pxbmi"]
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_aq35j"]
-size = Vector2(84, 69)
+size = Vector2(84, 73)
 
 [node name="boss" type="CharacterBody2D" groups=["enemy"]]
 collision_layer = 2
 script = ExtResource("1_faq14")
+chase_speed = 120.0
+jump_force = -340.0
+detection_range = 100.0
+particle_duration = 1.0
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
 emitting = false
@@ -331,14 +376,14 @@ scale_amount_max = 4.0
 color = Color(0.992157, 0, 0, 1)
 
 [node name="Collision" type="CollisionShape2D" parent="."]
-position = Vector2(-5.5, 10)
+position = Vector2(-5.5, 13)
 shape = SubResource("RectangleShape2D_urgpx")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_vs7xd")
-animation = &"Walk"
+animation = &"jump"
 autoplay = "Attack"
-flip_h = true
+frame_progress = 0.04911236
 
 [node name="chatboxSprite" type="Sprite2D" parent="AnimatedSprite2D"]
 visible = false
@@ -357,24 +402,18 @@ libraries = {
 &"": SubResource("AnimationLibrary_e261w")
 }
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="HurtArea" type="Area2D" parent="." groups=["enemy"]]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtArea"]
 position = Vector2(-7.5, -35)
 shape = SubResource("RectangleShape2D_0uvtv")
-one_way_collision = true
 
-[node name="BTPlayer" type="BTPlayer" parent="."]
-behavior_tree = ExtResource("5_e6x0j")
-blackboard_plan = SubResource("BlackboardPlan_pxbmi")
+[node name="DamageArea" type="Area2D" parent="." groups=["ebody"]]
 
-[node name="Hit" type="Area2D" parent="." groups=["enemy"]]
-monitoring = false
-
-[node name="Collision" type="CollisionShape2D" parent="Hit"]
-position = Vector2(-5, 23.5)
+[node name="Collision" type="CollisionShape2D" parent="DamageArea"]
+position = Vector2(-5, 25.5)
 shape = SubResource("RectangleShape2D_aq35j")
 debug_color = Color(0.523427, 0.573446, 0, 0.42)
 
-[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
-[connection signal="area_entered" from="Hit" to="." method="_on_hit_area_entered"]
+[connection signal="area_entered" from="HurtArea" to="." method="_on_hurt_area_area_entered"]
+[connection signal="area_entered" from="DamageArea" to="." method="_on_damage_area_body_entered"]

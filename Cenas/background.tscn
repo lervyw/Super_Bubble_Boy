@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://barbuh5nxkp2a"]
+[gd_scene load_steps=11 format=3 uid="uid://barbuh5nxkp2a"]
 
 [ext_resource type="Script" uid="uid://dip76wx5fkuqm" path="res://scripts/background.gd" id="1_eu30d"]
 [ext_resource type="Texture2D" uid="uid://qqcnd70hc2c1" path="res://sprites/img/background/fundo/arvores_3.png" id="2_uhqxv"]
@@ -6,9 +6,49 @@
 [ext_resource type="Texture2D" uid="uid://qebivfjepou2" path="res://sprites/img/background/fundo/1.png" id="2_yw0n6"]
 [ext_resource type="Texture2D" uid="uid://dqyr5d12lulap" path="res://sprites/img/background/fundo/arvore_2.png" id="3_vx3ae"]
 [ext_resource type="Texture2D" uid="uid://2g18p4rbmec3" path="res://sprites/img/background/fundo/arvore_1.png" id="4_dhaf6"]
+[ext_resource type="Script" uid="uid://dqbyjy6knuq1c" path="res://Cenas/dia_noite_ciclo.gd" id="7_w476n"]
+
+[sub_resource type="Animation" id="Animation_4keos"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DayAndNightCycle:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_tdv8i"]
+resource_name = "dia_noite"
+length = 48.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DayAndNightCycle:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 24, 43.643158),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(0, 0.31071323, 0.5239116, 1), Color(0.81846493, 0.8748703, 0.91357327, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_nprc1"]
+_data = {
+&"RESET": SubResource("Animation_4keos"),
+&"dia_noite": SubResource("Animation_tdv8i")
+}
 
 [node name="ParallaxBackground" type="ParallaxBackground"]
 script = ExtResource("1_eu30d")
+can_process = false
 layer_speed = Array[int]([5, 10, 15, 20, 25])
 
 [node name="Layer5" type="ParallaxLayer" parent="."]
@@ -61,5 +101,13 @@ offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("4_dhaf6")
 
-[node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0.617455, 0.617455, 0.617455, 1)
+[node name="DayAndNightCycle" type="CanvasModulate" parent="." node_paths=PackedStringArray("animation_player")]
+script = ExtResource("7_w476n")
+animation_player = NodePath("AnimationPlayer")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="DayAndNightCycle"]
+root_node = NodePath("../..")
+libraries = {
+&"": SubResource("AnimationLibrary_nprc1")
+}
+autoplay = "dia_noite"
