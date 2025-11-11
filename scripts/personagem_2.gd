@@ -5,34 +5,33 @@ enum Form { NORMAL, BUBBLE, SUPER }
 
 @export var speed := 150.0
 @export var jump_force := -450.0
-@export var super_jump_force := -350.0  # Pulo mais pesado para forma SUPER
+@export var super_jump_force := -350.0
 @export var gravity := 900.0
 @export var dash_speed := 400.0
 @export var dash_time := 0.2
 @export var animation_player: AnimationPlayer
+@export var audio_normal: AudioStreamPlayer
+@export var audio_super: AudioStreamPlayer
+
+@export_group("Death Settings")
+@export_range(0.0, 5.0) var death_delay: float = 1.0
 
 @export_group("Dash Settings")
-## Cancela gravidade durante dash no ar
 @export var dash_stops_fall: bool = true
-
-## Cooldown entre dashes (em segundos)
 @export_range(0.0, 2.0) var dash_cooldown: float = 0.3
 
-# Referência para área de ataque
 @onready var attack_area: Area2D = $AttackArea
 @onready var attack_collision: CollisionShape2D = $AttackArea/CollisionShape2D
 
-# Modificadores de velocidade na água por forma
-@export var water_speed_normal := 0.6  # 60% da velocidade
-@export var water_speed_bubble := 0.9  # 90% da velocidade (bolha é mais eficiente)
-@export var water_speed_super := 0.5   # 50% da velocidade (super é mais pesado)
+@export var water_speed_normal := 0.6
+@export var water_speed_bubble := 0.9
+@export var water_speed_super := 0.5
 
-# Física de flutuação na água
-@export var water_gravity_normal := 150.0   # Gravidade reduzida na água
-@export var water_gravity_bubble := 50.0    # Bolha flutua muito
-@export var water_gravity_super := 250.0    # Super afunda mais
-@export var water_buoyancy := 80.0          # Força de flutuação para cima
-@export var water_drag := 0.92              # Arrasto da água (0-1)
+@export var water_gravity_normal := 150.0
+@export var water_gravity_bubble := 50.0
+@export var water_gravity_super := 250.0
+@export var water_buoyancy := 80.0
+@export var water_drag := 0.92
 
 var dash_timer := 0.0
 var dash_cooldown_timer := 0.0
@@ -51,25 +50,30 @@ var unlocked_forms = {
 var bubble_jump_count := 0
 var max_bubble_jumps := 40
 
+# ==============================
+# ====== READY =================
+# ==============================
 func _ready() -> void:
 	if $Sprite2D:
 		$Sprite2D.attack_finished.connect(_on_attack_finished)
 	
-	# Desativa a área de ataque inicialmente
 	if attack_collision:
 		attack_collision.disabled = true
-		print("✅ Attack area desativada no início")
+	
+	# Inicializa o áudio na forma atual
+	update_audio_by_form()
 
+# ==============================
+# ====== PHYSICS PROCESS =======
+# ==============================
 func _physics_process(delta: float) -> void:
 	on_ground = is_on_floor()
 	if on_ground:
 		bubble_jump_count = 0
 
-	# Atualiza cooldown do dash
 	if dash_cooldown_timer > 0:
 		dash_cooldown_timer -= delta
 
-	# Aplica física de água ou gravidade normal
 	if in_water:
 		apply_water_physics(delta)
 	else:
@@ -79,8 +83,10 @@ func _physics_process(delta: float) -> void:
 	handle_state(delta)
 	move_and_slide()
 
+# ==============================
+# ====== MOVIMENTO ==============
+# ==============================
 func apply_normal_gravity(delta: float) -> void:
-	# Não aplica gravidade durante dash se configurado
 	if state == State.DASH and dash_stops_fall:
 		return
 	
@@ -90,22 +96,15 @@ func apply_normal_gravity(delta: float) -> void:
 		velocity.y += gravity * delta
 
 func apply_water_physics(delta: float) -> void:
-	# Aplica gravidade reduzida baseada na forma
 	var water_grav := water_gravity_normal
 	match form:
 		Form.BUBBLE:
 			water_grav = water_gravity_bubble
 		Form.SUPER:
 			water_grav = water_gravity_super
-		Form.NORMAL:
-			water_grav = water_gravity_normal
 	
 	velocity.y += water_grav * delta
-	
-	# Aplica força de flutuação (empurra para cima)
 	velocity.y -= water_buoyancy * delta
-	
-	# Aplica arrasto da água (desacelera movimento vertical)
 	velocity.y *= water_drag
 	velocity.x *= water_drag
 
@@ -114,20 +113,16 @@ func handle_input() -> void:
 		handle_jump()
 
 	if Input.is_action_just_pressed("forma1"):
-		print('bubble')
 		toggle_transform(Form.BUBBLE)
 	elif Input.is_action_just_pressed("forma2"):
-		print('super')
 		toggle_transform(Form.SUPER)
 	elif Input.is_action_just_pressed("normal"):
-		print('normal')
 		toggle_transform(Form.NORMAL)
 
 func handle_jump() -> void:
 	match form:
 		Form.BUBBLE:
 			if in_water:
-				# Na água, pulo da bolha impulsiona para cima
 				velocity.y = -100
 				bubble_jump_count += 1
 			elif bubble_jump_count < max_bubble_jumps:
@@ -135,13 +130,11 @@ func handle_jump() -> void:
 				bubble_jump_count += 1
 		Form.SUPER:
 			if in_water:
-				# Pulo na água dá impulso para cima (mais pesado)
 				velocity.y = -120
 			elif is_on_floor():
-				velocity.y = super_jump_force  # Usa força de pulo específica do SUPER
-		_:  # Form.NORMAL
+				velocity.y = super_jump_force
+		_:
 			if in_water:
-				# Pulo na água dá impulso para cima
 				velocity.y = -150
 			elif is_on_floor():
 				velocity.y = jump_force
@@ -157,12 +150,13 @@ func toggle_transform(target: Form) -> void:
 func start_transform(new_form: Form) -> void:
 	state = State.TRANSFORM
 	target_form = new_form
-	# Sprite2D.gd cuida da animação via handle_transform_animation()
 
 func can_dash() -> bool:
-	"""Verifica se pode dar dash (sem limite de quantidade, apenas cooldown)"""
 	return dash_cooldown_timer <= 0
 
+# ==============================
+# ====== STATE MACHINE =========
+# ==============================
 func handle_state(delta: float) -> void:
 	match state:
 		State.IDLE: idle_state()
@@ -205,11 +199,8 @@ func walk_state() -> void:
 
 func jump_state() -> void:
 	handle_horizontal_input()
-	
-	# Permite dash no ar (ilimitado, respeitando apenas cooldown)
 	if Input.is_action_just_pressed("dash") and can_dash():
 		change_state(State.DASH)
-	
 	if is_on_floor():
 		change_state(State.IDLE)
 
@@ -224,20 +215,16 @@ func crouch_state() -> void:
 func dash_state() -> void:
 	if dash_timer <= 0.0:
 		dash_timer = dash_time
-		dash_cooldown_timer = dash_cooldown  # Inicia cooldown
-		
+		dash_cooldown_timer = dash_cooldown
 		var dir: int = int(sign(Input.get_axis("ui_left", "ui_right")))
 		if dir == 0:
 			dir = -1 if $Sprite2D.flip_h else 1
 		velocity.x = dir * dash_speed
-		
-		# Cancela queda durante dash
 		if dash_stops_fall:
 			velocity.y = 0
 
 	dash_timer -= get_physics_process_delta_time()
 	if dash_timer <= 0:
-		# Volta para estado apropriado
 		if is_on_floor():
 			change_state(State.IDLE)
 		else:
@@ -252,11 +239,7 @@ func dead_state() -> void:
 func swim_state() -> void:
 	var dir_x := Input.get_axis("ui_left", "ui_right")
 	var dir_y := Input.get_axis("ui_up", "ui_down")
-	
-	# Velocidade base para natação (já reduzida)
 	var swim_speed := speed * 0.5
-	
-	# Aplica modificador adicional por forma
 	match form:
 		Form.NORMAL:
 			swim_speed *= water_speed_normal
@@ -264,18 +247,14 @@ func swim_state() -> void:
 			swim_speed *= water_speed_bubble
 		Form.SUPER:
 			swim_speed *= water_speed_super
-	
 	velocity.x = dir_x * swim_speed
 	velocity.y += dir_y * swim_speed * 0.6
-	
 	if not in_water:
 		change_state(State.IDLE)
 
 func handle_horizontal_input() -> void:
 	var dir := Input.get_axis("ui_left", "ui_right")
 	var current_speed := speed
-	
-	# Aplica modificador de velocidade se estiver na água
 	if in_water:
 		match form:
 			Form.NORMAL:
@@ -284,7 +263,6 @@ func handle_horizontal_input() -> void:
 				current_speed *= water_speed_bubble
 			Form.SUPER:
 				current_speed *= water_speed_super
-	
 	velocity.x = dir * current_speed
 	if dir != 0:
 		$Sprite2D.flip_h = dir < 0
@@ -292,30 +270,61 @@ func handle_horizontal_input() -> void:
 func change_state(new_state: State) -> void:
 	state = new_state
 
-# ===== SISTEMA DE ATAQUE =====
-
+# ==============================
+# ====== ATAQUE =================
+# ==============================
 func activate_attack_area() -> void:
-	"""Ativa a área de ataque quando o player ataca"""
 	if attack_collision:
 		attack_collision.disabled = false
-		print("⚔️ Attack area ATIVADA")
 
 func deactivate_attack_area() -> void:
-	"""Desativa a área de ataque após o ataque"""
 	if attack_collision:
 		attack_collision.disabled = true
-		print("🛡️ Attack area DESATIVADA")
 
 func _on_attack_finished() -> void:
-	"""Chamado quando a animação de ataque termina"""
 	deactivate_attack_area()
 	change_state(State.IDLE)
 
-# ===== MORTE =====
+# ==============================
+# ====== ÁUDIO =================
+# ==============================
+func update_audio_by_form() -> void:
+	"""Atualiza qual áudio deve tocar baseado na forma atual"""
+	if not audio_normal or not audio_super:
+		return
+	
+	match form:
+		Form.NORMAL, Form.BUBBLE:
+			# Para Normal e Bubble, toca áudio normal
+			if audio_super.playing:
+				audio_super.stop()
+			if not audio_normal.playing:
+				audio_normal.play()
+			print("🔊 Áudio: Normal/Bubble")
+		
+		Form.SUPER:
+			# Para Super, toca áudio super
+			if audio_normal.playing:
+				audio_normal.stop()
+			if not audio_super.playing:
+				audio_super.play()
+			print("🔊 Áudio: Super")
 
+# ==============================
+# ====== MORTE =================
+# ==============================
 func die() -> void:
 	state = State.DEAD
 	animation_player.play("Dead")
 	velocity = Vector2.ZERO
-	await get_tree().create_timer(1.0).timeout
-	get_tree().reload_current_scene()
+	
+	# Para todos os áudios quando morrer
+	if audio_normal:
+		audio_normal.stop()
+	if audio_super:
+		audio_super.stop()
+
+	await get_tree().create_timer(death_delay).timeout
+	
+	print("💀 Player morreu - Carregando tela de Continue...")
+	GameManager.goto_continue()

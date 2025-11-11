@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://d0kh5hjflam7d"]
+
+[ext_resource type="Script" uid="uid://c0hx6gai5w1og" path="res://DialogBox.gd" id="1_whfl3"]
+
+[node name="DialogBox" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_whfl3")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Name" type="Label" parent="Panel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="Text" type="RichTextLabel" parent="Panel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+text = "Test"
+
+[node name="Portrait" type="TextureRect" parent="Panel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Timer" type="Timer" parent="."]

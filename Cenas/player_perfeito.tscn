@@ -973,7 +973,7 @@ size = Vector2(24, 57)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fmspw"]
 size = Vector2(24, 46)
 
-[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("attack_area", "animated_sprite", "stats") groups=["player"]]
+[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("attack_area", "animated_sprite", "stats") groups=["jogador", "player"]]
 script = ExtResource("1_trcoh")
 attack_area = NodePath("Stomper")
 animated_sprite = NodePath("AnimatedSprite2D")

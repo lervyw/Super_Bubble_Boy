@@ -149,18 +149,28 @@ func _on_animacao_animation_finished(anim_name: StringName) -> void:
 		"Normal_Bolha":
 			player.form = player.Form.BUBBLE
 			player.change_state(player.State.IDLE)
+			player.update_audio_by_form()  # 🔊
+
 		"Normal_Super":
 			player.form = player.Form.SUPER
 			player.change_state(player.State.IDLE)
+			player.update_audio_by_form()  # 🔊
+
 		"Bolha_Normal", "Super_Normal":
 			player.form = player.Form.NORMAL
 			player.change_state(player.State.IDLE)
+			player.update_audio_by_form()  # 🔊
+
 		"Bolha_Super":
 			player.form = player.Form.SUPER
 			player.change_state(player.State.IDLE)
+			player.update_audio_by_form()  # 🔊
+
 		"Super_Bolha":
 			player.form = player.Form.BUBBLE
 			player.change_state(player.State.IDLE)
+			player.update_audio_by_form()  # 🔊
+
 
 		"Dead_normal", "S_dead", "B_dead":
 			get_tree().reload_current_scene()

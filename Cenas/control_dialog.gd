@@ -6,7 +6,7 @@ extends Control
 @export var dialogs: Array[String] = [
 	"você é um garoto com cabeça de bolha",
 	"precisa destruir um sapo maligno",
-	"e assim salvar o mundo",
+	"e assim salvar o universo",
 	"slimes serão invocados para lhe impedir",
 	"colete os Power Ups e ache o sapo",
 	"você tem 5 minutos para isso",
@@ -16,17 +16,13 @@ extends Control
 	"BOA SORTE!"
 ]
 
-@export_group("Próxima Cena")
-## Cena a ser carregada após terminar os diálogos
-@export_file("*.tscn") var next_scene_path: String = ""
-
 @export_group("Botão de Avançar")
 ## Botão que avança os diálogos quando clicado
 @export var advance_button: Button
 
 @export_group("Configurações")
 ## Ação ao terminar diálogos (esconder, remover ou mudar cena)
-@export_enum("Hide", "Remove", "Change Scene") var on_finish_action: int = 2
+@export_enum("Hide", "Remove", "Go To Level1") var on_finish_action: int = 2
 
 ## Tempo de espera antes de mudar de cena (em segundos)
 @export_range(0.0, 5.0) var delay_before_scene_change: float = 0.5
@@ -34,9 +30,12 @@ extends Control
 var current_dialog_index: int = 0
 
 func _ready() -> void:
+	print("🎬 Cutscene iniciada")
+	
 	# Configura o primeiro diálogo
 	if dialogs.size() > 0:
 		DialogBox.set_dialog(dialogs[current_dialog_index])
+		print("📝 Diálogo 1/%d" % dialogs.size())
 	else:
 		push_warning("⚠️ Nenhum diálogo configurado!")
 	
@@ -44,10 +43,6 @@ func _ready() -> void:
 	if advance_button:
 		advance_button.pressed.connect(_on_advance_button_pressed)
 		print("✅ Botão de avançar conectado")
-	
-	# Valida se tem cena configurada para transição
-	if on_finish_action == 2 and next_scene_path.is_empty():
-		push_warning("⚠️ Ação 'Change Scene' selecionada mas nenhuma cena configurada!")
 
 func _input(event: InputEvent) -> void:
 	# Detecta clique do mouse, tecla de ação ou botão do controle
@@ -89,14 +84,14 @@ func on_dialogs_finished() -> void:
 	# Executa a ação configurada
 	match on_finish_action:
 		0:  # Hide - Esconde o diálogo
-			print("👻 Escondendo diálogo...")
+			print("👻 Escondendo cutscene...")
 			hide_dialog()
 		1:  # Remove - Remove o diálogo da cena
-			print("🗑️ Removendo diálogo...")
+			print("🗑️ Removendo cutscene...")
 			remove_dialog()
-		2:  # Change Scene - Muda de cena
-			print("🎬 Carregando próxima cena...")
-			change_to_next_scene()
+		2:  # Go To Level1 - Vai para o Level1
+			print("🎬 Carregando Level 1...")
+			go_to_level1()
 		_:
 			push_warning("⚠️ Ação de finalização inválida!")
 
@@ -108,23 +103,16 @@ func remove_dialog() -> void:
 	"""Remove o controle de diálogo da árvore"""
 	queue_free()
 
-func change_to_next_scene() -> void:
-	"""Muda para a próxima cena configurada"""
-	if next_scene_path.is_empty():
-		push_error("❌ Caminho da próxima cena não configurado!")
-		return
+func go_to_level1() -> void:
+	"""Vai para o Level 1 usando o GameManager"""
+	# Aguarda um pouco antes de mudar de cena
+	if delay_before_scene_change > 0:
+		await get_tree().create_timer(delay_before_scene_change).timeout
 	
-	if not FileAccess.file_exists(next_scene_path):
-		push_error("❌ Arquivo de cena não encontrado: %s" % next_scene_path)
-		return
-	
-	# Aguarda um pouco antes de mudar de cena (para dar tempo do último diálogo ser lido)
-	await get_tree().create_timer(delay_before_scene_change).timeout
-	
-	print("🎬 Mudando para: %s" % next_scene_path)
-	get_tree().change_scene_to_file(next_scene_path)
+	print("🎮 Iniciando Level 1 via GameManager...")
+	GameManager.goto_level1()
 
-# ===== FUNÇÕES PÚBLICAS ÚTEIS =====
+# ===== FUNÇÕES PÚBLICAS =====
 
 func skip_all_dialogs() -> void:
 	"""Pula todos os diálogos e vai direto para a finalização"""
@@ -137,11 +125,6 @@ func reset_dialogs() -> void:
 	if dialogs.size() > 0:
 		DialogBox.set_dialog(dialogs[current_dialog_index])
 	print("🔄 Diálogos reiniciados")
-
-func set_next_scene(scene_path: String) -> void:
-	"""Configura a próxima cena programaticamente"""
-	next_scene_path = scene_path
-	print("🎯 Próxima cena definida: %s" % scene_path)
 
 func get_progress() -> float:
 	"""Retorna o progresso dos diálogos (0.0 a 1.0)"""

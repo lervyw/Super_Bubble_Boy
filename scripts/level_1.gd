@@ -10,6 +10,11 @@ extends Node2D
 @export var checkpoint_position: Vector2 = Vector2(288, 207)
 @export var lose_health_on_death: bool = false
 
+@export_group("Next Level")
+@export var boss_node: NodePath
+@export var next_scene: PackedScene
+
+
 func _ready() -> void:
 	print("🎮 Nível iniciado!")
 	
@@ -20,8 +25,27 @@ func _ready() -> void:
 	if not stats:
 		push_warning("Stats reference não definida!")
 	
-	# As SpawnZones cuidam de si mesmas!
+	# Conecta boss
+	if boss_node != NodePath("") and has_node(boss_node):
+		var boss = get_node(boss_node)
+		if boss and boss.has_signal("boss_defeated"):
+			boss.connect("boss_defeated", Callable(self, "_on_boss_defeated"))
+			print("✅ Boss conectado ao evento de vitória!")
+	else:
+		push_warning("⚠️ Nenhum boss configurado para este nível.")
+	
+	# Spawn zones continuam
 	setup_spawn_zones()
+
+func _on_boss_defeated() -> void:
+	print("🏁 Boss derrotado! Mudando de cena em 2 segundos...")
+	await get_tree().create_timer(2.0).timeout
+	if next_scene:
+		get_tree().change_scene_to_packed(next_scene)
+
+	else:
+		push_warning("⚠️ Nenhuma cena configurada em 'next_scene'.")
+
 
 func setup_spawn_zones() -> void:
 	"""Configura referências automáticas nas spawn zones"""

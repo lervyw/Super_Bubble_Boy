@@ -17,12 +17,16 @@ boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/image="res://gamejam/img/logoprojog.png"
 config/icon="res://icon_bubble.svg"
 
+[autoload]
+
+GameManager="*res://GameManager.gd"
+
 [display]
 
 window/size/viewport_width=420
 window/size/viewport_height=280
 window/size/mode=2
-window/stretch/mode="viewport"
+window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
 [input]
@@ -150,3 +154,7 @@ ui_select_input={
 2d_physics/layer_4="items"
 2d_physics/layer_5="hitbox"
 2d_physics/layer_6="hurtbox"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0

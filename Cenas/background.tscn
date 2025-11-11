@@ -47,19 +47,29 @@ _data = {
 }
 
 [node name="ParallaxBackground" type="ParallaxBackground"]
+scale = Vector2(1.2, 1)
+transform = Transform2D(1.2, 0, 0, 1, 0, 0)
 script = ExtResource("1_eu30d")
 can_process = false
-layer_speed = Array[int]([5, 10, 15, 20, 25])
+layer_speed = Array[float]([5.0, 10.0, 15.0, 20.0, 25.0])
+mirror_width = 2.0
 
 [node name="Layer5" type="ParallaxLayer" parent="."]
 motion_scale = Vector2(0.1, 0.1)
 motion_mirroring = Vector2(420, 280)
 
+[node name="TextureRect2" type="TextureRect" parent="Layer5"]
+offset_left = -6.0
+offset_top = 144.0
+offset_right = 414.0
+offset_bottom = 424.00006
+texture = ExtResource("2_xfjhv")
+
 [node name="TextureRect" type="TextureRect" parent="Layer5"]
 offset_left = -3.0
-offset_top = 279.0
+offset_top = -672.0
 offset_right = 417.0
-offset_bottom = 559.0
+offset_bottom = -391.99997
 texture = ExtResource("2_xfjhv")
 
 [node name="Layer3" type="ParallaxLayer" parent="."]
@@ -68,8 +78,9 @@ motion_scale = Vector2(0.2, 1)
 motion_mirroring = Vector2(420, 0)
 
 [node name="TextureRect" type="TextureRect" parent="Layer3"]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_top = -211.83334
+offset_right = 420.0
+offset_bottom = 68.16666
 texture = ExtResource("2_yw0n6")
 
 [node name="Layer4" type="ParallaxLayer" parent="."]
@@ -78,8 +89,9 @@ motion_scale = Vector2(0.4, 1)
 motion_mirroring = Vector2(420, 0)
 
 [node name="TextureRect" type="TextureRect" parent="Layer4"]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_top = -16.666664
+offset_right = 420.0
+offset_bottom = 263.33334
 texture = ExtResource("2_uhqxv")
 
 [node name="Layer2" type="ParallaxLayer" parent="."]
@@ -88,8 +100,9 @@ motion_scale = Vector2(0.6, 1)
 motion_mirroring = Vector2(420, 0)
 
 [node name="TextureRect" type="TextureRect" parent="Layer2"]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_top = -16.666664
+offset_right = 420.0
+offset_bottom = 263.33334
 texture = ExtResource("3_vx3ae")
 
 [node name="Layer1" type="ParallaxLayer" parent="."]
@@ -97,8 +110,9 @@ motion_scale = Vector2(0.8, 1)
 motion_mirroring = Vector2(420, 0)
 
 [node name="TextureRect" type="TextureRect" parent="Layer1"]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_top = -16.666666
+offset_right = 420.0
+offset_bottom = 263.33334
 texture = ExtResource("4_dhaf6")
 
 [node name="DayAndNightCycle" type="CanvasModulate" parent="." node_paths=PackedStringArray("animation_player")]

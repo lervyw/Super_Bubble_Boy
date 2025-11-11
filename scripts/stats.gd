@@ -196,8 +196,12 @@ func kill_enemy_stomp(enemy_area: Area2D) -> void:
 	var enemy = enemy_area.get_parent()
 	
 	if enemy and enemy.has_method("take_damage"):
-		enemy.take_damage()
-		print("💥 Stomp! Inimigo morto!")
+		if enemy.is_in_group("boss"):
+			enemy.take_damage(1)
+			print("💥 Stomp! boss leva hit!")
+		else:
+			enemy.take_damage()
+			print("💥 Stomp! Inimigo morto!")
 		
 		# Bounce após matar (igual Mario!)
 		if player:

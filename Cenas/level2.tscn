@@ -152,7 +152,7 @@ position = Vector2(-9.092773, -1.75)
 shape = SubResource("RectangleShape2D_rmmji")
 
 [node name="player" parent="." instance=ExtResource("14_u6hlc")]
-position = Vector2(333, 163)
+position = Vector2(927, -359)
 
 [connection signal="body_entered" from="Area2D" to="Area2D" method="_on_body_entered"]
 [connection signal="body_exited" from="Area2D" to="Area2D" method="_on_body_exited"]
