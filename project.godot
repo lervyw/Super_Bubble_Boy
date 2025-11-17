@@ -25,7 +25,6 @@ GameManager="*res://GameManager.gd"
 
 window/size/viewport_width=420
 window/size/viewport_height=280
-window/size/mode=2
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 

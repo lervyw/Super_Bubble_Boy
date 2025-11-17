@@ -9,8 +9,8 @@
 [ext_resource type="PackedScene" uid="uid://nfm81ywuusso" path="res://Cenas/saida.tscn" id="7_hwc5d"]
 [ext_resource type="PackedScene" uid="uid://2bsj0rjvtl73" path="res://Cenas/boss.tscn" id="11_2qijy"]
 [ext_resource type="PackedScene" uid="uid://nmyisap4c30m" path="res://Cenas/Timer.tscn" id="12_rg7h4"]
-[ext_resource type="Script" uid="uid://ce2nqxnlfritd" path="res://SpawnZone.gd" id="13_v4w3v"]
-[ext_resource type="PackedScene" uid="uid://cgowkxqeyyr7v" path="res://Cenas/player_perfeito.tscn" id="14_u6hlc"]
+[ext_resource type="Script" uid="uid://ce2nqxnlfritd" path="res://scripts/SpawnZone.gd" id="13_v4w3v"]
+[ext_resource type="PackedScene" uid="uid://cgowkxqeyyr7v" path="res://Cenas/player_jaragua.tscn" id="14_u6hlc"]
 [ext_resource type="PackedScene" uid="uid://orok10r1p86e" path="res://Cenas/slime.tscn" id="14_vbxh3"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_he0a0"]
