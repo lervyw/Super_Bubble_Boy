@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 enum State { IDLE, WALK, JUMP, ATTACK, CROUCH, DASH, TRANSFORM, DEAD, SWIM }
 enum Form { NORMAL, BUBBLE, SUPER }
+enum GameMode { PLATAFORMA, METROIDVANIA }
 
 @export var speed := 150.0
 @export var jump_force := -450.0
@@ -41,6 +42,10 @@ var state: State = State.IDLE
 var in_water: bool = false
 var target_form: Form = Form.NORMAL
 
+# ⚡ NOVO: Modo de jogo
+var mode: GameMode = GameMode.PLATAFORMA
+
+# SISTEMA EXISTENTE DE TRANSFORMAÇÃO
 var unlocked_forms = {
 	Form.NORMAL: true,
 	Form.BUBBLE: false,
@@ -60,8 +65,31 @@ func _ready() -> void:
 	if attack_collision:
 		attack_collision.disabled = true
 	
-	# Inicializa o áudio na forma atual
 	update_audio_by_form()
+
+# ==============================
+# ====== MODO DE JOGO ==========
+# ==============================
+
+func enable_metroidvania_mode() -> void:
+	mode = GameMode.METROIDVANIA
+	print("🔥 Modo Metroidvania ativado!")
+
+func can_transform() -> bool:
+	if mode != GameMode.METROIDVANIA:
+		return false
+
+	# 🔻 Futuras habilidades podem vir aqui:
+	# if not has_energy_core: return false
+
+	return unlocked_forms.get(Form.BUBBLE, false) or unlocked_forms.get(Form.SUPER, false)
+
+func can_dash_global() -> bool:
+	if mode != GameMode.METROIDVANIA:
+		return false
+	# 🔻 Futuro:
+	# if not ranura_dash: return false
+	return true
 
 # ==============================
 # ====== PHYSICS PROCESS =======
@@ -82,6 +110,20 @@ func _physics_process(delta: float) -> void:
 	handle_input()
 	handle_state(delta)
 	move_and_slide()
+
+# ==============================
+# ====== INPUT =================
+# ==============================
+func handle_input() -> void:
+	if Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("ui_up"):
+		handle_jump()
+
+	if Input.is_action_just_pressed("forma1"):
+		toggle_transform(Form.BUBBLE)
+	elif Input.is_action_just_pressed("forma2"):
+		toggle_transform(Form.SUPER)
+	elif Input.is_action_just_pressed("normal"):
+		toggle_transform(Form.NORMAL)
 
 # ==============================
 # ====== MOVIMENTO ==============
@@ -108,17 +150,6 @@ func apply_water_physics(delta: float) -> void:
 	velocity.y *= water_drag
 	velocity.x *= water_drag
 
-func handle_input() -> void:
-	if Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("ui_up"):
-		handle_jump()
-
-	if Input.is_action_just_pressed("forma1"):
-		toggle_transform(Form.BUBBLE)
-	elif Input.is_action_just_pressed("forma2"):
-		toggle_transform(Form.SUPER)
-	elif Input.is_action_just_pressed("normal"):
-		toggle_transform(Form.NORMAL)
-
 func handle_jump() -> void:
 	match form:
 		Form.BUBBLE:
@@ -139,9 +170,16 @@ func handle_jump() -> void:
 			elif is_on_floor():
 				velocity.y = jump_force
 
+# ==============================
+# ====== TRANSFORMAÇÃO =========
+# ==============================
 func toggle_transform(target: Form) -> void:
 	if state == State.TRANSFORM:
 		return
+
+	if not can_transform():
+		return
+
 	if form == target:
 		start_transform(Form.NORMAL)
 	elif unlocked_forms.get(target, false):
@@ -151,7 +189,12 @@ func start_transform(new_form: Form) -> void:
 	state = State.TRANSFORM
 	target_form = new_form
 
+# ==============================
+# ====== DASH ==================
+# ==============================
 func can_dash() -> bool:
+	if not can_dash_global():
+		return false
 	return dash_cooldown_timer <= 0
 
 # ==============================
@@ -230,6 +273,7 @@ func dash_state() -> void:
 		else:
 			change_state(State.JUMP)
 
+
 func transform_state() -> void:
 	velocity = Vector2.ZERO
 
@@ -289,26 +333,21 @@ func _on_attack_finished() -> void:
 # ====== ÁUDIO =================
 # ==============================
 func update_audio_by_form() -> void:
-	"""Atualiza qual áudio deve tocar baseado na forma atual"""
 	if not audio_normal or not audio_super:
 		return
 	
 	match form:
 		Form.NORMAL, Form.BUBBLE:
-			# Para Normal e Bubble, toca áudio normal
 			if audio_super.playing:
 				audio_super.stop()
 			if not audio_normal.playing:
 				audio_normal.play()
-			print("🔊 Áudio: Normal/Bubble")
 		
 		Form.SUPER:
-			# Para Super, toca áudio super
 			if audio_normal.playing:
 				audio_normal.stop()
 			if not audio_super.playing:
 				audio_super.play()
-			print("🔊 Áudio: Super")
 
 # ==============================
 # ====== MORTE =================
@@ -318,7 +357,6 @@ func die() -> void:
 	animation_player.play("Dead")
 	velocity = Vector2.ZERO
 	
-	# Para todos os áudios quando morrer
 	if audio_normal:
 		audio_normal.stop()
 	if audio_super:
@@ -326,5 +364,4 @@ func die() -> void:
 
 	await get_tree().create_timer(death_delay).timeout
 	
-	print("💀 Player morreu - Carregando tela de Continue...")
 	GameManager.goto_continue()
