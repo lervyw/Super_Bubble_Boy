@@ -422,9 +422,9 @@ libraries = {
 &"": SubResource("AnimationLibrary_e261w")
 }
 
-[node name="Area2D" type="Area2D" parent="." groups=["slime"]]
+[node name="DamageArea" type="Area2D" parent="." groups=["slime"]]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea"]
 light_mask = 4
 position = Vector2(2, -10.75)
 shape = SubResource("RectangleShape2D_0uvtv")
@@ -435,7 +435,7 @@ shape = SubResource("RectangleShape2D_0uvtv")
 position = Vector2(2, 18)
 shape = SubResource("RectangleShape2D_dl308")
 
-[node name="Hit" type="Area2D" parent="." groups=["ebody"]]
+[node name="Hit" type="Area2D" parent="." groups=["ebody", "enemy"]]
 monitoring = false
 
 [node name="Collision" type="CollisionShape2D" parent="Hit"]
@@ -444,6 +444,6 @@ position = Vector2(2, 2.5)
 shape = SubResource("RectangleShape2D_aq35j")
 debug_color = Color(0.523427, 0.573446, 0, 0.42)
 
-[connection signal="area_entered" from="Area2D" to="." method="_on_hit_area_entered"]
+[connection signal="area_entered" from="DamageArea" to="." method="_on_hit_area_entered"]
 [connection signal="area_entered" from="slime_foot" to="." method="_on_damage_area_body_entered"]
 [connection signal="area_entered" from="Hit" to="." method="_on_damage_area_area_entered"]

@@ -150,7 +150,6 @@ func chase_player() -> void:
 		velocity.x = 0
 		return
 
-	# Ataque por salto quando próximo
 	if distance < 70 and attack_cooldown_timer <= 0 and is_on_floor():
 		start_jump_attack(direction)
 	else:
@@ -167,7 +166,6 @@ func start_jump_attack(direction: float) -> void:
 	print("🧨 Slime iniciou salto em direção ao player!")
 
 func handle_attack_motion() -> void:
-	# Se pousou, fim do ataque
 	if is_on_floor():
 		is_attacking = false
 
@@ -191,14 +189,21 @@ func check_ledges() -> void:
 		if is_on_floor():
 			velocity.y = jump_force
 
+# ====================================================================
+# 🔥 NOVO — DANO USANDO O SISTEMA DO PLAYER (take_damage / invencibility)
+# ====================================================================
 func deal_damage_to_player(player_body: Node2D) -> void:
 	if attack_cooldown_timer > 0 or is_dead or is_bouncing:
 		return
 
-	var dealt = false
+	var dealt := false
+
+	# ===== PRIORITÁRIO: sistema novo =====
 	if player_body.has_method("take_damage"):
 		player_body.take_damage(damage_amount)
 		dealt = true
+
+	# ===== Fallback para players mais antigos ou NPCs =====
 	elif player_body.has_node("Stats"):
 		var stats = player_body.get_node("Stats")
 		if stats.has_method("take_damage"):
@@ -207,11 +212,14 @@ func deal_damage_to_player(player_body: Node2D) -> void:
 
 	if dealt:
 		print("💥 Slime causou dano no player!")
+
+		# Knockback no player
 		if player_body is CharacterBody2D:
 			var dir = sign(player_body.global_position.x - global_position.x)
 			player_body.velocity.x = dir * 300
 			player_body.velocity.y = -150
 
+		# Bounce opcional no slime
 		if bounce_on_hit:
 			execute_bounce(player_body)
 
@@ -230,6 +238,64 @@ func execute_bounce(player_body: Node2D) -> void:
 			particles.emitting = false
 	print("🔄 Slime deu bounce!")
 
+# ====================================================================
+# 🔥 FUNÇÕES DE DETECÇÃO DE ÁREAS (atualizadas para usar take_damage)
+# ====================================================================
+func _on_damage_area_body_entered(body: Node) -> void:
+	if is_dead:
+		return
+	
+	if body.is_in_group("player"):
+		deal_damage_to_player(body)
+
+func _on_damage_area_area_entered(area: Area2D) -> void:
+	if is_dead:
+		return
+	
+	if area.is_in_group("player_hurtbox") or area.is_in_group("player"):
+		var p = area.get_parent()
+		if p and p.is_in_group("player"):
+			deal_damage_to_player(p)
+
+# ====================================================================
+# 💀 DANO NO INIMIGO
+# ====================================================================
+func take_damage() -> void:
+	if is_dead:
+		return
+	is_dead = true
+	velocity = Vector2.ZERO
+	if hit_area:
+		hit_area.monitoring = false
+		hit_area.set_deferred("monitoring", false)
+	if damage_area:
+		damage_area.monitoring = false
+		damage_area.set_deferred("monitoring", false)
+	animation_sprite.visible = false
+	if particles:
+		particles.emitting = true
+	await get_tree().create_timer(0.5).timeout
+	queue_free()
+
+func _on_hit_area_entered(area: Area2D) -> void:
+	if is_dead:
+		return
+
+	if area.is_in_group("stomper"):
+		# Player pisou por cima!
+		take_damage()  # inimigo morre
+		stomp_bounce(area)
+
+func stomp_bounce(stomper: Area2D) -> void:
+	var player = stomper.get_parent()
+	if player and player is CharacterBody2D:
+		player.velocity.y = -260  # pode ajustar a força do bounce
+		player.bounce_from_enemy() # chamaremos essa função no player
+
+
+# ====================================================================
+# 🎞️ ANIMAÇÃO DO SLIME
+# ====================================================================
 func update_flip(direction: float) -> void:
 	if direction > 0:
 		animation_sprite.flip_h = true
@@ -252,36 +318,3 @@ func handle_animation() -> void:
 		animation_sprite.play("walk")
 	else:
 		animation_sprite.play("idle")
-
-func take_damage() -> void:
-	if is_dead:
-		return
-	is_dead = true
-	velocity = Vector2.ZERO
-	if hit_area:
-		hit_area.set_deferred("monitoring", false)
-	if damage_area:
-		damage_area.set_deferred("monitoring", false)
-	animation_sprite.visible = false
-	if particles:
-		particles.emitting = true
-	await get_tree().create_timer(0.5).timeout
-	queue_free()
-
-func _on_hit_area_entered(area: Area2D) -> void:
-	if area.is_in_group("stomper") or area.is_in_group("killer"):
-		take_damage()
-
-func _on_damage_area_body_entered(body: Area2D) -> void:
-	if is_dead:
-		return
-	if body.is_in_group("player"):
-		deal_damage_to_player(body)
-
-func _on_damage_area_area_entered(area: Area2D) -> void:
-	if is_dead:
-		return
-	if area.is_in_group("player_hurtbox") or area.is_in_group("player"):
-		var p = area.get_parent()
-		if p and p.is_in_group("player"):
-			deal_damage_to_player(p)

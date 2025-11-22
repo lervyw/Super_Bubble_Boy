@@ -1865,12 +1865,13 @@ size = Vector2(20, 30)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3udnp"]
 size = Vector2(18, 3.5)
 
-[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("animation_player", "audio_normal", "audio_super") groups=["jogador"]]
+[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("animation_player", "audio_normal", "audio_super", "stats") groups=["jogador"]]
 script = ExtResource("1_8vhvd")
 super_jump_force = -500.0
 animation_player = NodePath("AnimationPlayer")
 audio_normal = NodePath("audio_normal")
 audio_super = NodePath("audio_super")
+stats = NodePath("Stats")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -1905,13 +1906,9 @@ autoplay = true
 stream = ExtResource("5_2enhl")
 volume_db = -29.982
 
-[node name="Stats" type="Node" parent="." node_paths=PackedStringArray("piscar_timer", "player", "collision_area", "invencibilidade_timer", "textura")]
+[node name="Stats" type="Node" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("6_ruciq")
-piscar_timer = NodePath("piscar_timer")
 player = NodePath("..")
-collision_area = NodePath("../CollisionArea")
-invencibilidade_timer = NodePath("Invencibilidade")
-textura = NodePath("../Sprite2D")
 
 [node name="Invencibilidade" type="Timer" parent="Stats"]
 one_shot = true
@@ -1938,12 +1935,12 @@ shape = SubResource("RectangleShape2D_x33ej")
 position = Vector2(-1, 35)
 shape = SubResource("RectangleShape2D_3udnp")
 
-[node name="HUD" parent="." node_paths=PackedStringArray("status") instance=ExtResource("7_yk6xx")]
-status = NodePath("../Stats")
+[node name="HUD" parent="." node_paths=PackedStringArray("player", "stats") instance=ExtResource("7_yk6xx")]
+player = NodePath("..")
+stats = NodePath("../Stats")
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_finished"]
 [connection signal="animation_finished" from="AnimationPlayer" to="Sprite2D" method="_on_animacao_animation_finished"]
 [connection signal="timeout" from="Stats/Invencibilidade" to="Stats" method="_on_invencibilidade_timeout"]
 [connection signal="timeout" from="Stats/piscar_timer" to="Stats" method="_on_piscar_timer_timeout"]
-[connection signal="area_entered" from="CollisionArea" to="Stats" method="_on_colisao_area_entered"]
-[connection signal="area_entered" from="Stomper" to="Stats" method="_on_stomper_area_entered"]
+[connection signal="area_entered" from="CollisionArea" to="." method="_on_hurtbox_body_entered"]
