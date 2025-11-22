@@ -1,7 +1,8 @@
-[gd_scene load_steps=13 format=3 uid="uid://cuvstcr1mv580"]
+[gd_scene load_steps=14 format=3 uid="uid://cuvstcr1mv580"]
 
 [ext_resource type="Script" uid="uid://dojyvclehrqa7" path="res://Cenas/checkpoint.gd" id="1_45mom"]
 [ext_resource type="Texture2D" uid="uid://d3e4qvxj2eo0e" path="res://sprites/bubble/bubble_upgrade1.png" id="2_oe38b"]
+[ext_resource type="AudioStream" uid="uid://bpin6xch7n5sn" path="res://music/drop2.wav" id="3_oe38b"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_132vu"]
 atlas = ExtResource("2_oe38b")
@@ -70,10 +71,12 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_urjhs"]
 size = Vector2(12, 23)
 
-[node name="BubbleUp1" type="Area2D"]
+[node name="BubbleUp1" type="Area2D" node_paths=PackedStringArray("activate_particles", "activate_sound")]
 position = Vector2(-16, -1)
 collision_layer = 8
 script = ExtResource("1_45mom")
+activate_particles = NodePath("CPUParticles2D")
+activate_sound = NodePath("AudioStreamPlayer")
 
 [node name="upgrade" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_5rn12")
@@ -84,5 +87,19 @@ frame_progress = 0.578435
 [node name="Collision" type="CollisionShape2D" parent="."]
 position = Vector2(0, -1.5)
 shape = SubResource("RectangleShape2D_urjhs")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_oe38b")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 500
+lifetime = 0.2
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 50.0
+initial_velocity_max = 150.0
+scale_amount_max = 4.0
+color = Color(1, 0.8509804, 0, 1)
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

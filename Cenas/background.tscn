@@ -72,26 +72,26 @@ region_enabled = true
 region_rect = Rect2(0, 0, 840, 280)
 
 [node name="2" type="ParallaxLayer" parent="."]
-z_index = 3
+z_index = 1
 motion_scale = Vector2(0.3, 0.3)
 motion_mirroring = Vector2(420, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="2"]
 texture_repeat = 2
-position = Vector2(211.66666, 141)
-texture = ExtResource("4_dhaf6")
+position = Vector2(211.66666, 167)
+texture = ExtResource("3_vx3ae")
 region_enabled = true
 region_rect = Rect2(0, 0, 840, 280)
 
 [node name="3" type="ParallaxLayer" parent="."]
-z_index = 1
+z_index = 3
 motion_scale = Vector2(0.4, 0.4)
 motion_mirroring = Vector2(420, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="3"]
 texture_repeat = 2
-position = Vector2(211.66666, 167)
-texture = ExtResource("3_vx3ae")
+position = Vector2(211.66666, 141)
+texture = ExtResource("4_dhaf6")
 region_enabled = true
 region_rect = Rect2(0, 0, 840, 280)
 

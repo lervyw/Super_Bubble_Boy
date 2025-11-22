@@ -17,6 +17,8 @@ extends Node2D
 
 func _ready() -> void:
 	print("🎮 Nível iniciado!")
+	if stats and stats.has_method("restore_full_health"):
+		stats.restore_full_health()
 	
 	if not player:
 		push_error("Player reference não definida!")

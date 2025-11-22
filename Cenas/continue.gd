@@ -209,59 +209,63 @@ func _on_continue_pressed() -> void:
 	print("✅ Continue pressionado - Reproduzindo animação...")
 	stop_countdown()
 	_disable_buttons()
-	
-	# Toca a animação de Continue no AnimatedSprite2D
+
+	# Animação de continue
 	if animated_sprite and animated_sprite.sprite_frames.has_animation(continue_animation_name):
 		animated_sprite.play(continue_animation_name)
 		print("🎬 Animação '%s' iniciada" % continue_animation_name)
-	else:
-		if not animated_sprite:
-			push_warning("⚠️ AnimatedSprite2D não encontrado!")
-		else:
-			push_warning("⚠️ Animação '%s' não encontrada no SpriteFrames!" % continue_animation_name)
-	
-	# Aguarda o tempo da animação
+
 	await get_tree().create_timer(animation_delay).timeout
-	
-	print("🎮 Carregando nível...")
+
+	# 🔥 NÃO reset_game() aqui!!
+	# resetar vidas é via GameManager, não resetar tudo
+
+	print("🎮 Carregando nível novamente...")
+
+	# Restaura apenas vidas e HP
+	GameManager.restore_full_lives()
+
+	# Se tiver stats globais, reseta
+	GameManager.restore_full_health()
+
 	GameManager.restart_current_level()
+
+
 
 func _on_quit_pressed() -> void:
 	print("❌ Desistir pressionado - Reproduzindo animação...")
 	stop_countdown()
 	_disable_buttons()
-	
-	# Toca a animação de Give Up no AnimatedSprite2D
+
 	if animated_sprite and animated_sprite.sprite_frames.has_animation(giveup_animation_name):
 		animated_sprite.play(giveup_animation_name)
-		print("🎬 Animação '%s' iniciada" % giveup_animation_name)
-	else:
-		if not animated_sprite:
-			push_warning("⚠️ AnimatedSprite2D não encontrado!")
-		else:
-			push_warning("⚠️ Animação '%s' não encontrada no SpriteFrames!" % giveup_animation_name)
-	
-	# Aguarda o tempo da animação
+
 	await get_tree().create_timer(animation_delay).timeout
-	
+
 	print("🏠 Voltando ao menu...")
+
+	# Aqui sim resetamos tudo
+	GameManager.reset_game()
 	GameManager.goto_title()
+
+
 
 func _on_timeout() -> void:
 	print("⏰ Timeout! Reproduzindo animação de desistir...")
 	stop_countdown()
 	_disable_buttons()
-	
-	# Toca a animação de Give Up (mesmo comportamento de desistir)
+
 	if animated_sprite and animated_sprite.sprite_frames.has_animation(giveup_animation_name):
 		animated_sprite.play(giveup_animation_name)
-		print("🎬 Animação '%s' iniciada" % giveup_animation_name)
-	
-	# Aguarda o tempo da animação
+
 	await get_tree().create_timer(animation_delay).timeout
-	
+
 	print("🏠 Voltando ao menu...")
+
+	GameManager.reset_game()
 	GameManager.goto_title()
+
+
 
 func _disable_buttons() -> void:
 	if continue_button:
