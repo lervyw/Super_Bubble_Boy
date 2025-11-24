@@ -1,44 +1,59 @@
 extends CanvasLayer
 
 @export var player: CharacterBody2D
-@export var stats: Node  # seu node Stats atual
-@export var lives_label: Label
-@export var hp_label: Label
+@export var stats: Node
+@export var heart_icons: Array[TextureRect] = []
 @export var hp_bar: TextureProgressBar
-@export var life_icons: Array[TextureRect] = []
-
-func update_lives():
-	var lives = GameManager.get_lives()
-
-	for i in range(life_icons.size()):
-		life_icons[i].visible = i < lives
-
-
-func _ready() -> void:
-	update_display()
 
 func _process(delta: float) -> void:
-	update_display()
-	update_lives()
-
-func update_display() -> void:
 	if not player:
 		return
 
-	# Mostrar vidas SEMPRE
-	lives_label.text = "❤ x %d" % GameManager.get_lives()
-
-	# Modo Plataforma → esconder HP
 	if player.mode == player.GameMode.PLATAFORMA:
-		hp_bar.visible = false
-		hp_label.visible = false
+		_update_hearts()
+		_set_hp_visible(false)
+		# NÃO chamar _set_hearts_visible(true) → evitar reinicializar corações
+	else:
+		_update_hp_bar()
+		_set_hearts_visible(false)
+		_set_hp_visible(true)
+
+
+# ================================
+# ♥ CORAÇÕES (Modo Plataforma)
+# ================================
+func _update_hearts() -> void:
+	var lives := GameManager.get_lives()
+
+	for i in range(heart_icons.size()):
+		var heart := heart_icons[i]
+		if heart:
+			# Coração visível apenas se índice < vidas
+			heart.visible = i < lives
+
+
+# ================================
+# ♥ HP BAR (Modo Metroidvania)
+# ================================
+func _update_hp_bar() -> void:
+	if not hp_bar or not stats:
 		return
 
-	# Modo Metroidvania → mostrar HP
-	if stats:
-		hp_bar.visible = true
-		hp_label.visible = true
+	var current: float = float(stats.current_health)
+	var max_hp: float = float(stats.max_health)
 
-		hp_bar.max_value = stats.max_health
-		hp_bar.value = stats.current_health
-		hp_label.text = "%d/%d" % [stats.current_health, stats.max_health]
+	hp_bar.max_value = max_hp
+	hp_bar.value = current
+
+
+# ================================
+# Visibilidade independente
+# ================================
+func _set_hearts_visible(v: bool) -> void:
+	for h in heart_icons:
+		if h:
+			h.visible = v
+
+func _set_hp_visible(v: bool) -> void:
+	if hp_bar:
+		hp_bar.visible = v

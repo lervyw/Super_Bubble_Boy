@@ -18,8 +18,8 @@ enum GameMode { PLATAFORMA, METROIDVANIA }
 @export_range(0.0, 5.0) var death_delay: float = 1.0
 
 @export_group("Dash Settings")
-@export var dash_stops_fall: bool = false      # agora padrão: NÃO parar queda
-@export_range(0.0, 1.0) var dash_fall_factor: float = 0.3  # quão devagar cai no dash
+@export var dash_stops_fall: bool = false
+@export_range(0.0, 1.0) var dash_fall_factor: float = 0.3
 @export_range(0.0, 2.0) var dash_cooldown: float = 0.3
 
 @export_group("Damage Settings")
@@ -37,9 +37,8 @@ enum GameMode { PLATAFORMA, METROIDVANIA }
 @export var water_gravity_super := 250.0
 @export var water_buoyancy := 80.0
 @export var water_drag := 0.92
+
 @export var respawn_position: Vector2 = Vector2(288, 207)
-
-
 @export var stats: Node = null
 
 var dash_timer := 0.0
@@ -50,8 +49,6 @@ var state: State = State.IDLE
 var in_water: bool = false
 var target_form: Form = Form.NORMAL
 var is_bouncing_from_enemy := false
-
-
 
 var mode: GameMode = GameMode.PLATAFORMA
 
@@ -76,7 +73,6 @@ func _ready() -> void:
 	if attack_collision:
 		attack_collision.disabled = true
 
-	# ➤ Conectar hurtbox
 	if has_node("Hurtbox"):
 		var hurtbox = $Hurtbox
 		if not hurtbox.body_entered.is_connected(_on_hurtbox_body_entered):
@@ -84,13 +80,22 @@ func _ready() -> void:
 
 	update_audio_by_form()
 
-
 # ==============================
 # ====== MODO DE JOGO ==========
 # ==============================
 func enable_metroidvania_mode() -> void:
 	mode = GameMode.METROIDVANIA
 	print("🔥 Modo Metroidvania ativado!")
+	# opcional: restaurar HP quando entra no metroidvania
+	if stats and stats.has_method("reset_health_full"):
+		stats.reset_health_full()
+
+func enable_plataforma_mode() -> void:
+	mode = GameMode.PLATAFORMA
+	print("🎮 Modo Plataforma ativado!")
+	# no modo plataforma, HP não é usado na HUD, mas podemos garantir cheio
+	if stats and stats.has_method("reset_health_full"):
+		stats.reset_health_full()
 
 func can_transform() -> bool:
 	if mode != GameMode.METROIDVANIA:
@@ -98,9 +103,8 @@ func can_transform() -> bool:
 	return unlocked_forms.get(Form.BUBBLE, false) or unlocked_forms.get(Form.SUPER, false)
 
 func can_dash_global() -> bool:
-	# Dash existe nos dois modos, mas aqui já deixa pronto
-	# para no futuro exigir um powerup específico
-	return true
+	# Dash apenas no modo metroidvania
+	return mode == GameMode.METROIDVANIA
 
 # ==============================
 # ====== PHYSICS PROCESS =======
@@ -108,6 +112,7 @@ func can_dash_global() -> bool:
 func _physics_process(delta: float) -> void:
 	if is_bouncing_from_enemy:
 		is_bouncing_from_enemy = false
+
 	on_ground = is_on_floor()
 	if on_ground:
 		bubble_jump_count = 0
@@ -131,21 +136,22 @@ func handle_input() -> void:
 	if Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("ui_up"):
 		handle_jump()
 
-	if Input.is_action_just_pressed("forma1"):
-		toggle_transform(Form.BUBBLE)
-	elif Input.is_action_just_pressed("forma2"):
-		toggle_transform(Form.SUPER)
-	elif Input.is_action_just_pressed("normal"):
-		toggle_transform(Form.NORMAL)
+	# Transformações só em metroidvania
+	if mode == GameMode.METROIDVANIA:
+		if Input.is_action_just_pressed("forma1"):
+			toggle_transform(Form.BUBBLE)
+		elif Input.is_action_just_pressed("forma2"):
+			toggle_transform(Form.SUPER)
+		elif Input.is_action_just_pressed("normal"):
+			toggle_transform(Form.NORMAL)
 
 # ==============================
 # ====== MOVIMENTO =============
 # ==============================
 func apply_normal_gravity(delta: float) -> void:
-	# Durante o dash: cai devagar (nos dois modos)
 	if state == State.DASH:
 		if dash_stops_fall:
-			return # comportamento antigo, se quiser
+			return
 		velocity.y += gravity * dash_fall_factor * delta
 		return
 	
@@ -231,11 +237,13 @@ func handle_state(delta: float) -> void:
 
 func idle_state() -> void:
 	handle_horizontal_input()
+
 	if Input.is_action_just_pressed("jump") and on_ground:
 		change_state(State.JUMP)
 	elif abs(Input.get_axis("ui_left", "ui_right")) > 0:
 		change_state(State.WALK)
-	elif Input.is_action_just_pressed("attack"):
+	# Ataque NO BOTÃO só no modo metroidvania
+	elif mode == GameMode.METROIDVANIA and Input.is_action_just_pressed("attack"):
 		change_state(State.ATTACK)
 		activate_attack_area()
 	elif Input.is_action_pressed("crouch"):
@@ -245,9 +253,10 @@ func idle_state() -> void:
 
 func walk_state() -> void:
 	handle_horizontal_input()
+
 	if Input.is_action_just_pressed("jump") and on_ground:
 		change_state(State.JUMP)
-	elif Input.is_action_just_pressed("attack"):
+	elif mode == GameMode.METROIDVANIA and Input.is_action_just_pressed("attack"):
 		change_state(State.ATTACK)
 		activate_attack_area()
 	elif Input.is_action_pressed("crouch"):
@@ -333,23 +342,19 @@ func change_state(new_state: State) -> void:
 # ==============================
 func take_damage(amount: int = 1) -> void:
 	if is_invincible or state == State.DEAD:
-		print('invencicel')
 		return
 	
-	# MODO PLATAFORMA: não tem barra de HP, cada hit = morte (1 vida)
 	if mode == GameMode.PLATAFORMA:
-		print('levou dano plataforma')
+		# Sem HP visível, cada hit = 1 vida
 		_on_fatal_hit()
 		return
 	
-	# MODO METROIDVANIA: tem barra de HP
+	# METROIDVANIA → usa barra de HP
 	if stats and stats.has_method("take_damage"):
-		print('levou dano metroidvania')
 		stats.take_damage(amount)
 		if stats.current_health <= 0:
 			_on_fatal_hit()
 	else:
-		print('levou dano fatal')
 		_on_fatal_hit()
 	
 	if state != State.DEAD:
@@ -357,17 +362,27 @@ func take_damage(amount: int = 1) -> void:
 
 func start_invincibility() -> void:
 	is_invincible = true
-	await get_tree().create_timer(invincibility_time).timeout
+	var tree := get_tree()
+	if tree == null:
+		return
+	var timer := tree.create_timer(invincibility_time)
+	if timer == null:
+		return
+	await timer.timeout
 	is_invincible = false
 
 func _on_fatal_hit() -> void:
+	# 🔹 No METROIDVANIA → "uma vida só": morreu = vai pra Continue
+	if mode == GameMode.METROIDVANIA:
+		die()
+		return
+
+	# 🔹 No PLATAFORMA → usa sistema de 3 vidas + respawn
 	GameManager.lose_life()
 	
 	if GameManager.get_lives() <= 0:
-		# Sem vidas: morte “definitiva” -> tela de Continue
 		die()
 	else:
-		# Ainda tem vidas: respawn no checkpoint
 		await respawn_player()
 
 func respawn_player() -> void:
@@ -375,17 +390,21 @@ func respawn_player() -> void:
 	velocity = Vector2.ZERO
 	change_state(State.IDLE)
 	
-	# restaura HP no modo metroidvania
+	# no metroidvania respawn restauraria HP,
+	# mas atualmente ele só é chamado no modo plataforma
 	if mode == GameMode.METROIDVANIA and stats and stats.has_method("reset_health_full"):
 		stats.reset_health_full()
 	
-	# breve invencibilidade ao renascer
 	is_invincible = true
-	await get_tree().create_timer(invincibility_time).timeout
+	var tree := get_tree()
+	if tree:
+		var timer := tree.create_timer(invincibility_time)
+		if timer:
+			await timer.timeout
 	is_invincible = false
 
 # ==============================
-# ====== ATAQUE =================
+# ====== ATAQUE ================
 # ==============================
 func activate_attack_area() -> void:
 	if attack_collision:
@@ -424,7 +443,8 @@ func update_audio_by_form() -> void:
 # ==============================
 func die() -> void:
 	state = State.DEAD
-	animation_player.play("Dead")
+	if animation_player:
+		animation_player.play("Dead")
 	velocity = Vector2.ZERO
 	
 	if audio_normal:
@@ -432,52 +452,40 @@ func die() -> void:
 	if audio_super:
 		audio_super.stop()
 
-	# ==========================================
-	# PLATAFORMA → sem timer, só defer
-	# ==========================================
-	if mode == GameMode.PLATAFORMA:
-		print("💀 Plataforma: vida perdida, indo para continue...")
-		GameManager.call_deferred("goto_continue")
-		return
-
-	# ==========================================
-	# METROIDVANIA → aguarda animação antes de trocar cena
-	# MAS só se o player ainda existir
-	# ==========================================
-	var tree = get_tree()
+	var tree := get_tree()
 	if tree == null:
 		return
 
-	var timer = tree.create_timer(death_delay)
+	# Nos dois modos, morte "definitiva" leva para a tela de Continue
+	var timer := tree.create_timer(death_delay)
 	if timer == null:
 		return
-
 	await timer.timeout
 
 	if not is_inside_tree():
 		return
 
-	GameManager.call_deferred("goto_continue")
+	GameManager.goto_continue()
 
+# ==============================
+# ====== BOUNCE NO INIMIGO =====
+# ==============================
 func bounce_from_enemy() -> void:
 	is_bouncing_from_enemy = true
-	velocity.y = -260  # ajuste a força do bounce
-	
+	velocity.y = -260
+
 func _on_hurtbox_body_entered(body: Area2D) -> void:
 	if is_invincible:
 		return
 
-	# Se o objeto tiver "damage_amount", use ele
 	if body.has_method("deal_damage_to_player"):
 		body.deal_damage_to_player(self)
 		return
 
-	# Se for inimigo simples
 	if body.is_in_group("enemy"):
 		take_damage(1)
 		return
 
-	# Se for boss
 	if body.is_in_group("boss"):
 		take_damage(1)
 		return

@@ -3,8 +3,7 @@ extends Area2D
 @export var player: CharacterBody2D
 @export var stats: Node
 @export var update_respawn: bool = false
-@export var restore_health: bool = true
-@export var restore_lives: bool = true
+@export var respawn_node: Node2D
 
 func _ready() -> void:
 	if not player:
@@ -15,26 +14,25 @@ func _ready() -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body != player:
 		return
-	
-	# Continua compatível com o código antigo
-	stats.update_health("Increase", 1)
-	
-	# Desbloqueia a forma Bubble
+
+	# Cura leve
+	if stats and stats.has_method("update_health"):
+		stats.update_health("Increase", 1)
+
+	# Desbloqueia Bubble
 	player.unlocked_forms[player.Form.BUBBLE] = true
-	
-	print("🫧 Forma Bubble desbloqueada! +1 HP")
 
-	# Restaurar HP totalmente (modo Metroidvania)
-	if restore_health and stats.has_method("reset_health_full"):
-		stats.reset_health_full()
-	
-	# Restaurar vidas
-	if restore_lives:
+	# Respawn opcional
+	if update_respawn and respawn_node:
+		player.respawn_position = respawn_node.global_position
+
+	# Restaura vidas/HP dependendo do modo
+	if player.mode == player.GameMode.METROIDVANIA:
+		if stats and stats.has_method("reset_health_full"):
+			stats.reset_health_full()
 		GameManager.restore_full_lives()
-	
-	# Atualizar respawn (opcional)
-	if update_respawn:
-		player.respawn_position = player.global_position
-		print("📍 Respawn atualizado pelo BubbleUp1")
+	else:
+		GameManager.restore_full_lives()
 
+	print("🫧 Forma Bubble desbloqueada! +1 HP (se tiver) | Vidas restauradas!")
 	queue_free()

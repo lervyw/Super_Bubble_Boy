@@ -5,12 +5,10 @@
 [ext_resource type="Texture2D" uid="uid://hsp7iqcuiprc" path="res://sprites/img/progressbar/3.png" id="3_is2x6"]
 [ext_resource type="Texture2D" uid="uid://bfxdsw5y0srba" path="res://sprites/img/progressbar/2.png" id="5_mdj34"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("lives_label", "hp_label", "hp_bar", "life_icons")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar")]
 script = ExtResource("1_uow6a")
-lives_label = NodePath("HBoxContainer/Holder/LivesLabel")
-hp_label = NodePath("HBoxContainer/Holder/HPLabel")
+heart_icons = [NodePath("HBoxContainer/Holder/HPBar1"), NodePath("HBoxContainer/Holder/HPBar2"), NodePath("HBoxContainer/Holder/HPBar3")]
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
-life_icons = [NodePath("HBoxContainer/Holder/HPBar1"), NodePath("HBoxContainer/Holder/HPBar2"), NodePath("HBoxContainer/Holder/HPBar3")]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 anchors_preset = 15
@@ -63,10 +61,10 @@ stretch_mode = 1
 [node name="HPLabel" type="Label" parent="HBoxContainer/Holder"]
 visible = false
 layout_mode = 0
-offset_left = 4.4610443
-offset_top = 31.022621
+offset_left = 4.461045
+offset_top = 8.46072
 offset_right = 44.461044
-offset_bottom = 54.02262
+offset_bottom = 31.46072
 scale = Vector2(0.4899, 0.888391)
 text = "00"
 
@@ -74,18 +72,18 @@ text = "00"
 visible = false
 layout_mode = 0
 offset_left = 36.499454
-offset_top = 30.082537
+offset_top = 7.5206356
 offset_right = 76.499466
-offset_bottom = 53.082535
+offset_bottom = 30.520636
 scale = Vector2(0.4899, 0.888391)
 text = "00"
 
 [node name="TextureProgressBar" type="TextureProgressBar" parent="HBoxContainer/Holder"]
 layout_mode = 0
-offset_left = 3.2443962
-offset_top = 34.78294
-offset_right = 263.2444
-offset_bottom = 61.78294
+offset_left = 4.461045
+offset_top = 11.280958
+offset_right = 264.46106
+offset_bottom = 38.28096
 scale = Vector2(0.21362264, 0.5078016)
 texture_under = ExtResource("3_is2x6")
 texture_progress = ExtResource("5_mdj34")
