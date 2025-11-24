@@ -24,11 +24,6 @@ func play_if_different(anim_name: String) -> void:
 	if animation.current_animation != anim_name:
 		animation.play(anim_name)
 
-
-# ============================
-#   ATUALIZAÇÃO DE ANIMAÇÃO
-# ============================
-
 func update_animation(direction: Vector2) -> void:
 	match player.state:
 		player.State.TRANSFORM: handle_transform_animation()
@@ -127,34 +122,21 @@ func handle_death_animation() -> void:
 		player.Form.BUBBLE: play_if_different("B_dead")
 		player.Form.SUPER: play_if_different("S_dead")
 
-
-# ============================
-#   POSIÇÃO E DIRECTION
-# ============================
-
 func verify_position(direction: Vector2) -> void:
 	if direction.x > 0:
 		flip_h = false
 		if attack_area:
 			attack_area.scale.x = 1
-
 	elif direction.x < 0:
 		flip_h = true
 		if attack_area:
 			attack_area.scale.x = -1
 
-
-# ============================
-#   EVENTO FINAL DE ANIMAÇÃO
-# ============================
-
 func _on_animacao_animation_finished(anim_name: StringName) -> void:
 	match anim_name:
-		# Final de ataque
 		"Attack", "S_attack", "B_attack", "S_parry":
 			emit_signal("attack_finished")
 
-		# Transformações
 		"Normal_Bolha":
 			player.form = player.Form.BUBBLE
 			player.change_state(player.State.IDLE)
@@ -180,9 +162,8 @@ func _on_animacao_animation_finished(anim_name: StringName) -> void:
 			player.change_state(player.State.IDLE)
 			player.update_audio_by_form()
 
-		# Morte → agora NÃO recarrega cena!
 		"Dead_normal", "S_dead", "B_dead":
-			pass  # Player.gd controla a morte agora
+			pass  # Player.gd controla morte agora
 
 		_:
 			if player.state == player.State.TRANSFORM:

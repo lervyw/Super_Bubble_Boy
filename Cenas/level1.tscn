@@ -250,13 +250,17 @@ texture = SubResource("GradientTexture1D_6fn3k")
 [node name="BubbleUp2" parent="." node_paths=PackedStringArray("player") instance=ExtResource("17_etkem")]
 position = Vector2(2151, -15)
 player = NodePath("../player")
-respawn_position = Vector2(2151, -15)
+checkpoint_mode = 1
 
 [node name="SpawnPoint2" type="Node2D" parent="."]
 position = Vector2(2151, -20)
 
 [node name="SpawnPoint1" type="Node2D" parent="."]
 position = Vector2(182, 214)
+
+[node name="BubbleUp3" parent="." node_paths=PackedStringArray("player") instance=ExtResource("17_etkem")]
+position = Vector2(3463, -635)
+player = NodePath("../player")
 
 [connection signal="body_entered" from="Area2D" to="Area2D" method="_on_body_entered"]
 [connection signal="body_exited" from="Area2D" to="Area2D" method="_on_body_exited"]
