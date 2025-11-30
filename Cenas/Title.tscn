@@ -217,6 +217,8 @@ Button/colors/font_color = Color(1, 1, 1, 1)
 Button/fonts/font = ExtResource("8_mcqsg")
 Button/styles/hover = SubResource("StyleBoxFlat_qui40")
 Button/styles/normal = SubResource("StyleBoxFlat_2vbo6")
+Label/fonts/font = ExtResource("8_mcqsg")
+Label/styles/normal = SubResource("StyleBoxFlat_2vbo6")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_01s65"]
 bg_color = Color(0.254902, 0.607843, 0.996078, 1)
@@ -230,7 +232,7 @@ Button/fonts/font = ExtResource("8_mcqsg")
 Button/styles/hover = SubResource("StyleBoxFlat_01s65")
 Button/styles/normal = SubResource("StyleBoxFlat_di2en")
 
-[node name="Control" type="Control" node_paths=PackedStringArray("ambiente")]
+[node name="Control" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -238,7 +240,22 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_y12so")
-ambiente = NodePath("AudioStreamPlayer")
+
+[node name="Bg_0" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 420.0
+offset_bottom = 280.0
+texture = ExtResource("1_15gka")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 347.0
+offset_top = 206.0
+offset_right = 409.0
+offset_bottom = 268.0
+texture = ExtResource("4_j7fkm")
+expand_mode = 2
+stretch_mode = 4
 
 [node name="Bg_3" type="TextureRect" parent="."]
 layout_mode = 0
@@ -246,43 +263,29 @@ offset_right = 420.0
 offset_bottom = 280.0
 texture = ExtResource("4_r2t5r")
 
-[node name="Bg_0" type="TextureRect" parent="."]
-layout_mode = 0
-offset_right = 536.0
-offset_bottom = 280.0
-texture = ExtResource("1_15gka")
-
-[node name="TextureRect" type="TextureRect" parent="."]
-layout_mode = 0
-offset_left = 386.0
-offset_top = 152.0
-offset_right = 563.0
-offset_bottom = 279.0
-texture = ExtResource("4_j7fkm")
-expand_mode = 2
-stretch_mode = 4
-
 [node name="Bg_1" type="TextureRect" parent="."]
 layout_mode = 0
-offset_right = 539.0
+offset_right = 422.0
 offset_bottom = 280.0
 texture = ExtResource("2_77ghk")
 
 [node name="Bubble_boy" type="AnimatedSprite2D" parent="."]
-position = Vector2(209, 139)
+position = Vector2(99.5, 212)
+scale = Vector2(0.47857141, 0.47857141)
 sprite_frames = SubResource("SpriteFrames_t2lld")
 autoplay = "default"
 frame_progress = 0.37413
 
 [node name="Bolinha" type="AnimatedSprite2D" parent="."]
-position = Vector2(210, 140)
+position = Vector2(102, 212)
+scale = Vector2(0.4857143, 0.4857143)
 sprite_frames = SubResource("SpriteFrames_eldcj")
 autoplay = "default"
 frame_progress = 0.569063
 
 [node name="Titulo" type="AnimatedSprite2D" parent="."]
-position = Vector2(240, 204)
-scale = Vector2(1.14048, 1)
+position = Vector2(99.999985, 30.000015)
+scale = Vector2(0.57945865, 0.5857143)
 sprite_frames = SubResource("SpriteFrames_qxdjn")
 autoplay = "default"
 frame = 3
@@ -293,37 +296,128 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="MainMenu" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.111
-anchor_top = 0.502
-anchor_right = 0.111
-anchor_bottom = 0.502
-offset_left = -16.619999
-offset_top = 58.440002
-offset_right = 58.38
-offset_bottom = 130.44
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 174.0
+offset_top = 74.0
+offset_right = -90.0
+offset_bottom = -108.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu"]
 layout_mode = 2
 
-[node name="Start" type="Button" parent="HBoxContainer/VBoxContainer"]
+[node name="Start" type="Button" parent="MainMenu/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
-text = "Start"
+text = " Iniciar"
 
-[node name="Quit" type="Button" parent="HBoxContainer/VBoxContainer"]
+[node name="Config" type="Button" parent="MainMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "controles"
+
+[node name="Quit" type="Button" parent="MainMenu/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_8he0a")
-text = "Sair"
+text = "sair"
+
+[node name="ConfigMenu" type="HBoxContainer" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 174.0
+offset_top = 74.0
+offset_right = 258.0
+offset_bottom = 198.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigMenu"]
+layout_mode = 2
+
+[node name="Musica" type="Label" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Musica"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SliderMusica" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+
+[node name="Volume" type="Label" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Volume"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SliderEfeitos" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+
+[node name="VolumeConfig" type="Button" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Volume
+"
+
+[node name="Controles" type="Button" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Controles"
+
+[node name="Voltar" type="Button" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Voltar"
+
+[node name="ControlsMenu" type="HBoxContainer" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 174.0
+offset_top = 74.0
+offset_right = 258.0
+offset_bottom = 198.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlsMenu"]
+layout_mode = 2
+
+[node name="Controle1" type="Label" parent="ControlsMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Controle1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Controle2" type="Label" parent="ControlsMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Controle2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Controle3" type="Label" parent="ControlsMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Controle3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Voltar" type="Button" parent="ControlsMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Voltar"
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("9_7wsge")
 volume_db = -30.0
 autoplay = true
 
-[connection signal="pressed" from="HBoxContainer/VBoxContainer/Start" to="." method="_on_start_pressed"]
-[connection signal="pressed" from="HBoxContainer/VBoxContainer/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Start" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Config" to="." method="_on_open_config_menu"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="ConfigMenu/VBoxContainer/Controles" to="." method="_on_open_controls_menu"]
+[connection signal="pressed" from="ConfigMenu/VBoxContainer/Voltar" to="." method="_on_back_to_main"]
+[connection signal="pressed" from="ControlsMenu/VBoxContainer/Voltar" to="." method="_on_back_to_config"]
