@@ -19,7 +19,8 @@ config/icon="res://icon_bubble.svg"
 
 [autoload]
 
-GameManager="*res://GameManager.gd"
+GameManager="*res://scripts/GameManager.gd"
+ConfigManager="*res://scripts/ConfigManager.gd"
 
 [display]
 
