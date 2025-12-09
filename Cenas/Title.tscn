@@ -297,6 +297,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="MainMenu" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -319,7 +320,7 @@ text = " Iniciar"
 [node name="Config" type="Button" parent="MainMenu/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
-text = "controles"
+text = "config"
 
 [node name="Quit" type="Button" parent="MainMenu/VBoxContainer"]
 layout_mode = 2
@@ -363,7 +364,7 @@ theme = SubResource("Theme_50u4b")
 text = "Volume
 "
 
-[node name="Controles" type="Button" parent="ConfigMenu/VBoxContainer"]
+[node name="ConfigurarBotoes" type="Button" parent="ConfigMenu/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Controles"
@@ -374,7 +375,6 @@ theme = SubResource("Theme_50u4b")
 text = "Voltar"
 
 [node name="ControlsMenu" type="HBoxContainer" parent="."]
-visible = false
 layout_mode = 0
 offset_left = 174.0
 offset_top = 74.0
@@ -384,26 +384,25 @@ offset_bottom = 198.0
 [node name="VBoxContainer" type="VBoxContainer" parent="ControlsMenu"]
 layout_mode = 2
 
-[node name="Controle1" type="Label" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle1" type="Button" parent="ControlsMenu/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
-text = "Controle1"
-horizontal_alignment = 1
-vertical_alignment = 1
+text = "botao pulo"
 
-[node name="Controle2" type="Label" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle2" type="Button" parent="ControlsMenu/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
-text = "Controle2"
-horizontal_alignment = 1
-vertical_alignment = 1
+text = "transformacao 1"
 
-[node name="Controle3" type="Label" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle3" type="Button" parent="ControlsMenu/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
-text = "Controle3"
-horizontal_alignment = 1
-vertical_alignment = 1
+text = "transformacao 2"
+
+[node name="Controle4" type="Button" parent="ControlsMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "forma normal"
 
 [node name="Voltar" type="Button" parent="ControlsMenu/VBoxContainer"]
 layout_mode = 2
@@ -415,9 +414,9 @@ stream = ExtResource("9_7wsge")
 volume_db = -30.0
 autoplay = true
 
-[connection signal="pressed" from="MainMenu/VBoxContainer/Start" to="." method="_on_start_pressed"]
-[connection signal="pressed" from="MainMenu/VBoxContainer/Config" to="." method="_on_open_config_menu"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Start" to="." method="_on_iniciar"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Config" to="." method="_open_config_menu"]
 [connection signal="pressed" from="MainMenu/VBoxContainer/Quit" to="." method="_on_quit_pressed"]
-[connection signal="pressed" from="ConfigMenu/VBoxContainer/Controles" to="." method="_on_open_controls_menu"]
+[connection signal="pressed" from="ConfigMenu/VBoxContainer/ConfigurarBotoes" to="." method="_open_botoes_menu"]
 [connection signal="pressed" from="ConfigMenu/VBoxContainer/Voltar" to="." method="_on_back_to_main"]
 [connection signal="pressed" from="ControlsMenu/VBoxContainer/Voltar" to="." method="_on_back_to_config"]
