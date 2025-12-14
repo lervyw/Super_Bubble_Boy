@@ -1,5 +1,6 @@
 extends Node
-
+	# ESTE CODIGO CUIDA DE SALVAR INFORMACOES DE CONFIGURACAO DO JOGO
+	# ELE CONVERSA COM TITLE.GD, ou melhor, TITLE.GD conversa com ele
 const CONFIG_PATH := "user://config.json"
 
 # Valores padrão quando não existe config.json
@@ -36,7 +37,7 @@ func get_volume(bus_name: String) -> float:
 
 
 # ============================================================
-#                         INPUTS
+#            INPUTS ( PERMITE DEFINIR BOTOES DO MENU)
 # ============================================================
 
 func rebind_action(action: String, event: InputEvent):

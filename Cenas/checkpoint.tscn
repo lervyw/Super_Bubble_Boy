@@ -90,6 +90,7 @@ shape = SubResource("RectangleShape2D_urjhs")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_oe38b")
+bus = &"sfx"
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
 emitting = false

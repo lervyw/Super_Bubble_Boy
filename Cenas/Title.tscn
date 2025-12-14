@@ -240,6 +240,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_y12so")
+metadata/_edit_vertical_guides_ = [199.0]
+metadata/_edit_horizontal_guides_ = [77.0]
 
 [node name="Bg_0" type="TextureRect" parent="."]
 layout_mode = 0
@@ -302,10 +304,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 174.0
-offset_top = 74.0
-offset_right = -90.0
-offset_bottom = -108.0
+offset_left = 170.0
+offset_top = 78.0
+offset_right = -94.0
+offset_bottom = -104.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -328,12 +330,11 @@ theme = SubResource("Theme_8he0a")
 text = "sair"
 
 [node name="ConfigMenu" type="HBoxContainer" parent="."]
-visible = false
 layout_mode = 0
-offset_left = 174.0
-offset_top = 74.0
-offset_right = 258.0
-offset_bottom = 198.0
+offset_left = 158.0
+offset_top = 78.0
+offset_right = 242.0
+offset_bottom = 224.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ConfigMenu"]
 layout_mode = 2
@@ -347,6 +348,9 @@ vertical_alignment = 1
 
 [node name="SliderMusica" type="HSlider" parent="ConfigMenu/VBoxContainer"]
 layout_mode = 2
+min_value = -60.0
+max_value = 1.0
+value = 1.0
 
 [node name="Volume" type="Label" parent="ConfigMenu/VBoxContainer"]
 layout_mode = 2
@@ -357,12 +361,9 @@ vertical_alignment = 1
 
 [node name="SliderEfeitos" type="HSlider" parent="ConfigMenu/VBoxContainer"]
 layout_mode = 2
-
-[node name="VolumeConfig" type="Button" parent="ConfigMenu/VBoxContainer"]
-layout_mode = 2
-theme = SubResource("Theme_50u4b")
-text = "Volume
-"
+min_value = -60.0
+max_value = 1.0
+value = 1.0
 
 [node name="ConfigurarBotoes" type="Button" parent="ConfigMenu/VBoxContainer"]
 layout_mode = 2
@@ -375,11 +376,12 @@ theme = SubResource("Theme_50u4b")
 text = "Voltar"
 
 [node name="ControlsMenu" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 0
-offset_left = 174.0
-offset_top = 74.0
-offset_right = 258.0
-offset_bottom = 198.0
+offset_left = 126.0
+offset_top = 77.0
+offset_right = 268.0
+offset_bottom = 201.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ControlsMenu"]
 layout_mode = 2
@@ -411,8 +413,8 @@ text = "Voltar"
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("9_7wsge")
-volume_db = -30.0
 autoplay = true
+bus = &"music"
 
 [connection signal="pressed" from="MainMenu/VBoxContainer/Start" to="." method="_on_iniciar"]
 [connection signal="pressed" from="MainMenu/VBoxContainer/Config" to="." method="_open_config_menu"]
