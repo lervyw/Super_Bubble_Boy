@@ -7,10 +7,6 @@ signal attack_finished
 @export var stats: Node
 @export var nivel: Node
 @export var attack_area: Area2D
-var crouch_holding := false
-var crouch_anim_paused := false
-
-
 
 func _process(delta: float) -> void:
 	if not player:
@@ -104,16 +100,9 @@ func handle_transform_animation() -> void:
 
 func handle_crouch_animation() -> void:
 	match player.form:
-		player.Form.NORMAL:
-			if animation.current_animation != "N_c_loop":
-				animation.play("N_c_loop")
-		player.Form.SUPER:
-			if animation.current_animation != "S_crouch_hold":
-				animation.play("S_crouch_hold")
-		player.Form.BUBBLE:
-			play_if_different("Bubble_only")
-
-
+		player.Form.SUPER: play_if_different("S_crouch_hold")
+		player.Form.NORMAL: play_if_different("N_c_loop")
+		player.Form.BUBBLE: play_if_different("Bubble_only")
 
 func handle_death_animation() -> void:
 	match player.form:
@@ -131,12 +120,6 @@ func verify_position(direction: Vector2) -> void:
 
 func _on_animacao_animation_finished(anim_name: StringName) -> void:
 	match anim_name:
-		"N_c_loop", "S_crouch":
-			if player.state == player.State.CROUCH:
-				animation.pause()
-				crouch_anim_paused = true
-			return
-			
 		"Attack", "S_attack", "B_attack", "S_parry":
 			emit_signal("attack_finished")
 

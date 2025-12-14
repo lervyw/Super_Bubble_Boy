@@ -341,16 +341,7 @@ func handle_horizontal_input() -> void:
 		$Sprite2D.flip_h = dir < 0
 
 func change_state(new_state: State) -> void:
-	# Saindo do crouch → libera animação
-	if state == State.CROUCH and new_state != State.CROUCH:
-		var sprite := $Sprite2D
-		if sprite and sprite.animation and sprite.crouch_anim_paused:
-			sprite.animation.play()
-			sprite.crouch_anim_paused = false
-
 	state = new_state
-
-
 
 # ==============================
 # ====== DANO / VIDAS ==========
