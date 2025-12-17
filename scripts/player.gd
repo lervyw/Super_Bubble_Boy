@@ -17,6 +17,8 @@ enum GameMode { PLATAFORMA, METROIDVANIA }
 @export var animation_player: AnimationPlayer
 @export var audio_normal: AudioStreamPlayer
 @export var audio_super: AudioStreamPlayer
+@export var hud: CanvasLayer 
+# Itens exportados
 
 @export_group("Death Settings")
 @export_range(0.0, 5.0) var death_delay: float = 1.0
@@ -68,6 +70,7 @@ var is_invincible: bool = false
 # ========= READY ==============
 # ==============================
 func _ready() -> void:
+
 	# Conecta sinal de fim de animação do sprite -> _on_attack_finished
 	if $Sprite2D and $Sprite2D.has_signal("attack_finished"):
 		# assegura que método exista (foi erro antes)
@@ -87,6 +90,14 @@ func _ready() -> void:
 			hurtbox.body_entered.connect(_on_hurtbox_body_entered)
 
 	update_audio_by_form()
+	
+# Menu Panel
+func _input(event):
+	if event.is_action_pressed("hud_menu"):
+		hud.show_menu()
+
+	if event.is_action_released("hud_menu"):
+		hud.hide_menu()
 
 # ==============================
 # ====== MODO DE JOGO =========

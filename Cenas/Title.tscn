@@ -299,14 +299,13 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="MainMenu" type="HBoxContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 170.0
+offset_left = 186.0
 offset_top = 78.0
-offset_right = -94.0
+offset_right = -78.0
 offset_bottom = -104.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -330,10 +329,11 @@ theme = SubResource("Theme_8he0a")
 text = "sair"
 
 [node name="ConfigMenu" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 0
-offset_left = 158.0
+offset_left = 174.0
 offset_top = 78.0
-offset_right = 242.0
+offset_right = 258.0
 offset_bottom = 224.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ConfigMenu"]
@@ -378,10 +378,10 @@ text = "Voltar"
 [node name="ControlsMenu" type="HBoxContainer" parent="."]
 visible = false
 layout_mode = 0
-offset_left = 126.0
+offset_left = 142.0
 offset_top = 77.0
-offset_right = 268.0
-offset_bottom = 201.0
+offset_right = 284.0
+offset_bottom = 227.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ControlsMenu"]
 layout_mode = 2
@@ -405,6 +405,16 @@ text = "transformacao 2"
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "forma normal"
+
+[node name="Controle5" type="Button" parent="ControlsMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "botao menu"
+
+[node name="Controle6" type="Button" parent="ControlsMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "botao ataque"
 
 [node name="Voltar" type="Button" parent="ControlsMenu/VBoxContainer"]
 layout_mode = 2

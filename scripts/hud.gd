@@ -5,6 +5,12 @@ extends CanvasLayer
 @export var heart_icons: Array[TextureRect] = []
 @export var hp_bar: TextureProgressBar
 
+@export var menu_panel: Panel  # <<< NOVO
+
+func _ready() -> void:
+	if menu_panel:
+		menu_panel.visible = false
+
 func _process(delta: float) -> void:
 	if not player:
 		return
@@ -57,3 +63,12 @@ func _set_hearts_visible(v: bool) -> void:
 func _set_hp_visible(v: bool) -> void:
 	if hp_bar:
 		hp_bar.visible = v
+
+
+func show_menu():
+	if menu_panel:
+		menu_panel.visible = true
+
+func hide_menu():
+	if menu_panel:
+		menu_panel.visible = false
