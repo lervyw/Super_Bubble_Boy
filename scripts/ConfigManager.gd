@@ -41,24 +41,36 @@ func get_volume(bus_name: String) -> float:
 # ============================================================
 
 func rebind_action(action: String, event: InputEvent):
-	# Apaga binds antigos
+	# Garante que a ação existe
+	if not InputMap.has_action(action):
+		InputMap.add_action(action)
+
+	# Remove binds antigos
 	InputMap.action_erase_events(action)
-	InputMap.action_add_event(action, event)
 
-	# Salva o evento como texto serializável
-	var event_text := _event_to_string(event)
-	settings["inputs"][action] = event_text
+	# 🔥 DUPLICA o evento (ESSENCIAL)
+	var ev := event.duplicate()
+	InputMap.action_add_event(action, ev)
 
+	# Salva
+	settings["inputs"][action] = _event_to_string(ev)
 	_save()
+
+
 
 
 func apply_loaded_inputs():
 	for action in settings["inputs"].keys():
 		var ev_str = settings["inputs"][action]
 		var event = _string_to_event(ev_str)
+
 		if event:
+			if not InputMap.has_action(action):
+				InputMap.add_action(action)
+
 			InputMap.action_erase_events(action)
 			InputMap.action_add_event(action, event)
+
 
 
 # ============================================================
