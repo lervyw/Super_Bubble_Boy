@@ -4,7 +4,9 @@ extends CharacterBody2D
 # ==========================
 # ====== ENUMS / EXPORTS ===
 # ==========================
-enum State { IDLE, WALK, JUMP, ATTACK, CROUCH, DASH, TRANSFORM, DEAD, SWIM }
+enum State {
+	IDLE, WALK, JUMP, ATTACK, CROUCH, DASH, TRANSFORM, DEAD, SWIM, SPECIAL_ATTACK, DEFEND
+}
 enum Form { NORMAL, BUBBLE, SUPER }
 enum GameMode { PLATAFORMA, METROIDVANIA }
 
@@ -52,6 +54,8 @@ var state: State = State.IDLE
 var in_water: bool = false
 var target_form: Form = Form.NORMAL
 var is_bouncing_from_enemy := false
+var combo_lock := false
+var defending := false
 
 var mode: GameMode = GameMode.PLATAFORMA
 
@@ -92,16 +96,104 @@ func _ready() -> void:
 	update_audio_by_form()
 	
 # Menu Panel
+# Input global (HUD, especiais, defesa, seleção rápida)
 func _input(event):
+
+	# HUD
 	if event.is_action_pressed("hud_menu"):
 		hud.show_menu()
-
 	if event.is_action_released("hud_menu"):
 		hud.hide_menu()
 
-# ==============================
+	# Ataque especial
+	if event.is_action_pressed("attack_special"):
+		start_special_attack()
+
+	# Defesa / escudo
+	if event.is_action_pressed("defend"):
+		start_defense()
+	if event.is_action_released("defend"):
+		stop_defense()
+
+# Processamento contínuo (combos e seleção de forma)
+func _process(delta: float) -> void:
+	check_attack_combos()
+	check_quick_form_selection()
+
+# Inicia ataque especial
+func start_special_attack() -> void:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEAD]:
+		return
+	state = State.SPECIAL_ATTACK
+	activate_attack_area()
+
+# Inicia defesa
+func start_defense() -> void:
+	if state == State.DEAD:
+		return
+	defending = true
+	state = State.DEFEND
+
+# Finaliza defesa
+func stop_defense() -> void:
+	defending = false
+	if state == State.DEFEND:
+		change_state(State.IDLE)
+
+# Detecta combos de ataque
+func check_attack_combos() -> void:
+	if combo_lock or state == State.DEAD:
+		return
+
+	if Input.is_action_pressed("attack") and Input.is_action_pressed("attack_special"):
+		execute_combo(1)
+
+	elif Input.is_action_pressed("attack") and Input.is_action_pressed("defend"):
+		execute_combo(2)
+
+	elif Input.is_action_pressed("attack_special") and Input.is_action_pressed("defend"):
+		execute_combo(3)
+
+	elif Input.is_action_pressed("attack") and Input.is_action_pressed("jump"):
+		execute_combo(4)
+
+# Executa combo
+func execute_combo(id: int) -> void:
+	combo_lock = true
+	state = State.ATTACK
+	activate_attack_area()
+	print("Combo executado:", id)
+
+	await get_tree().create_timer(0.25).timeout
+	combo_lock = false
+
+# Seleção rápida de forma
+func check_quick_form_selection() -> void:
+	if not Input.is_action_pressed("form_select"):
+		return
+	if state == State.TRANSFORM or not can_transform():
+		return
+
+	if Input.is_action_pressed("right_stick_up"):
+		start_transform(Form.BUBBLE)
+
+	elif Input.is_action_pressed("right_stick_right"):
+		start_transform(Form.SUPER)
+
+	elif Input.is_action_pressed("right_stick_down"):
+		start_transform(Form.NORMAL)
+
+# Estado de ataque especial
+func special_attack_state() -> void:
+	velocity = Vector2.ZERO
+
+# Estado de defesa
+func defend_state() -> void:
+	velocity = Vector2.ZERO
+
+
+
 # ====== MODO DE JOGO =========
-# ==============================
 func enable_metroidvania_mode() -> void:
 	mode = GameMode.METROIDVANIA
 	print("🔥 Modo Metroidvania ativado!")
@@ -125,9 +217,7 @@ func can_dash_global() -> bool:
 	# Dash somente em Metroidvania
 	return mode == GameMode.METROIDVANIA
 
-# ==============================
 # ====== PHYSICS PROCESS =======
-# ==============================
 func _physics_process(delta: float) -> void:
 	# zera flag de bounce logo depois do frame (evita ficar travado)
 	if is_bouncing_from_enemy:
@@ -149,9 +239,7 @@ func _physics_process(delta: float) -> void:
 	handle_state(delta)
 	move_and_slide()
 
-# ==============================
 # ====== INPUT (APENAS jump) ==
-# ==============================
 func handle_input() -> void:
 	# Pulo SÓ pelo botão "jump"
 	if Input.is_action_just_pressed("jump"):
@@ -166,9 +254,7 @@ func handle_input() -> void:
 		elif Input.is_action_just_pressed("normal"):
 			toggle_transform(Form.NORMAL)
 
-# ==============================
 # ====== GRAVIDADE / DASH =======
-# ==============================
 func apply_normal_gravity(delta: float) -> void:
 	# Se estiver em DASH, aplicar queda lenta (aplica-se aos dois modos)
 	if state == State.DASH:
@@ -216,9 +302,7 @@ func handle_jump() -> void:
 			elif is_on_floor():
 				velocity.y = jump_force
 
-# ==============================
 # ====== TRANSFORMAÇÃO =========
-# ==============================
 func toggle_transform(target: Form) -> void:
 	if state == State.TRANSFORM:
 		return
@@ -233,28 +317,28 @@ func start_transform(new_form: Form) -> void:
 	state = State.TRANSFORM
 	target_form = new_form
 
-# ==============================
 # ====== DASH CONTROL =========
-# ==============================
 func can_dash() -> bool:
 	if not can_dash_global():
 		return false
 	return dash_cooldown_timer <= 0
 
-# ==============================
 # ====== STATE MACHINE =========
-# ==============================
+# Máquina de estados
 func handle_state(delta: float) -> void:
 	match state:
 		State.IDLE: idle_state()
 		State.WALK: walk_state()
 		State.JUMP: jump_state()
 		State.ATTACK: attack_state()
+		State.SPECIAL_ATTACK: special_attack_state()
+		State.DEFEND: defend_state()
 		State.CROUCH: crouch_state()
 		State.DASH: dash_state()
 		State.TRANSFORM: transform_state()
 		State.DEAD: dead_state()
 		State.SWIM: swim_state()
+
 
 func idle_state() -> void:
 	handle_horizontal_input()
@@ -354,9 +438,7 @@ func handle_horizontal_input() -> void:
 func change_state(new_state: State) -> void:
 	state = new_state
 
-# ==============================
 # ====== DANO / VIDAS ==========
-# ==============================
 func take_damage(amount: int = 1) -> void:
 	if is_invincible or state == State.DEAD:
 		return
@@ -424,9 +506,8 @@ func respawn_player() -> void:
 			await timer.timeout
 	is_invincible = false
 
-# ==============================
+
 # ====== ATAQUE (área) ========
-# ==============================
 func activate_attack_area() -> void:
 	if attack_collision:
 		attack_collision.disabled = false
@@ -436,15 +517,14 @@ func deactivate_attack_area() -> void:
 		attack_collision.disabled = true
 
 # Este método é chamado pelo Sprite2D quando a animação de ataque termina
+# Fim de ataque (normal, especial ou combo)
 func _on_attack_finished() -> void:
 	deactivate_attack_area()
-	# volta ao estado IDLE se ainda estiver vivo
 	if state != State.DEAD:
 		change_state(State.IDLE)
 
-# ==============================
+
 # ====== ÁUDIO / UTIL ========
-# ==============================
 func update_audio_by_form() -> void:
 	if not audio_normal or not audio_super:
 		return
@@ -456,9 +536,7 @@ func update_audio_by_form() -> void:
 			if audio_normal.playing: audio_normal.stop()
 			if not audio_super.playing: audio_super.play()
 
-# ==============================
 # ====== MORTE / CONTINUE ======
-# ==============================
 func die() -> void:
 	# marca dead e toca animação
 	state = State.DEAD
@@ -488,9 +566,7 @@ func die() -> void:
 	# ir para continue (GameManager já faz call_deferred em change_scene)
 	GameManager.goto_continue()
 
-# ==============================
 # ====== BOUNCE / HURTBOX ======
-# ==============================
 func bounce_from_enemy() -> void:
 	is_bouncing_from_enemy = true
 	velocity.y = -260

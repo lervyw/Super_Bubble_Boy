@@ -299,6 +299,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="MainMenu" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -376,47 +377,80 @@ theme = SubResource("Theme_50u4b")
 text = "Voltar"
 
 [node name="ControlsMenu" type="HBoxContainer" parent="."]
-visible = false
 layout_mode = 0
-offset_left = 142.0
+offset_left = 150.0
 offset_top = 77.0
-offset_right = 284.0
+offset_right = 300.0
 offset_bottom = 227.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ControlsMenu"]
+[node name="ScrollContainer" type="ScrollContainer" parent="ControlsMenu"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlsMenu/ScrollContainer"]
 layout_mode = 2
 
-[node name="Controle1" type="Button" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle1" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "botao pulo"
 
-[node name="Controle2" type="Button" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle2" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "transformacao 1"
 
-[node name="Controle3" type="Button" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle3" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "transformacao 2"
 
-[node name="Controle4" type="Button" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle4" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "forma normal"
 
-[node name="Controle5" type="Button" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle5" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "botao menu"
 
-[node name="Controle6" type="Button" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle6" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "botao ataque"
 
-[node name="Voltar" type="Button" parent="ControlsMenu/VBoxContainer"]
+[node name="Controle7" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "ataque especial"
+
+[node name="Controle8" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "escudo"
+
+[node name="Controle9" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "poder 1"
+
+[node name="Controle10" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "poder 2"
+
+[node name="Controle11" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "poder 3"
+
+[node name="Controle12" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "poder 4"
+
+[node name="Voltar" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Voltar"
@@ -431,4 +465,4 @@ bus = &"music"
 [connection signal="pressed" from="MainMenu/VBoxContainer/Quit" to="." method="_on_quit_pressed"]
 [connection signal="pressed" from="ConfigMenu/VBoxContainer/ConfigurarBotoes" to="." method="_open_botoes_menu"]
 [connection signal="pressed" from="ConfigMenu/VBoxContainer/Voltar" to="." method="_on_back_to_main"]
-[connection signal="pressed" from="ControlsMenu/VBoxContainer/Voltar" to="." method="_on_back_to_config"]
+[connection signal="pressed" from="ControlsMenu/ScrollContainer/VBoxContainer/Voltar" to="." method="_on_back_to_config"]

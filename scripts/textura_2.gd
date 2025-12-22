@@ -43,6 +43,13 @@ func update_animation(direction: Vector2) -> void:
 			handle_movement_animation(direction)
 		player.State.SWIM: handle_swim_animation(direction)
 		player.State.ATTACK: handle_attack_animation()
+		
+		player.State.SPECIAL_ATTACK:
+			handle_attack_animation()
+
+		player.State.DEFEND:
+			play_if_different("S_parry")
+
 
 func handle_dash_animation() -> void:
 	match player.form:
