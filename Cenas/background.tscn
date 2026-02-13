@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://barbuh5nxkp2a"]
+[gd_scene format=3 uid="uid://barbuh5nxkp2a"]
 
 [ext_resource type="Texture2D" uid="uid://rqtenx3ou800" path="res://sprites/img/background/fundo/0.png" id="1_kc0yp"]
 [ext_resource type="Texture2D" uid="uid://qqcnd70hc2c1" path="res://sprites/img/background/fundo/arvores_3.png" id="2_uhqxv"]
@@ -44,78 +44,77 @@ _data = {
 &"dia_noite": SubResource("Animation_tdv8i")
 }
 
-[node name="ParallaxBackground" type="ParallaxBackground"]
+[node name="ParallaxBackground" type="ParallaxBackground" unique_id=1574744103]
 scale = Vector2(1.2, 1)
 transform = Transform2D(1.2, 0, 0, 1, 0, 0)
 
-[node name="0" type="ParallaxLayer" parent="."]
+[node name="0" type="ParallaxLayer" parent="." unique_id=836353750]
 motion_scale = Vector2(0.1, 0.1)
 motion_mirroring = Vector2(420, 0)
 
-[node name="Sprite2D" type="Sprite2D" parent="0"]
+[node name="Sprite2D" type="Sprite2D" parent="0" unique_id=1185213382]
 texture_repeat = 2
 position = Vector2(211.66666, 141)
 texture = ExtResource("1_kc0yp")
 region_enabled = true
 region_rect = Rect2(0, 0, 840, 280)
 
-[node name="Sprite2D2" type="Sprite2D" parent="0"]
+[node name="Sprite2D2" type="Sprite2D" parent="0" unique_id=757413227]
 texture_repeat = 2
 position = Vector2(211.66666, -139)
 texture = ExtResource("1_kc0yp")
 region_enabled = true
 region_rect = Rect2(0, 0, 840, 280)
 
-[node name="Sprite2D3" type="Sprite2D" parent="0"]
+[node name="Sprite2D3" type="Sprite2D" parent="0" unique_id=241303606]
+visible = false
 texture_repeat = 2
 position = Vector2(211.66666, -411)
 texture = ExtResource("1_kc0yp")
 region_enabled = true
 region_rect = Rect2(0, 0, 840, 280)
 
-[node name="1" type="ParallaxLayer" parent="."]
+[node name="1" type="ParallaxLayer" parent="." unique_id=668906361]
 z_index = 1
 motion_scale = Vector2(0.2, 0.2)
 motion_mirroring = Vector2(420, 0)
 
-[node name="Sprite2D" type="Sprite2D" parent="1"]
+[node name="Sprite2D" type="Sprite2D" parent="1" unique_id=1351359358]
 texture_repeat = 2
 position = Vector2(211.66666, 77)
 texture = ExtResource("2_uhqxv")
 region_enabled = true
 region_rect = Rect2(0, 0, 840, 280)
 
-[node name="2" type="ParallaxLayer" parent="."]
+[node name="2" type="ParallaxLayer" parent="." unique_id=1701463783]
 z_index = 1
 motion_scale = Vector2(0.3, 0.3)
 motion_mirroring = Vector2(420, 0)
 
-[node name="Sprite2D" type="Sprite2D" parent="2"]
+[node name="Sprite2D" type="Sprite2D" parent="2" unique_id=233792336]
 texture_repeat = 2
 position = Vector2(211.66666, 103)
 texture = ExtResource("3_vx3ae")
 region_enabled = true
 region_rect = Rect2(0, 0, 840, 280)
 
-[node name="3" type="ParallaxLayer" parent="."]
+[node name="3" type="ParallaxLayer" parent="." unique_id=1924726880]
 z_index = 3
 motion_scale = Vector2(0.4, 0.4)
 motion_mirroring = Vector2(420, 0)
 
-[node name="Sprite2D" type="Sprite2D" parent="3"]
+[node name="Sprite2D" type="Sprite2D" parent="3" unique_id=2073794984]
 texture_repeat = 2
 position = Vector2(211.66666, 77)
 texture = ExtResource("4_dhaf6")
 region_enabled = true
 region_rect = Rect2(0, 0, 840, 280)
 
-[node name="DayAndNightCycle" type="CanvasModulate" parent="." node_paths=PackedStringArray("animation_player")]
+[node name="DayAndNightCycle" type="CanvasModulate" parent="." unique_id=1157350744 node_paths=PackedStringArray("animation_player")]
 script = ExtResource("7_w476n")
 animation_player = NodePath("AnimationPlayer")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="DayAndNightCycle"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="DayAndNightCycle" unique_id=79175496]
 root_node = NodePath("../..")
-libraries = {
-&"": SubResource("AnimationLibrary_nprc1")
-}
-autoplay = "dia_noite"
+libraries/ = SubResource("AnimationLibrary_nprc1")
+autoplay = &"dia_noite"
