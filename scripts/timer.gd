@@ -23,7 +23,7 @@ extends CanvasLayer
 @export var tempo: Label
 
 # Controla se o timer está rodando ou pausado
-var timer_running: bool = true
+var timer_running: bool = false
 
 
 # ================================
