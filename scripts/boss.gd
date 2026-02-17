@@ -1,270 +1,199 @@
+# BossSimple.gd
 extends CharacterBody2D
 
-# ======================================================
-# 🔧 CONFIGURAÇÕES
-# ======================================================
+# =========================================================
+#  BOSS SIMPLES
+#  - Move até o player (andar/pular/voar)
+#  - Ataca ativando uma hitbox (Area2D) por alguns ms
+#  - Dano via Player.take_damage() (ou Stats.take_damage fallback)
+# =========================================================
 
-@onready var sprite = $AnimatedSprite2D
-@onready var hurt_area = $HurtArea
-@onready var stomp_area = $StompArea
-@onready var player = get_tree().get_first_node_in_group("player")
 
-@export var damage_particles: CPUParticles2D
-@export var move_speed: float = 80.0
-@export var chase_speed: float = 150.0
+# ==========================
+# ===== CONFIGURAÇÕES ======
+# ==========================
+enum MoveMode { WALK, JUMP, FLY }
+
+@export_group("Target")
+@export var player_group: StringName = "player" # o seu player já usa isso
+
+@export_group("Movement")
+@export var move_mode: MoveMode = MoveMode.WALK
+@export var speed: float = 90.0
 @export var gravity: float = 900.0
-@export var jump_force: float = -380.0
+@export var jump_force: float = -320.0
+@export var jump_interval: float = 0.55 # usado no modo JUMP
+@export var fly_vertical_follow: bool = true
+@export var fly_y_speed: float = 60.0
 
-@export var detection_range: float = 260.0
-@export var attack_cooldown_time: float = 1.0
-@export var flee_distance: float = 80.0      # distância mínima para fugir
-@export var flee_jump_force: float = -350.0  # força do pulo para fugir
+@export_group("AI")
+@export var aggro_range: float = 450.0
+@export var stop_distance: float = 60.0
 
-@export var max_health: int = 3
-@export var show_debug: bool = false
+@export_group("Attack")
+@export var damage: int = 2
+@export var attack_range: float = 70.0
+@export var hitbox_active_time: float = 0.12
+@export var attack_cooldown: float = 1.0
 
-# ======================================================
-# 🔒 VARIÁVEIS
-# ======================================================
+@export_group("Nodes")
+@export var hitbox_path: NodePath = NodePath("AttackHitbox")
 
-var current_health: int
-var move_dir: int = 1
-var attack_cooldown: float = 0.0
-var is_hurt: bool = false
-var can_flip: bool = true
 
-var edge_check: RayCast2D
-var wall_check: RayCast2D
+# ==========================
+# ===== RUNTIME VARS =======
+# ==========================
+var player: Node2D
+var cooldown_t: float = 0.0
+var jump_t: float = 0.0
+var attacking: bool = false
 
-# ======================================================
-# 🧩 READY
-# ======================================================
+@onready var hitbox: Area2D = get_node_or_null(hitbox_path)
+@onready var hitbox_shape: CollisionShape2D = (
+	hitbox.get_node_or_null("CollisionShape2D") if hitbox else null
+)
 
+
+# ==========================
+# ========= READY ==========
+# ==========================
 func _ready() -> void:
-	current_health = max_health
-	create_rays()
+	player = get_tree().get_first_node_in_group(player_group) as Node2D
 
-	if hurt_area:
-		hurt_area.connect("area_entered", Callable(self, "_on_hurt_area_area_entered"))
+	# deixa a hitbox desligada por padrão
+	if hitbox_shape:
+		hitbox_shape.disabled = true
 
-	if stomp_area:
-		stomp_area.connect("area_entered", Callable(self, "_on_stomp_area_entered"))
+	# quando a hitbox tocar no player, aplica dano
+	if hitbox:
+		if not hitbox.body_entered.is_connected(_on_hitbox_body_entered):
+			hitbox.body_entered.connect(_on_hitbox_body_entered)
+		if not hitbox.area_entered.is_connected(_on_hitbox_area_entered):
+			hitbox.area_entered.connect(_on_hitbox_area_entered)
 
-	if not player:
-		push_warning("Boss: Player não encontrado!")
 
-# ======================================================
-# 🧰 RAYS
-# ======================================================
-
-func create_rays() -> void:
-	if not has_node("EdgeCheck"):
-		edge_check = RayCast2D.new()
-		edge_check.name = "EdgeCheck"
-		add_child(edge_check)
-	edge_check.enabled = true
-	edge_check.position = Vector2(20, 0)
-	edge_check.target_position = Vector2(0, 40)
-	edge_check.collision_mask = 1
-
-	if not has_node("WallCheck"):
-		wall_check = RayCast2D.new()
-		wall_check.name = "WallCheck"
-		add_child(wall_check)
-	wall_check.enabled = true
-	wall_check.position = Vector2(20, 0)
-	wall_check.target_position = Vector2(20, 0)
-	wall_check.collision_mask = 1
-
-func update_rays_direction() -> void:
-	edge_check.position.x = 20 * move_dir
-	wall_check.position.x = 20 * move_dir
-	wall_check.target_position.x = 20 * move_dir
-
-# ======================================================
-# 🔁 PHYSICS
-# ======================================================
-
+# ==========================
+# ===== LOOP FÍSICO ========
+# ==========================
 func _physics_process(delta: float) -> void:
-	if current_health <= 0:
+	# timers
+	if cooldown_t > 0.0:
+		cooldown_t -= delta
+	if jump_t > 0.0:
+		jump_t -= delta
+
+	# gravidade (exceto voar)
+	if move_mode != MoveMode.FLY and not is_on_floor():
+		velocity.y += gravity * delta
+	elif move_mode == MoveMode.FLY:
+		# remove queda no modo voar
+		velocity.y = 0.0
+
+	# valida player
+	if not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group(player_group) as Node2D
+
+	if not is_instance_valid(player):
+		velocity.x = 0.0
+		move_and_slide()
 		return
 
-	# gravidade
-	if not is_on_floor():
-		velocity.y += gravity * delta
+	var dist := global_position.distance_to(player.global_position)
+	if dist > aggro_range:
+		velocity.x = 0.0
+		move_and_slide()
+		return
 
-	# cooldown de ataque
-	if attack_cooldown > 0:
-		attack_cooldown -= delta
+	# ataque (se estiver perto)
+	if not attacking and cooldown_t <= 0.0 and dist <= attack_range:
+		start_attack()
+		velocity.x = 0.0
+		move_and_slide()
+		return
 
-	update_rays_direction()
-
-	# comportamento principal
-	if player:
-		var dist = global_position.distance_to(player.global_position)
-
-		if dist <= detection_range:
-			chase_and_attack(delta, dist)
-		else:
-			patrol(delta)
-	else:
-		patrol(delta)
+	# movimento em direção ao player
+	move_towards_player(delta, dist)
 
 	move_and_slide()
-	handle_animation()
 
-# ======================================================
-# 🤖 COMPORTAMENTO
-# ======================================================
 
-func patrol(delta: float) -> void:
-	if not can_flip:
-		velocity.x = move_dir * move_speed
+# ==========================
+# ===== MOVIMENTO ==========
+# ==========================
+func move_towards_player(delta: float, dist: float) -> void:
+	var dir: int = int(sign(player.global_position.x - global_position.x))
+	if dir == 0: dir = 1
+
+	# chegou perto o suficiente
+	if dist <= stop_distance:
+		velocity.x = 0.0
 		return
 
-	velocity.x = move_dir * move_speed
+	match move_mode:
+		MoveMode.WALK:
+			velocity.x = dir * speed
 
-	# 👇 vira em paredes
-	if wall_check.is_colliding():
-		debug_print("Parede → virar")
-		yield_flip()
+		MoveMode.JUMP:
+			# "anda pulando": dá impulsos horizontais e pequenos pulos em intervalos
+			velocity.x = dir * speed
+			if is_on_floor() and jump_t <= 0.0:
+				velocity.y = jump_force
+				jump_t = jump_interval
+
+		MoveMode.FLY:
+			velocity.x = dir * speed
+			if fly_vertical_follow:
+				var dy := player.global_position.y - global_position.y
+				velocity.y = clamp(dy, -1.0, 1.0) * fly_y_speed
+
+
+# ==========================
+# ===== ATAQUE (HITBOX) ====
+# ==========================
+func start_attack() -> void:
+	attacking = true
+	cooldown_t = attack_cooldown
+
+	# liga hitbox por um instante
+	if hitbox_shape:
+		hitbox_shape.disabled = false
+
+	# (opcional) aqui você toca animação de ataque
+
+	await get_tree().create_timer(hitbox_active_time).timeout
+
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+
+	attacking = false
+
+
+# ==========================
+# ===== DANO NO PLAYER =====
+# ==========================
+func apply_damage_to(target: Node) -> void:
+	# usa o Player.gd diretamente
+	if target.has_method("take_damage"):
+		target.take_damage(damage)
 		return
 
-	# 👇 vira em bordas
-	if not edge_check.is_colliding() and is_on_floor():
-		debug_print("Borda → virar")
-		yield_flip()
+	# fallback: Stats
+	if target.has_node("Stats"):
+		var stats = target.get_node("Stats")
+		if stats and stats.has_method("take_damage"):
+			stats.take_damage(damage)
+
+func _on_hitbox_body_entered(body: Node) -> void:
+	if not attacking:
 		return
+	if body and body.is_in_group(player_group):
+		apply_damage_to(body)
 
-func chase_and_attack(delta: float, dist: float) -> void:
-	var dir_to_player = sign(player.global_position.x - global_position.x)
-	move_dir = dir_to_player
-	update_flip()
-
-	# 📌 Se estiver muito perto → FUGIR
-	if dist < flee_distance and is_on_floor():
-		debug_print("Fugindo para se preservar!")
-		velocity.x = -dir_to_player * chase_speed * 0.6
-		velocity.y = flee_jump_force
+func _on_hitbox_area_entered(area: Area2D) -> void:
+	if not attacking:
 		return
-
-	# 📌 Se estiver no chão e sem cooldown → pular em direção ao player
-	if is_on_floor() and attack_cooldown <= 0:
-		debug_print("Ataque de pulo!")
-		velocity.y = jump_force
-		velocity.x = dir_to_player * chase_speed
-		attack_cooldown = attack_cooldown_time
+	if not area:
 		return
-
-	# Caso contrário, anda em direção ao player
-	velocity.x = dir_to_player * move_speed
-
-# ======================================================
-# 🔁 FLIP
-# ======================================================
-
-func yield_flip() -> void:
-	can_flip = false
-	move_dir *= -1
-	update_flip()
-	velocity.x = 0
-	await get_tree().create_timer(0.25).timeout
-	can_flip = true
-
-func update_flip() -> void:
-	sprite.flip_h = move_dir < 0
-
-# ======================================================
-# 💥 DANOS & STOMP
-# ======================================================
-
-func _on_hurt_area_area_entered(area: Area2D) -> void:
-	if area.is_in_group("player_attack") or area.is_in_group("killer"):
-		take_damage(1)
-
-func _on_stomp_area_entered(area: Area2D) -> void:
-	if area.is_in_group("player_stomp"):
-		take_damage(1)
-
-		# Player bounce estilo Mario
-		if area.has_method("on_stomped_enemy"):
-			area.on_stomped_enemy()
-
-func take_damage(amount: int) -> void:
-	if is_hurt or current_health <= 0:
-		return
-
-	current_health -= amount
-	is_hurt = true
-
-	debug_print("HP: %d / %d" % [current_health, max_health])
-
-	# efeito de dano
-	var original_modulate = sprite.modulate
-	sprite.modulate = Color(1, 0, 0)
-	if damage_particles:
-		damage_particles.emitting = true
-
-	sprite.play("hurt")
-
-	# knockback
-	velocity.y = -200
-	velocity.x = -move_dir * 150
-
-	await get_tree().create_timer(0.5).timeout
-
-	sprite.modulate = original_modulate
-	if damage_particles:
-		damage_particles.emitting = false
-
-	is_hurt = false
-
-	if current_health <= 0:
-		die()
-
-signal boss_defeated
-
-func die() -> void:
-	debug_print("Boss derrotado!")
-
-	if sprite.sprite_frames.has_animation("death"):
-		sprite.play("death")
-	else:
-		sprite.play("hurt")
-
-	hurt_area.monitoring = false
-	stomp_area.monitoring = false
-
-	emit_signal("boss_defeated")
-
-	await get_tree().create_timer(1.2).timeout
-	queue_free()
-
-# ======================================================
-# 🎞️ ANIMAÇÃO
-# ======================================================
-
-func handle_animation() -> void:
-	if is_hurt:
-		return
-
-	if not is_on_floor():
-		if sprite.sprite_frames.has_animation("jump"):
-			sprite.play("jump")
-		else:
-			sprite.play("idle")
-	elif abs(velocity.x) > 10:
-		if sprite.sprite_frames.has_animation("walk"):
-			sprite.play("walk")
-		else:
-			sprite.play("idle")
-	else:
-		sprite.play("idle")
-
-# ======================================================
-# 🧰 DEBUG
-# ======================================================
-
-func debug_print(msg: String) -> void:
-	if show_debug:
-		print(msg)
+	var p := area.get_parent()
+	if p and p.is_in_group(player_group):
+		apply_damage_to(p)
