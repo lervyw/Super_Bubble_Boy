@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://orok10r1p86e"]
+[gd_scene load_steps=13 format=3 uid="uid://orok10r1p86e"]
 
 [ext_resource type="Script" uid="uid://ckovbwcre5vgq" path="res://scripts/slime.gd" id="1_4p1wq"]
 [ext_resource type="Texture2D" uid="uid://defe4ik31ltgk" path="res://sprites/characters/slime.png" id="2_2w4kv"]
@@ -55,9 +55,17 @@ animations = [{
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_m7g7x"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2w4kv"]
+size = Vector2(38, 17)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t887w"]
+size = Vector2(20, 7)
+
 [node name="slime" type="CharacterBody2D" groups=["slime"]]
 collision_layer = 4
 script = ExtResource("1_4p1wq")
+stop_distance = 10.0
+max_health = 1
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(3, -4)
@@ -66,3 +74,17 @@ frame_progress = 0.46755388
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_m7g7x")
+
+[node name="AttackHitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_2w4kv")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -10.5)
+shape = SubResource("RectangleShape2D_t887w")
+
+[connection signal="area_entered" from="Hurtbox" to="." method="_on_hurtbox_area_entered"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=54 format=3 uid="uid://2bsj0rjvtl73"]
+[gd_scene load_steps=55 format=3 uid="uid://2bsj0rjvtl73"]
 
 [ext_resource type="Script" uid="uid://dal4xk7p4hxxg" path="res://scripts/boss.gd" id="1_faq14"]
 [ext_resource type="Texture2D" uid="uid://cbcodkdnhefhk" path="res://sprites/characters/Rei_slime.png" id="2_1xof2"]
@@ -357,9 +357,13 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_c7w6l"]
 radius = 22.090721
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1xof2"]
+size = Vector2(54, 26)
+
 [node name="boss" type="CharacterBody2D" groups=["boss"]]
 collision_layer = 2
 script = ExtResource("1_faq14")
+stop_distance = 20.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -24)
@@ -368,3 +372,9 @@ frame_progress = 0.6653457
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_c7w6l")
+
+[node name="AttackHitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
+position = Vector2(0, 9)
+shape = SubResource("RectangleShape2D_1xof2")
