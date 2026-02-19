@@ -1964,13 +1964,13 @@ position = Vector2(-1, 6)
 position = Vector2(1, 3)
 shape = SubResource("RectangleShape2D_bll10")
 
-[node name="AttackArea" type="Area2D" parent="." groups=["killer", "stomper"]]
+[node name="AttackArea" type="Area2D" parent="." groups=["killer"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 position = Vector2(19, 15)
 shape = SubResource("RectangleShape2D_x33ej")
 
-[node name="Stomper" type="Area2D" parent="." groups=["stomper"]]
+[node name="Stomper" type="Area2D" parent="." groups=["killer"]]
 
 [node name="ColisorMatador" type="CollisionShape2D" parent="Stomper"]
 position = Vector2(-1, 35)
