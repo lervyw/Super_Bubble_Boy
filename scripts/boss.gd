@@ -35,10 +35,16 @@ enum MoveMode { WALK, JUMP, FLY }
 @export var attack_range: float = 70.0
 @export var hitbox_active_time: float = 0.12
 @export var attack_cooldown: float = 1.0
+# ==========================
+# ===== VIDA DO INIMIGO =====
+# ==========================
+@export var max_health: int = 3
+var health: int = max_health
 
 @export_group("Nodes")
 @export var hitbox_path: NodePath = NodePath("AttackHitbox")
-
+@export var hurtbox_path: NodePath = NodePath("Hurtbox")
+@onready var hurtbox: Area2D = get_node_or_null(hurtbox_path)
 
 # ==========================
 # ===== RUNTIME VARS =======
@@ -47,6 +53,8 @@ var player: Node2D
 var cooldown_t: float = 0.0
 var jump_t: float = 0.0
 var attacking: bool = false
+var stunned: bool = false
+
 
 @onready var hitbox: Area2D = get_node_or_null(hitbox_path)
 @onready var hitbox_shape: CollisionShape2D = (
@@ -70,6 +78,9 @@ func _ready() -> void:
 			hitbox.body_entered.connect(_on_hitbox_body_entered)
 		if not hitbox.area_entered.is_connected(_on_hitbox_area_entered):
 			hitbox.area_entered.connect(_on_hitbox_area_entered)
+	if hurtbox:
+		if not hurtbox.area_entered.is_connected(_on_hurtbox_area_entered):
+			hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 
 
 # ==========================
@@ -167,6 +178,36 @@ func start_attack() -> void:
 
 	attacking = false
 
+# ==========================
+# ===== RECEBER DANO =======
+# ==========================
+func take_damage(amount: int) -> void:
+	health -= amount
+
+	# Desativa ataque e aplica stun
+	stunned = true
+	attacking = false
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+
+	# Timer de 1 segundo para sair do stun
+	await get_tree().create_timer(1.0).timeout
+	stunned = false
+
+	if health <= 0:
+		die()
+
+func die() -> void:
+	# garante que todas colisões estão desativadas
+	if $CollisionShape2D:
+		$CollisionShape2D.disabled = true
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+	if hurtbox and hurtbox.get_node("CollisionShape2D"):
+		hurtbox.get_node("CollisionShape2D").disabled = true
+
+	queue_free()  # remove o inimigo da cena
+
 
 # ==========================
 # ===== DANO NO PLAYER =====
@@ -197,3 +238,26 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 	var p := area.get_parent()
 	if p and p.is_in_group(player_group):
 		apply_damage_to(p)
+
+# ==========================
+# ===== DANO NO INIMIGO ====
+# ==========================
+func _on_hurtbox_area_entered(area: Area2D) -> void:
+	if area.is_in_group("killer"):
+		take_damage(2)
+		print("levou dano do player")
+	# Se o player pisar em cima (ex.: colisão vertical negativa)
+	var p := area.get_parent()
+	if p and p.is_in_group(player_group):
+		var dy: float = p.global_position.y - global_position.y
+		if dy < -10.0:  # player está acima do inimigo
+			# desativa colisões imediatamente
+			if $CollisionShape2D:
+				$CollisionShape2D.disabled = true
+			if hitbox_shape:
+				hitbox_shape.disabled = true
+			if hurtbox and hurtbox.get_node("CollisionShape2D"):
+				hurtbox.get_node("CollisionShape2D").disabled = true
+
+			die()  # remove o inimigo da cena
+			print("player pisou no inimigo")

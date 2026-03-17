@@ -843,10 +843,10 @@ respawn_position = Vector2(182, 214)
 [node name="Sprite2D" parent="player" index="1" node_paths=PackedStringArray("nivel")]
 nivel = NodePath("../..")
 
-[node name="Camera" parent="player" index="3"]
+[node name="Camera" parent="player" index="4"]
 limit_enabled = false
 
-[node name="audio_normal" parent="player" index="4"]
+[node name="audio_normal" parent="player" index="5"]
 stream = ExtResource("18_6ynql")
 
 [node name="BubbleUp1" parent="." node_paths=PackedStringArray("player", "stats") instance=ExtResource("9_y3u1x")]
@@ -860,8 +860,15 @@ player = NodePath("../player")
 stats = NodePath("../player/Stats")
 
 [node name="boss" parent="." instance=ExtResource("12_1m8e4")]
-position = Vector2(-1516, 169)
+position = Vector2(649, 208)
 scale = Vector2(1.2456018, 1.2456018)
+move_mode = 2
+stop_distance = 100.0
+
+[node name="slime" parent="." instance=ExtResource("25_oa4ws")]
+position = Vector2(464, 168)
+move_mode = 2
+stop_distance = 100.0
 
 [node name="Timer" parent="." instance=ExtResource("13_tb1qe")]
 
@@ -944,9 +951,6 @@ motion_scale = Vector2(0.5, 1)
 
 [node name="Sprite2D" parent="ParallaxBackground/3" index="0"]
 position = Vector2(211.66667, 112)
-
-[node name="slime" parent="." instance=ExtResource("25_oa4ws")]
-position = Vector2(464, 168)
 
 [connection signal="body_entered" from="Area2D5" to="Area2D5" method="_on_body_entered"]
 [connection signal="body_exited" from="Area2D5" to="Area2D5" method="_on_body_exited"]
