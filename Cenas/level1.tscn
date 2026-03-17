@@ -799,7 +799,7 @@ sources/13 = SubResource("TileSetAtlasSource_v51a0")
 sources/14 = SubResource("TileSetAtlasSource_v8j1p")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d0psv"]
-size = Vector2(255, 143)
+size = Vector2(256, 143)
 
 [sub_resource type="Gradient" id="Gradient_d0psv"]
 offsets = PackedFloat32Array(0, 0.15076923, 0.28923076, 0.6923077, 0.94153845, 1)
@@ -809,7 +809,7 @@ colors = PackedColorArray(0.093901195, 0.22275051, 0.6047446, 1, 0.36433682, 0.4
 gradient = SubResource("Gradient_d0psv")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_10gu2"]
-size = Vector2(64, 125)
+size = Vector2(62, 125)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_6fn3k"]
 gradient = SubResource("Gradient_d0psv")
@@ -840,7 +840,7 @@ position = Vector2(211, 139)
 hud = NodePath("HUD")
 respawn_position = Vector2(182, 214)
 
-[node name="Sprite2D" parent="player" index="1" node_paths=PackedStringArray("nivel")]
+[node name="Sprite2D" parent="player" index="0" node_paths=PackedStringArray("nivel")]
 nivel = NodePath("../..")
 
 [node name="Camera" parent="player" index="4"]
@@ -877,14 +877,14 @@ position = Vector2(1178, 250)
 script = ExtResource("15_10gu2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D5"]
-position = Vector2(117.5, 61.5)
+position = Vector2(116, 61.5)
 shape = SubResource("RectangleShape2D_d0psv")
 
 [node name="Sprite2D" type="Sprite2D" parent="Area2D5"]
 modulate = Color(1, 1, 1, 0.45490196)
-position = Vector2(115.92927, 61.85837)
+position = Vector2(116.03798, 61.85837)
 rotation = 1.5707964
-scale = Vector2(0.55974877, 255.8797)
+scale = Vector2(0.55974877, 256.09714)
 texture = SubResource("GradientTexture1D_10gu2")
 
 [node name="Area2D6" type="Area2D" parent="."]
@@ -892,14 +892,14 @@ position = Vector2(1722, 205)
 script = ExtResource("15_10gu2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D6"]
-position = Vector2(22, 81.5)
+position = Vector2(21, 81.5)
 shape = SubResource("RectangleShape2D_10gu2")
 
 [node name="Sprite2D" type="Sprite2D" parent="Area2D6"]
 modulate = Color(1, 1, 1, 0.45490196)
-position = Vector2(22.009233, 81.79443)
+position = Vector2(20.894455, 81.291885)
 rotation = 1.5707964
-scale = Vector2(0.48276356, 64.09658)
+scale = Vector2(0.48668972, 61.867023)
 texture = SubResource("GradientTexture1D_6fn3k")
 
 [node name="Area2D7" type="Area2D" parent="."]
