@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3 uid="uid://2bsj0rjvtl73"]
+[gd_scene load_steps=56 format=3 uid="uid://2bsj0rjvtl73"]
 
 [ext_resource type="Script" uid="uid://dal4xk7p4hxxg" path="res://scripts/boss.gd" id="1_faq14"]
 [ext_resource type="Texture2D" uid="uid://cbcodkdnhefhk" path="res://sprites/characters/Rei_slime.png" id="2_1xof2"]
@@ -360,6 +360,9 @@ radius = 22.090721
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xof2"]
 size = Vector2(54, 26)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mwuxf"]
+size = Vector2(30, 7)
+
 [node name="boss" type="CharacterBody2D" groups=["boss"]]
 collision_layer = 2
 script = ExtResource("1_faq14")
@@ -378,3 +381,11 @@ shape = SubResource("CircleShape2D_c7w6l")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
 position = Vector2(0, 9)
 shape = SubResource("RectangleShape2D_1xof2")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(4, -25)
+shape = SubResource("RectangleShape2D_mwuxf")
+
+[connection signal="area_entered" from="Hurtbox" to="." method="_on_hurtbox_area_entered"]
