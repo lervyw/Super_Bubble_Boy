@@ -90,9 +90,26 @@ scale = Vector2(0.21362264, 0.5078016)
 texture_under = ExtResource("3_is2x6")
 texture_progress = ExtResource("5_mdj34")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("attack_special_button", "defend_button")]
 offset_left = 281.0
 offset_top = 159.0
 offset_right = 390.0
 offset_bottom = 258.0
 script = ExtResource("5_is2x6")
+attack_special_button = NodePath("TextureRect2")
+defend_button = NodePath("TextureRect")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect2" type="TextureRect" parent="Panel"]
+layout_mode = 0
+offset_left = 67.0
+offset_top = 29.0
+offset_right = 107.0
+offset_bottom = 69.0
+
+[node name="TextureRect" type="TextureRect" parent="Panel"]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 27.0
+offset_right = 43.0
+offset_bottom = 67.0
