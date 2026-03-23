@@ -22,6 +22,19 @@ enum Form { NORMAL, BUBBLE, SUPER }
 
 enum GameMode { PLATAFORMA, METROIDVANIA }
 
+# ACOES DO HUD MENU
+# =============================
+enum HudMenuAction {
+	NONE,
+	SPECIAL_ATTACK,
+	DEFEND
+}
+
+var hud_menu_open := false
+var hud_menu_selection: HudMenuAction = HudMenuAction.NONE
+var hud_menu_axis_locked := false
+
+
 # Parâmetros principais de movimento e referências de nodes
 @export var speed := 150.0
 @export var jump_force := -450.0
@@ -135,23 +148,32 @@ func _ready() -> void:
 # ==============================
 func _input(event):
 	if event.is_action_pressed("hud_menu"):
-		hud.show_menu()
+		open_hud_menu()
+		return
+
 	if event.is_action_released("hud_menu"):
-		hud.hide_menu()
+		close_hud_menu()
+		return
+
+	# Enquanto o menu está aberto, bloqueia inputs normais
+	if hud_menu_open:
+		return
 
 	if event.is_action_pressed("attack_special"):
 		start_special_attack()
 
 	if event.is_action_pressed("defend"):
 		start_defense()
-	if event.is_action_released("defend"):
-		stop_defense()
 
 
 # ==============================
 # ===== PROCESS (não-física)
 # ==============================
 func _process(_delta: float) -> void:
+	if hud_menu_open:
+		process_hud_menu_selection()
+		return
+
 	check_attack_combos()
 	check_quick_form_selection()
 
@@ -160,19 +182,25 @@ func _process(_delta: float) -> void:
 # ===== AÇÕES: ESPECIAL/DEFESA
 # ==============================
 func start_special_attack() -> void:
-	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEAD]:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
 		return
-	state = State.SPECIAL_ATTACK
+
+	defending = false
+	change_state(State.SPECIAL_ATTACK)
 	activate_attack_area()
 
 func start_defense() -> void:
-	if state == State.DEAD:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
 		return
+
 	defending = true
-	state = State.DEFEND
+	change_state(State.DEFEND)
+	activate_attack_area()
 
 func stop_defense() -> void:
 	defending = false
+	deactivate_attack_area()
+
 	if state == State.DEFEND:
 		change_state(State.IDLE)
 
@@ -181,7 +209,7 @@ func stop_defense() -> void:
 # ===== COMBOS
 # ==============================
 func check_attack_combos() -> void:
-	if combo_lock or state == State.DEAD:
+	if hud_menu_open or combo_lock or state == State.DEAD:
 		return
 
 	if Input.is_action_pressed("attack") and Input.is_action_pressed("attack_special"):
@@ -207,6 +235,9 @@ func execute_combo(id: int) -> void:
 # ===== SELEÇÃO RÁPIDA DE FORMA
 # ==============================
 func check_quick_form_selection() -> void:
+	if hud_menu_open:
+		return
+
 	if not Input.is_action_pressed("form_select"):
 		return
 	if state == State.TRANSFORM or not can_transform():
@@ -270,6 +301,12 @@ func _physics_process(delta: float) -> void:
 	if dash_cooldown_timer > 0:
 		dash_cooldown_timer -= delta
 
+	# Enquanto o menu estiver aberto, congela o player
+	if hud_menu_open:
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
+
 	if in_water:
 		apply_water_physics(delta)
 	else:
@@ -285,6 +322,9 @@ func _physics_process(delta: float) -> void:
 # ===== INPUT (pulo + formas)
 # ==============================
 func handle_input() -> void:
+	if hud_menu_open:
+		return
+
 	if Input.is_action_just_pressed("jump"):
 		handle_jump()
 
@@ -533,6 +573,9 @@ func take_damage(amount: int = 1) -> void:
 	if is_invincible or state == State.DEAD:
 		return
 
+	if defending and state == State.DEFEND:
+		return
+
 	if mode == GameMode.PLATAFORMA:
 		_on_fatal_hit()
 		return
@@ -590,6 +633,94 @@ func respawn_player() -> void:
 			await timer.timeout
 	is_invincible = false
 
+# ==============================
+# ===== HUD MENU
+# ==============================
+func open_hud_menu() -> void:
+	if state in [State.DEAD, State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.TRANSFORM]:
+		return
+
+	hud_menu_open = true
+	hud_menu_selection = HudMenuAction.NONE
+	hud_menu_axis_locked = false
+	velocity = Vector2.ZERO
+
+	if hud and hud.has_method("show_menu"):
+		hud.show_menu()
+
+	if hud and hud.has_method("update_action_selection"):
+		hud.update_action_selection("none")
+
+func close_hud_menu() -> void:
+	if not hud_menu_open:
+		return
+
+	hud_menu_open = false
+	hud_menu_selection = HudMenuAction.NONE
+	hud_menu_axis_locked = false
+
+	if hud and hud.has_method("hide_menu"):
+		hud.hide_menu()
+
+func process_hud_menu_selection() -> void:
+	var horizontal := get_hud_menu_horizontal_axis()
+
+	# trava enquanto o eixo continua pressionado
+	if abs(horizontal) < 0.35:
+		hud_menu_axis_locked = false
+		return
+
+	if hud_menu_axis_locked:
+		return
+
+	hud_menu_axis_locked = true
+
+	if horizontal > 0.0:
+		select_hud_menu_action(HudMenuAction.SPECIAL_ATTACK)
+	elif horizontal < 0.0:
+		select_hud_menu_action(HudMenuAction.DEFEND)
+
+func get_hud_menu_horizontal_axis() -> float:
+	var raw_axis := Input.get_axis("ui_left", "ui_right")
+	if raw_axis == 0.0:
+		return 0.0
+
+	var facing_right := true
+	if has_node("Sprite2D"):
+		facing_right = not $Sprite2D.flip_h
+
+	# Frente = positivo, Trás = negativo
+	if facing_right:
+		return raw_axis
+
+	return -raw_axis
+
+func select_hud_menu_action(action: HudMenuAction) -> void:
+	if hud_menu_selection == action:
+		return
+
+	hud_menu_selection = action
+
+	match action:
+		HudMenuAction.SPECIAL_ATTACK:
+			if hud and hud.has_method("update_action_selection"):
+				hud.update_action_selection("attack_special")
+			execute_hud_menu_action("attack_special")
+
+		HudMenuAction.DEFEND:
+			if hud and hud.has_method("update_action_selection"):
+				hud.update_action_selection("defend")
+			execute_hud_menu_action("defend")
+
+func execute_hud_menu_action(action_name: String) -> void:
+	close_hud_menu()
+
+	match action_name:
+		"attack_special":
+			start_special_attack()
+		"defend":
+			start_defense()
+
 
 # ==============================
 # ===== ATAQUE (HITBOX)
@@ -604,6 +735,8 @@ func deactivate_attack_area() -> void:
 
 func _on_attack_finished() -> void:
 	deactivate_attack_area()
+	defending = false
+
 	if state != State.DEAD:
 		change_state(State.IDLE)
 

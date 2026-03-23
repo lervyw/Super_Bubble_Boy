@@ -24,6 +24,18 @@ signal attack_finished
 @export var special_animation_player: AnimationPlayer
 
 # ----------------
+# Special Attack
+# ----------------
+@export_group("Special Attack")
+@export var special_attack_area_normal: Area2D
+@export var special_attack_area_bubble: Area2D
+@export var special_attack_area_super: Area2D
+
+@export var special_attack_anim_normal: StringName = &"special_attack_normal"
+@export var special_attack_anim_bubble: StringName = &"special_attack_bubble"
+@export var special_attack_anim_super: StringName = &"special_attack_super"
+
+# ----------------
 # Hitboxes do corpo
 # ----------------
 @export_group("Body Hitboxes - Normal")
@@ -79,6 +91,7 @@ func _ready() -> void:
 
 	disable_all_hitboxes()
 	deactivate_all_attack_areas()
+	deactivate_all_special_attack_areas()
 	refresh_hitbox_for_current_state()
 
 # ================================
@@ -196,6 +209,7 @@ func handle_dash_animation() -> void:
 func handle_attack_animation() -> void:
 	activate_hitbox_for_state("attack")
 	deactivate_all_attack_areas()
+	deactivate_all_special_attack_areas()
 	activate_attack_area_for_current_form()
 
 	var anim_name: StringName = &"attack"
@@ -211,22 +225,60 @@ func handle_attack_animation() -> void:
 func handle_special_attack_animation() -> void:
 	activate_hitbox_for_state("attack")
 	deactivate_all_attack_areas()
-	activate_attack_area_for_current_form()
+	deactivate_all_special_attack_areas()
+
+	var anim_name: StringName = &""
+	var special_area: Area2D = null
 
 	match player.form:
 		player.Form.NORMAL:
-			play_if_different(&"attack")
-			play_special_animation_if_exists(&"special_attack_normal")
+			anim_name = special_attack_anim_normal
+			special_area = special_attack_area_normal
+
 		player.Form.BUBBLE:
-			play_if_different(&"attack_bubble")
-			play_special_animation_if_exists(&"special_attack_bubble")
+			anim_name = special_attack_anim_bubble
+			special_area = special_attack_area_bubble
+
 		player.Form.SUPER:
-			play_if_different(&"attack_super")
-			play_special_animation_if_exists(&"special_attack_super")
+			anim_name = special_attack_anim_super
+			special_area = special_attack_area_super
+
+	# ativa a hitbox especial
+	activate_attack_area(special_area)
+
+	# toca a animação especial no AnimatedSprite2D
+	if anim_name != &"" and sprite_frames.has_animation(anim_name):
+		play_if_different(anim_name)
+	else:
+		# fallback caso você ainda não tenha criado a animação especial
+		match player.form:
+			player.Form.NORMAL:
+				play_if_different(&"attack_super")
+			player.Form.BUBBLE:
+				play_if_different(&"attack_bubble")
+			player.Form.SUPER:
+				play_if_different(&"attack_super")
 
 func handle_defend_animation() -> void:
 	activate_hitbox_for_state("defend")
-	play_if_different(&"parry_super")
+	deactivate_all_attack_areas()
+	deactivate_all_special_attack_areas()
+	activate_attack_area_for_current_form()
+
+	var anim_name: StringName = &"parry_super"
+
+	match player.form:
+		player.Form.NORMAL:
+			if sprite_frames.has_animation(&"parry"):
+				anim_name = &"parry"
+		player.Form.BUBBLE:
+			if sprite_frames.has_animation(&"parry_bubble"):
+				anim_name = &"parry_bubble"
+		player.Form.SUPER:
+			if sprite_frames.has_animation(&"parry_super"):
+				anim_name = &"parry_super"
+
+	play_if_different(anim_name)
 
 func handle_movement_animation(direction: Vector2) -> void:
 	match player.form:
@@ -267,6 +319,7 @@ func handle_swim_animation(_direction: Vector2) -> void:
 func handle_transform_animation() -> void:
 	disable_all_hitboxes()
 	deactivate_all_attack_areas()
+	deactivate_all_special_attack_areas()
 
 	var cur = player.form
 	var tgt = player.target_form
@@ -288,6 +341,22 @@ func handle_transform_animation() -> void:
 
 	play_if_different(anim_name)
 
+func deactivate_all_special_attack_areas() -> void:
+	var areas: Array[Area2D] = [
+		special_attack_area_normal,
+		special_attack_area_bubble,
+		special_attack_area_super
+	]
+
+	for area in areas:
+		if is_instance_valid(area):
+			area.monitoring = false
+			area.monitorable = false
+
+			for child in area.get_children():
+				if child is CollisionShape2D:
+					child.disabled = true
+
 func handle_crouch_animation() -> void:
 	activate_hitbox_for_state("crouch")
 
@@ -302,6 +371,7 @@ func handle_crouch_animation() -> void:
 func handle_death_animation() -> void:
 	activate_hitbox_for_state("dead")
 	deactivate_all_attack_areas()
+	deactivate_all_special_attack_areas()
 
 	match player.form:
 		player.Form.NORMAL:
@@ -310,7 +380,6 @@ func handle_death_animation() -> void:
 			play_if_different(&"death_bubble")
 		player.Form.SUPER:
 			play_if_different(&"death_super")
-
 # ================================
 #       HITBOXES / ATTACK AREAS
 # ================================
@@ -475,6 +544,16 @@ func get_current_attack_area() -> Area2D:
 			return attack_area_super
 	return null
 
+func get_current_special_attack_area() -> Area2D:
+	match player.form:
+		player.Form.NORMAL:
+			return special_attack_area_normal
+		player.Form.BUBBLE:
+			return special_attack_area_bubble
+		player.Form.SUPER:
+			return special_attack_area_super
+	return null
+
 # ================================
 #         FLIP / HITBOX
 # ================================
@@ -509,45 +588,25 @@ func _on_animation_finished() -> void:
 
 	var anim_name: StringName = animation
 
+	var special_anims: Array[StringName] = [
+		special_attack_anim_normal,
+		special_attack_anim_bubble,
+		special_attack_anim_super
+	]
+
 	match anim_name:
-		# Ataques / parry
-		&"attack", &"attack_super", &"attack_bubble", &"parry_super":
+		&"attack", &"attack_super", &"attack_bubble", &"parry_super", &"parry", &"parry_bubble":
 			deactivate_all_attack_areas()
+			deactivate_all_special_attack_areas()
 			refresh_hitbox_for_current_state()
 			attack_finished.emit()
 
-		# ---- Transformações: ao terminar, aplica a forma nova ----
-		&"normal_to_bubble":
-			player.form = player.Form.BUBBLE
-			player.change_state(player.State.IDLE)
-			player.update_audio_by_form()
-			refresh_hitbox_for_current_state()
-
-		&"normal_to_super":
-			player.form = player.Form.SUPER
-			player.change_state(player.State.IDLE)
-			player.update_audio_by_form()
-			refresh_hitbox_for_current_state()
-
-		&"bubble_to_normal", &"super_to_normal":
-			player.form = player.Form.NORMAL
-			player.change_state(player.State.IDLE)
-			player.update_audio_by_form()
-			refresh_hitbox_for_current_state()
-
-		&"bubble_to_super":
-			player.form = player.Form.SUPER
-			player.change_state(player.State.IDLE)
-			player.update_audio_by_form()
-			refresh_hitbox_for_current_state()
-
-		&"super_to_bubble":
-			player.form = player.Form.BUBBLE
-			player.change_state(player.State.IDLE)
-			player.update_audio_by_form()
-			refresh_hitbox_for_current_state()
-
 		_:
-			if player.state == player.State.TRANSFORM:
+			if anim_name in special_anims:
+				deactivate_all_attack_areas()
+				deactivate_all_special_attack_areas()
+				refresh_hitbox_for_current_state()
+				attack_finished.emit()
+			elif player.state == player.State.TRANSFORM:
 				player.change_state(player.State.IDLE)
 				refresh_hitbox_for_current_state()

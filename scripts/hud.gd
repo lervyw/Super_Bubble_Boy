@@ -5,25 +5,23 @@ extends CanvasLayer
 @export var heart_icons: Array[TextureRect] = []
 @export var hp_bar: TextureProgressBar
 
-@export var menu_panel: Panel  # <<< NOVO
+@export var menu_panel: Panel
 
 func _ready() -> void:
 	if menu_panel:
 		menu_panel.visible = false
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if not player:
 		return
 
 	if player.mode == player.GameMode.PLATAFORMA:
 		_update_hearts()
 		_set_hp_visible(false)
-		# NÃO chamar _set_hearts_visible(true) → evitar reinicializar corações
 	else:
 		_update_hp_bar()
 		_set_hearts_visible(false)
 		_set_hp_visible(true)
-
 
 # ================================
 # ♥ CORAÇÕES (Modo Plataforma)
@@ -34,9 +32,7 @@ func _update_hearts() -> void:
 	for i in range(heart_icons.size()):
 		var heart := heart_icons[i]
 		if heart:
-			# Coração visível apenas se índice < vidas
 			heart.visible = i < lives
-
 
 # ================================
 # ♥ HP BAR (Modo Metroidvania)
@@ -51,7 +47,6 @@ func _update_hp_bar() -> void:
 	hp_bar.max_value = max_hp
 	hp_bar.value = current
 
-
 # ================================
 # Visibilidade independente
 # ================================
@@ -64,11 +59,23 @@ func _set_hp_visible(v: bool) -> void:
 	if hp_bar:
 		hp_bar.visible = v
 
-
-func show_menu():
+# ================================
+# HUD MENU
+# ================================
+func show_menu() -> void:
 	if menu_panel:
 		menu_panel.visible = true
 
-func hide_menu():
+		if menu_panel.has_method("set_action_selection"):
+			menu_panel.set_action_selection("none")
+
+func hide_menu() -> void:
 	if menu_panel:
 		menu_panel.visible = false
+
+		if menu_panel.has_method("set_action_selection"):
+			menu_panel.set_action_selection("none")
+
+func update_action_selection(action_name: String) -> void:
+	if menu_panel and menu_panel.has_method("set_action_selection"):
+		menu_panel.set_action_selection(action_name)
