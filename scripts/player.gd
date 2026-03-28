@@ -407,8 +407,17 @@ func toggle_transform(target: Form) -> void:
 		start_transform(target)
 
 func start_transform(new_form: Form) -> void:
-	state = State.TRANSFORM
+	if state == State.DEAD:
+		return
+
+	if form == new_form:
+		return
+
 	target_form = new_form
+	change_state(State.TRANSFORM)
+	velocity = Vector2.ZERO
+	deactivate_attack_area()
+	defending = false
 
 
 # ==============================

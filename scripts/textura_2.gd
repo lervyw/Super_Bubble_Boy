@@ -236,29 +236,26 @@ func handle_special_attack_animation() -> void:
 			special_area = special_attack_area_normal
 
 		player.Form.BUBBLE:
-			anim_name = special_attack_anim_bubble
-			special_area = special_attack_area_bubble
+			# Bubble agora usa o especial do SUPER
+			anim_name = special_attack_anim_super
+			special_area = special_attack_area_super
 
 		player.Form.SUPER:
 			anim_name = special_attack_anim_super
 			special_area = special_attack_area_super
 
-	# ativa a hitbox especial
 	activate_attack_area(special_area)
 
-	# toca a animação especial no AnimatedSprite2D
 	if anim_name != &"" and sprite_frames.has_animation(anim_name):
 		play_if_different(anim_name)
 	else:
-		# fallback caso você ainda não tenha criado a animação especial
 		match player.form:
 			player.Form.NORMAL:
 				play_if_different(&"attack_super")
 			player.Form.BUBBLE:
-				play_if_different(&"attack_bubble")
+				play_if_different(&"attack_super")
 			player.Form.SUPER:
 				play_if_different(&"attack_super")
-
 func handle_defend_animation() -> void:
 	activate_hitbox_for_state("defend")
 	deactivate_all_attack_areas()
@@ -549,7 +546,8 @@ func get_current_special_attack_area() -> Area2D:
 		player.Form.NORMAL:
 			return special_attack_area_normal
 		player.Form.BUBBLE:
-			return special_attack_area_bubble
+			# Bubble agora compartilha a área especial do SUPER
+			return special_attack_area_super
 		player.Form.SUPER:
 			return special_attack_area_super
 	return null
@@ -569,7 +567,10 @@ func flip_attack_areas(facing_left: bool) -> void:
 	var areas: Array[Area2D] = [
 		attack_area_normal,
 		attack_area_bubble,
-		attack_area_super
+		attack_area_super,
+		special_attack_area_normal,
+		special_attack_area_bubble,
+		special_attack_area_super
 	]
 
 	for area in areas:
@@ -607,6 +608,14 @@ func _on_animation_finished() -> void:
 				deactivate_all_special_attack_areas()
 				refresh_hitbox_for_current_state()
 				attack_finished.emit()
+				
 			elif player.state == player.State.TRANSFORM:
+				player.form = player.target_form
 				player.change_state(player.State.IDLE)
 				refresh_hitbox_for_current_state()
+
+				if player.has_method("refresh_stompers_for_current_form"):
+					player.refresh_stompers_for_current_form()
+
+				if player.has_method("update_audio_by_form"):
+					player.update_audio_by_form()
