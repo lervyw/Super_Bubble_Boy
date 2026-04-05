@@ -155,3 +155,8 @@
 
 - Updated `scripts/player.gd` so stomping a boss no longer routes through the generic instant-kill stomp branch
 - Boss stomps now apply a small configurable damage amount instead, while normal stompable enemies can still die from stomps
+
+### Boss damage flush and credits-scene script fix
+
+- Updated `scripts/boss.gd` so boss hitbox disabling during damage uses deferred collision-state changes, avoiding the physics query flush error on stomp/hit
+- Fixed `Cenas/Final_Credits.tscn` to reference `res://scripts/final_credits.gd` as a real script ext_resource instead of a broken generic resource path

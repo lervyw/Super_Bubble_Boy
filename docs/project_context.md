@@ -178,6 +178,7 @@ Recent history before new work:
 - Fatal enemy hits now put the player through `hurt` then the form-specific `death` animation and then reload the current level from the beginning
 - Platform mode now consumes global lives on fatal hits before that death/restart flow, while metroidvania still depends on HP reaching zero
 - Bosses are excluded from the player's generic stomp instant-kill path; stomps now chip boss health instead
+- `Cenas/Final_Credits.tscn` now uses the real `res://scripts/final_credits.gd` script resource, avoiding the boss-defeat scene-change script error
 
 ## Level 1 Test Setup
 
