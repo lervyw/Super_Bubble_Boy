@@ -143,3 +143,8 @@ Recent history before new work:
 - Track each meaningful change in `docs/change_log.md`
 - Create a git commit after each coherent task so the user can roll back safely
 - Avoid touching the untracked empty `.codex` file unless the user asks
+
+## Player-Facing Docs
+
+- `docs/how_to_play.md` now exists as the simple player manual
+- Current ultimate status: the code foundation exists, but there is no active input binding yet
