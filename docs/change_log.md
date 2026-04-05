@@ -118,3 +118,12 @@
 
 - Updated `Cenas/level1.tscn` so the current level scene explicitly uses the latest boss/slime animation-name overrides
 - Kept the scene's current manual placements while syncing the enemy test configuration in place
+
+## 2026-04-05
+
+### Simplified attack windows and no touch-damage in level1
+
+- Simplified player attack activation so the player's attack hitbox is only opened by `scripts/player.gd` during explicit attack windows
+- Removed the sprite-controller logic that was reactivating player attack areas every frame during attack animations
+- Removed simple body-touch damage from slime/boss contact on the player side; damage should now come from explicit enemy attack logic
+- Updated `Cenas/level1.tscn` so the slime test setup no longer uses contact-attack mode by default

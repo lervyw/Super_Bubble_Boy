@@ -67,6 +67,7 @@ var hud_menu_axis_locked := false
 @export_group("Normal Attack")
 @export var normal_attack_damage: int = 2
 @export var normal_attack_id: StringName = &"normal_attack"
+@export_range(0.05, 1.0, 0.01) var normal_attack_active_time: float = 0.16
 
 @export_group("Passive Attack Foundation")
 @export var passive_attack_enabled: bool = false
@@ -83,6 +84,7 @@ var hud_menu_axis_locked := false
 @export var active_attack_mana_costs: Array[float] = [20.0]
 @export var active_attack_damages: Array[int] = [4]
 @export var active_attack_area_paths: Array[NodePath] = [NodePath("AttackHitbox")]
+@export var active_attack_active_times: Array[float] = [0.22]
 @export var selected_active_attack_index: int = 0
 
 @export_group("Ultimate Attack")
@@ -92,6 +94,7 @@ var hud_menu_axis_locked := false
 @export var ultimate_attack_damage: int = 10
 @export var ultimate_attack_area_path: NodePath = NodePath("AttackHitbox")
 @export var allow_ultimate_input: bool = true
+@export_range(0.05, 1.5, 0.01) var ultimate_attack_active_time: float = 0.3
 
 @export_group("Respawn")
 @export var respawn_position: Vector2 = Vector2(288, 207)
@@ -124,6 +127,7 @@ var current_attack_kind: AttackKind = AttackKind.NONE
 var current_attack_id: StringName = &""
 var current_attack_damage: int = 0
 var current_attack_area: Area2D
+var attack_window_serial: int = 0
 
 var unlocked_forms = {
 	Form.NORMAL: true,
@@ -234,6 +238,8 @@ func normalize_attack_configuration() -> void:
 		active_attack_damages = [4]
 	if active_attack_area_paths.is_empty():
 		active_attack_area_paths = [NodePath("AttackHitbox")]
+	if active_attack_active_times.is_empty():
+		active_attack_active_times = [0.22]
 
 	while active_attack_cooldowns.size() < active_attack_names.size():
 		active_attack_cooldowns.append(active_attack_cooldowns.back())
@@ -243,6 +249,8 @@ func normalize_attack_configuration() -> void:
 		active_attack_damages.append(active_attack_damages.back())
 	while active_attack_area_paths.size() < active_attack_names.size():
 		active_attack_area_paths.append(active_attack_area_paths.back())
+	while active_attack_active_times.size() < active_attack_names.size():
+		active_attack_active_times.append(active_attack_active_times.back())
 
 	active_attack_timers.resize(active_attack_names.size())
 	for i in range(active_attack_timers.size()):
@@ -328,7 +336,7 @@ func start_special_attack() -> void:
 	)
 	active_attack_timers[selected_active_attack_index] = get_active_attack_cooldown(selected_active_attack_index)
 	change_state(State.SPECIAL_ATTACK)
-	activate_attack_area()
+	trigger_attack_window(get_active_attack_active_time(selected_active_attack_index))
 
 
 func start_ultimate_attack() -> void:
@@ -352,7 +360,7 @@ func start_ultimate_attack() -> void:
 	)
 	ultimate_cooldown_timer = ultimate_attack_cooldown
 	change_state(State.SPECIAL_ATTACK)
-	activate_attack_area()
+	trigger_attack_window(ultimate_attack_active_time)
 
 
 func start_defense() -> void:
@@ -360,9 +368,7 @@ func start_defense() -> void:
 		return
 
 	defending = true
-	prepare_attack_area(attack_area, 0, AttackKind.DEFEND, &"defend")
 	change_state(State.DEFEND)
-	activate_attack_area()
 
 
 func stop_defense() -> void:
@@ -391,7 +397,7 @@ func execute_combo(id: int) -> void:
 	combo_lock = true
 	prepare_attack_area(attack_area, normal_attack_damage, AttackKind.NORMAL, StringName("combo_%s" % id))
 	state = State.ATTACK
-	activate_attack_area()
+	trigger_attack_window(normal_attack_active_time)
 	print("Combo executado:", id)
 
 	await get_tree().create_timer(0.25).timeout
@@ -712,7 +718,7 @@ func start_normal_attack() -> void:
 	defending = false
 	prepare_attack_area(attack_area, normal_attack_damage, AttackKind.NORMAL, normal_attack_id)
 	change_state(State.ATTACK)
-	activate_attack_area()
+	trigger_attack_window(normal_attack_active_time)
 
 
 func take_damage(amount: int = 1) -> void:
@@ -879,6 +885,7 @@ func activate_attack_area() -> void:
 
 
 func deactivate_attack_area() -> void:
+	attack_window_serial += 1
 	set_area_collision_enabled(current_attack_area if current_attack_area != null else attack_area, false)
 	clear_attack_area_metadata(current_attack_area if current_attack_area != null else attack_area)
 	current_attack_kind = AttackKind.NONE
@@ -908,6 +915,24 @@ func prepare_attack_area(area: Area2D, damage: int, kind: AttackKind, attack_id:
 	target_area.set_meta(ATTACK_META_DAMAGE, damage)
 	target_area.set_meta(ATTACK_META_KIND, int(kind))
 	target_area.set_meta(ATTACK_META_ID, String(attack_id))
+
+
+func trigger_attack_window(duration: float) -> void:
+	var target_area := current_attack_area if current_attack_area != null else attack_area
+	if target_area == null:
+		return
+
+	attack_window_serial += 1
+	var serial := attack_window_serial
+	activate_attack_area()
+	_close_attack_window(serial, maxf(duration, 0.05))
+
+
+func _close_attack_window(serial: int, duration: float) -> void:
+	await get_tree().create_timer(duration).timeout
+	if serial != attack_window_serial:
+		return
+	deactivate_attack_area()
 
 
 func clear_attack_area_metadata(area: Area2D) -> void:
@@ -998,6 +1023,10 @@ func get_active_attack_damage(index: int) -> int:
 
 func get_active_attack_area(index: int) -> Area2D:
 	return get_area_from_path(active_attack_area_paths[index])
+
+
+func get_active_attack_active_time(index: int) -> float:
+	return active_attack_active_times[index]
 
 
 func can_trigger_active_attack(index: int) -> bool:
@@ -1179,18 +1208,4 @@ func _on_hurtbox_body_entered(body: Node) -> void:
 
 	if body.has_method("deal_damage_to_player"):
 		body.deal_damage_to_player(self)
-		return
-
-	if body.is_in_group("slime"):
-		bounce_from_enemy()
-		take_damage(1)
-		return
-
-	if body.is_in_group("boss"):
-		bounce_from_enemy()
-		take_damage(1)
-		return
-
-	if body.is_in_group("enemy"):
-		take_damage(1)
 		return

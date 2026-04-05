@@ -172,11 +172,12 @@ Recent history before new work:
 - Stomps are handled separately through the top `Hurtbox` area
 - Boss stomp no longer kills instantly; it applies damage and the boss only dies when health reaches zero
 - Slimes now have simple separation logic to reduce overlapping stacks
+- Player attack windows are now controlled only by `scripts/player.gd`; `scripts/textura_2.gd` no longer re-enables attack areas every animation frame
+- Player no longer takes damage just by touching slime/boss bodies; damage should now come from explicit enemy attack behavior
 
 ## Level 1 Test Setup
 
 - `res://Cenas/level1.tscn` now has explicit enemy test setup:
 - Boss uses scripted `idle`, `walk`, and `attack` animation names
-- One slime is set to `HITBOX` attack mode
-- One slime is set to `CONTACT` attack mode
+- Slimes in the current level1 test setup use explicit hitbox attacks instead of touch/contact damage
 - One slime is set to `FLY` movement mode for quick testing
