@@ -163,3 +163,13 @@ Recent history before new work:
 - Slime flying is still selected through the existing `move_mode = FLY` option
 - Player stomp areas are now tagged separately from normal attack areas so enemies do not die from accidental side collisions
 - Boss animation flow is now script-driven using the available `idle`, `walk`, and `attack` animations
+- `default` is treated as placeholder data for boss/slime sprite sheets and is no longer the intended runtime animation for their gameplay states
+- Attack hitboxes now turn off before the end of the animation, but the enemy remains in the attack state until the full attack animation duration has completed
+
+## Level 1 Test Setup
+
+- `res://Cenas/level1.tscn` now has explicit enemy test setup:
+- Boss uses scripted `idle`, `walk`, and `attack` animation names
+- One slime is set to `HITBOX` attack mode
+- One slime is set to `CONTACT` attack mode
+- One slime is set to `FLY` movement mode for quick testing
