@@ -167,19 +167,20 @@ func apply_slime_separation() -> void:
 	if not avoid_other_slimes:
 		return
 
-	var push := 0.0
+	var push: float = 0.0
 	for node in get_tree().get_nodes_in_group("slime"):
 		if node == self:
 			continue
 		if not (node is CharacterBody2D):
 			continue
 
-		var diff := global_position - node.global_position
-		var dist := abs(diff.x)
+		var other_slime: CharacterBody2D = node as CharacterBody2D
+		var diff: Vector2 = global_position - other_slime.global_position
+		var dist: float = absf(diff.x)
 		if dist <= 0.001 or dist > separation_distance:
 			continue
 
-		push += sign(diff.x) * ((separation_distance - dist) / separation_distance) * separation_strength
+		push += signf(diff.x) * ((separation_distance - dist) / separation_distance) * separation_strength
 
 	velocity.x += push
 
