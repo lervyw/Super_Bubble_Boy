@@ -114,6 +114,9 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2w4kv"]
 size = Vector2(38, 17)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_attack_receiver"]
+size = Vector2(26, 18)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t887w"]
 size = Vector2(20, 7)
 
@@ -139,10 +142,17 @@ shape = SubResource("CircleShape2D_m7g7x")
 position = Vector2(0, 1.5)
 shape = SubResource("RectangleShape2D_2w4kv")
 
+[node name="AttackReceiver" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackReceiver"]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_attack_receiver")
+
 [node name="Hurtbox" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 position = Vector2(0, -10.5)
 shape = SubResource("RectangleShape2D_t887w")
 
+[connection signal="area_entered" from="AttackReceiver" to="." method="_on_attack_receiver_area_entered"]
 [connection signal="area_entered" from="Hurtbox" to="." method="_on_hurtbox_area_entered"]

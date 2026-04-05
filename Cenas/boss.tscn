@@ -420,6 +420,9 @@ radius = 22.090721
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xof2"]
 size = Vector2(54, 26)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_attack_receiver"]
+size = Vector2(52, 44)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mwuxf"]
 size = Vector2(30, 7)
 
@@ -442,10 +445,17 @@ shape = SubResource("CircleShape2D_c7w6l")
 position = Vector2(0, 9)
 shape = SubResource("RectangleShape2D_1xof2")
 
+[node name="AttackReceiver" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackReceiver"]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_attack_receiver")
+
 [node name="Hurtbox" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 position = Vector2(4, -25)
 shape = SubResource("RectangleShape2D_mwuxf")
 
+[connection signal="area_entered" from="AttackReceiver" to="." method="_on_attack_receiver_area_entered"]
 [connection signal="area_entered" from="Hurtbox" to="." method="_on_hurtbox_area_entered"]
