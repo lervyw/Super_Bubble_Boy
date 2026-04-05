@@ -1,15 +1,19 @@
-[gd_scene load_steps=13 format=3 uid="uid://orok10r1p86e"]
+[gd_scene load_steps=14 format=3 uid="uid://orok10r1p86e"]
 
 [ext_resource type="Script" uid="uid://ckovbwcre5vgq" path="res://scripts/slime.gd" id="1_4p1wq"]
 [ext_resource type="Texture2D" uid="uid://defe4ik31ltgk" path="res://sprites/characters/slime.png" id="2_2w4kv"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_8djdq"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_r0vom"]
 atlas = ExtResource("2_2w4kv")
-region = Rect2(32, 0, 32, 32)
+region = Rect2(96, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7ftlq"]
 atlas = ExtResource("2_2w4kv")
 region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8djdq"]
+atlas = ExtResource("2_2w4kv")
+region = Rect2(32, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dl308"]
 atlas = ExtResource("2_2w4kv")
@@ -18,10 +22,6 @@ region = Rect2(128, 0, 32, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_t887w"]
 atlas = ExtResource("2_2w4kv")
 region = Rect2(160, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_r0vom"]
-atlas = ExtResource("2_2w4kv")
-region = Rect2(96, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_r3ryw"]
 atlas = ExtResource("2_2w4kv")
@@ -130,8 +130,6 @@ max_health = 1
 position = Vector2(3, -4)
 sprite_frames = SubResource("SpriteFrames_7ftlq")
 animation = &"idle"
-frame = 2
-frame_progress = 0.25962183
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_m7g7x")

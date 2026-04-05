@@ -138,3 +138,9 @@
 - Updated `scripts/boss.gd` and `scripts/slime.gd` so hitbox attacks now wait through the attack animation wind-up and only enable the hitbox at the end of the animation
 - Added a dedicated `HURT` state in `scripts/player.gd` and `scripts/textura_2.gd` so the player now shows the hurt animation before the death animation
 - Changed fatal player hits to restart the current level from the beginning instead of sending the player to continue/checkpoint flow
+
+### Scene sync for combat changes
+
+- Kept the scene-side hitbox and placement adjustments in `Cenas/player.tscn`, `Cenas/boss.tscn`, `Cenas/slime.tscn`, and `Cenas/level1.tscn`
+- Restored `boss` and `slime` scene preview animations to `idle` so runtime startup state matches gameplay expectations
+- Corrected the slime scene so `attack` remains the non-looping attack animation and `death` remains its separate animation resource
