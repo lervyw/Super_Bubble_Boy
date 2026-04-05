@@ -1937,7 +1937,7 @@ size = Vector2(44, 63)
 size = Vector2(18, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x33ej"]
-size = Vector2(20, 32)
+size = Vector2(27, 46)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3udnp"]
 size = Vector2(19, 3.5)
@@ -2046,7 +2046,7 @@ shape = SubResource("RectangleShape2D_bll10")
 [node name="AttackHitbox" type="Area2D" parent="." groups=["killer", "player_attack"]]
 
 [node name="AttackCollisionShape" type="CollisionShape2D" parent="AttackHitbox"]
-position = Vector2(20, 2)
+position = Vector2(23.5, 9)
 shape = SubResource("RectangleShape2D_x33ej")
 
 [node name="StompHitboxNormal" type="Area2D" parent="." groups=["killer", "player_stomper"]]
