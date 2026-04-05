@@ -101,6 +101,12 @@ func restore_full_health() -> void:
 		player.stats.restore_full_health()
 		print("💚 HP completamente restaurado!")
 
+func restore_full_mana() -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if player and "stats" in player and player.stats and player.stats.has_method("restore_full_mana"):
+		player.stats.restore_full_mana()
+		print("🔷 Mana completamente restaurada!")
+
 # =======================
 # ===== DEBUG ===========
 # =======================

@@ -48,6 +48,12 @@ enum CheckpointMode { PLATAFORMA, METROIDVANIA }
 @export_group("HP")
 @export var restore_health_on_activate: bool = true
 
+# ================================
+#              MANA
+# ================================
+@export_group("Mana")
+@export var restore_mana_on_activate: bool = true
+
 # Evita ativação duplicada
 var activated: bool = false
 
@@ -150,11 +156,18 @@ func activate_checkpoint() -> void:
 			s.reset_health_full()
 			print("💚 HP restaurado no checkpoint")
 
-	# ----- 4) Som de ativação -----
+	# ----- 4) Mana ao ativar (opcional) -----
+	if restore_mana_on_activate and player and "stats" in player and player.stats:
+		var s_mana = player.stats
+		if s_mana.has_method("reset_mana_full"):
+			s_mana.reset_mana_full()
+			print("🔷 Mana restaurada no checkpoint")
+
+	# ----- 5) Som de ativação -----
 	if activate_sound:
 		activate_sound.play()
 
-	# ----- 5) Partículas (efeito visual temporário) -----
+	# ----- 6) Partículas (efeito visual temporário) -----
 	if activate_particles:
 		activate_particles.visible = true
 		activate_particles.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -170,6 +183,6 @@ func activate_checkpoint() -> void:
 		if is_instance_valid(activate_particles):
 			activate_particles.visible = false
 
-	# ----- 6) One-shot: destrói o checkpoint após uso -----
+	# ----- 7) One-shot: destrói o checkpoint após uso -----
 	if destroy_after_activation:
 		queue_free()

@@ -3,39 +3,30 @@ extends CharacterBody2D
 # =========================================================
 #  PLAYER CONTROLLER
 #  - Máquina de estados (idle/walk/jump/attack/dash/etc)
-#  - Formas (normal/bubble/super)
 #  - Dois modos de jogo (Plataforma vs Metroidvania)
-#  - Dano, invencibilidade, respawn e morte
-#  - Combos, ataque especial, defesa
-#  - Stomp com bounce configurável por forma
+#  - Três formas (normal/bubble/super)
+#  - Ataques normais, passivos, super ativos e ultimate
+#  - Mana, cooldowns, respawn, dano e invencibilidade
 # =========================================================
 
-
-# ==========================
-# ====== ENUMS / EXPORTS ===
-# ==========================
 enum State {
 	IDLE, WALK, JUMP, ATTACK, CROUCH, DASH, TRANSFORM, DEAD, SWIM, SPECIAL_ATTACK, DEFEND
 }
 
 enum Form { NORMAL, BUBBLE, SUPER }
-
 enum GameMode { PLATAFORMA, METROIDVANIA }
+enum HudMenuAction { NONE, SPECIAL_ATTACK, DEFEND }
+enum AttackKind { NONE, NORMAL, PASSIVE, ACTIVE_SUPER, ULTIMATE, DEFEND }
 
-# ACOES DO HUD MENU
-# =============================
-enum HudMenuAction {
-	NONE,
-	SPECIAL_ATTACK,
-	DEFEND
-}
+const ATTACK_META_DAMAGE := &"attack_damage"
+const ATTACK_META_KIND := &"attack_kind"
+const ATTACK_META_ID := &"attack_id"
 
 var hud_menu_open := false
 var hud_menu_selection: HudMenuAction = HudMenuAction.NONE
 var hud_menu_axis_locked := false
 
-
-# Parâmetros principais de movimento e referências de nodes
+@export_group("Movement")
 @export var speed := 150.0
 @export var jump_force := -450.0
 @export var super_jump_force := -350.0
@@ -47,63 +38,92 @@ var hud_menu_axis_locked := false
 @export var audio_super: AudioStreamPlayer
 @export var hud: CanvasLayer
 
-# Ajustes de morte
+@export_group("Modes")
+@export var platform_mode_uses_mana: bool = false
+@export var platform_mode_allows_mana_attacks: bool = false
+@export var force_normal_form_in_platform_mode: bool = true
+
 @export_group("Death Settings")
 @export_range(0.0, 5.0) var death_delay: float = 1.0
 
-# Ajustes do dash
 @export_group("Dash Settings")
 @export var dash_stops_fall: bool = false
 @export_range(0.0, 1.0) var dash_fall_factor: float = 0.3
 @export_range(0.0, 2.0) var dash_cooldown: float = 0.3
 
-# Ajustes de dano
 @export_group("Damage Settings")
 @export_range(0.0, 5.0) var invincibility_time: float = 1.0
 
-# Ajustes do stomp
 @export_group("Stomp Settings")
 @export var stomp_requires_falling: bool = true
 @export var stomp_kills_enemy: bool = true
 @export_range(0.0, 2000.0) var stomp_bounce_force_normal: float = 260.0
 @export_range(0.0, 2000.0) var stomp_bounce_force_bubble: float = 180.0
 @export_range(0.0, 2000.0) var stomp_bounce_force_super: float = 320.0
-
-# Seleção manual dos stompers no Inspector
 @export var stomper_normal: Area2D
 @export var stomper_bubble: Area2D
 @export var stomper_super: Area2D
 
-# Spawn/checkpoint + stats (HP, etc)
+@export_group("Normal Attack")
+@export var normal_attack_damage: int = 2
+@export var normal_attack_id: StringName = &"normal_attack"
+
+@export_group("Passive Attack Foundation")
+@export var passive_attack_enabled: bool = false
+@export var passive_attack_id: StringName = &"passive_pulse"
+@export_range(0.1, 30.0, 0.1) var passive_attack_interval: float = 3.0
+@export_range(0.05, 3.0, 0.05) var passive_attack_active_time: float = 0.15
+@export var passive_attack_damage: int = 1
+@export var passive_attack_requires_target: bool = false
+@export var passive_attack_area_path: NodePath = NodePath("AttackArea")
+
+@export_group("Active Super Attacks")
+@export var active_attack_names: Array[StringName] = [&"super_attack_1"]
+@export var active_attack_cooldowns: Array[float] = [1.5]
+@export var active_attack_mana_costs: Array[float] = [20.0]
+@export var active_attack_damages: Array[int] = [4]
+@export var active_attack_area_paths: Array[NodePath] = [NodePath("AttackArea")]
+@export var selected_active_attack_index: int = 0
+
+@export_group("Ultimate Attack")
+@export var ultimate_attack_enabled: bool = true
+@export var ultimate_attack_id: StringName = &"ultimate_attack"
+@export_range(0.1, 30.0, 0.1) var ultimate_attack_cooldown: float = 8.0
+@export var ultimate_attack_damage: int = 10
+@export var ultimate_attack_area_path: NodePath = NodePath("AttackArea")
+@export var allow_ultimate_input: bool = false
+
+@export_group("Respawn")
 @export var respawn_position: Vector2 = Vector2(288, 207)
 @export var stats: Node = null
 
-
-# ==========================
-# ====== NODES ONREADY =====
-# ==========================
 @onready var attack_area: Area2D = $AttackArea
 @onready var attack_collision: CollisionShape2D = $AttackArea/CollisionShape2D
 
-
-# ==========================
-# ====== STATE VARS ========
-# ==========================
 var dash_timer := 0.0
 var dash_cooldown_timer := 0.0
+var passive_attack_timer := 0.0
 var on_ground := false
 
 var form: Form = Form.NORMAL
 var state: State = State.IDLE
+var mode: GameMode = GameMode.PLATAFORMA
 
 var in_water: bool = false
 var target_form: Form = Form.NORMAL
 var is_bouncing_from_enemy := false
-
 var combo_lock := false
 var defending := false
+var bubble_jump_count := 0
+var max_bubble_jumps := 40
+var is_invincible: bool = false
 
-var mode: GameMode = GameMode.PLATAFORMA
+var active_attack_timers: Array[float] = []
+var ultimate_cooldown_timer: float = 0.0
+var current_attack_kind: AttackKind = AttackKind.NONE
+var current_attack_id: StringName = &""
+var current_attack_damage: int = 0
+var current_attack_area: Area2D
 
 var unlocked_forms = {
 	Form.NORMAL: true,
@@ -111,16 +131,10 @@ var unlocked_forms = {
 	Form.SUPER: false
 }
 
-var bubble_jump_count := 0
-var max_bubble_jumps := 40
 
-var is_invincible: bool = false
-
-
-# ==============================
-# ========= READY ==============
-# ==============================
 func _ready() -> void:
+	normalize_attack_configuration()
+
 	if $Sprite2D and $Sprite2D.has_signal("attack_finished"):
 		if not has_method("_on_attack_finished"):
 			push_error("Player: método _on_attack_finished não encontrado!")
@@ -139,13 +153,10 @@ func _ready() -> void:
 	connect_stomper_signals(stomper_bubble)
 	connect_stomper_signals(stomper_super)
 	refresh_stompers_for_current_form()
-
 	update_audio_by_form()
+	passive_attack_timer = passive_attack_interval
 
 
-# ==============================
-# ===== INPUT GLOBAL (HUD etc)
-# ==============================
 func _input(event):
 	if event.is_action_pressed("hud_menu"):
 		open_hud_menu()
@@ -155,7 +166,6 @@ func _input(event):
 		close_hud_menu()
 		return
 
-	# Enquanto o menu está aberto, bloqueia inputs normais
 	if hud_menu_open:
 		return
 
@@ -165,10 +175,10 @@ func _input(event):
 	if event.is_action_pressed("defend"):
 		start_defense()
 
+	if allow_ultimate_input and InputMap.has_action("ultimate_attack") and event.is_action_pressed("ultimate_attack"):
+		start_ultimate_attack()
 
-# ==============================
-# ===== PROCESS (não-física)
-# ==============================
+
 func _process(_delta: float) -> void:
 	if hud_menu_open:
 		process_hud_menu_selection()
@@ -178,118 +188,10 @@ func _process(_delta: float) -> void:
 	check_quick_form_selection()
 
 
-# ==============================
-# ===== AÇÕES: ESPECIAL/DEFESA
-# ==============================
-func start_special_attack() -> void:
-	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
-		return
-
-	defending = false
-	change_state(State.SPECIAL_ATTACK)
-	activate_attack_area()
-
-func start_defense() -> void:
-	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
-		return
-
-	defending = true
-	change_state(State.DEFEND)
-	activate_attack_area()
-
-func stop_defense() -> void:
-	defending = false
-	deactivate_attack_area()
-
-	if state == State.DEFEND:
-		change_state(State.IDLE)
-
-
-# ==============================
-# ===== COMBOS
-# ==============================
-func check_attack_combos() -> void:
-	if hud_menu_open or combo_lock or state == State.DEAD:
-		return
-
-	if Input.is_action_pressed("attack") and Input.is_action_pressed("attack_special"):
-		execute_combo(1)
-	elif Input.is_action_pressed("attack") and Input.is_action_pressed("defend"):
-		execute_combo(2)
-	elif Input.is_action_pressed("attack_special") and Input.is_action_pressed("defend"):
-		execute_combo(3)
-	elif Input.is_action_pressed("attack") and Input.is_action_pressed("jump"):
-		execute_combo(4)
-
-func execute_combo(id: int) -> void:
-	combo_lock = true
-	state = State.ATTACK
-	activate_attack_area()
-	print("Combo executado:", id)
-
-	await get_tree().create_timer(0.25).timeout
-	combo_lock = false
-
-
-# ==============================
-# ===== SELEÇÃO RÁPIDA DE FORMA
-# ==============================
-func check_quick_form_selection() -> void:
-	if hud_menu_open:
-		return
-
-	if not Input.is_action_pressed("form_select"):
-		return
-	if state == State.TRANSFORM or not can_transform():
-		return
-
-	if Input.is_action_pressed("right_stick_up"):
-		start_transform(Form.BUBBLE)
-	elif Input.is_action_pressed("right_stick_right"):
-		start_transform(Form.SUPER)
-	elif Input.is_action_pressed("right_stick_down"):
-		start_transform(Form.NORMAL)
-
-
-# ==============================
-# ===== ESTADOS “TRAVADOS”
-# ==============================
-func special_attack_state() -> void:
-	velocity = Vector2.ZERO
-
-func defend_state() -> void:
-	velocity = Vector2.ZERO
-
-
-# ==============================
-# ===== MODO DE JOGO
-# ==============================
-func enable_metroidvania_mode() -> void:
-	mode = GameMode.METROIDVANIA
-	print("🔥 Modo Metroidvania ativado!")
-	if stats and stats.has_method("reset_health_full"):
-		stats.reset_health_full()
-
-func enable_plataforma_mode() -> void:
-	mode = GameMode.PLATAFORMA
-	print("🎮 Modo Plataforma ativado!")
-	if stats and stats.has_method("reset_health_full"):
-		stats.reset_health_full()
-
-func can_transform() -> bool:
-	if mode != GameMode.METROIDVANIA:
-		return false
-	return unlocked_forms.get(Form.BUBBLE, false) or unlocked_forms.get(Form.SUPER, false)
-
-func can_dash_global() -> bool:
-	return mode == GameMode.METROIDVANIA
-
-
-# ==============================
-# ===== FÍSICA PRINCIPAL
-# ==============================
 func _physics_process(delta: float) -> void:
 	refresh_stompers_for_current_form()
+	update_attack_cooldowns(delta)
+	process_passive_attack(delta)
 
 	if is_bouncing_from_enemy:
 		is_bouncing_from_enemy = false
@@ -298,10 +200,9 @@ func _physics_process(delta: float) -> void:
 	if on_ground:
 		bubble_jump_count = 0
 
-	if dash_cooldown_timer > 0:
+	if dash_cooldown_timer > 0.0:
 		dash_cooldown_timer -= delta
 
-	# Enquanto o menu estiver aberto, congela o player
 	if hud_menu_open:
 		velocity = Vector2.ZERO
 		move_and_slide()
@@ -314,13 +215,67 @@ func _physics_process(delta: float) -> void:
 
 	handle_input()
 	handle_state(delta)
-
 	move_and_slide()
 
 
-# ==============================
-# ===== INPUT (pulo + formas)
-# ==============================
+func normalize_attack_configuration() -> void:
+	if active_attack_names.is_empty():
+		active_attack_names = [&"super_attack_1"]
+	if active_attack_cooldowns.is_empty():
+		active_attack_cooldowns = [1.5]
+	if active_attack_mana_costs.is_empty():
+		active_attack_mana_costs = [20.0]
+	if active_attack_damages.is_empty():
+		active_attack_damages = [4]
+	if active_attack_area_paths.is_empty():
+		active_attack_area_paths = [NodePath("AttackArea")]
+
+	while active_attack_cooldowns.size() < active_attack_names.size():
+		active_attack_cooldowns.append(active_attack_cooldowns.back())
+	while active_attack_mana_costs.size() < active_attack_names.size():
+		active_attack_mana_costs.append(active_attack_mana_costs.back())
+	while active_attack_damages.size() < active_attack_names.size():
+		active_attack_damages.append(active_attack_damages.back())
+	while active_attack_area_paths.size() < active_attack_names.size():
+		active_attack_area_paths.append(active_attack_area_paths.back())
+
+	active_attack_timers.resize(active_attack_names.size())
+	for i in range(active_attack_timers.size()):
+		active_attack_timers[i] = 0.0
+
+	selected_active_attack_index = clampi(selected_active_attack_index, 0, active_attack_names.size() - 1)
+
+
+func update_attack_cooldowns(delta: float) -> void:
+	for i in range(active_attack_timers.size()):
+		if active_attack_timers[i] > 0.0:
+			active_attack_timers[i] = max(active_attack_timers[i] - delta, 0.0)
+
+	if ultimate_cooldown_timer > 0.0:
+		ultimate_cooldown_timer = max(ultimate_cooldown_timer - delta, 0.0)
+
+
+func process_passive_attack(delta: float) -> void:
+	if not passive_attack_enabled:
+		return
+	if state in [State.DEAD, State.TRANSFORM]:
+		return
+	if passive_attack_interval <= 0.0:
+		return
+
+	passive_attack_timer -= delta
+	if passive_attack_timer > 0.0:
+		return
+
+	passive_attack_timer = passive_attack_interval
+
+	var area := get_area_from_path(passive_attack_area_path)
+	if passive_attack_requires_target and not attack_area_has_targets(area):
+		return
+
+	trigger_instant_attack_window(area, passive_attack_active_time, passive_attack_damage, AttackKind.PASSIVE, passive_attack_id)
+
+
 func handle_input() -> void:
 	if hud_menu_open:
 		return
@@ -337,9 +292,172 @@ func handle_input() -> void:
 			toggle_transform(Form.NORMAL)
 
 
-# ==============================
-# ===== GRAVIDADE / ÁGUA / DASH
-# ==============================
+func start_special_attack() -> void:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
+		return
+	if not can_use_mana_attacks():
+		return
+	if not can_trigger_active_attack(selected_active_attack_index):
+		return
+
+	var attack_name := get_active_attack_name(selected_active_attack_index)
+	var mana_cost := get_active_attack_mana_cost(selected_active_attack_index)
+	if not consume_attack_mana(mana_cost):
+		return
+
+	defending = false
+	prepare_attack_area(
+		get_active_attack_area(selected_active_attack_index),
+		get_active_attack_damage(selected_active_attack_index),
+		AttackKind.ACTIVE_SUPER,
+		attack_name
+	)
+	active_attack_timers[selected_active_attack_index] = get_active_attack_cooldown(selected_active_attack_index)
+	change_state(State.SPECIAL_ATTACK)
+	activate_attack_area()
+
+
+func start_ultimate_attack() -> void:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
+		return
+	if not ultimate_attack_enabled:
+		return
+	if not can_use_mana_attacks():
+		return
+	if ultimate_cooldown_timer > 0.0:
+		return
+	if not consume_ultimate_mana():
+		return
+
+	defending = false
+	prepare_attack_area(
+		get_area_from_path(ultimate_attack_area_path),
+		ultimate_attack_damage,
+		AttackKind.ULTIMATE,
+		ultimate_attack_id
+	)
+	ultimate_cooldown_timer = ultimate_attack_cooldown
+	change_state(State.SPECIAL_ATTACK)
+	activate_attack_area()
+
+
+func start_defense() -> void:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
+		return
+
+	defending = true
+	prepare_attack_area(attack_area, 0, AttackKind.DEFEND, &"defend")
+	change_state(State.DEFEND)
+	activate_attack_area()
+
+
+func stop_defense() -> void:
+	defending = false
+	deactivate_attack_area()
+
+	if state == State.DEFEND:
+		change_state(State.IDLE)
+
+
+func check_attack_combos() -> void:
+	if hud_menu_open or combo_lock or state == State.DEAD:
+		return
+
+	if Input.is_action_pressed("attack") and Input.is_action_pressed("attack_special"):
+		execute_combo(1)
+	elif Input.is_action_pressed("attack") and Input.is_action_pressed("defend"):
+		execute_combo(2)
+	elif Input.is_action_pressed("attack_special") and Input.is_action_pressed("defend"):
+		execute_combo(3)
+	elif Input.is_action_pressed("attack") and Input.is_action_pressed("jump"):
+		execute_combo(4)
+
+
+func execute_combo(id: int) -> void:
+	combo_lock = true
+	prepare_attack_area(attack_area, normal_attack_damage, AttackKind.NORMAL, StringName("combo_%s" % id))
+	state = State.ATTACK
+	activate_attack_area()
+	print("Combo executado:", id)
+
+	await get_tree().create_timer(0.25).timeout
+	combo_lock = false
+
+
+func check_quick_form_selection() -> void:
+	if hud_menu_open:
+		return
+	if not Input.is_action_pressed("form_select"):
+		return
+	if state == State.TRANSFORM or not can_transform():
+		return
+
+	if Input.is_action_pressed("right_stick_up"):
+		start_transform(Form.BUBBLE)
+	elif Input.is_action_pressed("right_stick_right"):
+		start_transform(Form.SUPER)
+	elif Input.is_action_pressed("right_stick_down"):
+		start_transform(Form.NORMAL)
+
+
+func special_attack_state() -> void:
+	velocity = Vector2.ZERO
+
+
+func defend_state() -> void:
+	velocity = Vector2.ZERO
+
+
+func enable_metroidvania_mode() -> void:
+	mode = GameMode.METROIDVANIA
+	print("🔥 Modo Metroidvania ativado!")
+	restore_resources_full()
+
+
+func enable_plataforma_mode() -> void:
+	mode = GameMode.PLATAFORMA
+	print("🎮 Modo Plataforma ativado!")
+	restore_resources_full()
+
+	if force_normal_form_in_platform_mode:
+		force_form(Form.NORMAL)
+
+
+func can_transform() -> bool:
+	if mode != GameMode.METROIDVANIA:
+		return false
+	return unlocked_forms.get(Form.BUBBLE, false) or unlocked_forms.get(Form.SUPER, false)
+
+
+func can_dash_global() -> bool:
+	return mode == GameMode.METROIDVANIA
+
+
+func can_use_mana_system() -> bool:
+	if mode == GameMode.METROIDVANIA:
+		return true
+	return platform_mode_uses_mana
+
+
+func can_use_mana_attacks() -> bool:
+	if mode == GameMode.METROIDVANIA:
+		return true
+	return platform_mode_allows_mana_attacks
+
+
+func restore_resources_full() -> void:
+	if stats == null:
+		return
+	if stats.has_method("restore_all"):
+		stats.restore_all()
+		return
+
+	if stats.has_method("restore_full_health"):
+		stats.restore_full_health()
+	if stats.has_method("restore_full_mana"):
+		stats.restore_full_mana()
+
+
 func apply_normal_gravity(delta: float) -> void:
 	if state == State.DASH:
 		if dash_stops_fall:
@@ -351,6 +469,7 @@ func apply_normal_gravity(delta: float) -> void:
 		velocity.y += 50 * delta
 	else:
 		velocity.y += gravity * delta
+
 
 func apply_water_physics(delta: float) -> void:
 	var water_grav := 150.0
@@ -366,9 +485,6 @@ func apply_water_physics(delta: float) -> void:
 	velocity.x *= 0.92
 
 
-# ==============================
-# ===== PULO (por forma)
-# ==============================
 func handle_jump() -> void:
 	match form:
 		Form.BUBBLE:
@@ -378,13 +494,11 @@ func handle_jump() -> void:
 			elif bubble_jump_count < max_bubble_jumps:
 				velocity.y = -50
 				bubble_jump_count += 1
-
 		Form.SUPER:
 			if in_water:
 				velocity.y = -120
 			elif is_on_floor():
 				velocity.y = super_jump_force
-
 		_:
 			if in_water:
 				velocity.y = -150
@@ -392,24 +506,27 @@ func handle_jump() -> void:
 				velocity.y = jump_force
 
 
-# ==============================
-# ===== TRANSFORMAÇÃO
-# ==============================
 func toggle_transform(target: Form) -> void:
 	if state == State.TRANSFORM:
 		return
 	if not can_transform():
 		return
+	if target != Form.NORMAL and not unlocked_forms.get(target, false):
+		return
 
 	if form == target:
 		start_transform(Form.NORMAL)
-	elif unlocked_forms.get(target, false):
+	else:
 		start_transform(target)
+
 
 func start_transform(new_form: Form) -> void:
 	if state == State.DEAD:
 		return
-
+	if mode != GameMode.METROIDVANIA:
+		return
+	if new_form != Form.NORMAL and not unlocked_forms.get(new_form, false):
+		return
 	if form == new_form:
 		return
 
@@ -420,18 +537,24 @@ func start_transform(new_form: Form) -> void:
 	defending = false
 
 
-# ==============================
-# ===== DASH
-# ==============================
+func force_form(new_form: Form) -> void:
+	if new_form != Form.NORMAL and not unlocked_forms.get(new_form, false):
+		return
+
+	form = new_form
+	target_form = new_form
+	if state == State.TRANSFORM:
+		change_state(State.IDLE)
+	refresh_stompers_for_current_form()
+	update_audio_by_form()
+
+
 func can_dash() -> bool:
 	if not can_dash_global():
 		return false
 	return dash_cooldown_timer <= 0
 
 
-# ==============================
-# ===== MÁQUINA DE ESTADOS
-# ==============================
 func handle_state(_delta: float) -> void:
 	match state:
 		State.IDLE: idle_state()
@@ -447,9 +570,6 @@ func handle_state(_delta: float) -> void:
 		State.SWIM: swim_state()
 
 
-# ==============================
-# ===== ESTADOS BÁSICOS
-# ==============================
 func idle_state() -> void:
 	handle_horizontal_input()
 
@@ -457,28 +577,28 @@ func idle_state() -> void:
 		change_state(State.JUMP)
 	elif abs(Input.get_axis("ui_left", "ui_right")) > 0:
 		change_state(State.WALK)
-	elif mode == GameMode.METROIDVANIA and Input.is_action_just_pressed("attack"):
-		change_state(State.ATTACK)
-		activate_attack_area()
+	elif Input.is_action_just_pressed("attack"):
+		start_normal_attack()
 	elif Input.is_action_pressed("crouch"):
 		change_state(State.CROUCH)
 	elif Input.is_action_just_pressed("dash") and can_dash():
 		change_state(State.DASH)
+
 
 func walk_state() -> void:
 	handle_horizontal_input()
 
 	if Input.is_action_just_pressed("jump") and on_ground:
 		change_state(State.JUMP)
-	elif mode == GameMode.METROIDVANIA and Input.is_action_just_pressed("attack"):
-		change_state(State.ATTACK)
-		activate_attack_area()
+	elif Input.is_action_just_pressed("attack"):
+		start_normal_attack()
 	elif Input.is_action_pressed("crouch"):
 		change_state(State.CROUCH)
 	elif Input.is_action_just_pressed("dash") and can_dash():
 		change_state(State.DASH)
 	elif velocity.x == 0:
 		change_state(State.IDLE)
+
 
 func jump_state() -> void:
 	handle_horizontal_input()
@@ -489,8 +609,10 @@ func jump_state() -> void:
 	if is_on_floor():
 		change_state(State.IDLE)
 
+
 func attack_state() -> void:
 	velocity = Vector2.ZERO
+
 
 func crouch_state() -> void:
 	velocity.x = 0
@@ -498,9 +620,6 @@ func crouch_state() -> void:
 		change_state(State.IDLE)
 
 
-# ==============================
-# ===== DASH STATE
-# ==============================
 func dash_state() -> void:
 	if dash_timer <= 0.0:
 		dash_timer = dash_time
@@ -520,16 +639,15 @@ func dash_state() -> void:
 		else:
 			change_state(State.JUMP)
 
+
 func transform_state() -> void:
 	velocity = Vector2.ZERO
+
 
 func dead_state() -> void:
 	die()
 
 
-# ==============================
-# ===== NADO
-# ==============================
 func swim_state() -> void:
 	var dir_x := Input.get_axis("ui_left", "ui_right")
 	var dir_y := Input.get_axis("ui_up", "ui_down")
@@ -550,13 +668,10 @@ func swim_state() -> void:
 		change_state(State.IDLE)
 
 
-# ==============================
-# ===== MOVIMENTO HORIZONTAL
-# ==============================
 func handle_horizontal_input() -> void:
 	var dir := Input.get_axis("ui_left", "ui_right")
-
 	var current_speed := speed
+
 	if in_water:
 		match form:
 			Form.NORMAL:
@@ -571,17 +686,24 @@ func handle_horizontal_input() -> void:
 	if dir != 0:
 		$Sprite2D.flip_h = dir < 0
 
+
 func change_state(new_state: State) -> void:
 	state = new_state
 
 
-# ==============================
-# ===== DANO / VIDAS / HP
-# ==============================
+func start_normal_attack() -> void:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
+		return
+
+	defending = false
+	prepare_attack_area(attack_area, normal_attack_damage, AttackKind.NORMAL, normal_attack_id)
+	change_state(State.ATTACK)
+	activate_attack_area()
+
+
 func take_damage(amount: int = 1) -> void:
 	if is_invincible or state == State.DEAD:
 		return
-
 	if defending and state == State.DEFEND:
 		return
 
@@ -599,9 +721,9 @@ func take_damage(amount: int = 1) -> void:
 	if state != State.DEAD:
 		start_invincibility()
 
+
 func start_invincibility() -> void:
 	is_invincible = true
-
 	var tree := get_tree()
 	if tree == null:
 		is_invincible = false
@@ -615,6 +737,7 @@ func start_invincibility() -> void:
 	await timer.timeout
 	is_invincible = false
 
+
 func _on_fatal_hit() -> void:
 	if mode == GameMode.METROIDVANIA:
 		die()
@@ -626,13 +749,19 @@ func _on_fatal_hit() -> void:
 	else:
 		await respawn_player()
 
+
 func respawn_player() -> void:
 	global_position = respawn_position
 	velocity = Vector2.ZERO
 	change_state(State.IDLE)
 
-	if mode == GameMode.METROIDVANIA and stats and stats.has_method("reset_health_full"):
-		stats.reset_health_full()
+	if stats and stats.has_method("restore_all"):
+		stats.restore_all()
+	else:
+		if mode == GameMode.METROIDVANIA and stats and stats.has_method("reset_health_full"):
+			stats.reset_health_full()
+		if stats and stats.has_method("reset_mana_full"):
+			stats.reset_mana_full()
 
 	is_invincible = true
 	var tree := get_tree()
@@ -642,9 +771,7 @@ func respawn_player() -> void:
 			await timer.timeout
 	is_invincible = false
 
-# ==============================
-# ===== HUD MENU
-# ==============================
+
 func open_hud_menu() -> void:
 	if state in [State.DEAD, State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.TRANSFORM]:
 		return
@@ -660,6 +787,7 @@ func open_hud_menu() -> void:
 	if hud and hud.has_method("update_action_selection"):
 		hud.update_action_selection("none")
 
+
 func close_hud_menu() -> void:
 	if not hud_menu_open:
 		return
@@ -671,10 +799,10 @@ func close_hud_menu() -> void:
 	if hud and hud.has_method("hide_menu"):
 		hud.hide_menu()
 
+
 func process_hud_menu_selection() -> void:
 	var horizontal := get_hud_menu_horizontal_axis()
 
-	# trava enquanto o eixo continua pressionado
 	if abs(horizontal) < 0.35:
 		hud_menu_axis_locked = false
 		return
@@ -684,10 +812,11 @@ func process_hud_menu_selection() -> void:
 
 	hud_menu_axis_locked = true
 
-	if horizontal > 0.0:
+	if horizontal > 0.0 and can_use_mana_attacks():
 		select_hud_menu_action(HudMenuAction.SPECIAL_ATTACK)
 	elif horizontal < 0.0:
 		select_hud_menu_action(HudMenuAction.DEFEND)
+
 
 func get_hud_menu_horizontal_axis() -> float:
 	var raw_axis := Input.get_axis("ui_left", "ui_right")
@@ -698,11 +827,11 @@ func get_hud_menu_horizontal_axis() -> float:
 	if has_node("Sprite2D"):
 		facing_right = not $Sprite2D.flip_h
 
-	# Frente = positivo, Trás = negativo
 	if facing_right:
 		return raw_axis
 
 	return -raw_axis
+
 
 func select_hud_menu_action(action: HudMenuAction) -> void:
 	if hud_menu_selection == action:
@@ -715,11 +844,11 @@ func select_hud_menu_action(action: HudMenuAction) -> void:
 			if hud and hud.has_method("update_action_selection"):
 				hud.update_action_selection("attack_special")
 			execute_hud_menu_action("attack_special")
-
 		HudMenuAction.DEFEND:
 			if hud and hud.has_method("update_action_selection"):
 				hud.update_action_selection("defend")
 			execute_hud_menu_action("defend")
+
 
 func execute_hud_menu_action(action_name: String) -> void:
 	close_hud_menu()
@@ -731,16 +860,18 @@ func execute_hud_menu_action(action_name: String) -> void:
 			start_defense()
 
 
-# ==============================
-# ===== ATAQUE (HITBOX)
-# ==============================
 func activate_attack_area() -> void:
-	if attack_collision:
-		attack_collision.disabled = false
+	set_area_collision_enabled(current_attack_area if current_attack_area != null else attack_area, true)
+
 
 func deactivate_attack_area() -> void:
-	if attack_collision:
-		attack_collision.disabled = true
+	set_area_collision_enabled(current_attack_area if current_attack_area != null else attack_area, false)
+	clear_attack_area_metadata(current_attack_area if current_attack_area != null else attack_area)
+	current_attack_kind = AttackKind.NONE
+	current_attack_id = &""
+	current_attack_damage = 0
+	current_attack_area = null
+
 
 func _on_attack_finished() -> void:
 	deactivate_attack_area()
@@ -750,9 +881,137 @@ func _on_attack_finished() -> void:
 		change_state(State.IDLE)
 
 
-# ==============================
-# ===== ÁUDIO POR FORMA
-# ==============================
+func prepare_attack_area(area: Area2D, damage: int, kind: AttackKind, attack_id: StringName) -> void:
+	var target_area := area if area != null else attack_area
+	if target_area == null:
+		return
+
+	current_attack_kind = kind
+	current_attack_id = attack_id
+	current_attack_damage = damage
+	current_attack_area = target_area
+
+	target_area.set_meta(ATTACK_META_DAMAGE, damage)
+	target_area.set_meta(ATTACK_META_KIND, int(kind))
+	target_area.set_meta(ATTACK_META_ID, String(attack_id))
+
+
+func clear_attack_area_metadata(area: Area2D) -> void:
+	if area == null:
+		return
+
+	if area.has_meta(ATTACK_META_DAMAGE):
+		area.remove_meta(ATTACK_META_DAMAGE)
+	if area.has_meta(ATTACK_META_KIND):
+		area.remove_meta(ATTACK_META_KIND)
+	if area.has_meta(ATTACK_META_ID):
+		area.remove_meta(ATTACK_META_ID)
+
+
+func trigger_instant_attack_window(area: Area2D, duration: float, damage: int, kind: AttackKind, attack_id: StringName) -> void:
+	if area == null:
+		return
+
+	prepare_attack_area(area, damage, kind, attack_id)
+	set_area_collision_enabled(area, true)
+	_close_instant_attack_window(area, max(duration, 0.05), attack_id)
+
+
+func _close_instant_attack_window(area: Area2D, duration: float, attack_id: StringName) -> void:
+	await get_tree().create_timer(duration).timeout
+	if not is_instance_valid(area):
+		return
+	if current_attack_id == attack_id:
+		clear_attack_area_metadata(area)
+	set_area_collision_enabled(area, false)
+
+
+func set_area_collision_enabled(area: Area2D, enabled: bool) -> void:
+	if area == null:
+		return
+
+	area.monitoring = enabled
+	area.monitorable = enabled
+
+	for child in area.get_children():
+		if child is CollisionShape2D:
+			child.disabled = not enabled
+
+
+func attack_area_has_targets(area: Area2D) -> bool:
+	if area == null:
+		return false
+
+	for overlapping_area in area.get_overlapping_areas():
+		var target := overlapping_area.get_parent()
+		if is_valid_attack_target(target):
+			return true
+
+	for body in area.get_overlapping_bodies():
+		if is_valid_attack_target(body):
+			return true
+
+	return false
+
+
+func is_valid_attack_target(target: Node) -> bool:
+	if target == null:
+		return false
+	return target.is_in_group("enemy") or target.is_in_group("slime") or target.is_in_group("boss") or target.is_in_group("stompable")
+
+
+func get_area_from_path(path: NodePath) -> Area2D:
+	if path == NodePath(""):
+		return attack_area
+	return get_node_or_null(path) as Area2D
+
+
+func get_active_attack_name(index: int) -> StringName:
+	return active_attack_names[index]
+
+
+func get_active_attack_cooldown(index: int) -> float:
+	return active_attack_cooldowns[index]
+
+
+func get_active_attack_mana_cost(index: int) -> float:
+	return active_attack_mana_costs[index]
+
+
+func get_active_attack_damage(index: int) -> int:
+	return active_attack_damages[index]
+
+
+func get_active_attack_area(index: int) -> Area2D:
+	return get_area_from_path(active_attack_area_paths[index])
+
+
+func can_trigger_active_attack(index: int) -> bool:
+	if index < 0 or index >= active_attack_names.size():
+		return false
+	return active_attack_timers[index] <= 0.0
+
+
+func consume_attack_mana(amount: float) -> bool:
+	if amount <= 0.0:
+		return true
+	if not can_use_mana_system():
+		return true
+	if not stats or not stats.has_method("consume_mana"):
+		return true
+	return stats.consume_mana(amount)
+
+
+func consume_ultimate_mana() -> bool:
+	if not can_use_mana_system():
+		return true
+	if not stats:
+		return true
+	if stats.has_method("consume_all_mana"):
+		return stats.consume_all_mana()
+	return false
+
+
 func update_audio_by_form() -> void:
 	if not audio_normal or not audio_super:
 		return
@@ -763,7 +1022,6 @@ func update_audio_by_form() -> void:
 				audio_super.stop()
 			if not audio_normal.playing:
 				audio_normal.play()
-
 		Form.SUPER:
 			if audio_normal.playing:
 				audio_normal.stop()
@@ -771,9 +1029,6 @@ func update_audio_by_form() -> void:
 				audio_super.play()
 
 
-# ==============================
-# ===== MORTE / CONTINUE
-# ==============================
 func die() -> void:
 	state = State.DEAD
 	if animation_player:
@@ -804,23 +1059,21 @@ func die() -> void:
 	GameManager.goto_continue()
 
 
-# ==============================
-# ===== STOMP / BOUNCE
-# ==============================
 func connect_stomper_signals(stomper: Area2D) -> void:
 	if not stomper:
 		return
 
 	if not stomper.body_entered.is_connected(_on_stomper_body_entered):
 		stomper.body_entered.connect(_on_stomper_body_entered)
-
 	if not stomper.area_entered.is_connected(_on_stomper_area_entered):
 		stomper.area_entered.connect(_on_stomper_area_entered)
+
 
 func refresh_stompers_for_current_form() -> void:
 	set_stomper_enabled(stomper_normal, form == Form.NORMAL)
 	set_stomper_enabled(stomper_bubble, form == Form.BUBBLE)
 	set_stomper_enabled(stomper_super, form == Form.SUPER)
+
 
 func set_stomper_enabled(stomper: Area2D, enabled: bool) -> void:
 	if not stomper:
@@ -833,6 +1086,7 @@ func set_stomper_enabled(stomper: Area2D, enabled: bool) -> void:
 		if child is CollisionShape2D:
 			child.disabled = not enabled
 
+
 func get_stomp_bounce_force() -> float:
 	match form:
 		Form.BUBBLE:
@@ -841,6 +1095,7 @@ func get_stomp_bounce_force() -> float:
 			return stomp_bounce_force_super
 		_:
 			return stomp_bounce_force_normal
+
 
 func bounce_from_enemy(force: float = -1.0) -> void:
 	is_bouncing_from_enemy = true
@@ -854,19 +1109,20 @@ func bounce_from_enemy(force: float = -1.0) -> void:
 	if state != State.DEAD and state != State.TRANSFORM:
 		change_state(State.JUMP)
 
+
 func _on_stomper_body_entered(body: Node2D) -> void:
 	try_stomp(body)
+
 
 func _on_stomper_area_entered(area: Area2D) -> void:
 	try_stomp(area)
 
+
 func try_stomp(target: Node) -> void:
 	if target == null:
 		return
-
 	if state == State.DEAD or state == State.TRANSFORM:
 		return
-
 	if stomp_requires_falling and velocity.y <= 0.0:
 		return
 
@@ -884,10 +1140,10 @@ func try_stomp(target: Node) -> void:
 		if stomp_target.has_method("die"):
 			stomp_target.die()
 			return
-
 		if stomp_target.has_method("take_damage"):
 			stomp_target.take_damage(999)
 			return
+
 
 func resolve_stomp_target(node: Node) -> Node:
 	var current: Node = node
@@ -903,9 +1159,6 @@ func resolve_stomp_target(node: Node) -> Node:
 	return null
 
 
-# ==============================
-# ===== HURTBOX
-# ==============================
 func _on_hurtbox_body_entered(body: Node) -> void:
 	if is_invincible:
 		return

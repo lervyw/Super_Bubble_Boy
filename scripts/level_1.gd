@@ -52,8 +52,12 @@ func _ready() -> void:
 	print("🎮 Nível iniciado!")
 
 	# Restaura vida cheia ao entrar no nível (se existir stats)
-	if stats and stats.has_method("restore_full_health"):
+	if stats and stats.has_method("restore_all"):
+		stats.restore_all()
+	elif stats and stats.has_method("restore_full_health"):
 		stats.restore_full_health()
+		if stats.has_method("restore_full_mana"):
+			stats.restore_full_mana()
 
 	# Validação obrigatória do player
 	if not player:
@@ -143,6 +147,9 @@ func reset_player_position() -> void:
 	if lose_health_on_death and stats:
 		stats.update_health("Decrease", 1)
 		print("💔 -1 HP por morte")
+
+	if stats and stats.has_method("reset_mana_full"):
+		stats.reset_mana_full()
 
 	# Garante que o player nunca fique com 0 de vida
 	if stats and stats.current_health <= 0:

@@ -59,10 +59,26 @@ Observed responsibilities:
 - Character movement and state machine
 - Form switching: `NORMAL`, `BUBBLE`, `SUPER`
 - Hybrid game mode enum
-- Combat, combos, defense, special attack
-- Damage, invincibility, death, respawn
+- Combat, combos, defense, passive/active/ultimate attack foundations
+- Damage, invincibility, mana, death, respawn
 - Stomp logic per form
 - HUD interaction
+
+Current attack foundation in `scripts/player.gd`:
+
+- Normal attacks keep using the existing attack flow
+- Passive attacks now have a timer/config foundation
+- Active super attacks now support configurable slot arrays:
+  `name`, `cooldown`, `mana_cost`, `damage`, `area_path`
+- Ultimate attack now has its own cooldown/damage foundation and consumes all mana
+- Mana usage can be enabled/disabled independently from mana attacks in platform mode
+
+Current mode/form rules:
+
+- Forms can only be changed in `METROIDVANIA`
+- Locked forms still cannot be selected
+- Platform mode can optionally disable mana and/or mana-based attacks
+- Platform mode currently forces the player back to `NORMAL` form when enabled
 
 Important groups and combat nodes:
 
@@ -86,11 +102,11 @@ Observed responsibilities:
 - Chases player with configurable movement mode
 - Performs timed hitbox attack
 - Receives damage through hurtbox
-- Dies and frees itself from scene
+- Emits `boss_defeated` on death and frees itself from scene
 
 Important note:
 
-- `scripts/level_1.gd` expects a `boss_defeated` signal on the boss, but the current boss script reviewed does not define or emit that signal.
+- `scripts/level_1.gd` expects a `boss_defeated` signal on the boss. This has now been aligned in `scripts/boss.gd`.
 
 ### Common Enemy
 
