@@ -144,3 +144,9 @@
 - Kept the scene-side hitbox and placement adjustments in `Cenas/player.tscn`, `Cenas/boss.tscn`, `Cenas/slime.tscn`, and `Cenas/level1.tscn`
 - Restored `boss` and `slime` scene preview animations to `idle` so runtime startup state matches gameplay expectations
 - Corrected the slime scene so `attack` remains the non-looping attack animation and `death` remains its separate animation resource
+
+### Platform lives vs metroidvania health
+
+- Restored platform-mode life consumption so fatal hits now decrement `GameManager` lives before the death sequence
+- Kept metroidvania-mode fatal hits tied to the player's HP reaching zero
+- Platform mode now goes to continue only when the last life is consumed; otherwise it still reloads the current level after the hurt/death sequence

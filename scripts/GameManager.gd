@@ -78,6 +78,12 @@ func lose_life() -> void:
 		print("💀 Sem vidas! Indo para tela de Continue...")
 		goto_continue()
 
+
+func consume_life() -> int:
+	player_lives = max(player_lives - 1, 0)
+	print("💔 Vidas restantes: %d" % player_lives)
+	return player_lives
+
 func restore_full_lives() -> void:
 	player_lives = 3
 	print("💚 Vidas restauradas para: %d" % player_lives)

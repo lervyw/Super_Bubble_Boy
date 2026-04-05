@@ -131,6 +131,7 @@ var current_attack_area: Area2D
 var attack_window_serial: int = 0
 var fatal_hit_sequence_running: bool = false
 var hurt_sequence_running: bool = false
+var pending_game_over_after_death: bool = false
 
 var unlocked_forms = {
 	Form.NORMAL: true,
@@ -780,6 +781,9 @@ func _on_fatal_hit() -> void:
 	if fatal_hit_sequence_running or state == State.DEAD:
 		return
 
+	if mode == GameMode.PLATAFORMA and GameManager:
+		pending_game_over_after_death = GameManager.consume_life() <= 0
+
 	await play_fatal_hit_sequence()
 
 
@@ -1178,6 +1182,12 @@ func get_death_animation_name() -> StringName:
 
 
 func restart_level_from_beginning() -> void:
+	if pending_game_over_after_death:
+		pending_game_over_after_death = false
+		if GameManager:
+			GameManager.call_deferred("goto_continue")
+		return
+
 	var tree := get_tree()
 	if tree == null:
 		return
