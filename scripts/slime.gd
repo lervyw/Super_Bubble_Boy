@@ -44,6 +44,7 @@ var health: int = max_health
 @export var sprite_path: NodePath = NodePath("AnimatedSprite2D")
 @export var hitbox_path: NodePath = NodePath("AttackHitbox")
 @export var hurtbox_path: NodePath = NodePath("Hurtbox")
+@export var sprite_faces_left_by_default: bool = true
 @export var idle_animation: StringName = &"idle"
 @export var walk_animation: StringName = &"walk"
 @export var attack_animation: StringName = &"attack"
@@ -130,7 +131,7 @@ func move_towards_player(dist: float) -> void:
 		dir = 1
 
 	if sprite:
-		sprite.flip_h = dir < 0
+		sprite.flip_h = dir > 0 if sprite_faces_left_by_default else dir < 0
 
 	if dist <= stop_distance and attack_mode == AttackMode.HITBOX:
 		velocity.x = 0.0
