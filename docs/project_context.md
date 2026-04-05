@@ -168,6 +168,10 @@ Recent history before new work:
 - The player scene now uses clearer area names:
   `HurtboxArea`, `AttackHitbox`, `StompHitboxNormal`, `StompHitboxBubble`, `StompHitboxSuper`
 - Enemy hurtboxes now look for the player's real attack hitbox group (`player_attack`) for attack damage instead of treating every `killer` area the same way
+- Slime and boss now use a dedicated `AttackReceiver` area for button-based attack damage
+- Stomps are handled separately through the top `Hurtbox` area
+- Boss stomp no longer kills instantly; it applies damage and the boss only dies when health reaches zero
+- Slimes now have simple separation logic to reduce overlapping stacks
 
 ## Level 1 Test Setup
 

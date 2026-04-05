@@ -101,3 +101,13 @@
 - Moved the player attack hitbox upward so button attacks overlap slime and boss hurtboxes correctly
 - Updated `scripts/player.gd` default attack-area paths to the renamed `AttackHitbox`
 - Tightened `scripts/slime.gd` and `scripts/boss.gd` hurtbox filtering so attack damage comes from the player's actual attack hitbox instead of generic `killer` areas
+
+## 2026-04-05
+
+### Dedicated attack receiver and slime separation
+
+- Added a new `AttackReceiver` area to both `Cenas/slime.tscn` and `Cenas/boss.tscn`
+- Split enemy damage handling so button attacks hit `AttackReceiver` while stomps hit the existing top `Hurtbox`
+- Kept slime stomp as an instant kill because the slime is the small enemy
+- Changed boss stomp behavior so it deals damage instead of killing instantly; boss death now still depends on total health reaching zero
+- Added simple slime-to-slime separation in `scripts/slime.gd` so groups of slimes stop collapsing into a single overlapping stack

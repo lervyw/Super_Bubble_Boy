@@ -26,6 +26,9 @@ enum AttackMode { CONTACT, HITBOX }
 @export_group("AI")
 @export var aggro_range: float = 260.0
 @export var stop_distance: float = 40.0
+@export var avoid_other_slimes: bool = true
+@export_range(0.0, 128.0, 1.0) var separation_distance: float = 20.0
+@export_range(0.0, 200.0, 1.0) var separation_strength: float = 45.0
 
 @export_group("Attack")
 @export var attack_mode: AttackMode = AttackMode.HITBOX
@@ -43,6 +46,7 @@ var health: int = max_health
 @export_group("Nodes")
 @export var sprite_path: NodePath = NodePath("AnimatedSprite2D")
 @export var hitbox_path: NodePath = NodePath("AttackHitbox")
+@export var attack_receiver_path: NodePath = NodePath("AttackReceiver")
 @export var hurtbox_path: NodePath = NodePath("Hurtbox")
 @export var sprite_faces_left_by_default: bool = true
 @export var idle_animation: StringName = &"idle"
@@ -55,6 +59,7 @@ var health: int = max_health
 @onready var hitbox_shape: CollisionShape2D = (
 	hitbox.get_node_or_null("CollisionShape2D") if hitbox else null
 )
+@onready var attack_receiver: Area2D = get_node_or_null(attack_receiver_path)
 @onready var hurtbox: Area2D = get_node_or_null(hurtbox_path)
 
 var player: Node2D
@@ -76,6 +81,9 @@ func _ready() -> void:
 			hitbox.body_entered.connect(_on_hitbox_body_entered)
 		if not hitbox.area_entered.is_connected(_on_hitbox_area_entered):
 			hitbox.area_entered.connect(_on_hitbox_area_entered)
+
+	if attack_receiver and not attack_receiver.area_entered.is_connected(_on_attack_receiver_area_entered):
+		attack_receiver.area_entered.connect(_on_attack_receiver_area_entered)
 
 	if hurtbox and not hurtbox.area_entered.is_connected(_on_hurtbox_area_entered):
 		hurtbox.area_entered.connect(_on_hurtbox_area_entered)
@@ -120,6 +128,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	move_towards_player(dist)
+	apply_slime_separation()
 	move_and_slide()
 	process_contact_attack()
 	update_animation()
@@ -152,6 +161,27 @@ func move_towards_player(dist: float) -> void:
 			if fly_vertical_follow:
 				var dy := player.global_position.y - global_position.y
 				velocity.y = clamp(dy, -1.0, 1.0) * fly_y_speed
+
+
+func apply_slime_separation() -> void:
+	if not avoid_other_slimes:
+		return
+
+	var push := 0.0
+	for node in get_tree().get_nodes_in_group("slime"):
+		if node == self:
+			continue
+		if not (node is CharacterBody2D):
+			continue
+
+		var diff := global_position - node.global_position
+		var dist := abs(diff.x)
+		if dist <= 0.001 or dist > separation_distance:
+			continue
+
+		push += sign(diff.x) * ((separation_distance - dist) / separation_distance) * separation_strength
+
+	velocity.x += push
 
 
 func process_contact_attack() -> void:
@@ -268,6 +298,17 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 		apply_damage_to(p)
 
 
+func _on_attack_receiver_area_entered(area: Area2D) -> void:
+	if area == null or dying:
+		return
+
+	if area.is_in_group("player_attack") or (area.is_in_group("killer") and area.has_meta("attack_damage")):
+		var attack_damage := resolve_attack_damage(area)
+		if attack_damage > 0:
+			take_damage(attack_damage)
+			print("levou dano do player")
+
+
 func _on_hurtbox_area_entered(area: Area2D) -> void:
 	if area == null or dying:
 		return
@@ -281,13 +322,6 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 			if dy < -10.0 and player_velocity_y > 0.0:
 				die()
 				print("player pisou no inimigo")
-		return
-
-	if area.is_in_group("player_attack") or (area.is_in_group("killer") and area.has_meta("attack_damage")):
-		var attack_damage := resolve_attack_damage(area)
-		if attack_damage > 0:
-			take_damage(attack_damage)
-			print("levou dano do player")
 
 
 func resolve_attack_damage(area: Area2D) -> int:
