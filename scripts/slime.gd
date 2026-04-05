@@ -232,7 +232,7 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 # ==========================
 func _on_hurtbox_area_entered(area: Area2D) -> void:
 	if area.is_in_group("killer"):
-		take_damage(2)
+		take_damage(resolve_attack_damage(area))
 		print("levou dano do player")
 	# Se o player pisar em cima (ex.: colisão vertical negativa)
 	var p := area.get_parent()
@@ -249,3 +249,11 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 
 			die()  # remove o inimigo da cena
 			print("player pisou no inimigo")
+
+
+func resolve_attack_damage(area: Area2D) -> int:
+	if area == null:
+		return 2
+	if area.has_meta("attack_damage"):
+		return int(area.get_meta("attack_damage"))
+	return 2
