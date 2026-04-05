@@ -111,3 +111,10 @@
 - Kept slime stomp as an instant kill because the slime is the small enemy
 - Changed boss stomp behavior so it deals damage instead of killing instantly; boss death now still depends on total health reaching zero
 - Added simple slime-to-slime separation in `scripts/slime.gd` so groups of slimes stop collapsing into a single overlapping stack
+
+## 2026-04-05
+
+### Level 1 scene sync
+
+- Updated `Cenas/level1.tscn` so the current level scene explicitly uses the latest boss/slime animation-name overrides
+- Kept the scene's current manual placements while syncing the enemy test configuration in place

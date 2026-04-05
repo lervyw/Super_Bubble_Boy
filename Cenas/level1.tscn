@@ -835,9 +835,8 @@ position = Vector2(812, 1133.0001)
 level = NodePath("..")
 player = NodePath("../player")
 
-[node name="player" parent="." node_paths=PackedStringArray("hud") groups=["player"] instance=ExtResource("2_csolo")]
+[node name="player" parent="." groups=["player"] instance=ExtResource("2_csolo")]
 position = Vector2(211, 139)
-hud = NodePath("HUD")
 respawn_position = Vector2(182, 214)
 
 [node name="Sprite2D" parent="player" index="0" node_paths=PackedStringArray("nivel")]
@@ -860,7 +859,7 @@ player = NodePath("../player")
 stats = NodePath("../player/Stats")
 
 [node name="boss" parent="." instance=ExtResource("12_1m8e4")]
-position = Vector2(478, 102)
+position = Vector2(-1043, 98)
 scale = Vector2(1.2456018, 1.2456018)
 move_mode = 1
 stop_distance = 100.0
@@ -888,48 +887,81 @@ attack_animation = &"attack"
 position = Vector2(974, 197)
 stop_distance = 100.0
 attack_mode = 1
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime2" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(1050, 183)
-stop_distance = 100.0
 move_mode = 2
+stop_distance = 100.0
 attack_mode = 1
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime5" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(136, 464)
 stop_distance = 100.0
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime6" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(621, 459)
 stop_distance = 100.0
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime7" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(697, 445)
 stop_distance = 100.0
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime8" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(1814, 127)
 stop_distance = 100.0
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime9" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(2299, 122)
 stop_distance = 100.0
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime10" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(2375, 108)
 stop_distance = 100.0
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime11" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(414, 604)
 stop_distance = 100.0
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime12" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(899, 599)
 stop_distance = 100.0
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="slime13" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(975, 585)
 stop_distance = 100.0
+idle_animation = &"idle"
+walk_animation = &"walk"
+attack_animation = &"attack"
 
 [node name="Timer" parent="." instance=ExtResource("13_tb1qe")]
 
