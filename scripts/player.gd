@@ -10,7 +10,7 @@ extends CharacterBody2D
 # =========================================================
 
 enum State {
-	IDLE, WALK, JUMP, ATTACK, CROUCH, DASH, TRANSFORM, DEAD, SWIM, SPECIAL_ATTACK, DEFEND
+	IDLE, WALK, JUMP, ATTACK, CROUCH, DASH, TRANSFORM, DEAD, SWIM, SPECIAL_ATTACK, DEFEND, HURT
 }
 
 enum Form { NORMAL, BUBBLE, SUPER }
@@ -45,6 +45,7 @@ var hud_menu_axis_locked := false
 
 @export_group("Death Settings")
 @export_range(0.0, 5.0) var death_delay: float = 1.0
+@export var hurt_animation_name: StringName = &"hurt"
 
 @export_group("Dash Settings")
 @export var dash_stops_fall: bool = false
@@ -128,6 +129,8 @@ var current_attack_id: StringName = &""
 var current_attack_damage: int = 0
 var current_attack_area: Area2D
 var attack_window_serial: int = 0
+var fatal_hit_sequence_running: bool = false
+var hurt_sequence_running: bool = false
 
 var unlocked_forms = {
 	Form.NORMAL: true,
@@ -167,6 +170,9 @@ func _ready() -> void:
 
 
 func _input(event):
+	if state in [State.DEAD, State.HURT]:
+		return
+
 	if event.is_action_pressed("hud_menu"):
 		open_hud_menu()
 		return
@@ -189,6 +195,9 @@ func _input(event):
 
 
 func _process(_delta: float) -> void:
+	if state == State.HURT:
+		return
+
 	if hud_menu_open:
 		process_hud_menu_selection()
 		return
@@ -299,7 +308,7 @@ func process_passive_attack(delta: float) -> void:
 
 
 func handle_input() -> void:
-	if hud_menu_open:
+	if hud_menu_open or state == State.HURT or state == State.DEAD:
 		return
 
 	if Input.is_action_just_pressed("jump"):
@@ -315,7 +324,7 @@ func handle_input() -> void:
 
 
 func start_special_attack() -> void:
-	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
 	if not can_use_mana_attacks():
 		return
@@ -340,7 +349,7 @@ func start_special_attack() -> void:
 
 
 func start_ultimate_attack() -> void:
-	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
 	if not ultimate_attack_enabled:
 		return
@@ -364,7 +373,7 @@ func start_ultimate_attack() -> void:
 
 
 func start_defense() -> void:
-	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
 
 	defending = true
@@ -380,7 +389,7 @@ func stop_defense() -> void:
 
 
 func check_attack_combos() -> void:
-	if hud_menu_open or combo_lock or state == State.DEAD:
+	if hud_menu_open or combo_lock or state in [State.DEAD, State.HURT]:
 		return
 
 	if Input.is_action_pressed("attack") and Input.is_action_pressed("attack_special"):
@@ -541,7 +550,7 @@ func toggle_transform(target: Form) -> void:
 
 
 func start_transform(new_form: Form) -> void:
-	if state == State.DEAD:
+	if state in [State.DEAD, State.HURT]:
 		return
 	if mode != GameMode.METROIDVANIA:
 		return
@@ -588,6 +597,7 @@ func handle_state(_delta: float) -> void:
 		State.TRANSFORM: transform_state()
 		State.DEAD: dead_state()
 		State.SWIM: swim_state()
+		State.HURT: hurt_state()
 
 
 func idle_state() -> void:
@@ -665,7 +675,11 @@ func transform_state() -> void:
 
 
 func dead_state() -> void:
-	die()
+	velocity = Vector2.ZERO
+
+
+func hurt_state() -> void:
+	velocity = Vector2.ZERO
 
 
 func swim_state() -> void:
@@ -712,7 +726,7 @@ func change_state(new_state: State) -> void:
 
 
 func start_normal_attack() -> void:
-	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM]:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
 
 	defending = false
@@ -722,24 +736,28 @@ func start_normal_attack() -> void:
 
 
 func take_damage(amount: int = 1) -> void:
-	if is_invincible or state == State.DEAD:
+	if is_invincible or state in [State.DEAD, State.HURT]:
 		return
 	if defending and state == State.DEFEND:
 		return
 
+	var is_fatal_hit := mode == GameMode.PLATAFORMA
+
 	if mode == GameMode.PLATAFORMA:
+		pass
+	elif stats and stats.has_method("take_damage"):
+		stats.take_damage(amount)
+		if stats.current_health <= 0:
+			is_fatal_hit = true
+	else:
+		is_fatal_hit = true
+
+	if is_fatal_hit:
 		_on_fatal_hit()
 		return
 
-	if stats and stats.has_method("take_damage"):
-		stats.take_damage(amount)
-		if stats.current_health <= 0:
-			_on_fatal_hit()
-	else:
-		_on_fatal_hit()
-
-	if state != State.DEAD:
-		start_invincibility()
+	start_invincibility()
+	play_hurt_reaction()
 
 
 func start_invincibility() -> void:
@@ -759,15 +777,10 @@ func start_invincibility() -> void:
 
 
 func _on_fatal_hit() -> void:
-	if mode == GameMode.METROIDVANIA:
-		die()
+	if fatal_hit_sequence_running or state == State.DEAD:
 		return
 
-	GameManager.lose_life()
-	if GameManager.get_lives() <= 0:
-		die()
-	else:
-		await respawn_player()
+	await play_fatal_hit_sequence()
 
 
 func respawn_player() -> void:
@@ -793,7 +806,7 @@ func respawn_player() -> void:
 
 
 func open_hud_menu() -> void:
-	if state in [State.DEAD, State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.TRANSFORM]:
+	if state in [State.DEAD, State.HURT, State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.TRANSFORM]:
 		return
 
 	hud_menu_open = true
@@ -898,7 +911,7 @@ func _on_attack_finished() -> void:
 	deactivate_attack_area()
 	defending = false
 
-	if state != State.DEAD:
+	if state not in [State.DEAD, State.HURT]:
 		change_state(State.IDLE)
 
 
@@ -1073,33 +1086,106 @@ func update_audio_by_form() -> void:
 
 
 func die() -> void:
-	state = State.DEAD
-	if animation_player:
-		animation_player.play("Dead")
+	if fatal_hit_sequence_running or state == State.DEAD:
+		return
+	await play_death_sequence()
 
+
+func play_hurt_reaction() -> void:
+	if hurt_sequence_running or fatal_hit_sequence_running or state == State.DEAD:
+		return
+
+	hurt_sequence_running = true
+	defending = false
+	deactivate_attack_area()
 	velocity = Vector2.ZERO
+	change_state(State.HURT)
+	await wait_for_current_sprite_animation(hurt_animation_name)
+
+	if is_inside_tree() and state == State.HURT:
+		change_state(State.IDLE)
+
+	hurt_sequence_running = false
+
+
+func play_fatal_hit_sequence() -> void:
+	fatal_hit_sequence_running = true
+	hurt_sequence_running = false
+	is_invincible = true
+	defending = false
+	deactivate_attack_area()
+	velocity = Vector2.ZERO
+	change_state(State.HURT)
+	await wait_for_current_sprite_animation(hurt_animation_name)
+
+	if not is_inside_tree():
+		return
+
+	await play_death_sequence()
+
+
+func play_death_sequence() -> void:
+	if not is_inside_tree():
+		return
+
+	change_state(State.DEAD)
+	velocity = Vector2.ZERO
+	deactivate_attack_area()
 
 	if audio_normal:
 		audio_normal.stop()
 	if audio_super:
 		audio_super.stop()
 
-	var tree := get_tree()
-	if tree == null:
-		GameManager.call_deferred("goto_continue")
-		return
-
-	var timer := tree.create_timer(death_delay)
-	if timer == null:
-		GameManager.call_deferred("goto_continue")
-		return
-
-	await timer.timeout
+	await wait_for_current_sprite_animation(get_death_animation_name(), death_delay)
 
 	if not is_inside_tree():
 		return
 
-	GameManager.goto_continue()
+	restart_level_from_beginning()
+
+
+func wait_for_current_sprite_animation(anim_name: StringName, minimum_duration: float = 0.0) -> void:
+	var wait_duration := maxf(get_sprite_animation_duration(anim_name), minimum_duration)
+	if wait_duration <= 0.0:
+		return
+	await get_tree().create_timer(wait_duration).timeout
+
+
+func get_sprite_animation_duration(anim_name: StringName) -> float:
+	if not has_node("Sprite2D"):
+		return 0.0
+
+	var sprite := $Sprite2D as AnimatedSprite2D
+	if sprite == null or sprite.sprite_frames == null:
+		return 0.0
+	if not sprite.sprite_frames.has_animation(anim_name):
+		return 0.0
+
+	var frame_count: int = sprite.sprite_frames.get_frame_count(anim_name)
+	var speed: float = maxf(sprite.sprite_frames.get_animation_speed(anim_name), 1.0)
+	return maxf(float(frame_count) / speed, 0.0)
+
+
+func get_death_animation_name() -> StringName:
+	match form:
+		Form.BUBBLE:
+			return &"death_bubble"
+		Form.SUPER:
+			return &"death_super"
+		_:
+			return &"death"
+
+
+func restart_level_from_beginning() -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	if tree.current_scene:
+		tree.call_deferred("reload_current_scene")
+		return
+	if GameManager:
+		GameManager.call_deferred("restart_current_level")
 
 
 func connect_stomper_signals(stomper: Area2D) -> void:

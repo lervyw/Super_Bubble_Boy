@@ -127,3 +127,14 @@
 - Removed the sprite-controller logic that was reactivating player attack areas every frame during attack animations
 - Removed simple body-touch damage from slime/boss contact on the player side; damage should now come from explicit enemy attack logic
 - Updated `Cenas/level1.tscn` so the slime test setup no longer uses contact-attack mode by default
+
+### Enemy attack hitbox facing
+
+- Updated `scripts/boss.gd` and `scripts/slime.gd` so hitbox-based attacks mirror their `AttackHitbox` collision toward the player's horizontal position
+- Preserved the boss's existing scene offset as the base attack reach and derived a forward offset for slimes when their hitbox was centered in the scene
+
+### Enemy wind-up and player death restart flow
+
+- Updated `scripts/boss.gd` and `scripts/slime.gd` so hitbox attacks now wait through the attack animation wind-up and only enable the hitbox at the end of the animation
+- Added a dedicated `HURT` state in `scripts/player.gd` and `scripts/textura_2.gd` so the player now shows the hurt animation before the death animation
+- Changed fatal player hits to restart the current level from the beginning instead of sending the player to continue/checkpoint flow

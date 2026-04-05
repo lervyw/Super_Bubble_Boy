@@ -174,6 +174,8 @@ Recent history before new work:
 - Slimes now have simple separation logic to reduce overlapping stacks
 - Player attack windows are now controlled only by `scripts/player.gd`; `scripts/textura_2.gd` no longer re-enables attack areas every animation frame
 - Player no longer takes damage just by touching slime/boss bodies; damage should now come from explicit enemy attack behavior
+- Boss and slime hitbox attacks now play their wind-up animation first and only open the damaging hitbox at the end of the animation
+- Fatal enemy hits now put the player through `hurt` then the form-specific `death` animation and then reload the current level from the beginning
 
 ## Level 1 Test Setup
 
