@@ -58,6 +58,7 @@ var hud_menu_axis_locked := false
 @export_group("Stomp Settings")
 @export var stomp_requires_falling: bool = true
 @export var stomp_kills_enemy: bool = true
+@export var boss_stomp_damage: int = 1
 @export_range(0.0, 2000.0) var stomp_bounce_force_normal: float = 260.0
 @export_range(0.0, 2000.0) var stomp_bounce_force_bubble: float = 180.0
 @export_range(0.0, 2000.0) var stomp_bounce_force_super: float = 320.0
@@ -1273,6 +1274,11 @@ func try_stomp(target: Node) -> void:
 
 	if stomp_target.has_method("on_stomped"):
 		stomp_target.on_stomped(self)
+		return
+
+	if stomp_target.is_in_group("boss"):
+		if stomp_target.has_method("take_damage"):
+			stomp_target.take_damage(max(boss_stomp_damage, 1))
 		return
 
 	if stomp_kills_enemy:

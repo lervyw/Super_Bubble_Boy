@@ -150,3 +150,8 @@
 - Restored platform-mode life consumption so fatal hits now decrement `GameManager` lives before the death sequence
 - Kept metroidvania-mode fatal hits tied to the player's HP reaching zero
 - Platform mode now goes to continue only when the last life is consumed; otherwise it still reloads the current level after the hurt/death sequence
+
+### Boss stomp damage rule
+
+- Updated `scripts/player.gd` so stomping a boss no longer routes through the generic instant-kill stomp branch
+- Boss stomps now apply a small configurable damage amount instead, while normal stompable enemies can still die from stomps
