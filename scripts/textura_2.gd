@@ -208,9 +208,6 @@ func handle_dash_animation() -> void:
 
 func handle_attack_animation() -> void:
 	activate_hitbox_for_state("attack")
-	deactivate_all_attack_areas()
-	deactivate_all_special_attack_areas()
-	activate_attack_area_for_current_form()
 
 	var anim_name: StringName = &"attack"
 
@@ -224,27 +221,19 @@ func handle_attack_animation() -> void:
 
 func handle_special_attack_animation() -> void:
 	activate_hitbox_for_state("attack")
-	deactivate_all_attack_areas()
-	deactivate_all_special_attack_areas()
 
 	var anim_name: StringName = &""
-	var special_area: Area2D = null
 
 	match player.form:
 		player.Form.NORMAL:
 			anim_name = special_attack_anim_normal
-			special_area = special_attack_area_normal
 
 		player.Form.BUBBLE:
 			# Bubble agora usa o especial do SUPER
 			anim_name = special_attack_anim_super
-			special_area = special_attack_area_super
 
 		player.Form.SUPER:
 			anim_name = special_attack_anim_super
-			special_area = special_attack_area_super
-
-	activate_attack_area(special_area)
 
 	if anim_name != &"" and sprite_frames.has_animation(anim_name):
 		play_if_different(anim_name)
@@ -258,9 +247,6 @@ func handle_special_attack_animation() -> void:
 				play_if_different(&"attack_super")
 func handle_defend_animation() -> void:
 	activate_hitbox_for_state("defend")
-	deactivate_all_attack_areas()
-	deactivate_all_special_attack_areas()
-	activate_attack_area_for_current_form()
 
 	var anim_name: StringName = &"parry_super"
 

@@ -878,7 +878,7 @@ attack_animation = &"attack"
 [node name="slime4" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(489, 202)
 stop_distance = 100.0
-attack_mode = 0
+attack_mode = 1
 idle_animation = &"idle"
 walk_animation = &"walk"
 attack_animation = &"attack"
