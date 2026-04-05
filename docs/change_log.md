@@ -48,3 +48,11 @@
 
 - A local Godot binary was not available in the workspace shell, so I could not run a headless engine parse/test pass
 - Verification was limited to static inspection and diff review
+
+## 2026-04-05
+
+### Player manual
+
+- Added `docs/how_to_play.md` with a simple manual in plain language
+- Documented the currently confirmed keyboard controls from `project.godot`
+- Documented that the ultimate attack currently has no usable command because the input action is not bound and the player script keeps direct ultimate input disabled by default
