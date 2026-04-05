@@ -198,11 +198,13 @@ func die() -> void:
 	dying = true
 
 	if $CollisionShape2D:
-		$CollisionShape2D.disabled = true
+		$CollisionShape2D.set_deferred("disabled", true)
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 	if hurtbox and hurtbox.get_node("CollisionShape2D"):
-		hurtbox.get_node("CollisionShape2D").disabled = true
+		hurtbox.get_node("CollisionShape2D").set_deferred("disabled", true)
+	if attack_receiver and attack_receiver.get_node("CollisionShape2D"):
+		attack_receiver.get_node("CollisionShape2D").set_deferred("disabled", true)
 
 	if sprite:
 		sprite.stop()
