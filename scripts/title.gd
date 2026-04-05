@@ -49,6 +49,7 @@ extends Control
 
 @onready var btn_ataque_especial = $ControlsMenu/ScrollContainer/VBoxContainer/Controle7
 @onready var btn_defesa = $ControlsMenu/ScrollContainer/VBoxContainer/Controle8
+@onready var btn_ultimate = $ControlsMenu/ScrollContainer/VBoxContainer/Controle13
 
 @onready var btn_combo1 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle9
 @onready var btn_combo2 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle10
@@ -83,9 +84,9 @@ func _ready():
 	botoes_menu.visible = false
 
 	# --- Conecta botões do menu principal ---
-	btn_iniciar.pressed.connect(_on_iniciar)        # inicia o jogo/cutscene
-	btn_config.pressed.connect(_open_config_menu)   # abre config
-	btn_sair.pressed.connect(_on_sair)              # fecha o jogo
+	_connect_pressed_once(btn_iniciar, _on_iniciar)        # inicia o jogo/cutscene
+	_connect_pressed_once(btn_config, _open_config_menu)   # abre config
+	_connect_pressed_once(btn_sair, _on_sair)              # fecha o jogo
 
 	# --- Conecta sliders/botões da config ---
 	# Ao mexer no slider, atualiza o volume via ConfigManager
@@ -93,30 +94,44 @@ func _ready():
 	slider_sfx.value_changed.connect(func(val): ConfigManager.set_volume("sfx", val))
 
 	# Abre menu de controles / volta pro menu principal
-	btn_cfg_botoes.pressed.connect(_open_botoes_menu)
-	btn_voltar_config.pressed.connect(_back_to_menu)
+	_connect_pressed_once(btn_cfg_botoes, _open_botoes_menu)
+	_connect_pressed_once(btn_voltar_config, _back_to_menu)
 
 	# --- Conecta botões do menu de controles (cada um chama rebind de uma ação) ---
-	btn_pulo.pressed.connect(func(): _start_rebind("jump"))
-	btn_bolha.pressed.connect(func(): _start_rebind("forma1"))
-	btn_super.pressed.connect(func(): _start_rebind("forma2"))
-	btn_normal_form.pressed.connect(func(): _start_rebind("normal"))
-	btn_menu.pressed.connect(func(): _start_rebind("hud_menu"))
-	btn_ataque.pressed.connect(func(): _start_rebind("attack"))
-	
-	btn_ataque_especial.pressed.connect(func(): _start_rebind("attack_special"))
-	btn_defesa.pressed.connect(func(): _start_rebind("defend"))
-
-	btn_combo1.pressed.connect(func(): _start_rebind("combo_1"))
-	btn_combo2.pressed.connect(func(): _start_rebind("combo_2"))
-	btn_combo3.pressed.connect(func(): _start_rebind("combo_3"))
-	btn_combo4.pressed.connect(func(): _start_rebind("combo_4"))
+	_connect_rebind_button_once(btn_pulo, "jump")
+	_connect_rebind_button_once(btn_bolha, "forma1")
+	_connect_rebind_button_once(btn_super, "forma2")
+	_connect_rebind_button_once(btn_normal_form, "normal")
+	_connect_rebind_button_once(btn_menu, "hud_menu")
+	_connect_rebind_button_once(btn_ataque, "attack")
+	_connect_rebind_button_once(btn_ataque_especial, "attack_special")
+	_connect_rebind_button_once(btn_defesa, "defend")
+	_connect_rebind_button_once(btn_ultimate, "ultimate_attack")
+	_connect_rebind_button_once(btn_combo1, "combo_1")
+	_connect_rebind_button_once(btn_combo2, "combo_2")
+	_connect_rebind_button_once(btn_combo3, "combo_3")
+	_connect_rebind_button_once(btn_combo4, "combo_4")
 
 	# Volta do menu de controles para o menu de config
-	btn_voltar_botoes.pressed.connect(_back_to_config_menu)
+	_connect_pressed_once(btn_voltar_botoes, _back_to_config_menu)
 
 	# Atualiza o texto dos botões com o input atual (ex: "Pulo: Space")
 	_update_control_labels()
+
+
+func _connect_pressed_once(button: BaseButton, callable: Callable) -> void:
+	if button == null:
+		return
+	if not button.pressed.is_connected(callable):
+		button.pressed.connect(callable)
+
+
+func _connect_rebind_button_once(button: BaseButton, action_name: String) -> void:
+	if button == null:
+		return
+	var action_callable := func(): _start_rebind(action_name)
+	if not button.pressed.is_connected(action_callable):
+		button.pressed.connect(action_callable)
 
 
 # ================================
@@ -213,6 +228,7 @@ func _update_control_labels():
 	btn_ataque.text = "Ataque: " + _get_current_input_name("attack")
 	btn_ataque_especial.text = "Ataque Especial: " + _get_current_input_name("attack_special")
 	btn_defesa.text = "Defesa: " + _get_current_input_name("defend")
+	btn_ultimate.text = "Ultimate: " + _get_current_input_name("ultimate_attack")
 
 	btn_combo1.text = "Combo 1: " + _get_current_input_name("combo_1")
 	btn_combo2.text = "Combo 2: " + _get_current_input_name("combo_2")

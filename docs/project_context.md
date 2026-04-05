@@ -147,4 +147,11 @@ Recent history before new work:
 ## Player-Facing Docs
 
 - `docs/how_to_play.md` now exists as the simple player manual
-- Current ultimate status: the code foundation exists, but there is no active input binding yet
+- Current ultimate status: `ultimate_attack` is now present in `project.godot` and can be rebound from `Title.tscn`
+
+## Title / Config Menu
+
+- `res://Cenas/Title.tscn` is the first screen shown by the game
+- `res://scripts/title.gd` controls the main menu, config menu, and input rebinding menu
+- The controls menu now includes a dedicated `Ultimate` rebind button for `ultimate_attack`
+- Title button signal wiring was aligned with the current script method names to avoid broken presses at runtime

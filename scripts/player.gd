@@ -91,7 +91,7 @@ var hud_menu_axis_locked := false
 @export_range(0.1, 30.0, 0.1) var ultimate_attack_cooldown: float = 8.0
 @export var ultimate_attack_damage: int = 10
 @export var ultimate_attack_area_path: NodePath = NodePath("AttackArea")
-@export var allow_ultimate_input: bool = false
+@export var allow_ultimate_input: bool = true
 
 @export_group("Respawn")
 @export var respawn_position: Vector2 = Vector2(288, 207)

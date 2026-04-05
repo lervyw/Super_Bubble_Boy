@@ -56,3 +56,13 @@
 - Added `docs/how_to_play.md` with a simple manual in plain language
 - Documented the currently confirmed keyboard controls from `project.godot`
 - Documented that the ultimate attack currently has no usable command because the input action is not bound and the player script keeps direct ultimate input disabled by default
+
+## 2026-04-05
+
+### Ultimate input mapping in title menu
+
+- Added an `Ultimate` button to the controls menu in `Cenas/Title.tscn`
+- Updated `scripts/title.gd` so `ultimate_attack` can be rebound and its current key is shown in the menu
+- Enabled direct ultimate input by default in `scripts/player.gd`, so the new `ultimate_attack` binding is actually used in gameplay
+- Fixed `Title.tscn` button signal targets so they match the methods that currently exist in `scripts/title.gd`
+- Preserved the existing save/load behavior by continuing to route rebinds through `ConfigManager.rebind_action()`

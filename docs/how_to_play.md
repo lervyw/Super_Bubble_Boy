@@ -172,6 +172,7 @@ These are the controls I could confirm from `project.godot`.
 ### Combat
 
 - Normal attack: `C`
+- Ultimate attack: `T`
 
 ### Form Change
 
@@ -194,17 +195,12 @@ This is used by the quick form selection logic.
 
 Short answer:
 
-- there is no command yet
+- right now the default command is `T`
 
-Why:
+Also:
 
-- the player script has the ultimate attack code
-- but `allow_ultimate_input` is off by default
-- and `project.godot` does not have an `ultimate_attack` input action yet
-
-So if you try to use it now:
-
-- nothing will happen
+- you can change this in the Title screen controls menu
+- the button name there is `Ultimate`
 
 ## What To Remember In Potato Mode
 
@@ -215,4 +211,4 @@ So if you try to use it now:
 - Normal attack = basic hit
 - Super attack = spends some mana
 - Ultimate attack = spends all mana
-- Ultimate button does not exist yet
+- Ultimate currently uses `T` by default
