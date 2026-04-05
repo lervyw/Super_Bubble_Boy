@@ -3,18 +3,6 @@
 [ext_resource type="Script" uid="uid://ckovbwcre5vgq" path="res://scripts/slime.gd" id="1_4p1wq"]
 [ext_resource type="Texture2D" uid="uid://defe4ik31ltgk" path="res://sprites/characters/slime.png" id="2_2w4kv"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_r0vom"]
-atlas = ExtResource("2_2w4kv")
-region = Rect2(96, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_7ftlq"]
-atlas = ExtResource("2_2w4kv")
-region = Rect2(64, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_8djdq"]
-atlas = ExtResource("2_2w4kv")
-region = Rect2(32, 0, 32, 32)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_dl308"]
 atlas = ExtResource("2_2w4kv")
 region = Rect2(128, 0, 32, 32)
@@ -27,8 +15,34 @@ region = Rect2(160, 0, 32, 32)
 atlas = ExtResource("2_2w4kv")
 region = Rect2(0, 0, 32, 32)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_8djdq"]
+atlas = ExtResource("2_2w4kv")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ftlq"]
+atlas = ExtResource("2_2w4kv")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r0vom"]
+atlas = ExtResource("2_2w4kv")
+region = Rect2(96, 0, 32, 32)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_7ftlq"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dl308")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t887w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r3ryw")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 7.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_8djdq")
@@ -45,20 +59,6 @@ animations = [{
 "loop": true,
 "name": &"death",
 "speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_dl308")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_t887w")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_r3ryw")
-}],
-"loop": false,
-"name": &"attack",
-"speed": 7.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -112,7 +112,7 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_m7g7x"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2w4kv"]
-size = Vector2(38, 17)
+size = Vector2(12, 17)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack_receiver"]
 size = Vector2(26, 18)
