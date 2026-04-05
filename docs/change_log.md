@@ -92,3 +92,12 @@
 - Changed `Cenas/boss.tscn` attack animation to non-looping so the full attack can complete cleanly
 - Cleaned broken slime instance overrides from `Cenas/level1.tscn` that were pointing hitbox/hurtbox paths at a different slime node
 - Added explicit level1 test overrides so the scene now contains examples of hitbox slime, contact slime, and flying slime behavior
+
+## 2026-04-05
+
+### Player attack hitbox clarity and enemy damage fix
+
+- Renamed the player collision areas in `Cenas/player.tscn` so the real attack and stomp areas are easier to distinguish
+- Moved the player attack hitbox upward so button attacks overlap slime and boss hurtboxes correctly
+- Updated `scripts/player.gd` default attack-area paths to the renamed `AttackHitbox`
+- Tightened `scripts/slime.gd` and `scripts/boss.gd` hurtbox filtering so attack damage comes from the player's actual attack hitbox instead of generic `killer` areas

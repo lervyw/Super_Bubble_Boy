@@ -165,6 +165,9 @@ Recent history before new work:
 - Boss animation flow is now script-driven using the available `idle`, `walk`, and `attack` animations
 - `default` is treated as placeholder data for boss/slime sprite sheets and is no longer the intended runtime animation for their gameplay states
 - Attack hitboxes now turn off before the end of the animation, but the enemy remains in the attack state until the full attack animation duration has completed
+- The player scene now uses clearer area names:
+  `HurtboxArea`, `AttackHitbox`, `StompHitboxNormal`, `StompHitboxBubble`, `StompHitboxSuper`
+- Enemy hurtboxes now look for the player's real attack hitbox group (`player_attack`) for attack damage instead of treating every `killer` area the same way
 
 ## Level 1 Test Setup
 

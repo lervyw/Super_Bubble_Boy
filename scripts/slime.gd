@@ -283,7 +283,7 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 				print("player pisou no inimigo")
 		return
 
-	if area.is_in_group("killer"):
+	if area.is_in_group("player_attack") or (area.is_in_group("killer") and area.has_meta("attack_damage")):
 		var attack_damage := resolve_attack_damage(area)
 		if attack_damage > 0:
 			take_damage(attack_damage)
