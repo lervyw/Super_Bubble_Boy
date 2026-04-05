@@ -184,7 +184,7 @@ func take_damage(amount: int) -> void:
 	attacking = false
 
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 
 	if health <= 0:
 		die()
