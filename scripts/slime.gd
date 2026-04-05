@@ -68,13 +68,16 @@ var jump_t: float = 0.0
 var attacking: bool = false
 var stunned: bool = false
 var dying: bool = false
+var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
 	player = get_tree().get_first_node_in_group(player_group) as Node2D
 
 	if hitbox_shape:
+		attack_hitbox_base_position = hitbox_shape.position
 		hitbox_shape.disabled = true
+		update_attack_hitbox_facing(get_facing_direction_to_player())
 
 	if hitbox:
 		if not hitbox.body_entered.is_connected(_on_hitbox_body_entered):
@@ -135,12 +138,11 @@ func _physics_process(delta: float) -> void:
 
 
 func move_towards_player(dist: float) -> void:
-	var dir: int = int(sign(player.global_position.x - global_position.x))
-	if dir == 0:
-		dir = 1
+	var dir := get_facing_direction_to_player()
 
 	if sprite:
 		sprite.flip_h = dir > 0 if sprite_faces_left_by_default else dir < 0
+	update_attack_hitbox_facing(dir)
 
 	if dist <= stop_distance and attack_mode == AttackMode.HITBOX:
 		velocity.x = 0.0
@@ -218,6 +220,8 @@ func start_attack() -> void:
 	attacking = true
 	cooldown_t = attack_cooldown
 	play_attack_animation()
+	update_attack_hitbox_facing(get_facing_direction_to_player())
+	await wait_for_attack_hitbox_start()
 
 	if hitbox_shape:
 		hitbox_shape.disabled = false
@@ -335,6 +339,32 @@ func resolve_attack_damage(area: Area2D) -> int:
 	return 0
 
 
+func get_facing_direction_to_player() -> int:
+	if not is_instance_valid(player):
+		return 1
+
+	var dir: int = int(sign(player.global_position.x - global_position.x))
+	if dir == 0:
+		return 1
+	return dir
+
+
+func update_attack_hitbox_facing(dir: int) -> void:
+	if hitbox_shape == null:
+		return
+
+	var hitbox_offset_x := absf(attack_hitbox_base_position.x)
+	if is_zero_approx(hitbox_offset_x):
+		var rectangle_shape := hitbox_shape.shape as RectangleShape2D
+		if rectangle_shape:
+			hitbox_offset_x = rectangle_shape.size.x * 0.5
+
+	if is_zero_approx(hitbox_offset_x):
+		return
+
+	hitbox_shape.position = Vector2(hitbox_offset_x * dir, attack_hitbox_base_position.y)
+
+
 func update_animation() -> void:
 	if sprite == null:
 		return
@@ -368,16 +398,33 @@ func wait_for_attack_animation() -> void:
 	await wait_for_animation(attack_animation)
 
 
+func wait_for_attack_hitbox_start() -> void:
+	var attack_anim_duration := get_animation_duration(attack_animation)
+	var hitbox_delay := maxf(attack_anim_duration - hitbox_active_time, 0.0)
+	if hitbox_delay <= 0.0:
+		return
+	await get_tree().create_timer(hitbox_delay).timeout
+
+
 func wait_for_animation(anim_name: StringName) -> void:
 	if not has_animation(anim_name):
 		return
 	if sprite.animation != anim_name:
 		play_animation(anim_name)
 
+	var anim_duration := get_animation_duration(anim_name)
+	if anim_duration <= 0.0:
+		return
+	await get_tree().create_timer(anim_duration).timeout
+
+
+func get_animation_duration(anim_name: StringName) -> float:
+	if not has_animation(anim_name):
+		return 0.0
+
 	var frame_count: int = sprite.sprite_frames.get_frame_count(anim_name)
 	var speed: float = maxf(sprite.sprite_frames.get_animation_speed(anim_name), 1.0)
-	var anim_duration: float = maxf(float(frame_count) / speed, hitbox_active_time)
-	await get_tree().create_timer(anim_duration).timeout
+	return maxf(float(frame_count) / speed, 0.0)
 
 
 func has_animation(anim_name: StringName) -> bool:

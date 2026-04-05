@@ -135,6 +135,10 @@ func update_animation(direction: Vector2) -> void:
 			handle_death_animation()
 			return
 
+		player.State.HURT:
+			handle_hurt_animation()
+			return
+
 	if player.state == player.State.SWIM:
 		handle_swim_animation(direction)
 		return
@@ -363,6 +367,18 @@ func handle_death_animation() -> void:
 			play_if_different(&"death_bubble")
 		player.Form.SUPER:
 			play_if_different(&"death_super")
+
+
+func handle_hurt_animation() -> void:
+	activate_hitbox_for_state("dead")
+	deactivate_all_attack_areas()
+	deactivate_all_special_attack_areas()
+
+	if sprite_frames.has_animation(&"hurt"):
+		play_if_different(&"hurt")
+		return
+
+	handle_death_animation()
 # ================================
 #       HITBOXES / ATTACK AREAS
 # ================================
