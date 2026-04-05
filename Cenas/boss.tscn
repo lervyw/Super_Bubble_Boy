@@ -3,6 +3,10 @@
 [ext_resource type="Script" uid="uid://dal4xk7p4hxxg" path="res://scripts/boss.gd" id="1_faq14"]
 [ext_resource type="Texture2D" uid="uid://cbcodkdnhefhk" path="res://sprites/characters/Rei_slime.png" id="2_1xof2"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_xu6nh"]
+atlas = ExtResource("2_1xof2")
+region = Rect2(200, 0, 200, 100)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_v2qpp"]
 atlas = ExtResource("2_1xof2")
 region = Rect2(1600, 0, 200, 100)
@@ -26,10 +30,6 @@ region = Rect2(2400, 0, 200, 100)
 [sub_resource type="AtlasTexture" id="AtlasTexture_mwuxf"]
 atlas = ExtResource("2_1xof2")
 region = Rect2(0, 0, 200, 100)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_xu6nh"]
-atlas = ExtResource("2_1xof2")
-region = Rect2(200, 0, 200, 100)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1m2nt"]
 atlas = ExtResource("2_1xof2")
@@ -203,6 +203,9 @@ region = Rect2(9600, 0, 200, 100)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_xu6nh")
+}, {
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_v2qpp")
 }, {
 "duration": 1.0,
@@ -216,6 +219,9 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_c4frm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xu6nh")
 }],
 "loop": false,
 "name": &"attack",
@@ -430,11 +436,14 @@ size = Vector2(30, 7)
 collision_layer = 2
 script = ExtResource("1_faq14")
 stop_distance = 20.0
+max_health = 40
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -24)
 sprite_frames = SubResource("SpriteFrames_s534l")
-animation = &"idle"
+animation = &"attack"
+frame = 6
+frame_progress = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_c7w6l")
