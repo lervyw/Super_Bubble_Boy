@@ -152,6 +152,7 @@ func _ready() -> void:
 	connect_stomper_signals(stomper_normal)
 	connect_stomper_signals(stomper_bubble)
 	connect_stomper_signals(stomper_super)
+	register_combat_area_groups()
 	refresh_stompers_for_current_form()
 	update_audio_by_form()
 	passive_attack_timer = passive_attack_interval
@@ -244,6 +245,15 @@ func normalize_attack_configuration() -> void:
 		active_attack_timers[i] = 0.0
 
 	selected_active_attack_index = clampi(selected_active_attack_index, 0, active_attack_names.size() - 1)
+
+
+func register_combat_area_groups() -> void:
+	if attack_area and not attack_area.is_in_group("player_attack"):
+		attack_area.add_to_group("player_attack")
+
+	for stomper in [stomper_normal, stomper_bubble, stomper_super]:
+		if stomper and not stomper.is_in_group("player_stomper"):
+			stomper.add_to_group("player_stomper")
 
 
 func update_attack_cooldowns(delta: float) -> void:
