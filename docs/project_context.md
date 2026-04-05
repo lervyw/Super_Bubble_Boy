@@ -177,6 +177,7 @@ Recent history before new work:
 - Boss and slime hitbox attacks now play their wind-up animation first and only open the damaging hitbox at the end of the animation
 - Fatal enemy hits now put the player through `hurt` then the form-specific `death` animation and then reload the current level from the beginning
 - Platform mode now consumes global lives on fatal hits before that death/restart flow, while metroidvania still depends on HP reaching zero
+- Bosses are excluded from the player's generic stomp instant-kill path; stomps now chip boss health instead
 
 ## Level 1 Test Setup
 
