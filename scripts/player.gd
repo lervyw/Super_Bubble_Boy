@@ -75,14 +75,14 @@ var hud_menu_axis_locked := false
 @export_range(0.05, 3.0, 0.05) var passive_attack_active_time: float = 0.15
 @export var passive_attack_damage: int = 1
 @export var passive_attack_requires_target: bool = false
-@export var passive_attack_area_path: NodePath = NodePath("AttackArea")
+@export var passive_attack_area_path: NodePath = NodePath("AttackHitbox")
 
 @export_group("Active Super Attacks")
 @export var active_attack_names: Array[StringName] = [&"super_attack_1"]
 @export var active_attack_cooldowns: Array[float] = [1.5]
 @export var active_attack_mana_costs: Array[float] = [20.0]
 @export var active_attack_damages: Array[int] = [4]
-@export var active_attack_area_paths: Array[NodePath] = [NodePath("AttackArea")]
+@export var active_attack_area_paths: Array[NodePath] = [NodePath("AttackHitbox")]
 @export var selected_active_attack_index: int = 0
 
 @export_group("Ultimate Attack")
@@ -90,15 +90,15 @@ var hud_menu_axis_locked := false
 @export var ultimate_attack_id: StringName = &"ultimate_attack"
 @export_range(0.1, 30.0, 0.1) var ultimate_attack_cooldown: float = 8.0
 @export var ultimate_attack_damage: int = 10
-@export var ultimate_attack_area_path: NodePath = NodePath("AttackArea")
+@export var ultimate_attack_area_path: NodePath = NodePath("AttackHitbox")
 @export var allow_ultimate_input: bool = true
 
 @export_group("Respawn")
 @export var respawn_position: Vector2 = Vector2(288, 207)
 @export var stats: Node = null
 
-@onready var attack_area: Area2D = $AttackArea
-@onready var attack_collision: CollisionShape2D = $AttackArea/CollisionShape2D
+@onready var attack_area: Area2D = $AttackHitbox
+@onready var attack_collision: CollisionShape2D = $AttackHitbox/AttackCollisionShape
 
 var dash_timer := 0.0
 var dash_cooldown_timer := 0.0
@@ -148,6 +148,10 @@ func _ready() -> void:
 		var hurtbox = $Hurtbox
 		if hurtbox and not hurtbox.body_entered.is_connected(_on_hurtbox_body_entered):
 			hurtbox.body_entered.connect(_on_hurtbox_body_entered)
+	elif has_node("HurtboxArea"):
+		var hurtbox_area = $HurtboxArea
+		if hurtbox_area and not hurtbox_area.area_entered.is_connected(_on_hurtbox_body_entered):
+			hurtbox_area.area_entered.connect(_on_hurtbox_body_entered)
 
 	connect_stomper_signals(stomper_normal)
 	connect_stomper_signals(stomper_bubble)
@@ -229,7 +233,7 @@ func normalize_attack_configuration() -> void:
 	if active_attack_damages.is_empty():
 		active_attack_damages = [4]
 	if active_attack_area_paths.is_empty():
-		active_attack_area_paths = [NodePath("AttackArea")]
+		active_attack_area_paths = [NodePath("AttackHitbox")]
 
 	while active_attack_cooldowns.size() < active_attack_names.size():
 		active_attack_cooldowns.append(active_attack_cooldowns.back())
