@@ -288,9 +288,9 @@ func wait_for_animation(anim_name: StringName) -> void:
 	if sprite.animation != anim_name:
 		play_animation(anim_name)
 
-	var frame_count := sprite.sprite_frames.get_frame_count(anim_name)
-	var speed := max(sprite.sprite_frames.get_animation_speed(anim_name), 1.0)
-	var anim_duration := max(float(frame_count) / speed, hitbox_active_time)
+	var frame_count: int = sprite.sprite_frames.get_frame_count(anim_name)
+	var speed: float = maxf(sprite.sprite_frames.get_animation_speed(anim_name), 1.0)
+	var anim_duration: float = maxf(float(frame_count) / speed, hitbox_active_time)
 	await get_tree().create_timer(anim_duration).timeout
 
 
