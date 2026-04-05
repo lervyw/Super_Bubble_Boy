@@ -122,9 +122,10 @@ Observed responsibilities:
 
 - Simple chase AI
 - Jump/walk/fly modes
-- Timed melee hitbox
+- Configurable attack mode per slime:
+  `CONTACT` or `HITBOX`
 - Hurtbox damage intake
-- Death on stomp or direct attack
+- Death only from valid player attack hitboxes or valid stomp checks
 
 ## Git Baseline
 
@@ -155,3 +156,10 @@ Recent history before new work:
 - `res://scripts/title.gd` controls the main menu, config menu, and input rebinding menu
 - The controls menu now includes a dedicated `Ultimate` rebind button for `ultimate_attack`
 - Title button signal wiring was aligned with the current script method names to avoid broken presses at runtime
+
+## Current Combat Notes
+
+- Slime enemies can now be configured in the Inspector to attack either by direct contact/pounce or by timed hitbox attack
+- Slime flying is still selected through the existing `move_mode = FLY` option
+- Player stomp areas are now tagged separately from normal attack areas so enemies do not die from accidental side collisions
+- Boss animation flow is now script-driven using the available `idle`, `walk`, and `attack` animations

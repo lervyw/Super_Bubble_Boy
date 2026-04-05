@@ -66,3 +66,18 @@
 - Enabled direct ultimate input by default in `scripts/player.gd`, so the new `ultimate_attack` binding is actually used in gameplay
 - Fixed `Title.tscn` button signal targets so they match the methods that currently exist in `scripts/title.gd`
 - Preserved the existing save/load behavior by continuing to route rebinds through `ConfigManager.rebind_action()`
+
+## 2026-04-05
+
+### Slime attack and stomp fix
+
+- Reworked `scripts/slime.gd` so each slime can now attack through a new Inspector-configurable `attack_mode`
+- Supported slime attack modes:
+  `CONTACT` for direct pounce/contact damage and `HITBOX` for boss-style timed attack hitboxes
+- Kept flying configurable through the existing `move_mode = FLY`
+- Fixed enemy hurtbox filtering so slimes no longer die from accidental side collisions with the player; now they only die from valid player attacks or valid stomps
+
+### Boss animation use
+
+- Reworked `scripts/boss.gd` to drive the boss sprite with the available `idle`, `walk`, and `attack` animations based on behavior
+- Updated `Cenas/boss.tscn` so the boss no longer starts in attack animation by default
