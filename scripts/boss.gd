@@ -42,6 +42,9 @@ var health: int = max_health
 @export var sprite_path: NodePath = NodePath("AnimatedSprite2D")
 @export var hitbox_path: NodePath = NodePath("AttackHitbox")
 @export var hurtbox_path: NodePath = NodePath("Hurtbox")
+@export var idle_animation: StringName = &"idle"
+@export var walk_animation: StringName = &"walk"
+@export var attack_animation: StringName = &"attack"
 
 @onready var sprite: AnimatedSprite2D = get_node_or_null(sprite_path)
 @onready var hitbox: Area2D = get_node_or_null(hitbox_path)
@@ -72,7 +75,7 @@ func _ready() -> void:
 	if hurtbox and not hurtbox.area_entered.is_connected(_on_hurtbox_area_entered):
 		hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 
-	play_animation(&"idle")
+	play_animation(idle_animation)
 
 
 func _physics_process(delta: float) -> void:
@@ -94,14 +97,14 @@ func _physics_process(delta: float) -> void:
 
 	if not is_instance_valid(player):
 		velocity.x = 0.0
-		play_animation(&"idle")
+		play_animation(idle_animation)
 		move_and_slide()
 		return
 
 	var dist := global_position.distance_to(player.global_position)
 	if dist > aggro_range:
 		velocity.x = 0.0
-		play_animation(&"idle")
+		play_animation(idle_animation)
 		move_and_slide()
 		return
 
@@ -148,7 +151,7 @@ func move_towards_player(dist: float) -> void:
 func start_attack() -> void:
 	attacking = true
 	cooldown_t = attack_cooldown
-	play_animation(&"attack")
+	play_animation(attack_animation)
 
 	if hitbox_shape:
 		hitbox_shape.disabled = false
@@ -158,6 +161,7 @@ func start_attack() -> void:
 	if hitbox_shape:
 		hitbox_shape.disabled = true
 
+	await wait_for_attack_animation()
 	attacking = false
 	update_animation()
 
@@ -264,12 +268,30 @@ func update_animation() -> void:
 	if sprite == null or dying:
 		return
 	if attacking:
-		play_animation(&"attack")
+		play_animation(attack_animation)
 		return
 	if abs(velocity.x) > 5.0:
-		play_animation(&"walk")
+		play_animation(walk_animation)
 		return
-	play_animation(&"idle")
+	play_animation(idle_animation)
+
+
+func wait_for_attack_animation() -> void:
+	await wait_for_animation(attack_animation)
+
+
+func wait_for_animation(anim_name: StringName) -> void:
+	if sprite == null or sprite.sprite_frames == null:
+		return
+	if not sprite.sprite_frames.has_animation(anim_name):
+		return
+	if sprite.animation != anim_name:
+		play_animation(anim_name)
+
+	var frame_count := sprite.sprite_frames.get_frame_count(anim_name)
+	var speed := max(sprite.sprite_frames.get_animation_speed(anim_name), 1.0)
+	var anim_duration := max(float(frame_count) / speed, hitbox_active_time)
+	await get_tree().create_timer(anim_duration).timeout
 
 
 func play_animation(anim_name: StringName) -> void:
