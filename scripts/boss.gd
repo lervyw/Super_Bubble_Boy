@@ -1,6 +1,10 @@
 extends CharacterBody2D
 
 signal boss_defeated
+signal health_changed(current_health: int, max_health: int)
+signal hud_visibility_changed(visible: bool)
+
+const ATTACK_META_DAMAGE := &"attack_damage"
 
 enum State { IDLE, CHASE, ATTACK, STUN, TRANSFORM, DEAD }
 enum Form { NORMAL, SUPER }
@@ -39,11 +43,13 @@ var health: int = max_health
 @export var sprite_path: NodePath = NodePath("AnimatedSprite2D")
 @export var hurtbox_path: NodePath = NodePath("Hurtbox")
 @export var hitbox_path: NodePath = NodePath("AttackHitbox")
+@export var attack_receiver_path: NodePath = NodePath("AttackReceiver")
 
 @onready var sprite: AnimatedSprite2D = get_node_or_null(sprite_path)
 @onready var hurtbox: Area2D = get_node_or_null(hurtbox_path)
 @onready var hitbox: Area2D = get_node_or_null(hitbox_path)
 @onready var hitbox_shape: CollisionShape2D = hitbox.get_node_or_null("CollisionShape2D") if hitbox else null
+@onready var attack_receiver: Area2D = get_node_or_null(attack_receiver_path)
 
 var player: Node2D
 var state: State = State.IDLE
@@ -51,20 +57,33 @@ var form: Form = Form.NORMAL
 
 var cooldown_t := 0.0
 var facing_dir := -1
+var hud_visible := false
 
 # =========================================================
 
 func _ready():
+	if not is_in_group("boss"):
+		add_to_group("boss")
+
+	health = max_health
 	player = get_tree().get_first_node_in_group(player_group)
 
-	if hurtbox:
+	if hurtbox and not hurtbox.area_entered.is_connected(_on_hurtbox_area_entered):
 		hurtbox.area_entered.connect(_on_hurtbox_area_entered)
+
+	if attack_receiver and not attack_receiver.area_entered.is_connected(_on_attack_receiver_area_entered):
+		attack_receiver.area_entered.connect(_on_attack_receiver_area_entered)
 
 	if hitbox_shape:
 		hitbox_shape.disabled = true
 
 	if hitbox:
 		hitbox.body_entered.connect(_on_hitbox_body_entered)
+		if not hitbox.area_entered.is_connected(_on_hitbox_area_entered):
+			hitbox.area_entered.connect(_on_hitbox_area_entered)
+
+	emit_signal("health_changed", health, max_health)
+	emit_signal("hud_visibility_changed", false)
 
 # =========================================================
 
@@ -81,6 +100,7 @@ func _physics_process(delta):
 		return
 
 	var dist = global_position.distance_to(player.global_position)
+	update_hud_visibility(dist <= aggro_range)
 
 	match state:
 		State.IDLE:
@@ -146,7 +166,8 @@ func take_damage(amount):
 	if state == State.DEAD:
 		return
 
-	health -= amount
+	health -= max(amount, 1)
+	emit_signal("health_changed", max(health, 0), max_health)
 
 	if form == Form.NORMAL and health <= max_health / 2:
 		start_transform()
@@ -189,6 +210,7 @@ func die():
 	state = State.DEAD
 
 	set_physics_process(false)
+	update_hud_visibility(false)
 
 	if has_animation(death_animation):
 		play_animation(death_animation)
@@ -201,12 +223,59 @@ func die():
 
 func _on_hurtbox_area_entered(area):
 	if area.is_in_group("player_stomper"):
-		take_damage(1)
+		take_damage(get_damage_from_area(area, 1))
+
+
+func _on_attack_receiver_area_entered(area):
+	if area == null or state == State.DEAD:
+		return
+
+	if area.is_in_group("player_attack"):
+		take_damage(get_damage_from_area(area, 1))
 
 func _on_hitbox_body_entered(body):
-	if body.is_in_group(player_group):
-		if body.has_method("take_damage"):
-			body.take_damage(damage)
+	var target := resolve_player_target(body)
+	if target and target.has_method("take_damage"):
+		target.take_damage(damage)
+
+
+func _on_hitbox_area_entered(area):
+	var target := resolve_player_target(area)
+	if target and target.has_method("take_damage"):
+		target.take_damage(damage)
+
+
+func get_damage_from_area(area: Area2D, fallback: int = 1) -> int:
+	if area and area.has_meta(ATTACK_META_DAMAGE):
+		return max(int(area.get_meta(ATTACK_META_DAMAGE)), 1)
+	return max(fallback, 1)
+
+
+func resolve_player_target(node: Node) -> Node:
+	var current := node
+	while current != null:
+		if current.is_in_group(player_group):
+			return current
+		if current.has_method("take_damage") and current is CharacterBody2D:
+			return current
+		current = current.get_parent()
+	return null
+
+
+func deal_damage_to_player(target: Node) -> void:
+	if target and target.has_method("take_damage"):
+		target.take_damage(damage)
+
+
+func update_hud_visibility(visible: bool) -> void:
+	if hud_visible == visible:
+		return
+	hud_visible = visible
+	emit_signal("hud_visibility_changed", visible)
+
+
+func is_hud_visible() -> bool:
+	return hud_visible
 
 # =========================================================
 

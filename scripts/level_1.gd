@@ -72,6 +72,10 @@ func _ready() -> void:
 	# Se um boss foi configurado e existe na cena
 	if boss_node != NodePath("") and has_node(boss_node):
 		var boss = get_node(boss_node)
+		var hud = player.get_node_or_null("HUD")
+
+		if hud and hud.has_method("set_boss_target"):
+			hud.set_boss_target(boss)
 
 		# Conecta o sinal de vitória do boss
 		if boss and boss.has_signal("boss_defeated"):
