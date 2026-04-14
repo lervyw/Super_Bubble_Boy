@@ -6,11 +6,12 @@
 [ext_resource type="Script" uid="uid://d2h8ljiy2tu0a" path="res://Cenas/hud_panel.gd" id="5_is2x6"]
 [ext_resource type="Texture2D" uid="uid://bfxdsw5y0srba" path="res://sprites/img/progressbar/2.png" id="5_mdj34"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "menu_panel")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "boss_hp_bar", "menu_panel")]
 script = ExtResource("1_uow6a")
 heart_icons = [NodePath("HBoxContainer/Holder/HPBar1"), NodePath("HBoxContainer/Holder/HPBar2"), NodePath("HBoxContainer/Holder/HPBar3")]
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
 mana_bar = NodePath("HBoxContainer/Holder/ManaBar")
+boss_hp_bar = NodePath("BossBar")
 menu_panel = NodePath("Panel")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -98,6 +99,15 @@ offset_top = 33.28096
 offset_right = 264.46106
 offset_bottom = 60.28096
 scale = Vector2(0.21362264, 0.3578016)
+texture_under = ExtResource("3_is2x6")
+texture_progress = ExtResource("5_mdj34")
+
+[node name="BossBar" type="TextureProgressBar" parent="."]
+offset_left = 48.0
+offset_top = 230.99998
+offset_right = 308.0
+offset_bottom = 258.0
+scale = Vector2(0.85, 0.85)
 texture_under = ExtResource("3_is2x6")
 texture_progress = ExtResource("5_mdj34")
 

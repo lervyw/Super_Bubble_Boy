@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+const ATTACK_META_DAMAGE := &"attack_damage"
+
 enum MoveMode { WALK, JUMP, FLY }
 enum AttackMode { CONTACT, HITBOX }
 
@@ -63,6 +65,9 @@ var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 
 
 func _ready():
+	if not is_in_group("slime"):
+		add_to_group("slime")
+
 	player = get_tree().get_first_node_in_group(player_group)
 
 	if hitbox_shape:
@@ -73,10 +78,10 @@ func _ready():
 		hitbox.body_entered.connect(_on_hitbox_body_entered)
 		hitbox.area_entered.connect(_on_hitbox_area_entered)
 
-	if attack_receiver:
+	if attack_receiver and not attack_receiver.area_entered.is_connected(_on_attack_receiver_area_entered):
 		attack_receiver.area_entered.connect(_on_attack_receiver_area_entered)
 
-	if hurtbox:
+	if hurtbox and not hurtbox.area_entered.is_connected(_on_hurtbox_area_entered):
 		hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 
 	play_idle_animation()
@@ -169,9 +174,9 @@ func process_contact_attack():
 		if collision == null:
 			continue
 
-		var collider = collision.get_collider()
-		if collider and collider.is_in_group(player_group):
-			apply_damage_to(collider)
+		var target := resolve_player_target(collision.get_collider())
+		if target:
+			apply_damage_to(target)
 			cooldown_t = attack_cooldown
 			return
 
@@ -201,7 +206,7 @@ func take_damage(amount):
 	if dying:
 		return
 
-	health -= amount
+	health -= max(amount, 1)
 	stunned = true
 	attacking = false
 
@@ -252,16 +257,17 @@ func apply_damage_to(target):
 func _on_hitbox_body_entered(body):
 	if dying or not attacking:
 		return
-	if body.is_in_group(player_group):
-		apply_damage_to(body)
+	var target := resolve_player_target(body)
+	if target:
+		apply_damage_to(target)
 
 
 func _on_hitbox_area_entered(area):
 	if dying or not attacking:
 		return
-	var p = area.get_parent()
-	if p and p.is_in_group(player_group):
-		apply_damage_to(p)
+	var target := resolve_player_target(area)
+	if target:
+		apply_damage_to(target)
 
 
 func _on_attack_receiver_area_entered(area):
@@ -269,7 +275,7 @@ func _on_attack_receiver_area_entered(area):
 		return
 
 	if area.is_in_group("player_attack"):
-		take_damage(1)
+		take_damage(get_damage_from_area(area, 1))
 
 
 func _on_hurtbox_area_entered(area):
@@ -277,7 +283,29 @@ func _on_hurtbox_area_entered(area):
 		return
 
 	if area.is_in_group("player_stomper"):
-		die()
+		take_damage(get_damage_from_area(area, 1))
+
+
+func get_damage_from_area(area: Area2D, fallback: int = 1) -> int:
+	if area and area.has_meta(ATTACK_META_DAMAGE):
+		return max(int(area.get_meta(ATTACK_META_DAMAGE)), 1)
+	return max(fallback, 1)
+
+
+func resolve_player_target(node: Node) -> Node:
+	var current := node
+	while current != null:
+		if current.is_in_group(player_group):
+			return current
+		if current.has_method("take_damage") and current is CharacterBody2D:
+			return current
+		current = current.get_parent()
+	return null
+
+
+func deal_damage_to_player(target: Node) -> void:
+	if target and target.has_method("take_damage"):
+		target.take_damage(damage)
 
 
 func update_animation():

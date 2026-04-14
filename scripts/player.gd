@@ -58,7 +58,7 @@ var hud_menu_axis_locked := false
 @export_group("Stomp Settings")
 @export var stomp_requires_falling: bool = true
 @export var stomp_kills_enemy: bool = true
-@export var boss_stomp_damage: int = 1
+@export var stomp_damage: int = 1
 @export_range(0.0, 2000.0) var stomp_bounce_force_normal: float = 260.0
 @export_range(0.0, 2000.0) var stomp_bounce_force_bubble: float = 180.0
 @export_range(0.0, 2000.0) var stomp_bounce_force_super: float = 320.0
@@ -143,6 +143,9 @@ var unlocked_forms = {
 
 func _ready() -> void:
 	normalize_attack_configuration()
+
+	if not is_in_group("player"):
+		add_to_group("player")
 
 	if $Sprite2D and $Sprite2D.has_signal("attack_finished"):
 		if not has_method("_on_attack_finished"):
@@ -307,6 +310,23 @@ func process_passive_attack(delta: float) -> void:
 		return
 
 	trigger_instant_attack_window(area, passive_attack_active_time, passive_attack_damage, AttackKind.PASSIVE, passive_attack_id)
+
+
+func set_passive_attack_enabled(enabled: bool) -> void:
+	passive_attack_enabled = enabled
+	passive_attack_timer = passive_attack_interval if enabled else 0.0
+
+
+func toggle_passive_attack() -> void:
+	set_passive_attack_enabled(not passive_attack_enabled)
+
+
+func configure_passive_attack(interval: float, active_time: float, damage: int) -> void:
+	passive_attack_interval = maxf(interval, 0.1)
+	passive_attack_active_time = maxf(active_time, 0.05)
+	passive_attack_damage = max(damage, 1)
+	if passive_attack_enabled:
+		passive_attack_timer = passive_attack_interval
 
 
 func handle_input() -> void:
@@ -1203,6 +1223,10 @@ func connect_stomper_signals(stomper: Area2D) -> void:
 	if not stomper:
 		return
 
+	stomper.set_meta(ATTACK_META_DAMAGE, max(stomp_damage, 1))
+	stomper.set_meta(ATTACK_META_KIND, int(AttackKind.PASSIVE))
+	stomper.set_meta(ATTACK_META_ID, "stomp")
+
 	if not stomper.body_entered.is_connected(_on_stomper_body_entered):
 		stomper.body_entered.connect(_on_stomper_body_entered)
 	if not stomper.area_entered.is_connected(_on_stomper_area_entered):
@@ -1219,6 +1243,7 @@ func set_stomper_enabled(stomper: Area2D, enabled: bool) -> void:
 	if not stomper:
 		return
 
+	stomper.set_meta(ATTACK_META_DAMAGE, max(stomp_damage, 1))
 	stomper.monitoring = enabled
 	stomper.monitorable = enabled
 
@@ -1271,23 +1296,8 @@ func try_stomp(target: Node) -> void:
 		return
 
 	bounce_from_enemy()
-
 	if stomp_target.has_method("on_stomped"):
 		stomp_target.on_stomped(self)
-		return
-
-	if stomp_target.is_in_group("boss"):
-		if stomp_target.has_method("take_damage"):
-			stomp_target.take_damage(max(boss_stomp_damage, 1))
-		return
-
-	if stomp_kills_enemy:
-		if stomp_target.has_method("die"):
-			stomp_target.die()
-			return
-		if stomp_target.has_method("take_damage"):
-			stomp_target.take_damage(999)
-			return
 
 
 func resolve_stomp_target(node: Node) -> Node:
