@@ -3,10 +3,6 @@
 [ext_resource type="Script" uid="uid://ckovbwcre5vgq" path="res://scripts/slime.gd" id="1_4p1wq"]
 [ext_resource type="Texture2D" uid="uid://defe4ik31ltgk" path="res://sprites/characters/slime.png" id="2_2w4kv"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_dl308"]
-atlas = ExtResource("2_2w4kv")
-region = Rect2(128, 0, 32, 32)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_t887w"]
 atlas = ExtResource("2_2w4kv")
 region = Rect2(160, 0, 32, 32)
@@ -23,6 +19,10 @@ region = Rect2(32, 0, 32, 32)
 atlas = ExtResource("2_2w4kv")
 region = Rect2(64, 0, 32, 32)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_dl308"]
+atlas = ExtResource("2_2w4kv")
+region = Rect2(128, 0, 32, 32)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_r0vom"]
 atlas = ExtResource("2_2w4kv")
 region = Rect2(96, 0, 32, 32)
@@ -30,9 +30,6 @@ region = Rect2(96, 0, 32, 32)
 [sub_resource type="SpriteFrames" id="SpriteFrames_7ftlq"]
 animations = [{
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_dl308")
-}, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_t887w")
 }, {
@@ -120,7 +117,7 @@ size = Vector2(26, 18)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t887w"]
 size = Vector2(20, 7)
 
-[node name="slime" type="CharacterBody2D" groups=["slime"]]
+[node name="slime" type="CharacterBody2D"]
 collision_layer = 4
 script = ExtResource("1_4p1wq")
 stop_distance = 10.0
@@ -129,9 +126,9 @@ max_health = 1
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(3, -4)
 sprite_frames = SubResource("SpriteFrames_7ftlq")
-animation = &"idle"
+animation = &"walk"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["slime"]]
 shape = SubResource("CircleShape2D_m7g7x")
 
 [node name="AttackHitbox" type="Area2D" parent="."]
@@ -146,7 +143,7 @@ shape = SubResource("RectangleShape2D_2w4kv")
 position = Vector2(0, -2)
 shape = SubResource("RectangleShape2D_attack_receiver")
 
-[node name="Hurtbox" type="Area2D" parent="."]
+[node name="Hurtbox" type="Area2D" parent="." groups=["stompable"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 position = Vector2(0, -10.5)
