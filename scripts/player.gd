@@ -1294,11 +1294,10 @@ func resolve_stomp_target(node: Node) -> Node:
 	var current: Node = node
 
 	while current != null:
-		if current.is_in_group("enemy") \
-		or current.is_in_group("stompable") \
-		or current.is_in_group("boss") \
-		or current.is_in_group("slime"):
-			return current
+		# ✅ só aceita stompable
+		if current.is_in_group("stompable"):
+			return current.get_parent() # retorna o inimigo (slime/boss)
+
 		current = current.get_parent()
 
 	return null
