@@ -14,7 +14,7 @@ var jump_count: int
 
 
 func _physics_process(delta: float) -> void:
-	trans()	
+	transport()	
 	horizontal_moviment_env()
 	vertical_moviment_env()
 	gravity(delta)
@@ -38,7 +38,7 @@ func vertical_moviment_env() -> void:
 			velocity.y = jump_speed
 	#print(velocity)
 	#print(velocity)
-func trans() -> void:
+func transport() -> void:
 	
 	if Input.is_action_just_pressed("forma1") and not transformando :
 		transformando1()
@@ -86,11 +86,3 @@ func die() -> void:
 	position = respawn_position
 	# Reativa o controle
 	set_physics_process(true)
-
-
-
-
-#func _on_animation_finished(anim_name: StringName) -> void:
-#	if (anim_name == "Walk"):
-###		print("gay")
-#		pass # Replace with function body.

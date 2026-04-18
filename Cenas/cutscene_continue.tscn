@@ -1,0 +1,215 @@
+[gd_scene load_steps=20 format=3 uid="uid://csimfkoyib6py"]
+
+[ext_resource type="Script" uid="uid://bftfr3cv7lh3l" path="res://Cenas/cutscene_test.gd" id="1_3u5hk"]
+[ext_resource type="Script" uid="uid://df1jebqvywtna" path="res://Cenas/continue.gd" id="2_145gj"]
+[ext_resource type="Texture2D" uid="uid://ohe5hgiqhwbp" path="res://sprites/characters/fundo_continue_1.png" id="3_145gj"]
+[ext_resource type="Texture2D" uid="uid://cm47s6s1ij0gx" path="res://sprites/img/background/fundo/dialog.png" id="4_8gte1"]
+[ext_resource type="Theme" uid="uid://f3qbr13lf6l6" path="res://demo/assets/button.tres" id="5_a4vsq"]
+[ext_resource type="Script" uid="uid://c4ws4fw1kocq0" path="res://Cenas/dialog_box.gd" id="6_23p8q"]
+[ext_resource type="Texture2D" uid="uid://cfg3c1jfph8ur" path="res://sprites/characters/fundo_continue_bolha_1.png" id="7_145gj"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_145gj"]
+font_size = 38
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3u5hk"]
+atlas = ExtResource("7_145gj")
+region = Rect2(146, 0, 146, 233)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gy6pq"]
+atlas = ExtResource("7_145gj")
+region = Rect2(438, 0, 146, 233)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_db18x"]
+atlas = ExtResource("7_145gj")
+region = Rect2(292, 0, 146, 233)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8gte1"]
+atlas = ExtResource("7_145gj")
+region = Rect2(292, 233, 146, 233)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a4vsq"]
+atlas = ExtResource("7_145gj")
+region = Rect2(438, 233, 146, 233)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_23p8q"]
+atlas = ExtResource("7_145gj")
+region = Rect2(0, 0, 146, 233)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q7a65"]
+atlas = ExtResource("7_145gj")
+region = Rect2(146, 0, 146, 233)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8n5vf"]
+atlas = ExtResource("7_145gj")
+region = Rect2(438, 0, 146, 233)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_832q5"]
+atlas = ExtResource("7_145gj")
+region = Rect2(0, 233, 146, 233)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vr7qq"]
+atlas = ExtResource("7_145gj")
+region = Rect2(146, 233, 146, 233)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tj32a"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3u5hk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3u5hk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gy6pq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gy6pq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_db18x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8gte1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a4vsq")
+}],
+"loop": true,
+"name": &"continue",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_23p8q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q7a65")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q7a65")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_23p8q")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gy6pq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8n5vf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_db18x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_832q5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vr7qq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vr7qq")
+}],
+"loop": true,
+"name": &"giveup",
+"speed": 6.0
+}]
+
+[node name="Control" type="Control" node_paths=PackedStringArray("DialogBox", "animated_sprite", "continue_button", "quit_button", "timer_label")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_145gj")
+DialogBox = NodePath("Node/CharacterNode/MarginContainer/VBoxContainer/DialogBox")
+animated_sprite = NodePath("Node/AnimatedSprite2D")
+continue_button = NodePath("Continue")
+quit_button = NodePath("Desistir")
+timer_label = NodePath("Node/CharacterNode/Timer")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -1.0000001
+offset_right = 1199.0
+offset_bottom = 676.0
+scale = Vector2(0.494775, 0.41477522)
+texture = ExtResource("3_145gj")
+expand_mode = 2
+
+[node name="Border" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 105.0
+offset_top = 27.0
+offset_right = 2025.0
+offset_bottom = 1107.0
+scale = Vector2(0.11737341, 0.11737341)
+texture = ExtResource("4_8gte1")
+
+[node name="Desistir" type="Button" parent="."]
+layout_mode = 0
+offset_left = 176.00002
+offset_top = 192.0
+offset_right = 279.2107
+offset_bottom = 241.99998
+scale = Vector2(0.71698, 0.71698)
+theme = ExtResource("5_a4vsq")
+text = "Desistir
+△"
+
+[node name="Continue" type="Button" parent="."]
+layout_mode = 0
+offset_left = 176.0
+offset_top = 152.0
+offset_right = 286.0
+offset_bottom = 202.00002
+scale = Vector2(0.67272073, 0.7150347)
+theme = ExtResource("5_a4vsq")
+text = "Continuar
+X"
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("1_3u5hk")
+
+[node name="CharacterNode" type="Node2D" parent="Node"]
+
+[node name="MarginContainer" type="MarginContainer" parent="Node/CharacterNode"]
+offset_left = 113.000015
+offset_top = 30.0
+offset_right = 323.0
+offset_bottom = 137.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Node/CharacterNode/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Node/CharacterNode/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Continue?"
+
+[node name="DialogBox" type="RichTextLabel" parent="Node/CharacterNode/MarginContainer/VBoxContainer"]
+clip_contents = false
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "test"
+fit_content = true
+script = ExtResource("6_23p8q")
+
+[node name="Timer" type="Label" parent="Node/CharacterNode"]
+offset_left = 113.0
+offset_top = 154.0
+offset_right = 153.0
+offset_bottom = 177.0
+text = "10"
+label_settings = SubResource("LabelSettings_145gj")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Node"]
+position = Vector2(328, 176.00002)
+scale = Vector2(0.78800666, 0.7880066)
+sprite_frames = SubResource("SpriteFrames_tj32a")
+autoplay = "default"
