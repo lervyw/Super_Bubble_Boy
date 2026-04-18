@@ -1,14 +1,15 @@
-[gd_scene load_steps=40 format=3 uid="uid://bxwaorviofm3w"]
+[gd_scene load_steps=41 format=3 uid="uid://bxwaorviofm3w"]
 
-[ext_resource type="Texture2D" uid="uid://bi03taar753" path="res://gamejam/img/background/titulo/preto1.png" id="1_15gka"]
-[ext_resource type="Script" path="res://Cenas/title.gd" id="1_w4qiy"]
-[ext_resource type="Texture2D" uid="uid://bkhsbfwka4gqw" path="res://gamejam/img/background/titulo/bg_4.png" id="2_77ghk"]
-[ext_resource type="Texture2D" uid="uid://c1wvd3iu3i0gl" path="res://gamejam/img/background/titulo/bg_5.png" id="4_r2t5r"]
-[ext_resource type="Texture2D" uid="uid://coh3wdrj77jd8" path="res://gamejam/img/background/titulo/animacao/bg_3/bg_3-Sheet.png" id="5_mou5i"]
-[ext_resource type="Texture2D" uid="uid://ti17al0ug0d8" path="res://gamejam/img/background/titulo/animacao/bg_2/bg_2-Sheet.png" id="6_ss2qd"]
-[ext_resource type="Texture2D" uid="uid://cwliycx745eik" path="res://gamejam/img/background/titulo/animacao/bg_1/bg_1-Sheet.png" id="7_14sl4"]
-[ext_resource type="FontFile" uid="uid://tb0dgy82p4df" path="res://gamejam/img/background/fundo/Rev Mini Pixel.ttf" id="8_mcqsg"]
-[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://Cenas/music/A Alegria Pixelada.wav" id="9_7wsge"]
+[ext_resource type="Texture2D" uid="uid://bi03taar753" path="res://sprites/img/background/titulo/preto1.png" id="1_15gka"]
+[ext_resource type="Script" uid="uid://cx7ula7bxnjv4" path="res://scripts/title.gd" id="1_y12so"]
+[ext_resource type="Texture2D" uid="uid://bkhsbfwka4gqw" path="res://sprites/img/background/titulo/bg_4.png" id="2_77ghk"]
+[ext_resource type="Texture2D" uid="uid://cgaylwx7lnqna" path="res://sprites/img/logoprojog.jpg" id="4_j7fkm"]
+[ext_resource type="Texture2D" uid="uid://c1wvd3iu3i0gl" path="res://sprites/img/background/titulo/bg_5.png" id="4_r2t5r"]
+[ext_resource type="Texture2D" uid="uid://coh3wdrj77jd8" path="res://sprites/img/background/titulo/animacao/bg_3/bg_3-Sheet.png" id="5_mou5i"]
+[ext_resource type="Texture2D" uid="uid://ti17al0ug0d8" path="res://sprites/img/background/titulo/animacao/bg_2/bg_2-Sheet.png" id="6_ss2qd"]
+[ext_resource type="Texture2D" uid="uid://cwliycx745eik" path="res://sprites/img/background/titulo/animacao/bg_1/bg_1-Sheet.png" id="7_14sl4"]
+[ext_resource type="FontFile" uid="uid://tb0dgy82p4df" path="res://sprites/img/background/fundo/Rev Mini Pixel.ttf" id="8_mcqsg"]
+[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://music/A Alegria Pixelada.wav" id="9_7wsge"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tq2gh"]
 atlas = ExtResource("5_mou5i")
@@ -124,61 +125,79 @@ animations = [{
 "speed": 10.0
 }]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_k126n"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_6wxxs"]
 atlas = ExtResource("7_14sl4")
-region = Rect2(0, 0, 420, 280)
+region = Rect2(0, 140, 420, 140)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_1xv02"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_crvrx"]
 atlas = ExtResource("7_14sl4")
-region = Rect2(420, 0, 420, 280)
+region = Rect2(420, 140, 420, 140)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_dou2u"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_oij53"]
 atlas = ExtResource("7_14sl4")
-region = Rect2(840, 0, 420, 280)
+region = Rect2(840, 140, 420, 140)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_2egfr"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_ulqww"]
 atlas = ExtResource("7_14sl4")
-region = Rect2(1260, 0, 420, 280)
+region = Rect2(1260, 140, 420, 140)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_5jhc3"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_sewk3"]
 atlas = ExtResource("7_14sl4")
-region = Rect2(1680, 0, 420, 280)
+region = Rect2(1680, 140, 420, 140)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_qs2s4"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_wu0bt"]
 atlas = ExtResource("7_14sl4")
-region = Rect2(2100, 0, 420, 280)
+region = Rect2(2100, 140, 420, 140)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_7qe5t"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ju1s"]
 atlas = ExtResource("7_14sl4")
-region = Rect2(2520, 0, 420, 280)
+region = Rect2(2520, 140, 420, 140)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_qxdjn"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_k126n")
+"texture": SubResource("AtlasTexture_6wxxs")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_1xv02")
+"texture": SubResource("AtlasTexture_crvrx")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_dou2u")
+"texture": SubResource("AtlasTexture_oij53")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_2egfr")
+"texture": SubResource("AtlasTexture_ulqww")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_5jhc3")
+"texture": SubResource("AtlasTexture_sewk3")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_qs2s4")
+"texture": SubResource("AtlasTexture_wu0bt")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_7qe5t")
+"texture": SubResource("AtlasTexture_7ju1s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6wxxs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ju1s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6wxxs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ju1s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6wxxs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ju1s")
 }],
 "loop": true,
 "name": &"default",
-"speed": 2.0
+"speed": 3.0
 }]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qui40"]
@@ -198,6 +217,8 @@ Button/colors/font_color = Color(1, 1, 1, 1)
 Button/fonts/font = ExtResource("8_mcqsg")
 Button/styles/hover = SubResource("StyleBoxFlat_qui40")
 Button/styles/normal = SubResource("StyleBoxFlat_2vbo6")
+Label/fonts/font = ExtResource("8_mcqsg")
+Label/styles/normal = SubResource("StyleBoxFlat_2vbo6")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_01s65"]
 bg_color = Color(0.254902, 0.607843, 0.996078, 1)
@@ -211,92 +232,242 @@ Button/fonts/font = ExtResource("8_mcqsg")
 Button/styles/hover = SubResource("StyleBoxFlat_01s65")
 Button/styles/normal = SubResource("StyleBoxFlat_di2en")
 
-[node name="Control" type="Control" node_paths=PackedStringArray("ambiente")]
+[node name="Control" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_w4qiy")
-ambiente = NodePath("AudioStreamPlayer")
+script = ExtResource("1_y12so")
+metadata/_edit_vertical_guides_ = [199.0]
+metadata/_edit_horizontal_guides_ = [77.0]
 
-[node name="ParallaxLayer4" type="ParallaxLayer" parent="."]
+[node name="Bg_0" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 420.0
+offset_bottom = 280.0
+texture = ExtResource("1_15gka")
 
-[node name="Bg_3" type="TextureRect" parent="ParallaxLayer4"]
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 347.0
+offset_top = 206.0
+offset_right = 409.0
+offset_bottom = 268.0
+texture = ExtResource("4_j7fkm")
+expand_mode = 2
+stretch_mode = 4
+
+[node name="Bg_3" type="TextureRect" parent="."]
+layout_mode = 0
 offset_right = 420.0
 offset_bottom = 280.0
 texture = ExtResource("4_r2t5r")
 
-[node name="ParallaxLayer" type="ParallaxLayer" parent="."]
-
-[node name="Bg_0" type="TextureRect" parent="ParallaxLayer"]
-offset_right = 536.0
-offset_bottom = 280.0
-texture = ExtResource("1_15gka")
-
-[node name="ParallaxLayer2" type="ParallaxLayer" parent="."]
-
-[node name="Bg_1" type="TextureRect" parent="ParallaxLayer2"]
-offset_right = 539.0
+[node name="Bg_1" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 422.0
 offset_bottom = 280.0
 texture = ExtResource("2_77ghk")
 
 [node name="Bubble_boy" type="AnimatedSprite2D" parent="."]
-position = Vector2(209, 139)
+position = Vector2(99.5, 212)
+scale = Vector2(0.47857141, 0.47857141)
 sprite_frames = SubResource("SpriteFrames_t2lld")
 autoplay = "default"
 frame_progress = 0.37413
 
 [node name="Bolinha" type="AnimatedSprite2D" parent="."]
-position = Vector2(210, 140)
+position = Vector2(102, 212)
+scale = Vector2(0.4857143, 0.4857143)
 sprite_frames = SubResource("SpriteFrames_eldcj")
 autoplay = "default"
 frame_progress = 0.569063
 
 [node name="Titulo" type="AnimatedSprite2D" parent="."]
-position = Vector2(287, 141)
-scale = Vector2(1.14048, 1)
+position = Vector2(99.999985, 30.000015)
+scale = Vector2(0.57945865, 0.5857143)
 sprite_frames = SubResource("SpriteFrames_qxdjn")
 autoplay = "default"
-frame_progress = 0.623647
+frame = 3
+frame_progress = 0.49152
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="MainMenu" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.111
-anchor_top = 0.502
-anchor_right = 0.111
-anchor_bottom = 0.502
-offset_left = -29.62
-offset_top = -50.56
-offset_right = 45.38
-offset_bottom = 50.44
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 186.0
+offset_top = 78.0
+offset_right = -78.0
+offset_bottom = -104.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu"]
 layout_mode = 2
 
-[node name="Start" type="Button" parent="HBoxContainer/VBoxContainer"]
+[node name="Start" type="Button" parent="MainMenu/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
-text = "Start"
+text = " Iniciar"
 
-[node name="Quit" type="Button" parent="HBoxContainer/VBoxContainer"]
+[node name="Config" type="Button" parent="MainMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "config"
+
+[node name="Quit" type="Button" parent="MainMenu/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_8he0a")
-text = "Sair"
+text = "sair"
+
+[node name="ConfigMenu" type="HBoxContainer" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 174.0
+offset_top = 78.0
+offset_right = 258.0
+offset_bottom = 224.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigMenu"]
+layout_mode = 2
+
+[node name="Musica" type="Label" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Musica"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SliderMusica" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+min_value = -60.0
+max_value = 1.0
+value = 1.0
+
+[node name="Volume" type="Label" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Volume"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SliderEfeitos" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+min_value = -60.0
+max_value = 1.0
+value = 1.0
+
+[node name="ConfigurarBotoes" type="Button" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Controles"
+
+[node name="Voltar" type="Button" parent="ConfigMenu/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Voltar"
+
+[node name="ControlsMenu" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 77.0
+offset_right = 300.0
+offset_bottom = 227.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ControlsMenu"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlsMenu/ScrollContainer"]
+layout_mode = 2
+
+[node name="Controle1" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "botao pulo"
+
+[node name="Controle2" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "transformacao 1"
+
+[node name="Controle3" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "transformacao 2"
+
+[node name="Controle4" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "forma normal"
+
+[node name="Controle5" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "botao menu"
+
+[node name="Controle6" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "botao ataque"
+
+[node name="Controle7" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "ataque especial"
+
+[node name="Controle8" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "escudo"
+
+[node name="Controle9" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "poder 1"
+
+[node name="Controle10" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "poder 2"
+
+[node name="Controle11" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "poder 3"
+
+[node name="Controle12" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "poder 4"
+
+[node name="Controle13" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "ultimate"
+
+[node name="Voltar" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Voltar"
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("9_7wsge")
-volume_db = -30.0
 autoplay = true
+bus = &"music"
 
-[connection signal="pressed" from="HBoxContainer/VBoxContainer/Start" to="." method="_on_start_pressed"]
-[connection signal="pressed" from="HBoxContainer/VBoxContainer/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Start" to="." method="_on_iniciar"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Config" to="." method="_open_config_menu"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Quit" to="." method="_on_sair"]
+[connection signal="pressed" from="ConfigMenu/VBoxContainer/ConfigurarBotoes" to="." method="_open_botoes_menu"]
+[connection signal="pressed" from="ConfigMenu/VBoxContainer/Voltar" to="." method="_back_to_menu"]
+[connection signal="pressed" from="ControlsMenu/ScrollContainer/VBoxContainer/Voltar" to="." method="_back_to_config_menu"]

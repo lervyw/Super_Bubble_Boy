@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://nfm81ywuusso"]
 
-[ext_resource type="Script" path="res://Cenas/saida.gd" id="1_wk2tc"]
+[ext_resource type="Script" uid="uid://djv20rs0wgcty" path="res://scripts/saida.gd" id="1_mjiy0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_twqaj"]
 size = Vector2(162152, 231.519)
@@ -9,7 +9,7 @@ size = Vector2(162152, 231.519)
 position = Vector2(458, -39)
 scale = Vector2(0.427611, 0.427611)
 collision_layer = 2
-script = ExtResource("1_wk2tc")
+script = ExtResource("1_mjiy0")
 
 [node name="Collision" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_twqaj")
