@@ -2039,7 +2039,7 @@ one_shot = true
 [node name="piscar_timer" type="Timer" parent="Stats"]
 wait_time = 0.1
 
-[node name="HurtboxArea" type="Area2D" parent="." groups=["player"]]
+[node name="HurtboxArea" type="Area2D" parent="." groups=["player", "player_hurtbox"]]
 position = Vector2(-1, 6)
 
 [node name="HurtboxCollisionShape" type="CollisionShape2D" parent="HurtboxArea"]
