@@ -5,41 +5,106 @@ extends Area2D
 #  - Ativa física de água no player
 #  - Diminui velocidade / gravidade (controlado no Player.gd)
 #  - Troca estado para SWIM ao entrar
+#  - Funciona com body e areas do player
 # =========================================================
 
+@export var player: CharacterBody2D
 
-# ================================
-#        ENTRADA NA ÁGUA
-# ================================
+# Quantos colliders/areas do player estão dentro da água
+var overlap_count: int = 0
+
+func _ready() -> void:
+	if not player:
+		player = get_tree().get_first_node_in_group("player") as CharacterBody2D
+
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
+
+	if not body_exited.is_connected(_on_body_exited):
+		body_exited.connect(_on_body_exited)
+
+	if not area_entered.is_connected(_on_area_entered):
+		area_entered.connect(_on_area_entered)
+
+	if not area_exited.is_connected(_on_area_exited):
+		area_exited.connect(_on_area_exited)
+
 func _on_body_entered(body: Node) -> void:
-	# Verifica se é o player e se ele possui a variável 'in_water'
-	if body.is_in_group("jogador") and "in_water" in body:
-		# Ativa flag de água (usada no Player.gd)
-		body.in_water = true
+	if is_player_body(body):
+		enter_water()
 
-		# Troca estado para SWIM, se suportado
-		if "change_state" in body:
-			body.change_state(body.State.SWIM)
-
-		print("💧 Entrou na água")
-
-
-# ================================
-#          SAÍDA DA ÁGUA
-# ================================
 func _on_body_exited(body: Node) -> void:
-	# Verifica se é o player e se ele possui a variável 'in_water'
-	if body.is_in_group("jogador") and "in_water" in body:
-		# Desativa flag de água
-		body.in_water = false
+	if is_player_body(body):
+		exit_water()
 
-		# Decide estado ao sair da água
-		if "change_state" in body:
-			# Se saiu e já está no chão, volta para IDLE
-			if body.is_on_floor():
-				body.change_state(body.State.IDLE)
-			else:
-				# Se saiu no ar, continua em JUMP
-				body.change_state(body.State.JUMP)
+func _on_area_entered(area: Area2D) -> void:
+	if is_player_area(area):
+		enter_water()
 
-		print("🌊 Saiu da água")
+func _on_area_exited(area: Area2D) -> void:
+	if is_player_area(area):
+		exit_water()
+
+func is_player_body(body: Node) -> bool:
+	if body == null:
+		return false
+
+	if body == player:
+		return true
+
+	if body.get_parent() == player:
+		return true
+
+	if player != null and player.is_ancestor_of(body):
+		return true
+
+	return false
+
+func is_player_area(area: Area2D) -> bool:
+	if area == null:
+		return false
+
+	if area.get_parent() == player:
+		return true
+
+	if player != null and player.is_ancestor_of(area):
+		return true
+
+	return false
+
+func enter_water() -> void:
+	if not is_instance_valid(player):
+		return
+
+	overlap_count += 1
+
+	# Só faz a transição real na primeira entrada
+	if overlap_count > 1:
+		return
+
+	player.in_water = true
+
+	if player.has_method("change_state") and player.state != player.State.DEAD:
+		player.change_state(player.State.SWIM)
+
+	print("💧 Entrou na água")
+
+func exit_water() -> void:
+	if not is_instance_valid(player):
+		return
+
+	overlap_count = max(overlap_count - 1, 0)
+
+	# Só sai da água quando nada mais do player estiver sobrepondo
+	if overlap_count > 0:
+		return
+
+	player.in_water = false
+
+	if player.has_method("change_state") and player.state != player.State.DEAD:
+		if player.is_on_floor():
+			player.change_state(player.State.IDLE)
+		else:
+			player.change_state(player.State.JUMP)
+
+	print("🌊 Saiu da água")

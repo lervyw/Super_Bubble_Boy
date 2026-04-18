@@ -1,320 +1,421 @@
 extends CharacterBody2D
 
-@onready var animation_sprite = $AnimatedSprite2D
-@onready var particles = $CPUParticles2D
-@onready var hit_area = $Hit
-@onready var damage_area = $DamageArea
-@onready var raycast_right: RayCast2D = get_node_or_null("RaycastRight")
-@onready var raycast_left: RayCast2D = get_node_or_null("RaycastLeft")
+const ATTACK_META_DAMAGE := &"attack_damage"
+
+enum MoveMode { WALK, JUMP, FLY }
+enum AttackMode { CONTACT, HITBOX }
+
+@export_group("Target")
+@export var player_group: StringName = "jogador"
+@export var player_hurtbox_group: StringName = "player_hurtbox"
 
 @export_group("Movement")
-@export var patrol_speed: float = 20.0
-@export var chase_speed: float = 40.0
-@export var jump_force: float = -250.0
-@export var gravity_strength: float = 900.0
+@export var move_mode: MoveMode = MoveMode.JUMP
+@export var speed: float = 70.0
+@export var gravity: float = 900.0
+@export var jump_force: float = -260.0
+@export var jump_interval: float = 0.35
+@export var fly_y_speed: float = 70.0
+@export var fly_vertical_follow: bool = true
 
 @export_group("AI")
-@export var detection_range: float = 100.0
-@export var stop_chase_distance: float = 10.0
-@export var use_raycast_detection: bool = true
-@export var detect_ledges: bool = true
-
-@export_group("Bounce System")
-@export var bounce_on_hit: bool = true
-@export var bounce_force: float = -200.0
-@export var bounce_distance: float = 100.0
-@export var min_distance_to_player: float = 30.0
+@export var aggro_range: float = 260.0
+@export var stop_distance: float = 40.0
+@export var avoid_other_slimes: bool = true
+@export var separation_distance: float = 20.0
+@export var separation_strength: float = 45.0
 
 @export_group("Attack")
-@export var damage_amount: int = 1
-@export var attack_cooldown: float = 1.0
-@export var jump_attack_force: float = -300.0
-@export var jump_attack_horizontal_speed: float = 80.0
+@export var attack_mode: AttackMode = AttackMode.HITBOX
+@export var damage: int = 1
+@export var attack_range: float = 48.0
+@export var hitbox_active_time: float = 0.10
+@export var attack_cooldown: float = 0.85
+@export var contact_attack_requires_fall: bool = false
+@export var contact_attack_min_speed_y: float = 10.0
+@export_range(-1, 99, 1) var attack_hitbox_start_frame: int = -1
+@export_range(-1, 99, 1) var attack_hitbox_end_frame: int = -1
 
-var player: Node2D = null
-var is_chasing: bool = false
-var move_direction: float = 1.0
-var is_dead: bool = false
-var is_bouncing: bool = false
-var attack_cooldown_timer: float = 0.0
-var is_attacking: bool = false
+@export_group("Health")
+@export var max_health: int = 3
+var health: int = max_health
 
-func _ready() -> void:
-	player = get_tree().get_first_node_in_group("player")
-	if not player:
-		push_warning("Slime: Player não encontrado no grupo 'player'")
-	setup_edge_detection()
+@export_group("Nodes")
+@export var sprite_path: NodePath = NodePath("AnimatedSprite2D")
+@export var hitbox_path: NodePath = NodePath("AttackHitbox")
+@export var attack_receiver_path: NodePath = NodePath("AttackReceiver")
+@export var hurtbox_path: NodePath = NodePath("Hurtbox")
 
-	if damage_area:
-		if not damage_area.body_entered.is_connected(_on_damage_area_body_entered):
-			damage_area.body_entered.connect(_on_damage_area_body_entered)
-		if not damage_area.area_entered.is_connected(_on_damage_area_area_entered):
-			damage_area.area_entered.connect(_on_damage_area_area_entered)
+@export var sprite_faces_left_by_default: bool = true
+@export var idle_animation: StringName = &"idle"
+@export var walk_animation: StringName = &"walk"
+@export var attack_animation: StringName = &"attack"
+@export var death_animation: StringName = &"death"
 
-func setup_edge_detection() -> void:
-	if detect_ledges:
-		if not raycast_right:
-			raycast_right = create_edge_raycast("RaycastRight", Vector2(12, 0))
-		if not raycast_left:
-			raycast_left = create_edge_raycast("RaycastLeft", Vector2(-12, 0))
-		if raycast_right:
-			configure_raycast(raycast_right, Vector2(15, 20))
-		if raycast_left:
-			configure_raycast(raycast_left, Vector2(-15, 20))
+@onready var sprite: AnimatedSprite2D = get_node_or_null(sprite_path)
+@onready var hitbox: Area2D = get_node_or_null(hitbox_path)
+@onready var hitbox_shape: CollisionShape2D = hitbox.get_node_or_null("CollisionShape2D") if hitbox else null
+@onready var attack_receiver: Area2D = get_node_or_null(attack_receiver_path)
+@onready var hurtbox: Area2D = get_node_or_null(hurtbox_path)
 
-func create_edge_raycast(name: String, offset: Vector2) -> RayCast2D:
-	var rc = RayCast2D.new()
-	rc.name = name
-	rc.position = offset
-	rc.enabled = true
-	rc.collide_with_bodies = true
-	rc.collision_mask = 1
-	add_child(rc)
-	return rc
+var player: Node2D
+var cooldown_t: float = 0.0
+var jump_t: float = 0.0
+var attacking: bool = false
+var stunned: bool = false
+var dying: bool = false
+var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 
-func configure_raycast(rc: RayCast2D, target_pos: Vector2) -> void:
-	rc.enabled = true
-	rc.target_position = target_pos
-	rc.collide_with_bodies = true
-	rc.collision_mask = 1
-	rc.exclude_parent = false
 
-func _physics_process(delta: float) -> void:
-	if is_dead:
+func _ready():
+	if not is_in_group("slime"):
+		add_to_group("slime")
+
+	player = get_tree().get_first_node_in_group(player_group)
+
+	if hitbox_shape:
+		attack_hitbox_base_position = hitbox_shape.position
+		hitbox_shape.disabled = true
+
+	if hitbox:
+		hitbox.body_entered.connect(_on_hitbox_body_entered)
+		hitbox.area_entered.connect(_on_hitbox_area_entered)
+
+	if attack_receiver and not attack_receiver.area_entered.is_connected(_on_attack_receiver_area_entered):
+		attack_receiver.area_entered.connect(_on_attack_receiver_area_entered)
+
+	if hurtbox and not hurtbox.area_entered.is_connected(_on_hurtbox_area_entered):
+		hurtbox.area_entered.connect(_on_hurtbox_area_entered)
+
+	play_idle_animation()
+
+
+func _physics_process(delta):
+	if dying:
 		return
 
-	if not is_on_floor():
-		velocity.y += gravity_strength * delta
+	if cooldown_t > 0:
+		cooldown_t -= delta
+	if jump_t > 0:
+		jump_t -= delta
 
-	attack_cooldown_timer -= delta
+	if move_mode != MoveMode.FLY and not is_on_floor():
+		velocity.y += gravity * delta
+	elif move_mode == MoveMode.FLY:
+		velocity.y = 0
 
-	if is_bouncing:
-		if is_on_floor():
-			is_bouncing = false
-	elif is_attacking:
-		handle_attack_motion()
-	elif player:
-		update_ai()
-	else:
-		patrol()
+	if not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group(player_group)
 
-	handle_animation()
+	if not is_instance_valid(player):
+		velocity.x = 0
+		move_and_slide()
+		return
+
+	var dist = global_position.distance_to(player.global_position)
+
+	if dist > aggro_range:
+		velocity.x = 0
+		move_and_slide()
+		return
+
+	if attack_mode == AttackMode.HITBOX and not stunned and not attacking and cooldown_t <= 0 and dist <= attack_range:
+		start_attack()
+		return
+
+	move_towards_player(dist)
 	move_and_slide()
+	process_contact_attack()
+	update_animation()
 
-func update_ai() -> void:
-	var distance_to_player = get_distance_to_player()
 
-	if distance_to_player < min_distance_to_player:
-		retreat_from_player()
-		return
+func move_towards_player(dist):
+	var dir = sign(player.global_position.x - global_position.x)
 
-	if distance_to_player <= detection_range:
-		if use_raycast_detection and not can_see_player():
-			is_chasing = false
-			patrol()
-		else:
-			is_chasing = true
-			chase_player()
-	else:
-		is_chasing = false
-		patrol()
-
-func get_distance_to_player() -> float:
-	if not player:
-		return INF
-	return global_position.distance_to(player.global_position)
-
-func retreat_from_player() -> void:
-	if not player:
-		return
-	var away_dir = -sign(player.global_position.x - global_position.x)
-	velocity.x = away_dir * patrol_speed
-	update_flip(away_dir)
-
-func can_see_player() -> bool:
-	if not player:
-		return false
-	var space_state = get_world_2d().direct_space_state
-	var query = PhysicsRayQueryParameters2D.create(global_position, player.global_position)
-	query.exclude = [self]
-	query.collision_mask = 1
-	var result = space_state.intersect_ray(query)
-	return result.is_empty()
-
-func chase_player() -> void:
-	var distance = get_distance_to_player()
-	var direction = sign(player.global_position.x - global_position.x)
-	update_flip(direction)
-
-	if distance < stop_chase_distance:
+	# ❌ NÃO vira imediatamente
+	if dist <= stop_distance and attack_mode == AttackMode.HITBOX:
 		velocity.x = 0
 		return
 
-	if distance < 70 and attack_cooldown_timer <= 0 and is_on_floor():
-		start_jump_attack(direction)
+	# ✅ só vira quando realmente vai se mover
+	update_sprite_direction(dir)
+
+	match move_mode:
+		MoveMode.WALK:
+			velocity.x = dir * speed
+		MoveMode.JUMP:
+			velocity.x = dir * speed
+			if is_on_floor():
+				velocity.y = jump_force
+		MoveMode.FLY:
+			velocity.x = dir * speed
+
+
+# ✅ NOVA FUNÇÃO RESPONSÁVEL POR VIRAR O SPRITE
+func update_sprite_direction(dir):
+	if not sprite:
+		return
+
+	if sprite_faces_left_by_default:
+		sprite.flip_h = dir > 0
 	else:
-		velocity.x = direction * chase_speed
-		if is_on_wall() and is_on_floor():
-			velocity.y = jump_force
+		sprite.flip_h = dir < 0
 
-func start_jump_attack(direction: float) -> void:
-	is_attacking = true
-	attack_cooldown_timer = attack_cooldown
-	velocity.y = jump_attack_force
-	velocity.x = direction * jump_attack_horizontal_speed
-	animation_sprite.play("jump_attack")
-	print("🧨 Slime iniciou salto em direção ao player!")
+	update_attack_hitbox_direction(dir)
 
-func handle_attack_motion() -> void:
-	if is_on_floor():
-		is_attacking = false
 
-func patrol() -> void:
-	velocity.x = move_direction * patrol_speed
-	update_flip(move_direction)
-	if is_on_wall():
-		move_direction *= -1
-		if is_on_floor():
-			velocity.y = jump_force
-	if detect_ledges and is_on_floor():
-		check_ledges()
-
-func check_ledges() -> void:
-	if move_direction > 0 and raycast_right and not raycast_right.is_colliding():
-		move_direction *= -1
-		if is_on_floor():
-			velocity.y = jump_force
-	elif move_direction < 0 and raycast_left and not raycast_left.is_colliding():
-		move_direction *= -1
-		if is_on_floor():
-			velocity.y = jump_force
-
-# ====================================================================
-# 🔥 NOVO — DANO USANDO O SISTEMA DO PLAYER (take_damage / invencibility)
-# ====================================================================
-func deal_damage_to_player(player_body: Node2D) -> void:
-	if attack_cooldown_timer > 0 or is_dead or is_bouncing:
+func update_attack_hitbox_direction(dir: int) -> void:
+	if not hitbox_shape:
 		return
 
-	var dealt := false
+	hitbox_shape.position = Vector2(
+		-attack_hitbox_base_position.x if sprite and sprite.flip_h else attack_hitbox_base_position.x,
+		attack_hitbox_base_position.y
+	)
 
-	# ===== PRIORITÁRIO: sistema novo =====
-	if player_body.has_method("take_damage"):
-		player_body.take_damage(damage_amount)
-		dealt = true
 
-	# ===== Fallback para players mais antigos ou NPCs =====
-	elif player_body.has_node("Stats"):
-		var stats = player_body.get_node("Stats")
-		if stats.has_method("take_damage"):
-			stats.take_damage(damage_amount)
-			dealt = true
-
-	if dealt:
-		print("💥 Slime causou dano no player!")
-
-		# Knockback no player
-		if player_body is CharacterBody2D:
-			var dir = sign(player_body.global_position.x - global_position.x)
-			player_body.velocity.x = dir * 300
-			player_body.velocity.y = -150
-
-		# Bounce opcional no slime
-		if bounce_on_hit:
-			execute_bounce(player_body)
-
-		attack_cooldown_timer = attack_cooldown
-
-func execute_bounce(player_body: Node2D) -> void:
-	var bounce_dir = -sign(player_body.global_position.x - global_position.x)
-	velocity.x = bounce_dir * bounce_distance
-	velocity.y = bounce_force
-	is_bouncing = true
-
-	if particles:
-		particles.emitting = true
-		await get_tree().create_timer(0.3).timeout
-		if particles:
-			particles.emitting = false
-	print("🔄 Slime deu bounce!")
-
-# ====================================================================
-# 🔥 FUNÇÕES DE DETECÇÃO DE ÁREAS (atualizadas para usar take_damage)
-# ====================================================================
-func _on_damage_area_body_entered(body: Node) -> void:
-	if is_dead:
+func process_contact_attack():
+	if dying:
 		return
-	
-	if body.is_in_group("player"):
-		deal_damage_to_player(body)
 
-func _on_damage_area_area_entered(area: Area2D) -> void:
-	if is_dead:
+	if attack_mode != AttackMode.CONTACT:
 		return
-	
-	if area.is_in_group("player_hurtbox") or area.is_in_group("player"):
-		var p = area.get_parent()
-		if p and p.is_in_group("player"):
-			deal_damage_to_player(p)
 
-# ====================================================================
-# 💀 DANO NO INIMIGO
-# ====================================================================
-func take_damage() -> void:
-	if is_dead:
+	if cooldown_t > 0 or stunned or attacking:
 		return
-	is_dead = true
-	velocity = Vector2.ZERO
-	if hit_area:
-		hit_area.monitoring = false
-		hit_area.set_deferred("monitoring", false)
-	if damage_area:
-		damage_area.monitoring = false
-		damage_area.set_deferred("monitoring", false)
-	animation_sprite.visible = false
-	if particles:
-		particles.emitting = true
-	await get_tree().create_timer(0.5).timeout
+
+	for i in range(get_slide_collision_count()):
+		var collision = get_slide_collision(i)
+		if collision == null:
+			continue
+
+		var target := resolve_contact_target(collision.get_collider())
+		if target:
+			apply_damage_to(target)
+			cooldown_t = attack_cooldown
+			return
+
+
+func start_attack():
+	attacking = true
+	cooldown_t = attack_cooldown
+
+	play_attack_animation()
+
+	if uses_frame_based_hitbox():
+		await run_attack_hitbox_by_frames(attack_animation)
+	else:
+		await wait_for_attack_hitbox_start()
+
+		if hitbox_shape:
+			hitbox_shape.disabled = false
+
+		await get_tree().create_timer(hitbox_active_time).timeout
+
+		if hitbox_shape:
+			hitbox_shape.disabled = true
+
+	await wait_for_animation(attack_animation)
+
+	attacking = false
+
+
+func take_damage(amount):
+	if dying:
+		return
+
+	health -= max(amount, 1)
+	stunned = true
+	attacking = false
+
+	if health <= 0:
+		die()
+		return
+
+	await get_tree().create_timer(1.0).timeout
+	stunned = false
+
+
+func die():
+	if dying:
+		return
+
+	dying = true
+
+	set_physics_process(false)
+	set_collision_layer(0)
+	set_collision_mask(0)
+
+	if $CollisionShape2D:
+		$CollisionShape2D.set_deferred("disabled", true)
+
+	if hitbox_shape:
+		hitbox_shape.set_deferred("disabled", true)
+
+	if hurtbox:
+		hurtbox.set_deferred("monitoring", false)
+
+	if attack_receiver:
+		attack_receiver.set_deferred("monitoring", false)
+
+	attacking = false
+
+	if has_animation(death_animation):
+		play_animation(death_animation)
+		await wait_for_animation(death_animation)
+
 	queue_free()
 
-func _on_hit_area_entered(area: Area2D) -> void:
-	if is_dead:
+
+func apply_damage_to(target):
+	if target.has_method("take_damage"):
+		target.take_damage(damage)
+
+
+func _on_hitbox_body_entered(body):
+	if dying or not attacking:
+		return
+	var target := resolve_damage_target(body)
+	if target:
+		apply_damage_to(target)
+
+
+func _on_hitbox_area_entered(area):
+	if dying or not attacking:
+		return
+	var target := resolve_damage_target(area)
+	if target:
+		apply_damage_to(target)
+
+
+func _on_attack_receiver_area_entered(area):
+	if area == null or dying:
 		return
 
-	if area.is_in_group("stomper"):
-		# Player pisou por cima!
-		take_damage()  # inimigo morre
-		stomp_bounce(area)
-
-func stomp_bounce(stomper: Area2D) -> void:
-	var player = stomper.get_parent()
-	if player and player is CharacterBody2D:
-		player.velocity.y = -260  # pode ajustar a força do bounce
-		player.bounce_from_enemy() # chamaremos essa função no player
+	if area.is_in_group("player_attack"):
+		take_damage(get_damage_from_area(area, 1))
 
 
-# ====================================================================
-# 🎞️ ANIMAÇÃO DO SLIME
-# ====================================================================
-func update_flip(direction: float) -> void:
-	if direction > 0:
-		animation_sprite.flip_h = true
-	elif direction < 0:
-		animation_sprite.flip_h = false
-
-func handle_animation() -> void:
-	if is_dead:
+func _on_hurtbox_area_entered(area):
+	if area == null or dying:
 		return
-	if is_bouncing:
-		animation_sprite.play("bounce" if animation_sprite.sprite_frames.has_animation("bounce") else "fall")
-	elif is_attacking:
-		if animation_sprite.sprite_frames.has_animation("jump_attack"):
-			animation_sprite.play("jump_attack")
-		else:
-			animation_sprite.play("jump")
-	elif not is_on_floor():
-		animation_sprite.play("fall")
-	elif abs(velocity.x) > 0:
-		animation_sprite.play("walk")
+
+	if area.is_in_group("player_stomper"):
+		take_damage(get_damage_from_area(area, 1))
+
+
+func get_damage_from_area(area: Area2D, fallback: int = 1) -> int:
+	if area and area.has_meta(ATTACK_META_DAMAGE):
+		return max(int(area.get_meta(ATTACK_META_DAMAGE)), 1)
+	return max(fallback, 1)
+
+
+func resolve_damage_target(node: Node) -> Node:
+	var current := node
+	while current != null:
+		if current.is_in_group(player_hurtbox_group):
+			return current.get_parent()
+		current = current.get_parent()
+	return null
+
+
+func resolve_contact_target(node: Node) -> Node:
+	var current := node
+	while current != null:
+		if current.is_in_group(player_group):
+			return current
+		current = current.get_parent()
+	return null
+
+
+func deal_damage_to_player(target: Node) -> void:
+	if target and target.has_method("take_damage"):
+		target.take_damage(damage)
+
+
+func uses_frame_based_hitbox() -> bool:
+	return attack_hitbox_start_frame >= 0 and attack_hitbox_end_frame >= attack_hitbox_start_frame
+
+
+func run_attack_hitbox_by_frames(anim: StringName) -> void:
+	if not sprite or not has_animation(anim):
+		return
+
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+
+	var last_frame := -1
+	while attacking and sprite.animation == anim and sprite.is_playing():
+		var frame := sprite.frame
+		if frame != last_frame:
+			update_attack_hitbox_frame_state(frame)
+			last_frame = frame
+		await get_tree().process_frame
+
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+
+
+func update_attack_hitbox_frame_state(frame: int) -> void:
+	if not hitbox_shape:
+		return
+
+	var inside_window := frame >= attack_hitbox_start_frame and frame <= attack_hitbox_end_frame
+	hitbox_shape.disabled = not inside_window
+
+
+func update_animation():
+	if sprite == null or dying:
+		return
+
+	if attacking:
+		play_attack_animation()
+	elif abs(velocity.x) > 5:
+		play_walk_animation()
 	else:
-		animation_sprite.play("idle")
+		play_idle_animation()
+
+
+func play_idle_animation():
+	play_animation(idle_animation)
+
+func play_walk_animation():
+	play_animation(walk_animation)
+
+func play_attack_animation():
+	play_animation(attack_animation)
+
+
+func wait_for_animation(anim):
+	if not has_animation(anim):
+		return
+
+	var duration = get_animation_duration(anim)
+	if duration > 0:
+		await get_tree().create_timer(duration).timeout
+
+
+func wait_for_attack_hitbox_start():
+	var total = get_animation_duration(attack_animation)
+	var delay = maxf(total - hitbox_active_time, 0)
+	if delay > 0:
+		await get_tree().create_timer(delay).timeout
+
+
+func get_animation_duration(anim):
+	if not has_animation(anim):
+		return 0
+
+	var frames = sprite.sprite_frames.get_frame_count(anim)
+	var speed = maxf(sprite.sprite_frames.get_animation_speed(anim), 1.0)
+
+	return float(frames) / speed
+
+
+func has_animation(anim):
+	return sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation(anim)
+
+
+func play_animation(anim):
+	if has_animation(anim) and sprite.animation != anim:
+		sprite.play(anim)

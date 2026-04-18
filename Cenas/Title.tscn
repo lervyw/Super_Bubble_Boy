@@ -450,6 +450,11 @@ layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "poder 4"
 
+[node name="Controle13" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "ultimate"
+
 [node name="Voltar" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
@@ -462,7 +467,7 @@ bus = &"music"
 
 [connection signal="pressed" from="MainMenu/VBoxContainer/Start" to="." method="_on_iniciar"]
 [connection signal="pressed" from="MainMenu/VBoxContainer/Config" to="." method="_open_config_menu"]
-[connection signal="pressed" from="MainMenu/VBoxContainer/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Quit" to="." method="_on_sair"]
 [connection signal="pressed" from="ConfigMenu/VBoxContainer/ConfigurarBotoes" to="." method="_open_botoes_menu"]
-[connection signal="pressed" from="ConfigMenu/VBoxContainer/Voltar" to="." method="_on_back_to_main"]
-[connection signal="pressed" from="ControlsMenu/ScrollContainer/VBoxContainer/Voltar" to="." method="_on_back_to_config"]
+[connection signal="pressed" from="ConfigMenu/VBoxContainer/Voltar" to="." method="_back_to_menu"]
+[connection signal="pressed" from="ControlsMenu/ScrollContainer/VBoxContainer/Voltar" to="." method="_back_to_config_menu"]
