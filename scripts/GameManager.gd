@@ -78,6 +78,12 @@ func lose_life() -> void:
 		print("💀 Sem vidas! Indo para tela de Continue...")
 		goto_continue()
 
+
+func consume_life() -> int:
+	player_lives = max(player_lives - 1, 0)
+	print("💔 Vidas restantes: %d" % player_lives)
+	return player_lives
+
 func restore_full_lives() -> void:
 	player_lives = 3
 	print("💚 Vidas restauradas para: %d" % player_lives)
@@ -100,6 +106,12 @@ func restore_full_health() -> void:
 	if player and "stats" in player and player.stats and player.stats.has_method("restore_full_health"):
 		player.stats.restore_full_health()
 		print("💚 HP completamente restaurado!")
+
+func restore_full_mana() -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if player and "stats" in player and player.stats and player.stats.has_method("restore_full_mana"):
+		player.stats.restore_full_mana()
+		print("🔷 Mana completamente restaurada!")
 
 # =======================
 # ===== DEBUG ===========
