@@ -109,7 +109,7 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_m7g7x"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2w4kv"]
-size = Vector2(12, 17)
+size = Vector2(19, 21)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack_receiver"]
 size = Vector2(26, 18)
@@ -121,12 +121,13 @@ size = Vector2(20, 7)
 collision_layer = 4
 script = ExtResource("1_4p1wq")
 stop_distance = 10.0
+attack_hitbox_start_frame = 0
 max_health = 1
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(3, -4)
 sprite_frames = SubResource("SpriteFrames_7ftlq")
-animation = &"walk"
+animation = &"attack"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["slime"]]
 shape = SubResource("CircleShape2D_m7g7x")
@@ -134,7 +135,7 @@ shape = SubResource("CircleShape2D_m7g7x")
 [node name="AttackHitbox" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
-position = Vector2(0, 1.5)
+position = Vector2(-3.5, -0.5)
 shape = SubResource("RectangleShape2D_2w4kv")
 
 [node name="AttackReceiver" type="Area2D" parent="."]

@@ -144,9 +144,6 @@ var unlocked_forms = {
 func _ready() -> void:
 	normalize_attack_configuration()
 
-	if not is_in_group("player"):
-		add_to_group("player")
-
 	if $Sprite2D and $Sprite2D.has_signal("attack_finished"):
 		if not has_method("_on_attack_finished"):
 			push_error("Player: método _on_attack_finished não encontrado!")

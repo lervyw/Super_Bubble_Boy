@@ -6,7 +6,8 @@ enum MoveMode { WALK, JUMP, FLY }
 enum AttackMode { CONTACT, HITBOX }
 
 @export_group("Target")
-@export var player_group: StringName = "player"
+@export var player_group: StringName = "jogador"
+@export var player_hurtbox_group: StringName = "player_hurtbox"
 
 @export_group("Movement")
 @export var move_mode: MoveMode = MoveMode.JUMP
@@ -32,6 +33,8 @@ enum AttackMode { CONTACT, HITBOX }
 @export var attack_cooldown: float = 0.85
 @export var contact_attack_requires_fall: bool = false
 @export var contact_attack_min_speed_y: float = 10.0
+@export_range(-1, 99, 1) var attack_hitbox_start_frame: int = -1
+@export_range(-1, 99, 1) var attack_hitbox_end_frame: int = -1
 
 @export_group("Health")
 @export var max_health: int = 3
@@ -158,6 +161,18 @@ func update_sprite_direction(dir):
 	else:
 		sprite.flip_h = dir < 0
 
+	update_attack_hitbox_direction(dir)
+
+
+func update_attack_hitbox_direction(dir: int) -> void:
+	if not hitbox_shape:
+		return
+
+	hitbox_shape.position = Vector2(
+		-attack_hitbox_base_position.x if sprite and sprite.flip_h else attack_hitbox_base_position.x,
+		attack_hitbox_base_position.y
+	)
+
 
 func process_contact_attack():
 	if dying:
@@ -174,7 +189,7 @@ func process_contact_attack():
 		if collision == null:
 			continue
 
-		var target := resolve_player_target(collision.get_collider())
+		var target := resolve_contact_target(collision.get_collider())
 		if target:
 			apply_damage_to(target)
 			cooldown_t = attack_cooldown
@@ -187,15 +202,18 @@ func start_attack():
 
 	play_attack_animation()
 
-	await wait_for_attack_hitbox_start()
+	if uses_frame_based_hitbox():
+		await run_attack_hitbox_by_frames(attack_animation)
+	else:
+		await wait_for_attack_hitbox_start()
 
-	if hitbox_shape:
-		hitbox_shape.disabled = false
+		if hitbox_shape:
+			hitbox_shape.disabled = false
 
-	await get_tree().create_timer(hitbox_active_time).timeout
+		await get_tree().create_timer(hitbox_active_time).timeout
 
-	if hitbox_shape:
-		hitbox_shape.disabled = true
+		if hitbox_shape:
+			hitbox_shape.disabled = true
 
 	await wait_for_animation(attack_animation)
 
@@ -257,7 +275,7 @@ func apply_damage_to(target):
 func _on_hitbox_body_entered(body):
 	if dying or not attacking:
 		return
-	var target := resolve_player_target(body)
+	var target := resolve_damage_target(body)
 	if target:
 		apply_damage_to(target)
 
@@ -265,7 +283,7 @@ func _on_hitbox_body_entered(body):
 func _on_hitbox_area_entered(area):
 	if dying or not attacking:
 		return
-	var target := resolve_player_target(area)
+	var target := resolve_damage_target(area)
 	if target:
 		apply_damage_to(target)
 
@@ -292,12 +310,19 @@ func get_damage_from_area(area: Area2D, fallback: int = 1) -> int:
 	return max(fallback, 1)
 
 
-func resolve_player_target(node: Node) -> Node:
+func resolve_damage_target(node: Node) -> Node:
+	var current := node
+	while current != null:
+		if current.is_in_group(player_hurtbox_group):
+			return current.get_parent()
+		current = current.get_parent()
+	return null
+
+
+func resolve_contact_target(node: Node) -> Node:
 	var current := node
 	while current != null:
 		if current.is_in_group(player_group):
-			return current
-		if current.has_method("take_damage") and current is CharacterBody2D:
 			return current
 		current = current.get_parent()
 	return null
@@ -306,6 +331,37 @@ func resolve_player_target(node: Node) -> Node:
 func deal_damage_to_player(target: Node) -> void:
 	if target and target.has_method("take_damage"):
 		target.take_damage(damage)
+
+
+func uses_frame_based_hitbox() -> bool:
+	return attack_hitbox_start_frame >= 0 and attack_hitbox_end_frame >= attack_hitbox_start_frame
+
+
+func run_attack_hitbox_by_frames(anim: StringName) -> void:
+	if not sprite or not has_animation(anim):
+		return
+
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+
+	var last_frame := -1
+	while attacking and sprite.animation == anim and sprite.is_playing():
+		var frame := sprite.frame
+		if frame != last_frame:
+			update_attack_hitbox_frame_state(frame)
+			last_frame = frame
+		await get_tree().process_frame
+
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+
+
+func update_attack_hitbox_frame_state(frame: int) -> void:
+	if not hitbox_shape:
+		return
+
+	var inside_window := frame >= attack_hitbox_start_frame and frame <= attack_hitbox_end_frame
+	hitbox_shape.disabled = not inside_window
 
 
 func update_animation():

@@ -561,11 +561,13 @@ collision_layer = 2
 script = ExtResource("1_faq14")
 max_health = 40
 stop_distance = 20.0
+attack_hitbox_start_frame = 3
+attack_hitbox_end_frame = 4
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -24)
 sprite_frames = SubResource("SpriteFrames_s534l")
-animation = &"walk_super"
+animation = &"attack"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["boss"]]
 shape = SubResource("CircleShape2D_c7w6l")

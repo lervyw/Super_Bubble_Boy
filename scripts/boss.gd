@@ -9,7 +9,8 @@ const ATTACK_META_DAMAGE := &"attack_damage"
 enum State { IDLE, CHASE, ATTACK, STUN, TRANSFORM, DEAD }
 enum Form { NORMAL, SUPER }
 
-@export var player_group: StringName = "player"
+@export var player_group: StringName = "jogador"
+@export var player_hurtbox_group: StringName = "player_hurtbox"
 
 @export_group("Stats")
 @export var max_health: int = 6
@@ -26,6 +27,8 @@ var health: int = max_health
 @export var attack_range: float = 70.0
 @export var attack_cooldown: float = 1.0
 @export var hitbox_active_time: float = 0.12
+@export_range(-1, 99, 1) var attack_hitbox_start_frame: int = -1
+@export_range(-1, 99, 1) var attack_hitbox_end_frame: int = -1
 
 @export_group("Animations")
 @export var idle_animation: StringName = &"idle"
@@ -58,6 +61,7 @@ var form: Form = Form.NORMAL
 var cooldown_t := 0.0
 var facing_dir := -1
 var hud_visible := false
+var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 
 # =========================================================
 
@@ -75,12 +79,15 @@ func _ready():
 		attack_receiver.area_entered.connect(_on_attack_receiver_area_entered)
 
 	if hitbox_shape:
+		attack_hitbox_base_position = hitbox_shape.position
 		hitbox_shape.disabled = true
 
 	if hitbox:
 		hitbox.body_entered.connect(_on_hitbox_body_entered)
 		if not hitbox.area_entered.is_connected(_on_hitbox_area_entered):
 			hitbox.area_entered.connect(_on_hitbox_area_entered)
+
+	update_sprite_direction(facing_dir)
 
 	emit_signal("health_changed", health, max_health)
 	emit_signal("hud_visibility_changed", false)
@@ -96,6 +103,8 @@ func _physics_process(delta):
 
 	apply_gravity(delta)
 
+	if not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group(player_group)
 	if not is_instance_valid(player):
 		return
 
@@ -126,12 +135,15 @@ func handle_idle(dist):
 
 func handle_chase(dist):
 	var dir = sign(player.global_position.x - global_position.x)
+	if dir == 0:
+		dir = facing_dir
+
+	facing_dir = dir
+	update_sprite_direction(facing_dir)
 
 	if dist <= stop_distance:
 		velocity.x = 0
 	else:
-		facing_dir = dir
-		update_sprite_direction(facing_dir)
 		velocity.x = dir * speed
 
 	if dist <= attack_range and cooldown_t <= 0:
@@ -146,15 +158,18 @@ func start_attack():
 
 	play_attack_animation()
 
-	await wait_for_attack_hitbox_start()
+	if uses_frame_based_hitbox():
+		await run_attack_hitbox_by_frames(get_attack_anim())
+	else:
+		await wait_for_attack_hitbox_start()
 
-	if hitbox_shape:
-		hitbox_shape.disabled = false
+		if hitbox_shape:
+			hitbox_shape.disabled = false
 
-	await get_tree().create_timer(hitbox_active_time).timeout
+		await get_tree().create_timer(hitbox_active_time).timeout
 
-	if hitbox_shape:
-		hitbox_shape.disabled = true
+		if hitbox_shape:
+			hitbox_shape.disabled = true
 
 	await wait_for_animation(get_attack_anim())
 
@@ -234,13 +249,13 @@ func _on_attack_receiver_area_entered(area):
 		take_damage(get_damage_from_area(area, 1))
 
 func _on_hitbox_body_entered(body):
-	var target := resolve_player_target(body)
+	var target := resolve_damage_target(body)
 	if target and target.has_method("take_damage"):
 		target.take_damage(damage)
 
 
 func _on_hitbox_area_entered(area):
-	var target := resolve_player_target(area)
+	var target := resolve_damage_target(area)
 	if target and target.has_method("take_damage"):
 		target.take_damage(damage)
 
@@ -251,13 +266,11 @@ func get_damage_from_area(area: Area2D, fallback: int = 1) -> int:
 	return max(fallback, 1)
 
 
-func resolve_player_target(node: Node) -> Node:
+func resolve_damage_target(node: Node) -> Node:
 	var current := node
 	while current != null:
-		if current.is_in_group(player_group):
-			return current
-		if current.has_method("take_damage") and current is CharacterBody2D:
-			return current
+		if current.is_in_group(player_hurtbox_group):
+			return current.get_parent()
 		current = current.get_parent()
 	return null
 
@@ -291,6 +304,48 @@ func update_sprite_direction(dir):
 
 	# sprite olha pra esquerda por padrão
 	sprite.flip_h = dir > 0
+	update_attack_hitbox_direction(dir)
+
+
+func update_attack_hitbox_direction(dir: int) -> void:
+	if not hitbox_shape:
+		return
+
+	hitbox_shape.position = Vector2(
+		-attack_hitbox_base_position.x if sprite and sprite.flip_h else attack_hitbox_base_position.x,
+		attack_hitbox_base_position.y
+	)
+
+
+func uses_frame_based_hitbox() -> bool:
+	return attack_hitbox_start_frame >= 0 and attack_hitbox_end_frame >= attack_hitbox_start_frame
+
+
+func run_attack_hitbox_by_frames(anim: StringName) -> void:
+	if not sprite or not has_animation(anim):
+		return
+
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+
+	var last_frame := -1
+	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing():
+		var frame := sprite.frame
+		if frame != last_frame:
+			update_attack_hitbox_frame_state(frame)
+			last_frame = frame
+		await get_tree().process_frame
+
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+
+
+func update_attack_hitbox_frame_state(frame: int) -> void:
+	if not hitbox_shape:
+		return
+
+	var inside_window := frame >= attack_hitbox_start_frame and frame <= attack_hitbox_end_frame
+	hitbox_shape.disabled = not inside_window
 
 # =========================================================
 

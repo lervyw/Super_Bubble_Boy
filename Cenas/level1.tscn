@@ -836,7 +836,7 @@ level = NodePath("..")
 player = NodePath("../player")
 
 [node name="player" parent="." groups=["player"] instance=ExtResource("2_csolo")]
-position = Vector2(-1007, 81)
+position = Vector2(225, 167)
 respawn_position = Vector2(182, 214)
 
 [node name="Sprite2D" parent="player" index="0" node_paths=PackedStringArray("nivel")]
