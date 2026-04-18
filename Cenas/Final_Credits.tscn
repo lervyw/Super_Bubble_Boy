@@ -1,12 +1,10 @@
 [gd_scene load_steps=8 format=3 uid="uid://cxlaxy2tpvxf6"]
 
 [ext_resource type="Texture2D" uid="uid://dhjaruc8dbs22" path="res://sprites/img/background/fundo/preto2.png" id="1_drqkr"]
+[ext_resource type="Script" uid="uid://blivby1w6e4f5" path="res://scripts/final_credits.gd" id="2_hv7c0"]
 [ext_resource type="Texture2D" uid="uid://dvpjyo0caiwvi" path="res://sprites/img/logo_baixa_reso.png" id="4_ov38y"]
 [ext_resource type="FontFile" uid="uid://tb0dgy82p4df" path="res://sprites/img/background/fundo/Rev Mini Pixel.ttf" id="8_r48pw"]
 [ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://music/A Alegria Pixelada.wav" id="9_4q30t"]
-
-[sub_resource type="Resource" id="Resource_ywxhq"]
-metadata/__load_path__ = "res://Cenas/final_credits.gd"
 
 [sub_resource type="Theme" id="Theme_qofri"]
 Label/font_sizes/font_size = 26
@@ -24,7 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("Resource_ywxhq")
+script = ExtResource("2_hv7c0")
 
 [node name="Bg_0" type="TextureRect" parent="."]
 layout_mode = 0

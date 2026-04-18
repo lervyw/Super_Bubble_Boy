@@ -1,11 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://4v1mv6nx587x"]
+[gd_scene load_steps=6 format=3 uid="uid://4v1mv6nx587x"]
 
 [ext_resource type="Script" uid="uid://c73t1ba5irapk" path="res://scripts/hud.gd" id="1_uow6a"]
 [ext_resource type="Texture2D" uid="uid://b1ui6vclleonv" path="res://sprites/bubble/VidaBolha.png" id="2_hek4y"]
+[ext_resource type="Texture2D" uid="uid://hsp7iqcuiprc" path="res://sprites/img/progressbar/3.png" id="3_is2x6"]
+[ext_resource type="Script" uid="uid://d2h8ljiy2tu0a" path="res://Cenas/hud_panel.gd" id="5_is2x6"]
+[ext_resource type="Texture2D" uid="uid://bfxdsw5y0srba" path="res://sprites/img/progressbar/2.png" id="5_mdj34"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("label")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "boss_hp_bar", "menu_panel")]
 script = ExtResource("1_uow6a")
-label = NodePath("HBoxContainer/Holder/Label")
+heart_icons = [NodePath("HBoxContainer/Holder/HPBar1"), NodePath("HBoxContainer/Holder/HPBar2"), NodePath("HBoxContainer/Holder/HPBar3")]
+hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
+mana_bar = NodePath("HBoxContainer/Holder/ManaBar")
+boss_hp_bar = NodePath("BossBar")
+menu_panel = NodePath("Panel")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 anchors_preset = 15
@@ -22,20 +29,108 @@ size_flags_vertical = 4
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Bubble" type="TextureRect" parent="HBoxContainer/Holder"]
+[node name="HPBar1" type="TextureRect" parent="HBoxContainer/Holder"]
 texture_filter = 1
 layout_mode = 1
-offset_right = 8.0
-offset_bottom = 9.0
+offset_left = 10.949837
+offset_top = 4.7003965
+offset_right = 26.949837
+offset_bottom = 20.700397
 scale = Vector2(0.865075, 1.75739)
 texture = ExtResource("2_hek4y")
 stretch_mode = 1
 
-[node name="Label" type="Label" parent="HBoxContainer/Holder"]
+[node name="HPBar2" type="TextureRect" parent="HBoxContainer/Holder"]
+texture_filter = 1
+layout_mode = 1
+offset_left = 25.144068
+offset_top = 4.7003965
+offset_right = 41.144066
+offset_bottom = 20.700397
+scale = Vector2(0.865075, 1.75739)
+texture = ExtResource("2_hek4y")
+stretch_mode = 1
+
+[node name="HPBar3" type="TextureRect" parent="HBoxContainer/Holder"]
+texture_filter = 1
+layout_mode = 1
+offset_left = 39.338303
+offset_top = 4.7003965
+offset_right = 55.338306
+offset_bottom = 20.700397
+scale = Vector2(0.865075, 1.75739)
+texture = ExtResource("2_hek4y")
+stretch_mode = 1
+
+[node name="HPLabel" type="Label" parent="HBoxContainer/Holder"]
+visible = false
 layout_mode = 0
-offset_left = 15.4109
-offset_top = 2.82024
-offset_right = 55.4109
-offset_bottom = 25.8202
+offset_left = 4.461045
+offset_top = 8.46072
+offset_right = 44.461044
+offset_bottom = 31.46072
 scale = Vector2(0.4899, 0.888391)
 text = "00"
+
+[node name="LivesLabel" type="Label" parent="HBoxContainer/Holder"]
+visible = false
+layout_mode = 0
+offset_left = 36.499454
+offset_top = 7.5206356
+offset_right = 76.499466
+offset_bottom = 30.520636
+scale = Vector2(0.4899, 0.888391)
+text = "00"
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="HBoxContainer/Holder"]
+layout_mode = 0
+offset_left = 4.461045
+offset_top = 11.280958
+offset_right = 264.46106
+offset_bottom = 38.28096
+scale = Vector2(0.21362264, 0.5078016)
+texture_under = ExtResource("3_is2x6")
+texture_progress = ExtResource("5_mdj34")
+
+[node name="ManaBar" type="TextureProgressBar" parent="HBoxContainer/Holder"]
+layout_mode = 0
+offset_left = 4.461045
+offset_top = 33.28096
+offset_right = 264.46106
+offset_bottom = 60.28096
+scale = Vector2(0.21362264, 0.3578016)
+texture_under = ExtResource("3_is2x6")
+texture_progress = ExtResource("5_mdj34")
+
+[node name="BossBar" type="TextureProgressBar" parent="."]
+offset_left = 48.0
+offset_top = 230.99998
+offset_right = 308.0
+offset_bottom = 258.0
+scale = Vector2(0.85, 0.85)
+texture_under = ExtResource("3_is2x6")
+texture_progress = ExtResource("5_mdj34")
+
+[node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("attack_special_button", "defend_button")]
+offset_left = 281.0
+offset_top = 159.0
+offset_right = 390.0
+offset_bottom = 258.0
+script = ExtResource("5_is2x6")
+attack_special_button = NodePath("TextureRect2")
+defend_button = NodePath("TextureRect")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect2" type="TextureRect" parent="Panel"]
+layout_mode = 0
+offset_left = 67.0
+offset_top = 29.0
+offset_right = 107.0
+offset_bottom = 69.0
+
+[node name="TextureRect" type="TextureRect" parent="Panel"]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 27.0
+offset_right = 43.0
+offset_bottom = 67.0
