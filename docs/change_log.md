@@ -182,3 +182,9 @@
 - Updated `scripts/timer.gd` so the timer can be configured by the level controller, hides itself when disabled, and no longer requires manual player wiring in the timer scene
 - Updated `scripts/player.gd` with a public timeout death path that uses the same hurt/death/restart/continue flow as fatal hits
 - Set `Cenas/level1.tscn` and `Cenas/level2.tscn` to explicitly use a 180 second countdown through their root level controller
+
+### Slime facing behavior
+
+- Reviewed `Cenas/level1.tscn` enemy setup and confirmed slimes target the player through the `jogador` group from the base player scene
+- Added `turn_horizontal_threshold` to `scripts/slime.gd` so slimes keep their current facing while the player is nearly above them
+- Slimes now only turn toward the player after the player has moved far enough horizontally, preventing rapid left/right flipping loops
