@@ -174,3 +174,11 @@
 ### Verification notes
 
 - No local Godot executable was available in the shell, so validation was limited to static inspection and diff review
+
+### Level timer reconnection
+
+- Reconnected the level timer through `scripts/level_1.gd` so each level can enable/disable countdown from the root node Inspector
+- Added per-level timer settings for `level_timer_enabled`, `level_time_limit`, and `timer_node`
+- Updated `scripts/timer.gd` so the timer can be configured by the level controller, hides itself when disabled, and no longer requires manual player wiring in the timer scene
+- Updated `scripts/player.gd` with a public timeout death path that uses the same hurt/death/restart/continue flow as fatal hits
+- Set `Cenas/level1.tscn` and `Cenas/level2.tscn` to explicitly use a 180 second countdown through their root level controller

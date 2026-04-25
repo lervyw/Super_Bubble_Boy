@@ -1154,6 +1154,16 @@ func die() -> void:
 	await play_death_sequence()
 
 
+func handle_level_timeout() -> void:
+	if fatal_hit_sequence_running or state == State.DEAD:
+		return
+
+	if mode == GameMode.PLATAFORMA and GameManager:
+		pending_game_over_after_death = GameManager.consume_life() <= 0
+
+	await play_fatal_hit_sequence()
+
+
 func play_hurt_reaction() -> void:
 	if hurt_sequence_running or fatal_hit_sequence_running or state == State.DEAD:
 		return

@@ -166,6 +166,16 @@ Recent history before new work:
 - The game window opens at `1260x840`, an integer 3x scale
 - Stretch aspect is `keep` so the image preserves the 3:2 proportion instead of expanding into a distorted shape
 
+## Level Timer
+
+- The timer HUD scene is `res://Cenas/Timer.tscn`
+- Timer logic lives in `res://scripts/timer.gd`
+- The default timer value in the timer script is still `180.0` seconds
+- The active per-level control is now on the root level script `res://scripts/level_1.gd`:
+  `level_timer_enabled`, `level_time_limit`, and `timer_node`
+- `level1` and `level2` currently enable the timer with `level_time_limit = 180.0`
+- When time reaches zero, the timer calls the player's timeout death flow so platform-mode lives and the Continue scene remain compatible
+
 ## Current Combat Notes
 
 - Slime enemies can now be configured in the Inspector to attack either by direct contact/pounce or by timed hitbox attack

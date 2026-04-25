@@ -34,6 +34,21 @@ extends Node2D
 
 
 # ================================
+#          CONFIGURAÇÃO DE TEMPO
+# ================================
+@export_group("Level Timer")
+
+# Liga/desliga o contador da fase pelo Inspector do nível.
+@export var level_timer_enabled: bool = true
+
+# Tempo total da fase em segundos.
+@export_range(1.0, 3600.0, 1.0) var level_time_limit: float = 180.0
+
+# Timer HUD da fase.
+@export var timer_node: NodePath = NodePath("Timer")
+
+
+# ================================
 #        PRÓXIMO NÍVEL
 # ================================
 @export_group("Next Level")
@@ -86,6 +101,7 @@ func _ready() -> void:
 
 	# Configura automaticamente todas as spawn zones
 	setup_spawn_zones()
+	setup_level_timer()
 
 
 # ================================
@@ -120,6 +136,28 @@ func setup_spawn_zones() -> void:
 				zone.player = player
 
 			print("✅ SpawnZone '%s' configurada" % zone.name)
+
+
+func setup_level_timer() -> void:
+	if timer_node == NodePath(""):
+		return
+
+	var level_timer = get_node_or_null(timer_node)
+	if not level_timer:
+		push_warning("Timer da fase não encontrado: %s" % timer_node)
+		return
+
+	if level_timer.has_method("configure_level_timer"):
+		level_timer.configure_level_timer(level_timer_enabled, level_time_limit, player)
+		return
+
+	level_timer.set("time_left", level_time_limit)
+	level_timer.set("player", player)
+	if level_timer.has_method("resume_timer") and level_timer_enabled:
+		level_timer.resume_timer()
+	elif level_timer.has_method("pause_timer"):
+		level_timer.pause_timer()
+	level_timer.visible = level_timer_enabled
 
 
 # ================================
