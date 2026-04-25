@@ -21,6 +21,7 @@ var health: int = max_health
 @export var gravity: float = 900.0
 @export var stop_distance: float = 60.0
 @export var aggro_range: float = 450.0
+@export var turn_horizontal_threshold: float = 32.0
 
 @export_group("Attack")
 @export var damage: int = 2
@@ -134,22 +135,32 @@ func handle_idle(dist):
 		state = State.CHASE
 
 func handle_chase(dist):
-	var dir = sign(player.global_position.x - global_position.x)
-	if dir == 0:
-		dir = facing_dir
+	var dir: int = get_horizontal_chase_direction()
 
-	facing_dir = dir
-	update_sprite_direction(facing_dir)
+	if dir != 0:
+		facing_dir = dir
 
 	if dist <= stop_distance:
 		velocity.x = 0
 	else:
-		velocity.x = dir * speed
+		velocity.x = facing_dir * speed
+		update_sprite_direction(facing_dir)
 
 	if dist <= attack_range and cooldown_t <= 0:
 		state = State.ATTACK
 		start_attack()
 		return
+
+
+func get_horizontal_chase_direction() -> int:
+	if not is_instance_valid(player):
+		return 0
+
+	var horizontal_delta: float = player.global_position.x - global_position.x
+	if absf(horizontal_delta) < turn_horizontal_threshold:
+		return 0
+
+	return int(sign(horizontal_delta))
 
 # =========================================================
 
