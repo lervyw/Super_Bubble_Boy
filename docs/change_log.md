@@ -188,3 +188,8 @@
 - Reviewed `Cenas/level1.tscn` enemy setup and confirmed slimes target the player through the `jogador` group from the base player scene
 - Added `turn_horizontal_threshold` to `scripts/slime.gd` so slimes keep their current facing while the player is nearly above them
 - Slimes now only turn toward the player after the player has moved far enough horizontally, preventing rapid left/right flipping loops
+
+### Boss facing behavior
+
+- Added the same horizontal turn threshold concept to `scripts/boss.gd`
+- The boss now keeps its current facing when the player is nearly above/centered and only turns after meaningful horizontal separation
