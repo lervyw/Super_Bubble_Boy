@@ -154,8 +154,17 @@ Recent history before new work:
 
 - `res://Cenas/Title.tscn` is the first screen shown by the game
 - `res://scripts/title.gd` controls the main menu, config menu, and input rebinding menu
+- The title menus use a framed dark pixel-art layout with the existing animated title/background assets
+- The config screen exposes Master, Music, and SFX volume sliders
 - The controls menu now includes a dedicated `Ultimate` rebind button for `ultimate_attack`
+- The controls menu also exposes left, right, crouch, dash, and pause rebinding entries
 - Title button signal wiring was aligned with the current script method names to avoid broken presses at runtime
+
+## Display Settings
+
+- Internal pixel-art viewport remains `420x280`
+- The game window opens at `1260x840`, an integer 3x scale
+- Stretch aspect is `keep` so the image preserves the 3:2 proportion instead of expanding into a distorted shape
 
 ## Current Combat Notes
 

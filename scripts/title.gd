@@ -32,6 +32,7 @@ extends Control
 # Sliders e botões da tela de configurações (volume + ir pro rebind)
 @onready var slider_musica = $ConfigMenu/VBoxContainer/SliderMusica
 @onready var slider_sfx = $ConfigMenu/VBoxContainer/SliderEfeitos
+@onready var slider_master = $ConfigMenu/VBoxContainer/SliderMaster
 @onready var btn_cfg_botoes = $ConfigMenu/VBoxContainer/ConfigurarBotoes
 @onready var btn_voltar_config = $ConfigMenu/VBoxContainer/Voltar
 
@@ -50,6 +51,11 @@ extends Control
 @onready var btn_ataque_especial = $ControlsMenu/ScrollContainer/VBoxContainer/Controle7
 @onready var btn_defesa = $ControlsMenu/ScrollContainer/VBoxContainer/Controle8
 @onready var btn_ultimate = $ControlsMenu/ScrollContainer/VBoxContainer/Controle13
+@onready var btn_esquerda = $ControlsMenu/ScrollContainer/VBoxContainer/Controle14
+@onready var btn_direita = $ControlsMenu/ScrollContainer/VBoxContainer/Controle15
+@onready var btn_agachar = $ControlsMenu/ScrollContainer/VBoxContainer/Controle16
+@onready var btn_dash = $ControlsMenu/ScrollContainer/VBoxContainer/Controle17
+@onready var btn_pause = $ControlsMenu/ScrollContainer/VBoxContainer/Controle18
 
 @onready var btn_combo1 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle9
 @onready var btn_combo2 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle10
@@ -90,6 +96,10 @@ func _ready():
 
 	# --- Conecta sliders/botões da config ---
 	# Ao mexer no slider, atualiza o volume via ConfigManager
+	slider_master.value = ConfigManager.get_volume("master")
+	slider_musica.value = ConfigManager.get_volume("music")
+	slider_sfx.value = ConfigManager.get_volume("sfx")
+	slider_master.value_changed.connect(func(val): ConfigManager.set_volume("master", val))
 	slider_musica.value_changed.connect(func(val): ConfigManager.set_volume("music", val))
 	slider_sfx.value_changed.connect(func(val): ConfigManager.set_volume("sfx", val))
 
@@ -107,6 +117,11 @@ func _ready():
 	_connect_rebind_button_once(btn_ataque_especial, "attack_special")
 	_connect_rebind_button_once(btn_defesa, "defend")
 	_connect_rebind_button_once(btn_ultimate, "ultimate_attack")
+	_connect_rebind_button_once(btn_esquerda, "left")
+	_connect_rebind_button_once(btn_direita, "right")
+	_connect_rebind_button_once(btn_agachar, "crouch")
+	_connect_rebind_button_once(btn_dash, "dash")
+	_connect_rebind_button_once(btn_pause, "pause_menu")
 	_connect_rebind_button_once(btn_combo1, "combo_1")
 	_connect_rebind_button_once(btn_combo2, "combo_2")
 	_connect_rebind_button_once(btn_combo3, "combo_3")
@@ -203,7 +218,8 @@ func _back_to_config_menu():
 func _start_rebind(action_name: String):
 	# Entra no modo "aguardando input" e define qual ação será alterada
 	awaiting_rebind_action = action_name
-	print("🎮 Pressione um botão para redefinir:", action_name)
+	_set_rebind_prompt("Pressione uma tecla ou botão")
+	print("Pressione um botão para redefinir:", action_name)
 
 func _finish_rebind(event: InputEvent):
 	# Aplica o rebind no ConfigManager (provavelmente mexe no InputMap e salva)
@@ -216,7 +232,7 @@ func _finish_rebind(event: InputEvent):
 
 
 # ================================
-#   VISUAL (ESTILO GZDOOM)
+#   VISUAL / LABELS
 # ================================
 func _update_control_labels():
 	# Atualiza o texto de cada botão para mostrar qual tecla/botão está configurado agora
@@ -229,11 +245,17 @@ func _update_control_labels():
 	btn_ataque_especial.text = "Ataque Especial: " + _get_current_input_name("attack_special")
 	btn_defesa.text = "Defesa: " + _get_current_input_name("defend")
 	btn_ultimate.text = "Ultimate: " + _get_current_input_name("ultimate_attack")
+	btn_esquerda.text = "Esquerda: " + _get_current_input_name("left")
+	btn_direita.text = "Direita: " + _get_current_input_name("right")
+	btn_agachar.text = "Agachar: " + _get_current_input_name("crouch")
+	btn_dash.text = "Dash: " + _get_current_input_name("dash")
+	btn_pause.text = "Pausa: " + _get_current_input_name("pause_menu")
 
 	btn_combo1.text = "Combo 1: " + _get_current_input_name("combo_1")
 	btn_combo2.text = "Combo 2: " + _get_current_input_name("combo_2")
 	btn_combo3.text = "Combo 3: " + _get_current_input_name("combo_3")
 	btn_combo4.text = "Combo 4: " + _get_current_input_name("combo_4")
+	_set_rebind_prompt("Selecione uma ação para remapear")
 
 
 func _get_current_input_name(action: String) -> String:
@@ -249,7 +271,10 @@ func _get_current_input_name(action: String) -> String:
 
 	# Se for teclado, converte keycode para string legível
 	if ev is InputEventKey:
-		return OS.get_keycode_string(ev.physical_keycode)
+		var keycode := ev.physical_keycode
+		if keycode == 0:
+			keycode = ev.keycode
+		return OS.get_keycode_string(keycode)
 
 	# Se for controle, mostra o índice do botão
 	if ev is InputEventJoypadButton:
@@ -257,3 +282,9 @@ func _get_current_input_name(action: String) -> String:
 
 	# Fallback pra casos não tratados (mouse, eixo analógico, etc.)
 	return "<desconhecido>"
+
+
+func _set_rebind_prompt(text: String) -> void:
+	var prompt := $ControlsMenu/ScrollContainer/VBoxContainer.get_node_or_null("RebindPrompt")
+	if prompt:
+		prompt.text = text

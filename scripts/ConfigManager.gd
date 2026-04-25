@@ -42,6 +42,8 @@ func _ready():
 func set_volume(bus_name: String, value_db: float):
 	# Busca o índice do bus de áudio pelo nome
 	var bus := AudioServer.get_bus_index(bus_name)
+	if bus < 0 and bus_name.to_lower() == "master":
+		bus = AudioServer.get_bus_index("Master")
 
 	# Se o bus existir, aplica o volume em decibéis
 	if bus >= 0:
