@@ -185,6 +185,7 @@ Recent history before new work:
 - Player stomp areas are now tagged separately from normal attack areas so enemies do not die from accidental side collisions
 - Boss animation flow is now script-driven using the available `idle`, `walk`, and `attack` animations
 - Boss facing also uses `turn_horizontal_threshold`, so it does not rapidly flip when the player is almost directly above it
+- Fatal boss hitbox damage passes the boss as the damage source, causing the player's death sequence to end on the Continue scene
 - `default` is treated as placeholder data for boss/slime sprite sheets and is no longer the intended runtime animation for their gameplay states
 - Attack hitboxes now turn off before the end of the animation, but the enemy remains in the attack state until the full attack animation duration has completed
 - The player scene now uses clearer area names:

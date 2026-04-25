@@ -767,13 +767,14 @@ func start_normal_attack() -> void:
 	trigger_attack_window(normal_attack_active_time)
 
 
-func take_damage(amount: int = 1) -> void:
+func take_damage(amount: int = 1, source: Node = null) -> void:
 	if is_invincible or state in [State.DEAD, State.HURT]:
 		return
 	if defending and state == State.DEFEND:
 		return
 
 	var is_fatal_hit := mode == GameMode.PLATAFORMA
+	var force_continue_after_death := is_boss_damage_source(source)
 
 	if mode == GameMode.PLATAFORMA:
 		pass
@@ -785,7 +786,7 @@ func take_damage(amount: int = 1) -> void:
 		is_fatal_hit = true
 
 	if is_fatal_hit:
-		_on_fatal_hit()
+		_on_fatal_hit(force_continue_after_death)
 		return
 
 	start_invincibility()
@@ -808,14 +809,25 @@ func start_invincibility() -> void:
 	is_invincible = false
 
 
-func _on_fatal_hit() -> void:
+func _on_fatal_hit(force_continue_after_death: bool = false) -> void:
 	if fatal_hit_sequence_running or state == State.DEAD:
 		return
 
 	if mode == GameMode.PLATAFORMA and GameManager:
 		pending_game_over_after_death = GameManager.consume_life() <= 0
+	if force_continue_after_death:
+		pending_game_over_after_death = true
 
 	await play_fatal_hit_sequence()
+
+
+func is_boss_damage_source(source: Node) -> bool:
+	var current := source
+	while current != null:
+		if current.is_in_group("boss"):
+			return true
+		current = current.get_parent()
+	return false
 
 
 func respawn_player() -> void:
