@@ -180,6 +180,8 @@ Recent history before new work:
 
 - Slime enemies can now be configured in the Inspector to attack either by direct contact/pounce or by timed hitbox attack
 - Slime flying is still selected through the existing `move_mode = FLY` option
+- Slimes target the player through the `jogador` group and use `player_hurtbox` for hitbox damage resolution
+- Slime facing now has a horizontal dead zone through `turn_horizontal_threshold`, so the enemy does not rapidly flip when the player is almost directly above it
 - Player stomp areas are now tagged separately from normal attack areas so enemies do not die from accidental side collisions
 - Boss animation flow is now script-driven using the available `idle`, `walk`, and `attack` animations
 - `default` is treated as placeholder data for boss/slime sprite sheets and is no longer the intended runtime animation for their gameplay states
