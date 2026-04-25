@@ -193,3 +193,9 @@
 
 - Added the same horizontal turn threshold concept to `scripts/boss.gd`
 - The boss now keeps its current facing when the player is nearly above/centered and only turns after meaningful horizontal separation
+
+### Boss fatal hit continue flow
+
+- Updated boss hitbox damage to pass the boss as the damage source to the player
+- Updated `scripts/player.gd` so fatal boss damage goes through the hurt/death sequence and then opens the Continue scene
+- Kept non-boss fatal hits using the existing platform lives rule before Continue

@@ -262,13 +262,13 @@ func _on_attack_receiver_area_entered(area):
 func _on_hitbox_body_entered(body):
 	var target := resolve_damage_target(body)
 	if target and target.has_method("take_damage"):
-		target.take_damage(damage)
+		target.take_damage(damage, self)
 
 
 func _on_hitbox_area_entered(area):
 	var target := resolve_damage_target(area)
 	if target and target.has_method("take_damage"):
-		target.take_damage(damage)
+		target.take_damage(damage, self)
 
 
 func get_damage_from_area(area: Area2D, fallback: int = 1) -> int:
