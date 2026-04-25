@@ -7,15 +7,33 @@ extends CanvasLayer
 @export var mana_bar: TextureProgressBar
 @export var boss_hp_bar: TextureProgressBar
 @export var menu_panel: Panel
+@export var pause_menu_panel: Control
+@export var passive_toggle: CheckButton
 
 var boss_target: Node = null
+var pause_menu_open: bool = false
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
 	if menu_panel:
 		menu_panel.visible = false
+	if pause_menu_panel:
+		pause_menu_panel.process_mode = Node.PROCESS_MODE_ALWAYS
+		pause_menu_panel.visible = false
+	if passive_toggle:
+		passive_toggle.process_mode = Node.PROCESS_MODE_ALWAYS
+		if not passive_toggle.toggled.is_connected(_on_passive_toggle_toggled):
+			passive_toggle.toggled.connect(_on_passive_toggle_toggled)
 	if boss_hp_bar:
 		boss_hp_bar.visible = false
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause_menu"):
+		toggle_pause_menu()
+		get_viewport().set_input_as_handled()
 
 
 func _process(_delta: float) -> void:
@@ -33,6 +51,7 @@ func _process(_delta: float) -> void:
 	_update_mana_bar()
 	_set_mana_visible(_is_mana_visible())
 	_update_menu_panel_state()
+	_update_pause_menu_state()
 
 
 func _update_hearts() -> void:
@@ -75,6 +94,16 @@ func _update_menu_panel_state() -> void:
 		return
 	if menu_panel.has_method("set_special_attack_enabled") and player:
 		menu_panel.set_special_attack_enabled(player.can_use_mana_attacks())
+	if menu_panel.has_method("set_ultimate_enabled") and player:
+		menu_panel.set_ultimate_enabled(player.allow_ultimate_input and player.ultimate_attack_enabled and player.can_use_mana_attacks())
+
+
+func _update_pause_menu_state() -> void:
+	if not pause_menu_open:
+		return
+	if passive_toggle and player and "passive_attack_enabled" in player:
+		if passive_toggle.button_pressed != player.passive_attack_enabled:
+			passive_toggle.set_pressed_no_signal(player.passive_attack_enabled)
 
 
 func _set_hearts_visible(v: bool) -> void:
@@ -190,3 +219,37 @@ func hide_menu() -> void:
 func update_action_selection(action_name: String) -> void:
 	if menu_panel and menu_panel.has_method("set_action_selection"):
 		menu_panel.set_action_selection(action_name)
+
+
+func toggle_pause_menu() -> void:
+	if pause_menu_open:
+		close_pause_menu()
+	else:
+		open_pause_menu()
+
+
+func open_pause_menu() -> void:
+	pause_menu_open = true
+	if player and player.has_method("close_hud_menu"):
+		player.close_hud_menu()
+	get_tree().paused = true
+
+	if pause_menu_panel:
+		pause_menu_panel.visible = true
+
+	if passive_toggle and player and "passive_attack_enabled" in player:
+		passive_toggle.set_pressed_no_signal(player.passive_attack_enabled)
+
+
+func close_pause_menu() -> void:
+	pause_menu_open = false
+
+	if pause_menu_panel:
+		pause_menu_panel.visible = false
+
+	get_tree().paused = false
+
+
+func _on_passive_toggle_toggled(enabled: bool) -> void:
+	if player and player.has_method("set_passive_attack_enabled"):
+		player.set_passive_attack_enabled(enabled)

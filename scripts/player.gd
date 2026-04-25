@@ -15,7 +15,7 @@ enum State {
 
 enum Form { NORMAL, BUBBLE, SUPER }
 enum GameMode { PLATAFORMA, METROIDVANIA }
-enum HudMenuAction { NONE, SPECIAL_ATTACK, DEFEND }
+enum HudMenuAction { NONE, ULTIMATE, PLACEHOLDER, SPECIAL_ATTACK, DEFEND }
 enum AttackKind { NONE, NORMAL, PASSIVE, ACTIVE_SUPER, ULTIMATE, DEFEND }
 
 const ATTACK_META_DAMAGE := &"attack_damage"
@@ -25,6 +25,7 @@ const ATTACK_META_ID := &"attack_id"
 var hud_menu_open := false
 var hud_menu_selection: HudMenuAction = HudMenuAction.NONE
 var hud_menu_axis_locked := false
+var hud_menu_selection_locked := false
 
 @export_group("Movement")
 @export var speed := 150.0
@@ -180,10 +181,14 @@ func _input(event):
 		return
 
 	if event.is_action_released("hud_menu"):
+		if hud_menu_selection_locked:
+			get_viewport().set_input_as_handled()
+			return
 		close_hud_menu()
 		return
 
 	if hud_menu_open:
+		get_viewport().set_input_as_handled()
 		return
 
 	if event.is_action_pressed("attack_special"):
@@ -411,7 +416,15 @@ func check_attack_combos() -> void:
 	if hud_menu_open or combo_lock or state in [State.DEAD, State.HURT]:
 		return
 
-	if Input.is_action_pressed("attack") and Input.is_action_pressed("attack_special"):
+	if InputMap.has_action("combo_1") and Input.is_action_just_pressed("combo_1"):
+		execute_combo(1)
+	elif InputMap.has_action("combo_2") and Input.is_action_just_pressed("combo_2"):
+		execute_combo(2)
+	elif InputMap.has_action("combo_3") and Input.is_action_just_pressed("combo_3"):
+		execute_combo(3)
+	elif InputMap.has_action("combo_4") and Input.is_action_just_pressed("combo_4"):
+		execute_combo(4)
+	elif Input.is_action_pressed("attack") and Input.is_action_pressed("attack_special"):
 		execute_combo(1)
 	elif Input.is_action_pressed("attack") and Input.is_action_pressed("defend"):
 		execute_combo(2)
@@ -834,6 +847,7 @@ func open_hud_menu() -> void:
 	hud_menu_open = true
 	hud_menu_selection = HudMenuAction.NONE
 	hud_menu_axis_locked = false
+	hud_menu_selection_locked = false
 	velocity = Vector2.ZERO
 
 	if hud and hud.has_method("show_menu"):
@@ -850,15 +864,19 @@ func close_hud_menu() -> void:
 	hud_menu_open = false
 	hud_menu_selection = HudMenuAction.NONE
 	hud_menu_axis_locked = false
+	hud_menu_selection_locked = false
 
 	if hud and hud.has_method("hide_menu"):
 		hud.hide_menu()
 
 
 func process_hud_menu_selection() -> void:
-	var horizontal := get_hud_menu_horizontal_axis()
+	if hud_menu_selection_locked:
+		return
 
-	if abs(horizontal) < 0.35:
+	var direction := get_hud_menu_direction()
+
+	if direction == Vector2.ZERO:
 		hud_menu_axis_locked = false
 		return
 
@@ -866,26 +884,36 @@ func process_hud_menu_selection() -> void:
 		return
 
 	hud_menu_axis_locked = true
+	hud_menu_selection_locked = true
 
-	if horizontal > 0.0 and can_use_mana_attacks():
-		select_hud_menu_action(HudMenuAction.SPECIAL_ATTACK)
-	elif horizontal < 0.0:
-		select_hud_menu_action(HudMenuAction.DEFEND)
+	if abs(direction.x) > abs(direction.y):
+		if direction.x > 0.0:
+			select_hud_menu_action(HudMenuAction.SPECIAL_ATTACK)
+		else:
+			select_hud_menu_action(HudMenuAction.DEFEND)
+	else:
+		if direction.y < 0.0:
+			select_hud_menu_action(HudMenuAction.ULTIMATE)
+		else:
+			select_hud_menu_action(HudMenuAction.PLACEHOLDER)
 
 
-func get_hud_menu_horizontal_axis() -> float:
-	var raw_axis := Input.get_axis("ui_left", "ui_right")
-	if raw_axis == 0.0:
-		return 0.0
+func get_hud_menu_direction() -> Vector2:
+	var direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down", 0.35)
+	if direction != Vector2.ZERO:
+		return direction
 
-	var facing_right := true
-	if has_node("Sprite2D"):
-		facing_right = not $Sprite2D.flip_h
+	var keyboard_direction := Vector2.ZERO
+	if Input.is_action_pressed("ui_left"):
+		keyboard_direction.x -= 1.0
+	if Input.is_action_pressed("ui_right"):
+		keyboard_direction.x += 1.0
+	if Input.is_action_pressed("ui_up"):
+		keyboard_direction.y -= 1.0
+	if Input.is_action_pressed("ui_down"):
+		keyboard_direction.y += 1.0
 
-	if facing_right:
-		return raw_axis
-
-	return -raw_axis
+	return keyboard_direction.normalized() if keyboard_direction != Vector2.ZERO else Vector2.ZERO
 
 
 func select_hud_menu_action(action: HudMenuAction) -> void:
@@ -895,6 +923,14 @@ func select_hud_menu_action(action: HudMenuAction) -> void:
 	hud_menu_selection = action
 
 	match action:
+		HudMenuAction.ULTIMATE:
+			if hud and hud.has_method("update_action_selection"):
+				hud.update_action_selection("ultimate_attack")
+			execute_hud_menu_action("ultimate_attack")
+		HudMenuAction.PLACEHOLDER:
+			if hud and hud.has_method("update_action_selection"):
+				hud.update_action_selection("placeholder")
+			execute_hud_menu_action("placeholder")
 		HudMenuAction.SPECIAL_ATTACK:
 			if hud and hud.has_method("update_action_selection"):
 				hud.update_action_selection("attack_special")
@@ -906,13 +942,18 @@ func select_hud_menu_action(action: HudMenuAction) -> void:
 
 
 func execute_hud_menu_action(action_name: String) -> void:
-	close_hud_menu()
-
 	match action_name:
+		"ultimate_attack":
+			start_ultimate_attack()
+		"placeholder":
+			pass
 		"attack_special":
 			start_special_attack()
 		"defend":
 			start_defense()
+
+	await get_tree().create_timer(0.45).timeout
+	close_hud_menu()
 
 
 func activate_attack_area() -> void:

@@ -106,7 +106,8 @@ func _process(_delta: float) -> void:
 		Input.get_axis("ui_up", "ui_down")
 	)
 
-	verify_position(direction)
+	if not is_player_using_hud_menu():
+		verify_position(direction)
 	update_animation(direction)
 
 # ================================
@@ -115,6 +116,10 @@ func _process(_delta: float) -> void:
 func play_if_different(anim_name: StringName) -> void:
 	if animation != anim_name:
 		play(anim_name)
+
+
+func is_player_using_hud_menu() -> bool:
+	return "hud_menu_open" in player and player.hud_menu_open
 
 func play_special_animation_if_exists(anim_name: StringName) -> void:
 	if is_instance_valid(special_animation_player):

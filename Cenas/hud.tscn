@@ -1,18 +1,28 @@
-[gd_scene load_steps=6 format=3 uid="uid://4v1mv6nx587x"]
+[gd_scene load_steps=14 format=3 uid="uid://4v1mv6nx587x"]
 
 [ext_resource type="Script" uid="uid://c73t1ba5irapk" path="res://scripts/hud.gd" id="1_uow6a"]
 [ext_resource type="Texture2D" uid="uid://b1ui6vclleonv" path="res://sprites/bubble/VidaBolha.png" id="2_hek4y"]
 [ext_resource type="Texture2D" uid="uid://hsp7iqcuiprc" path="res://sprites/img/progressbar/3.png" id="3_is2x6"]
 [ext_resource type="Script" uid="uid://d2h8ljiy2tu0a" path="res://Cenas/hud_panel.gd" id="5_is2x6"]
 [ext_resource type="Texture2D" uid="uid://bfxdsw5y0srba" path="res://sprites/img/progressbar/2.png" id="5_mdj34"]
+[ext_resource type="Texture2D" path="res://sprites/assets/buttom1_power.png" id="6_btn1"]
+[ext_resource type="Texture2D" path="res://sprites/assets/buttom1_power_used.png" id="7_btn1_used"]
+[ext_resource type="Texture2D" path="res://sprites/assets/buttom2_power.png" id="8_btn2"]
+[ext_resource type="Texture2D" path="res://sprites/assets/buttom2_power_used.png" id="9_btn2_used"]
+[ext_resource type="Texture2D" path="res://sprites/assets/buttom3_power.png" id="10_btn3"]
+[ext_resource type="Texture2D" path="res://sprites/assets/buttom3_power_used.png" id="11_btn3_used"]
+[ext_resource type="Texture2D" path="res://sprites/assets/buttom4_power.png" id="12_btn4"]
+[ext_resource type="Texture2D" path="res://sprites/assets/buttom4_power_used.png" id="13_btn4_used"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "boss_hp_bar", "menu_panel")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "boss_hp_bar", "menu_panel", "pause_menu_panel", "passive_toggle")]
 script = ExtResource("1_uow6a")
 heart_icons = [NodePath("HBoxContainer/Holder/HPBar1"), NodePath("HBoxContainer/Holder/HPBar2"), NodePath("HBoxContainer/Holder/HPBar3")]
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
 mana_bar = NodePath("HBoxContainer/Holder/ManaBar")
 boss_hp_bar = NodePath("BossBar")
 menu_panel = NodePath("Panel")
+pause_menu_panel = NodePath("PauseMenu")
+passive_toggle = NodePath("PauseMenu/VBoxContainer/PassiveToggle")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 anchors_preset = 15
@@ -111,26 +121,94 @@ scale = Vector2(0.85, 0.85)
 texture_under = ExtResource("3_is2x6")
 texture_progress = ExtResource("5_mdj34")
 
-[node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("attack_special_button", "defend_button")]
-offset_left = 281.0
-offset_top = 159.0
-offset_right = 390.0
-offset_bottom = 258.0
+[node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("up_button", "down_button", "left_button", "right_button")]
+offset_left = 278.0
+offset_top = 140.0
+offset_right = 398.0
+offset_bottom = 260.0
 script = ExtResource("5_is2x6")
-attack_special_button = NodePath("TextureRect2")
-defend_button = NodePath("TextureRect")
+up_button = NodePath("Ultimate")
+down_button = NodePath("Placeholder")
+left_button = NodePath("Defend")
+right_button = NodePath("Special")
+up_normal_texture = ExtResource("6_btn1")
+up_selected_texture = ExtResource("7_btn1_used")
+down_normal_texture = ExtResource("8_btn2")
+down_selected_texture = ExtResource("9_btn2_used")
+left_normal_texture = ExtResource("10_btn3")
+left_selected_texture = ExtResource("11_btn3_used")
+right_normal_texture = ExtResource("12_btn4")
+right_selected_texture = ExtResource("13_btn4_used")
 metadata/_edit_use_anchors_ = true
 
-[node name="TextureRect2" type="TextureRect" parent="Panel"]
+[node name="Ultimate" type="TextureRect" parent="Panel"]
 layout_mode = 0
-offset_left = 67.0
-offset_top = 29.0
-offset_right = 107.0
-offset_bottom = 69.0
+offset_left = 42.0
+offset_top = 4.0
+offset_right = 78.0
+offset_bottom = 40.0
+texture = ExtResource("6_btn1")
+stretch_mode = 5
 
-[node name="TextureRect" type="TextureRect" parent="Panel"]
+[node name="Placeholder" type="TextureRect" parent="Panel"]
 layout_mode = 0
-offset_left = 3.0
-offset_top = 27.0
-offset_right = 43.0
-offset_bottom = 67.0
+offset_left = 42.0
+offset_top = 80.0
+offset_right = 78.0
+offset_bottom = 116.0
+texture = ExtResource("8_btn2")
+stretch_mode = 5
+
+[node name="Defend" type="TextureRect" parent="Panel"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 42.0
+offset_right = 40.0
+offset_bottom = 78.0
+texture = ExtResource("10_btn3")
+stretch_mode = 5
+
+[node name="Special" type="TextureRect" parent="Panel"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 42.0
+offset_right = 116.0
+offset_bottom = 78.0
+texture = ExtResource("12_btn4")
+stretch_mode = 5
+
+[node name="PauseMenu" type="Panel" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -86.0
+offset_top = -47.0
+offset_right = 86.0
+offset_bottom = 47.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="PauseMenu/VBoxContainer"]
+layout_mode = 2
+text = "Menu"
+horizontal_alignment = 1
+
+[node name="PassiveToggle" type="CheckButton" parent="PauseMenu/VBoxContainer"]
+layout_mode = 2
+text = "Passiva"
+
+[node name="Hint" type="Label" parent="PauseMenu/VBoxContainer"]
+layout_mode = 2
+text = "TAB para voltar"
+horizontal_alignment = 1
