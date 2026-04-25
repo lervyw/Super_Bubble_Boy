@@ -15,6 +15,7 @@ extends CanvasLayer
 
 # Tempo inicial do nível (em segundos)
 @export var time_left: float = 180.0  # 180s = 3 minutos
+@export var start_enabled: bool = false
 
 # Referência ao player (para matar quando o tempo acabar)
 @export var player: CharacterBody2D
@@ -32,9 +33,11 @@ var timer_running: bool = false
 func _ready() -> void:
 	# Atualiza o texto inicial do timer
 	update_timer_text()
+	timer_running = start_enabled
+	visible = start_enabled
 
 	# Valida referências para evitar erros silenciosos
-	if not player:
+	if start_enabled and not player:
 		push_warning("⚠️ Player não configurado no Timer!")
 	if not tempo:
 		push_warning("⚠️ Label de tempo não configurado no Timer!")
@@ -48,13 +51,16 @@ func _process(delta: float) -> void:
 	if not timer_running:
 		return
 
-	# Enquanto houver tempo, continua contando
-	if time_left > 0:
-		time_left -= delta
-		update_timer_text()
-	else:
-		# Quando chega a zero, finaliza
+	if time_left <= 0.0:
 		time_left = 0
+		timer_running = false
+		on_timer_end()
+		return
+
+	time_left = maxf(time_left - delta, 0.0)
+	update_timer_text()
+
+	if time_left <= 0.0:
 		timer_running = false
 		on_timer_end()
 
@@ -88,15 +94,18 @@ func update_timer_text() -> void:
 # ================================
 func on_timer_end() -> void:
 	"""Chamado quando o tempo acaba"""
-	print("⏰ Tempo esgotado! Game Over!")
+	print("Tempo esgotado!")
 
 	# Garante que o player existe
 	if not player:
 		push_error("❌ Player não configurado!")
 		return
 
-	# Mata o player (lógica de morte fica no Player.gd)
-	player.die()
+	# Deixa o Player decidir como consumir vida, morrer e ir para Continue.
+	if player.has_method("handle_level_timeout"):
+		player.handle_level_timeout()
+	elif player.has_method("die"):
+		player.die()
 
 
 # ================================
@@ -124,19 +133,34 @@ func remove_time(seconds: float) -> void:
 func pause_timer() -> void:
 	"""Pausa o timer"""
 	timer_running = false
-	print("⏸️ Timer pausado")
+	print("Timer pausado")
 
 func resume_timer() -> void:
 	"""Retoma o timer"""
 	timer_running = true
-	print("▶️ Timer resumido")
+	visible = true
+	print("Timer resumido")
 
 func reset_timer(new_time: float = 180.0) -> void:
 	"""Reinicia o timer com um novo valor"""
 	time_left = new_time
 	timer_running = true
+	visible = true
 	update_timer_text()
-	print("🔄 Timer reiniciado")
+	print("Timer reiniciado")
+
+func configure_level_timer(enabled: bool, seconds: float, target_player: CharacterBody2D = null) -> void:
+	"""Configura o timer a partir do controlador do nível."""
+	if target_player:
+		player = target_player
+
+	time_left = maxf(seconds, 0.0)
+	timer_running = enabled and time_left > 0.0
+	visible = enabled
+	update_timer_text()
+
+	if timer_running and not player:
+		push_warning("Timer habilitado sem player configurado.")
 
 func get_time_remaining() -> float:
 	"""Retorna o tempo restante em segundos"""

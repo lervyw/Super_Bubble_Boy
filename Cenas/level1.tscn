@@ -817,11 +817,14 @@ gradient = SubResource("Gradient_d0psv")
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6fn3k"]
 size = Vector2(1806, 198.5)
 
-[node name="level1" type="Node2D" node_paths=PackedStringArray("player", "stats")]
+[node name="level1" type="Node2D" node_paths=PackedStringArray("player", "stats", "timer_node")]
 script = ExtResource("1_o25p7")
 player = NodePath("player")
 stats = NodePath("player/Stats")
 checkpoint_position = Vector2(182, 214)
+level_timer_enabled = true
+level_time_limit = 180.0
+timer_node = NodePath("Timer")
 boss_node = NodePath("boss")
 next_scene = ExtResource("2_6fn3k")
 

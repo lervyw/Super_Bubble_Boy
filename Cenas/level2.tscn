@@ -69,10 +69,13 @@ sources/3 = SubResource("TileSetAtlasSource_rfofu")
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rmmji"]
 size = Vector2(613.63824, 91.5)
 
-[node name="level1" type="Node2D" node_paths=PackedStringArray("player", "stats")]
+[node name="level1" type="Node2D" node_paths=PackedStringArray("player", "stats", "timer_node")]
 script = ExtResource("1_u6hlc")
 player = NodePath("player")
 stats = NodePath("player/Stats")
+level_timer_enabled = true
+level_time_limit = 180.0
+timer_node = NodePath("Timer")
 
 [node name="ParallaxBackground" parent="." instance=ExtResource("2_67p7o")]
 
