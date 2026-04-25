@@ -160,3 +160,17 @@
 
 - Updated `scripts/boss.gd` so boss hitbox disabling during damage uses deferred collision-state changes, avoiding the physics query flush error on stomp/hit
 - Fixed `Cenas/Final_Credits.tscn` to reference `res://scripts/final_credits.gd` as a real script ext_resource instead of a broken generic resource path
+
+## 2026-04-25
+
+### Title menu layout and resolution pass
+
+- Reworked `Cenas/Title.tscn` main/config/controls menus into a darker framed pixel-art layout with wider, consistent buttons and stronger hover/focus states
+- Added a Master volume slider to the title config menu and fixed `scripts/ConfigManager.gd` so the built-in `Master` audio bus can be controlled through the saved lowercase `master` setting
+- Added missing control rebinding entries for left, right, crouch, dash, and pause while preserving the existing attack/form/combo/ultimate rebinding flow
+- Updated `scripts/title.gd` so the title menu initializes slider values from saved config and shows a small prompt when waiting for a new input
+- Changed the project window settings to open at 1260x840 while keeping the internal 420x280 pixel-art viewport and preserving aspect ratio with `stretch/aspect="keep"`
+
+### Verification notes
+
+- No local Godot executable was available in the shell, so validation was limited to static inspection and diff review
