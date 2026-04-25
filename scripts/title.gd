@@ -271,7 +271,7 @@ func _get_current_input_name(action: String) -> String:
 
 	# Se for teclado, converte keycode para string legível
 	if ev is InputEventKey:
-		var keycode := ev.physical_keycode
+		var keycode: int = ev.physical_keycode
 		if keycode == 0:
 			keycode = ev.keycode
 		return OS.get_keycode_string(keycode)
