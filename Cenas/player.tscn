@@ -487,7 +487,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"attack",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -507,7 +507,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"attack_bubble",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -524,7 +524,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"attack_crouch_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -538,7 +538,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"attack_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -579,7 +579,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"attack_super_combo",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -605,7 +605,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"born",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -625,7 +625,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"bubble_to_normal",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -672,7 +672,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"bubble_to_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -692,7 +692,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"crouch",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -706,7 +706,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"crouch_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -720,7 +720,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"dash",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -731,7 +731,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"dash_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -781,7 +781,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"death",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -807,7 +807,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"death_bubble",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -857,7 +857,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"death_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1213,7 +1213,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"default",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1569,7 +1569,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"default_1",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1580,7 +1580,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"fall",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1591,7 +1591,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"fall_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1605,7 +1605,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"hurt",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1619,7 +1619,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"idle",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1639,7 +1639,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"idle_bubble",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1650,7 +1650,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"idle_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1664,7 +1664,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"jump",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1675,7 +1675,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"jump_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1701,7 +1701,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"normal_to_bubble",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1736,7 +1736,21 @@ animations = [{
 }],
 "loop": false,
 "name": &"normal_to_super",
-"speed": 5.0
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rxqvy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2umio")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2umio")
+}],
+"loop": false,
+"name": &"parry",
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1753,7 +1767,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"parry_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1806,7 +1820,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"super_to_bubble",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1841,7 +1855,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"super_to_normal",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1861,7 +1875,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"swim",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1884,7 +1898,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"swim_super",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1901,7 +1915,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"walk",
-"speed": 6.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1924,7 +1938,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"walk_super",
-"speed": 5.0
+"speed": 8.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kadp1"]
@@ -1963,7 +1977,7 @@ stats = NodePath("Stats")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="." node_paths=PackedStringArray("player", "stats", "special_attack_area_normal", "special_attack_area_bubble", "special_attack_area_super", "body_idle_normal", "body_walk_normal", "body_jump_normal", "body_fall_normal", "body_crouch_normal", "body_dash_normal", "body_swim_normal", "body_attack_normal", "body_defend_normal", "body_dead_normal", "body_idle_bubble", "body_walk_bubble", "body_jump_bubble", "body_fall_bubble", "body_crouch_bubble", "body_dash_bubble", "body_swim_bubble", "body_attack_bubble", "body_defend_bubble", "body_dead_bubble", "body_idle_super", "body_walk_super", "body_jump_super", "body_fall_super", "body_crouch_super", "body_dash_super", "body_swim_super", "body_attack_super", "body_defend_super", "body_dead_super", "attack_area_normal", "attack_area_bubble", "attack_area_super")]
 sprite_frames = SubResource("SpriteFrames_nwtu0")
-animation = &"walk"
+animation = &"walk_super"
 script = ExtResource("3_ybr15")
 player = NodePath("..")
 stats = NodePath("../Stats")

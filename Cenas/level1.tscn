@@ -849,12 +849,12 @@ limit_enabled = false
 stream = ExtResource("18_6ynql")
 
 [node name="BubbleUp1" parent="." node_paths=PackedStringArray("player", "stats") instance=ExtResource("9_y3u1x")]
-position = Vector2(575, 222)
+position = Vector2(203, 446)
 player = NodePath("../player")
 stats = NodePath("../player/Stats")
 
 [node name="bubble_up2" parent="." node_paths=PackedStringArray("player", "stats") instance=ExtResource("10_h5nj6")]
-position = Vector2(157, 217)
+position = Vector2(118, 591)
 player = NodePath("../player")
 stats = NodePath("../player/Stats")
 
@@ -866,56 +866,43 @@ stop_distance = 70.0
 
 [node name="slime" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(543, 209)
-stop_distance = 30.0
 
 [node name="slime4" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(489, 202)
-stop_distance = 30.0
 
 [node name="slime3" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(974, 197)
-stop_distance = 30.0
 
 [node name="slime2" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(1050, 183)
 move_mode = 2
-stop_distance = 30.0
 
 [node name="slime5" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(136, 464)
-stop_distance = 30.0
 
 [node name="slime6" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(621, 459)
-stop_distance = 30.0
 
 [node name="slime7" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(697, 445)
-stop_distance = 30.0
 
 [node name="slime8" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(1814, 127)
-stop_distance = 30.0
 
 [node name="slime9" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(2299, 122)
-stop_distance = 30.0
 
 [node name="slime10" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(2375, 108)
-stop_distance = 30.0
 
 [node name="slime11" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(414, 604)
-stop_distance = 30.0
 
 [node name="slime12" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(899, 599)
-stop_distance = 30.0
 
 [node name="slime13" parent="." instance=ExtResource("25_oa4ws")]
 position = Vector2(975, 585)
-stop_distance = 30.0
 
 [node name="Timer" parent="." instance=ExtResource("13_tb1qe")]
 
@@ -965,12 +952,12 @@ scale = Vector2(0.76920235, 1792.4397)
 texture = SubResource("GradientTexture1D_6fn3k")
 
 [node name="BubbleUp2" parent="." node_paths=PackedStringArray("player") instance=ExtResource("17_etkem")]
-position = Vector2(810, 222)
+position = Vector2(3560, 94)
 player = NodePath("../player")
 checkpoint_mode = 1
 
 [node name="SpawnPoint2" type="Node2D" parent="."]
-position = Vector2(809, 223)
+position = Vector2(3559, 95)
 
 [node name="SpawnPoint1" type="Node2D" parent="."]
 position = Vector2(182, 214)

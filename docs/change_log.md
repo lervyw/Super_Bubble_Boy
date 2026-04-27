@@ -160,3 +160,42 @@
 
 - Updated `scripts/boss.gd` so boss hitbox disabling during damage uses deferred collision-state changes, avoiding the physics query flush error on stomp/hit
 - Fixed `Cenas/Final_Credits.tscn` to reference `res://scripts/final_credits.gd` as a real script ext_resource instead of a broken generic resource path
+
+## 2026-04-25
+
+### Title menu layout and resolution pass
+
+- Reworked `Cenas/Title.tscn` main/config/controls menus into a darker framed pixel-art layout with wider, consistent buttons and stronger hover/focus states
+- Added a Master volume slider to the title config menu and fixed `scripts/ConfigManager.gd` so the built-in `Master` audio bus can be controlled through the saved lowercase `master` setting
+- Added missing control rebinding entries for left, right, crouch, dash, and pause while preserving the existing attack/form/combo/ultimate rebinding flow
+- Updated `scripts/title.gd` so the title menu initializes slider values from saved config and shows a small prompt when waiting for a new input
+- Changed the project window settings to open at 1260x840 while keeping the internal 420x280 pixel-art viewport and preserving aspect ratio with `stretch/aspect="keep"`
+
+### Verification notes
+
+- No local Godot executable was available in the shell, so validation was limited to static inspection and diff review
+
+### Level timer reconnection
+
+- Reconnected the level timer through `scripts/level_1.gd` so each level can enable/disable countdown from the root node Inspector
+- Added per-level timer settings for `level_timer_enabled`, `level_time_limit`, and `timer_node`
+- Updated `scripts/timer.gd` so the timer can be configured by the level controller, hides itself when disabled, and no longer requires manual player wiring in the timer scene
+- Updated `scripts/player.gd` with a public timeout death path that uses the same hurt/death/restart/continue flow as fatal hits
+- Set `Cenas/level1.tscn` and `Cenas/level2.tscn` to explicitly use a 180 second countdown through their root level controller
+
+### Slime facing behavior
+
+- Reviewed `Cenas/level1.tscn` enemy setup and confirmed slimes target the player through the `jogador` group from the base player scene
+- Added `turn_horizontal_threshold` to `scripts/slime.gd` so slimes keep their current facing while the player is nearly above them
+- Slimes now only turn toward the player after the player has moved far enough horizontally, preventing rapid left/right flipping loops
+
+### Boss facing behavior
+
+- Added the same horizontal turn threshold concept to `scripts/boss.gd`
+- The boss now keeps its current facing when the player is nearly above/centered and only turns after meaningful horizontal separation
+
+### Boss fatal hit continue flow
+
+- Updated boss hitbox damage to pass the boss as the damage source to the player
+- Updated `scripts/player.gd` so fatal boss damage goes through the hurt/death sequence and then opens the Continue scene
+- Kept non-boss fatal hits using the existing platform lives rule before Continue

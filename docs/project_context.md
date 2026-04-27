@@ -154,15 +154,38 @@ Recent history before new work:
 
 - `res://Cenas/Title.tscn` is the first screen shown by the game
 - `res://scripts/title.gd` controls the main menu, config menu, and input rebinding menu
+- The title menus use a framed dark pixel-art layout with the existing animated title/background assets
+- The config screen exposes Master, Music, and SFX volume sliders
 - The controls menu now includes a dedicated `Ultimate` rebind button for `ultimate_attack`
+- The controls menu also exposes left, right, crouch, dash, and pause rebinding entries
 - Title button signal wiring was aligned with the current script method names to avoid broken presses at runtime
+
+## Display Settings
+
+- Internal pixel-art viewport remains `420x280`
+- The game window opens at `1260x840`, an integer 3x scale
+- Stretch aspect is `keep` so the image preserves the 3:2 proportion instead of expanding into a distorted shape
+
+## Level Timer
+
+- The timer HUD scene is `res://Cenas/Timer.tscn`
+- Timer logic lives in `res://scripts/timer.gd`
+- The default timer value in the timer script is still `180.0` seconds
+- The active per-level control is now on the root level script `res://scripts/level_1.gd`:
+  `level_timer_enabled`, `level_time_limit`, and `timer_node`
+- `level1` and `level2` currently enable the timer with `level_time_limit = 180.0`
+- When time reaches zero, the timer calls the player's timeout death flow so platform-mode lives and the Continue scene remain compatible
 
 ## Current Combat Notes
 
 - Slime enemies can now be configured in the Inspector to attack either by direct contact/pounce or by timed hitbox attack
 - Slime flying is still selected through the existing `move_mode = FLY` option
+- Slimes target the player through the `jogador` group and use `player_hurtbox` for hitbox damage resolution
+- Slime facing now has a horizontal dead zone through `turn_horizontal_threshold`, so the enemy does not rapidly flip when the player is almost directly above it
 - Player stomp areas are now tagged separately from normal attack areas so enemies do not die from accidental side collisions
 - Boss animation flow is now script-driven using the available `idle`, `walk`, and `attack` animations
+- Boss facing also uses `turn_horizontal_threshold`, so it does not rapidly flip when the player is almost directly above it
+- Fatal boss hitbox damage passes the boss as the damage source, causing the player's death sequence to end on the Continue scene
 - `default` is treated as placeholder data for boss/slime sprite sheets and is no longer the intended runtime animation for their gameplay states
 - Attack hitboxes now turn off before the end of the animation, but the enemy remains in the attack state until the full attack animation duration has completed
 - The player scene now uses clearer area names:

@@ -21,6 +21,7 @@ enum AttackMode { CONTACT, HITBOX }
 @export_group("AI")
 @export var aggro_range: float = 260.0
 @export var stop_distance: float = 40.0
+@export var turn_horizontal_threshold: float = 24.0
 @export var avoid_other_slimes: bool = true
 @export var separation_distance: float = 20.0
 @export var separation_strength: float = 45.0
@@ -64,6 +65,7 @@ var jump_t: float = 0.0
 var attacking: bool = false
 var stunned: bool = false
 var dying: bool = false
+var facing_dir: int = -1
 var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 
 
@@ -87,6 +89,7 @@ func _ready():
 	if hurtbox and not hurtbox.area_entered.is_connected(_on_hurtbox_area_entered):
 		hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 
+	update_sprite_direction(facing_dir)
 	play_idle_animation()
 
 
@@ -130,7 +133,10 @@ func _physics_process(delta):
 
 
 func move_towards_player(dist):
-	var dir = sign(player.global_position.x - global_position.x)
+	var dir: int = get_horizontal_chase_direction()
+	if dir == 0:
+		velocity.x = 0
+		return
 
 	# ❌ NÃO vira imediatamente
 	if dist <= stop_distance and attack_mode == AttackMode.HITBOX:
@@ -138,6 +144,7 @@ func move_towards_player(dist):
 		return
 
 	# ✅ só vira quando realmente vai se mover
+	facing_dir = dir
 	update_sprite_direction(dir)
 
 	match move_mode:
@@ -151,9 +158,20 @@ func move_towards_player(dist):
 			velocity.x = dir * speed
 
 
+func get_horizontal_chase_direction() -> int:
+	if not is_instance_valid(player):
+		return 0
+
+	var horizontal_delta: float = player.global_position.x - global_position.x
+	if absf(horizontal_delta) < turn_horizontal_threshold:
+		return 0
+
+	return int(sign(horizontal_delta))
+
+
 # ✅ NOVA FUNÇÃO RESPONSÁVEL POR VIRAR O SPRITE
-func update_sprite_direction(dir):
-	if not sprite:
+func update_sprite_direction(dir: int) -> void:
+	if not sprite or dir == 0:
 		return
 
 	if sprite_faces_left_by_default:
