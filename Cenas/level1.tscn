@@ -954,7 +954,6 @@ texture = SubResource("GradientTexture1D_6fn3k")
 [node name="BubbleUp2" parent="." node_paths=PackedStringArray("player") instance=ExtResource("17_etkem")]
 position = Vector2(3560, 94)
 player = NodePath("../player")
-checkpoint_mode = 1
 
 [node name="SpawnPoint2" type="Node2D" parent="."]
 position = Vector2(3559, 95)
