@@ -6,7 +6,7 @@ extends Area2D
 #  - Atualiza/buffa HP máximo (se aplicável)
 #  - Desbloqueia a forma SUPER
 #  - Opcionalmente redefine o respawn
-#  - Restaura vidas e HP conforme o modo de jogo
+#  - Restaura HP no modo Metroidvania
 # =========================================================
 
 # ================================
@@ -107,14 +107,10 @@ func collect() -> void:
 	if update_respawn and respawn_node:
 		player.respawn_position = respawn_node.global_position
 
-	# --- Restauração de vidas / HP ---
-	if player.mode == player.GameMode.METROIDVANIA:
-		if stats and stats.has_method("reset_health_full"):
-			stats.reset_health_full()
-		GameManager.restore_full_lives()
-	else:
-		GameManager.restore_full_lives()
+	# --- Restauração de HP ---
+	if stats and stats.has_method("reset_health_full"):
+		stats.reset_health_full()
 
-	print("⭐ Forma Super desbloqueada! Vida e vidas restauradas!")
+	print("⭐ Forma Super desbloqueada! Vida restaurada!")
 
 	queue_free()

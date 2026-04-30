@@ -9,6 +9,9 @@ extends CanvasLayer
 @export var menu_panel: Panel
 @export var pause_menu_panel: Control
 @export var passive_toggle: CheckButton
+@export var resume_button: Button
+@export var main_menu_button: Button
+@export var quit_button: Button
 
 var boss_target: Node = null
 var pause_menu_open: bool = false
@@ -26,6 +29,18 @@ func _ready() -> void:
 		passive_toggle.process_mode = Node.PROCESS_MODE_ALWAYS
 		if not passive_toggle.toggled.is_connected(_on_passive_toggle_toggled):
 			passive_toggle.toggled.connect(_on_passive_toggle_toggled)
+	if resume_button:
+		resume_button.process_mode = Node.PROCESS_MODE_ALWAYS
+		if not resume_button.pressed.is_connected(close_pause_menu):
+			resume_button.pressed.connect(close_pause_menu)
+	if main_menu_button:
+		main_menu_button.process_mode = Node.PROCESS_MODE_ALWAYS
+		if not main_menu_button.pressed.is_connected(_on_main_menu_pressed):
+			main_menu_button.pressed.connect(_on_main_menu_pressed)
+	if quit_button:
+		quit_button.process_mode = Node.PROCESS_MODE_ALWAYS
+		if not quit_button.pressed.is_connected(_on_quit_pressed):
+			quit_button.pressed.connect(_on_quit_pressed)
 	if boss_hp_bar:
 		boss_hp_bar.visible = false
 
@@ -40,13 +55,9 @@ func _process(_delta: float) -> void:
 	if not player:
 		return
 
-	if player.mode == player.GameMode.PLATAFORMA:
-		_update_hearts()
-		_set_hp_visible(false)
-	else:
-		_update_hp_bar()
-		_set_hearts_visible(false)
-		_set_hp_visible(true)
+	_update_hp_bar()
+	_set_hearts_visible(false)
+	_set_hp_visible(true)
 
 	_update_mana_bar()
 	_set_mana_visible(_is_mana_visible())
@@ -253,3 +264,14 @@ func close_pause_menu() -> void:
 func _on_passive_toggle_toggled(enabled: bool) -> void:
 	if player and player.has_method("set_passive_attack_enabled"):
 		player.set_passive_attack_enabled(enabled)
+
+
+func _on_main_menu_pressed() -> void:
+	close_pause_menu()
+	if GameManager:
+		GameManager.goto_title()
+
+
+func _on_quit_pressed() -> void:
+	close_pause_menu()
+	get_tree().quit()

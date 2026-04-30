@@ -1,6 +1,6 @@
 # How To Play
 
-Last updated: 2026-04-05
+Last updated: 2026-04-29
 
 This file is the simple version.
 Think of it as "potato knowledge".
@@ -11,30 +11,12 @@ You control Bubble Boy in a 2D game.
 
 The game has:
 
-- 2 gameplay modes
+- 1 gameplay mode
 - 3 forms
 - normal attacks
 - mana attacks
 
-## The 2 Gameplay Modes
-
-### Platformer Mode
-
-This is the simpler mode.
-
-Main idea:
-
-- jump
-- move
-- attack
-- survive
-
-Important:
-
-- You cannot change forms here
-- The game can be set to disable mana here
-- The game can also be set to disable mana attacks here
-- When this mode is activated, the player goes back to Normal form
+## Gameplay Mode
 
 ### Metroidvania Mode
 
@@ -182,7 +164,6 @@ These are the controls I could confirm from `project.godot`.
 
 Important:
 
-- form change only works in Metroidvania mode
 - form change only works if the form is unlocked
 
 ### Radial / Quick Form Input
@@ -204,11 +185,10 @@ Also:
 
 ## What To Remember In Potato Mode
 
-- Platformer mode = simple mode
-- Metroidvania mode = full mode
-- Only Metroidvania can change forms
+- The game uses metroidvania mode
 - Only unlocked forms can be used
 - Normal attack = basic hit
 - Super attack = spends some mana
 - Ultimate attack = spends all mana
 - Ultimate currently uses `T` by default
+- Death sends the player back to the last checkpoint

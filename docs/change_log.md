@@ -1,5 +1,25 @@
 # Change Log
 
+## 2026-04-29
+
+### Single metroidvania gameplay paradigm
+
+- Changed `scripts/player.gd` so gameplay now starts and behaves as metroidvania by default
+- Kept legacy mode methods/enums for scene/script compatibility, but platform mode no longer drives runtime rules
+- Changed fatal player damage from boss, slime, hazards, or timeout to play hurt/death and respawn at the last checkpoint with HP/mana restored
+- Removed Continue-scene routing and platform life consumption from the active player death flow
+- Updated checkpoints so their legacy `checkpoint_mode` export no longer changes gameplay mode
+- Updated Bubble/Super power-ups so they restore HP without touching platform lives
+
+### Pause menu actions
+
+- Added pause-menu buttons for continuing, returning to the main menu, and quitting the game
+- Wired the pause menu actions through `scripts/hud.gd` while keeping TAB as the open/close input
+
+### Documentation sync
+
+- Updated `docs/project_context.md` and `docs/how_to_play.md` for the metroidvania-only rule and checkpoint death flow
+
 ## 2026-04-05
 
 ### Baseline documentation

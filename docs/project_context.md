@@ -1,21 +1,17 @@
 # Project Context
 
-Last reviewed: 2026-04-05
+Last reviewed: 2026-04-29
 
 ## Overview
 
 This repository is a Godot 2D game project for `Super Bubble Boy`.
 The current playable foundation appears to be concentrated in `Cenas/level1.tscn`.
 
-The game concept described by the user is a hybrid that switches between:
+The game now uses a single gameplay paradigm:
 
-- Platformer
 - Metroidvania
 
-The player logic already contains an explicit `GameMode` enum with:
-
-- `PLATAFORMA`
-- `METROIDVANIA`
+The legacy `GameMode` enum still exists in `scripts/player.gd` for compatibility with older scripts/scenes, but runtime gameplay should behave as metroidvania only.
 
 ## Main Level 1 Wiring
 
@@ -58,7 +54,7 @@ Observed responsibilities:
 
 - Character movement and state machine
 - Form switching: `NORMAL`, `BUBBLE`, `SUPER`
-- Hybrid game mode enum
+- Legacy game mode enum kept for compatibility
 - Combat, combos, defense, passive/active/ultimate attack foundations
 - Damage, invincibility, mana, death, respawn
 - Stomp logic per form
@@ -71,14 +67,13 @@ Current attack foundation in `scripts/player.gd`:
 - Active super attacks now support configurable slot arrays:
   `name`, `cooldown`, `mana_cost`, `damage`, `area_path`
 - Ultimate attack now has its own cooldown/damage foundation and consumes all mana
-- Mana usage can be enabled/disabled independently from mana attacks in platform mode
+- Mana and mana attacks are always available by gameplay rules
 
 Current mode/form rules:
 
-- Forms can only be changed in `METROIDVANIA`
+- The player starts and stays in metroidvania behavior
 - Locked forms still cannot be selected
-- Platform mode can optionally disable mana and/or mana-based attacks
-- Platform mode currently forces the player back to `NORMAL` form when enabled
+- Checkpoints no longer change gameplay mode
 
 Important groups and combat nodes:
 
@@ -174,7 +169,7 @@ Recent history before new work:
 - The active per-level control is now on the root level script `res://scripts/level_1.gd`:
   `level_timer_enabled`, `level_time_limit`, and `timer_node`
 - `level1` and `level2` currently enable the timer with `level_time_limit = 180.0`
-- When time reaches zero, the timer calls the player's timeout death flow so platform-mode lives and the Continue scene remain compatible
+- When time reaches zero, the timer calls the player's timeout death flow. Death now respawns the player at the last checkpoint instead of using platform lives or the Continue scene.
 
 ## Current Combat Notes
 
@@ -185,7 +180,7 @@ Recent history before new work:
 - Player stomp areas are now tagged separately from normal attack areas so enemies do not die from accidental side collisions
 - Boss animation flow is now script-driven using the available `idle`, `walk`, and `attack` animations
 - Boss facing also uses `turn_horizontal_threshold`, so it does not rapidly flip when the player is almost directly above it
-- Fatal boss hitbox damage passes the boss as the damage source, causing the player's death sequence to end on the Continue scene
+- Fatal boss and slime damage both use the same checkpoint respawn flow
 - `default` is treated as placeholder data for boss/slime sprite sheets and is no longer the intended runtime animation for their gameplay states
 - Attack hitboxes now turn off before the end of the animation, but the enemy remains in the attack state until the full attack animation duration has completed
 - The player scene now uses clearer area names:
@@ -198,8 +193,8 @@ Recent history before new work:
 - Player attack windows are now controlled only by `scripts/player.gd`; `scripts/textura_2.gd` no longer re-enables attack areas every animation frame
 - Player no longer takes damage just by touching slime/boss bodies; damage should now come from explicit enemy attack behavior
 - Boss and slime hitbox attacks now play their wind-up animation first and only open the damaging hitbox at the end of the animation
-- Fatal enemy hits now put the player through `hurt` then the form-specific `death` animation and then reload the current level from the beginning
-- Platform mode now consumes global lives on fatal hits before that death/restart flow, while metroidvania still depends on HP reaching zero
+- Fatal enemy hits now put the player through `hurt` then the form-specific `death` animation and then respawn the player at the last checkpoint with HP/mana restored
+- Platform lives and the Continue scene are no longer part of the player death flow
 - Bosses are excluded from the player's generic stomp instant-kill path; stomps now chip boss health instead
 - `Cenas/Final_Credits.tscn` now uses the real `res://scripts/final_credits.gd` script resource, avoiding the boss-defeat scene-change script error
 
