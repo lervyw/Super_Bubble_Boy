@@ -25,6 +25,11 @@
 - Removed the old `checkpoint_mode` override from the `BubbleUp2` checkpoint instance in `Cenas/level1.tscn`
 - Confirmed the level's initial checkpoint and player respawn position remain aligned at `Vector2(182, 214)`
 
+### HUD visual assets
+
+- Added the new HUD asset set under `sprites/assets/hud/`
+- Updated `Cenas/hud.tscn` to use the new life, mana, ultimate bubble, and stamina textures
+
 ## 2026-04-05
 
 ### Baseline documentation
