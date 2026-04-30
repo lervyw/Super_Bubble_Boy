@@ -14,7 +14,7 @@
 [ext_resource type="Texture2D" path="res://sprites/assets/buttom4_power.png" id="12_btn4"]
 [ext_resource type="Texture2D" path="res://sprites/assets/buttom4_power_used.png" id="13_btn4_used"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "boss_hp_bar", "menu_panel", "pause_menu_panel", "passive_toggle")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "boss_hp_bar", "menu_panel", "pause_menu_panel", "passive_toggle", "resume_button", "main_menu_button", "quit_button")]
 script = ExtResource("1_uow6a")
 heart_icons = [NodePath("HBoxContainer/Holder/HPBar1"), NodePath("HBoxContainer/Holder/HPBar2"), NodePath("HBoxContainer/Holder/HPBar3")]
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
@@ -23,6 +23,9 @@ boss_hp_bar = NodePath("BossBar")
 menu_panel = NodePath("Panel")
 pause_menu_panel = NodePath("PauseMenu")
 passive_toggle = NodePath("PauseMenu/VBoxContainer/PassiveToggle")
+resume_button = NodePath("PauseMenu/VBoxContainer/ResumeButton")
+main_menu_button = NodePath("PauseMenu/VBoxContainer/MainMenuButton")
+quit_button = NodePath("PauseMenu/VBoxContainer/QuitButton")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 anchors_preset = 15
@@ -193,9 +196,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -86.0
-offset_top = -47.0
+offset_top = -82.0
 offset_right = 86.0
-offset_bottom = 47.0
+offset_bottom = 82.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -207,6 +210,18 @@ horizontal_alignment = 1
 [node name="PassiveToggle" type="CheckButton" parent="PauseMenu/VBoxContainer"]
 layout_mode = 2
 text = "Passiva"
+
+[node name="ResumeButton" type="Button" parent="PauseMenu/VBoxContainer"]
+layout_mode = 2
+text = "Continuar"
+
+[node name="MainMenuButton" type="Button" parent="PauseMenu/VBoxContainer"]
+layout_mode = 2
+text = "Menu principal"
+
+[node name="QuitButton" type="Button" parent="PauseMenu/VBoxContainer"]
+layout_mode = 2
+text = "Sair do jogo"
 
 [node name="Hint" type="Label" parent="PauseMenu/VBoxContainer"]
 layout_mode = 2

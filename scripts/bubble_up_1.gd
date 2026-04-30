@@ -5,7 +5,7 @@ extends Area2D
 #  - Cura o player levemente
 #  - Desbloqueia a forma Bubble
 #  - Opcionalmente atualiza o checkpoint/respawn
-#  - Restaura vidas/HP conforme o modo de jogo
+#  - Restaura HP no modo Metroidvania
 # =========================================================
 
 # ================================
@@ -103,14 +103,10 @@ func collect() -> void:
 	if update_respawn and respawn_node:
 		player.respawn_position = respawn_node.global_position
 
-	# --- Restauração de vidas / HP ---
-	if player.mode == player.GameMode.METROIDVANIA:
-		if stats and stats.has_method("reset_health_full"):
-			stats.reset_health_full()
-		GameManager.restore_full_lives()
-	else:
-		GameManager.restore_full_lives()
+	# --- Restauração de HP ---
+	if stats and stats.has_method("reset_health_full"):
+		stats.reset_health_full()
 
-	print("🫧 Forma Bubble desbloqueada! +1 HP (se tiver) | Vidas restauradas!")
+	print("🫧 Forma Bubble desbloqueada! HP restaurado!")
 
 	queue_free()

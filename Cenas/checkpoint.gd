@@ -2,7 +2,7 @@ extends Area2D
 # =========================================================
 #  CHECKPOINT (POWER-UP)
 #  Ao encostar:
-#  - ativa checkpoint (muda modo do player)
+#  - ativa checkpoint
 #  - atualiza respawn (por Node2D ou Vector2)
 #  - opcionalmente restaura HP
 #  - toca som e mostra partículas
@@ -127,15 +127,8 @@ func activate_checkpoint() -> void:
 
 	print("🏁 Checkpoint ativado: ", name)
 
-	# ----- 1) Troca o modo do jogo -----
-	match checkpoint_mode:
-		CheckpointMode.PLATAFORMA:
-			if player and player.has_method("enable_plataforma_mode"):
-				player.enable_plataforma_mode()
-
-		CheckpointMode.METROIDVANIA:
-			if player and player.has_method("enable_metroidvania_mode"):
-				player.enable_metroidvania_mode()
+	# O jogo agora usa apenas o modo Metroidvania. O campo checkpoint_mode
+	# permanece exportado para manter cenas antigas compatíveis, mas não altera gameplay.
 
 	# ----- 2) Atualiza o respawn do player -----
 	if update_respawn and player:

@@ -148,8 +148,6 @@ func restore_all() -> void:
 
 
 func is_health_visible() -> bool:
-	if player:
-		return player.mode == player.GameMode.METROIDVANIA
 	return true
 
 
