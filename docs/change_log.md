@@ -20,6 +20,11 @@
 
 - Updated `docs/project_context.md` and `docs/how_to_play.md` for the metroidvania-only rule and checkpoint death flow
 
+### Level 1 scene sync
+
+- Removed the old `checkpoint_mode` override from the `BubbleUp2` checkpoint instance in `Cenas/level1.tscn`
+- Confirmed the level's initial checkpoint and player respawn position remain aligned at `Vector2(182, 214)`
+
 ## 2026-04-05
 
 ### Baseline documentation
