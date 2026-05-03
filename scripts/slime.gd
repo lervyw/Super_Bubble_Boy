@@ -4,6 +4,7 @@ const ATTACK_META_DAMAGE := &"attack_damage"
 
 enum MoveMode { WALK, JUMP, FLY }
 enum AttackMode { CONTACT, HITBOX }
+enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 
 @export_group("Target")
 @export var player_group: StringName = "jogador"
@@ -15,8 +16,16 @@ enum AttackMode { CONTACT, HITBOX }
 @export var gravity: float = 900.0
 @export var jump_force: float = -260.0
 @export var jump_interval: float = 0.35
+@export var fly_mode: FlyMode = FlyMode.X_ONLY
 @export var fly_y_speed: float = 70.0
 @export var fly_vertical_follow: bool = true
+@export var fly_zigzag_amplitude: float = 70.0
+@export var fly_zigzag_frequency: float = 5.0
+
+@export_group("Water")
+@export_range(0.05, 1.0, 0.05) var water_speed_multiplier: float = 0.55
+@export_range(0.05, 1.0, 0.05) var water_gravity_multiplier: float = 0.35
+@export_range(0.05, 1.0, 0.05) var water_jump_multiplier: float = 0.65
 
 @export_group("AI")
 @export var aggro_range: float = 260.0
@@ -67,6 +76,9 @@ var stunned: bool = false
 var dying: bool = false
 var facing_dir: int = -1
 var attack_hitbox_base_position: Vector2 = Vector2.ZERO
+var fly_time: float = 0.0
+var in_water: bool = false
+var water_zone_overlap_count: int = 0
 
 
 func _ready():
@@ -101,9 +113,10 @@ func _physics_process(delta):
 		cooldown_t -= delta
 	if jump_t > 0:
 		jump_t -= delta
+	fly_time += delta
 
 	if move_mode != MoveMode.FLY and not is_on_floor():
-		velocity.y += gravity * delta
+		velocity.y += gravity * get_water_gravity_multiplier() * delta
 	elif move_mode == MoveMode.FLY:
 		velocity.y = 0
 
@@ -126,6 +139,14 @@ func _physics_process(delta):
 		start_attack()
 		return
 
+	if attacking:
+		velocity.x = 0
+		if move_mode == MoveMode.FLY:
+			velocity.y = 0
+		move_and_slide()
+		update_animation()
+		return
+
 	move_towards_player(dist)
 	move_and_slide()
 	process_contact_attack()
@@ -133,29 +154,79 @@ func _physics_process(delta):
 
 
 func move_towards_player(dist):
+	if dist <= stop_distance:
+		velocity.x = 0
+		if move_mode == MoveMode.FLY:
+			velocity.y = 0
+		return
+
 	var dir: int = get_horizontal_chase_direction()
-	if dir == 0:
+	if dir == 0 and move_mode != MoveMode.FLY:
 		velocity.x = 0
 		return
 
-	# ❌ NÃO vira imediatamente
-	if dist <= stop_distance and attack_mode == AttackMode.HITBOX:
-		velocity.x = 0
-		return
-
-	# ✅ só vira quando realmente vai se mover
-	facing_dir = dir
-	update_sprite_direction(dir)
+	if dir != 0:
+		facing_dir = dir
+		update_sprite_direction(dir)
 
 	match move_mode:
 		MoveMode.WALK:
-			velocity.x = dir * speed
+			velocity.x = dir * get_water_speed()
 		MoveMode.JUMP:
-			velocity.x = dir * speed
+			velocity.x = dir * get_water_speed()
 			if is_on_floor():
-				velocity.y = jump_force
+				velocity.y = jump_force * get_water_jump_multiplier()
 		MoveMode.FLY:
-			velocity.x = dir * speed
+			move_flying_towards_player(dir)
+
+
+func move_flying_towards_player(dir: int) -> void:
+	var to_player := player.global_position - global_position
+
+	match fly_mode:
+		FlyMode.X_ONLY:
+			velocity.x = dir * get_water_speed()
+			velocity.y = 0
+		FlyMode.DIRECT:
+			velocity.x = sign(to_player.x) * get_water_speed() if absf(to_player.x) > stop_distance else 0.0
+			velocity.y = sign(to_player.y) * get_water_fly_y_speed() if fly_vertical_follow and absf(to_player.y) > stop_distance else 0.0
+		FlyMode.ZIGZAG:
+			var horizontal_dir := dir
+			if horizontal_dir == 0:
+				horizontal_dir = facing_dir
+
+			velocity.x = horizontal_dir * get_water_speed()
+			velocity.y = sin(fly_time * fly_zigzag_frequency) * fly_zigzag_amplitude * get_water_speed_multiplier()
+
+
+func enter_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count += 1
+	in_water = true
+
+
+func exit_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count = max(water_zone_overlap_count - 1, 0)
+	in_water = water_zone_overlap_count > 0
+
+
+func get_water_speed_multiplier() -> float:
+	return water_speed_multiplier if in_water else 1.0
+
+
+func get_water_gravity_multiplier() -> float:
+	return water_gravity_multiplier if in_water else 1.0
+
+
+func get_water_jump_multiplier() -> float:
+	return water_jump_multiplier if in_water else 1.0
+
+
+func get_water_speed() -> float:
+	return speed * get_water_speed_multiplier()
+
+
+func get_water_fly_y_speed() -> float:
+	return fly_y_speed * get_water_speed_multiplier()
 
 
 func get_horizontal_chase_direction() -> int:
@@ -388,7 +459,7 @@ func update_animation():
 
 	if attacking:
 		play_attack_animation()
-	elif abs(velocity.x) > 5:
+	elif abs(velocity.x) > 5 or (move_mode == MoveMode.FLY and abs(velocity.y) > 5):
 		play_walk_animation()
 	else:
 		play_idle_animation()

@@ -21,7 +21,9 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 	if menu_panel:
-		menu_panel.visible = false
+		menu_panel.visible = true
+		if menu_panel.has_method("set_menu_active"):
+			menu_panel.set_menu_active(false)
 	if pause_menu_panel:
 		pause_menu_panel.process_mode = Node.PROCESS_MODE_ALWAYS
 		pause_menu_panel.visible = false
@@ -107,6 +109,14 @@ func _update_menu_panel_state() -> void:
 		menu_panel.set_special_attack_enabled(player.can_use_mana_attacks())
 	if menu_panel.has_method("set_ultimate_enabled") and player:
 		menu_panel.set_ultimate_enabled(player.allow_ultimate_input and player.ultimate_attack_enabled and player.can_use_mana_attacks())
+	if menu_panel.has_method("set_special_attack_cooldown_progress") and player and player.has_method("get_active_attack_cooldown_progress"):
+		menu_panel.set_special_attack_cooldown_progress(player.get_active_attack_cooldown_progress())
+	if menu_panel.has_method("set_ultimate_cooldown_progress") and player and player.has_method("get_ultimate_cooldown_progress"):
+		menu_panel.set_ultimate_cooldown_progress(player.get_ultimate_cooldown_progress())
+	if menu_panel.has_method("set_defend_cooldown_progress"):
+		menu_panel.set_defend_cooldown_progress(1.0)
+	if menu_panel.has_method("set_placeholder_cooldown_progress"):
+		menu_panel.set_placeholder_cooldown_progress(1.0)
 
 
 func _update_pause_menu_state() -> void:
@@ -214,6 +224,8 @@ func _set_boss_hp_visible(v: bool) -> void:
 func show_menu() -> void:
 	if menu_panel:
 		menu_panel.visible = true
+		if menu_panel.has_method("set_menu_active"):
+			menu_panel.set_menu_active(true)
 
 		if menu_panel.has_method("set_action_selection"):
 			menu_panel.set_action_selection("none")
@@ -221,7 +233,9 @@ func show_menu() -> void:
 
 func hide_menu() -> void:
 	if menu_panel:
-		menu_panel.visible = false
+		menu_panel.visible = true
+		if menu_panel.has_method("set_menu_active"):
+			menu_panel.set_menu_active(false)
 
 		if menu_panel.has_method("set_action_selection"):
 			menu_panel.set_action_selection("none")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://4v1mv6nx587x"]
+[gd_scene load_steps=25 format=3 uid="uid://4v1mv6nx587x"]
 
 [ext_resource type="Script" uid="uid://c73t1ba5irapk" path="res://scripts/hud.gd" id="1_uow6a"]
 [ext_resource type="Texture2D" uid="uid://p2sjqryksujc" path="res://sprites/assets/hud/vida2.png" id="2_ftv5m"]
@@ -8,20 +8,27 @@
 [ext_resource type="Texture2D" uid="uid://dyw1j231b8efp" path="res://sprites/assets/hud/mana1.png" id="5_016od"]
 [ext_resource type="Texture2D" uid="uid://ca88v480wmppl" path="res://sprites/assets/hud/bolha_ult1.png" id="5_cqml6"]
 [ext_resource type="Script" uid="uid://d2h8ljiy2tu0a" path="res://Cenas/hud_panel.gd" id="5_is2x6"]
-[ext_resource type="Texture2D" uid="uid://d0dnhdwx68hyb" path="res://sprites/assets/buttom1_power.png" id="6_btn1"]
 [ext_resource type="Texture2D" uid="uid://bh0e4a1i1nue" path="res://sprites/assets/hud/stamina2.png" id="6_cqml6"]
-[ext_resource type="Texture2D" uid="uid://hrtvschl2dw8" path="res://sprites/assets/buttom1_power_used.png" id="7_btn1_used"]
 [ext_resource type="Texture2D" uid="uid://dh1ohr4g5ujkx" path="res://sprites/assets/hud/stamina1.png" id="7_crc4m"]
-[ext_resource type="Texture2D" uid="uid://c64ips57jdya1" path="res://sprites/assets/buttom2_power.png" id="8_btn2"]
-[ext_resource type="Texture2D" uid="uid://dusxo7jfjmobv" path="res://sprites/assets/buttom2_power_used.png" id="9_btn2_used"]
-[ext_resource type="Texture2D" uid="uid://17oe7s2dkfc7" path="res://sprites/assets/buttom3_power.png" id="10_btn3"]
-[ext_resource type="Texture2D" uid="uid://cfmmx7hapunrd" path="res://sprites/assets/buttom3_power_used.png" id="11_btn3_used"]
-[ext_resource type="Texture2D" uid="uid://jivxo6tt0iye" path="res://sprites/assets/buttom4_power.png" id="12_btn4"]
-[ext_resource type="Texture2D" uid="uid://ba6ydu4t5lj0d" path="res://sprites/assets/buttom4_power_used.png" id="13_btn4_used"]
+[ext_resource type="Texture2D" uid="uid://fusqyieo1sju" path="res://sprites/assets/bolha_espinho1.png" id="16_e85wo"]
+[ext_resource type="Texture2D" uid="uid://ckwcuaqm3rx1o" path="res://sprites/assets/bolha_espinho2.png" id="17_civdl"]
+[ext_resource type="Texture2D" uid="uid://kac1qw7iwumo" path="res://sprites/assets/bolha_guardian1.png" id="18_1j8pg"]
+[ext_resource type="Texture2D" uid="uid://cmjexj6vnx5ds" path="res://sprites/assets/power_wheel/hud poderes1.png" id="19_016od"]
+[ext_resource type="Texture2D" uid="uid://c5pte1oxnsry6" path="res://sprites/assets/bolha_guardian2.png" id="19_qvn4r"]
+[ext_resource type="Texture2D" uid="uid://dvohnbh8cyour" path="res://sprites/assets/lançador_de_bolha1.png" id="20_dh4pb"]
+[ext_resource type="Texture2D" uid="uid://bjnqqjtyaikuk" path="res://sprites/assets/power_wheel/hud poderes2.png" id="20_panel_active"]
+[ext_resource type="Texture2D" uid="uid://5tivadxigeul" path="res://sprites/assets/power_wheel/hud poderes3.png" id="21_panel_frame3"]
+[ext_resource type="Texture2D" uid="uid://bv3uq2w0xvl5y" path="res://sprites/assets/lançador_de_bolha2.png" id="21_putjb"]
+[ext_resource type="Texture2D" uid="uid://udjnytgjew77" path="res://sprites/assets/tempo_bolhoso1.png" id="22_invt5"]
+[ext_resource type="Texture2D" uid="uid://x7uwvdtyo36u" path="res://sprites/assets/power_wheel/hud poderes4.png" id="22_panel_frame4"]
+[ext_resource type="Texture2D" uid="uid://chfnxeemn25rc" path="res://sprites/assets/tempo_bolhoso2.png" id="23_o7n0q"]
+[ext_resource type="Texture2D" uid="uid://dqgnm8xab67a7" path="res://sprites/assets/power_wheel/hud poderes5.png" id="23_panel_frame5"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_power_panel"]
 
 [node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "boss_hp_bar", "menu_panel", "pause_menu_panel", "passive_toggle", "resume_button", "main_menu_button", "quit_button")]
 script = ExtResource("1_uow6a")
-heart_icons = [NodePath(""), NodePath(""), NodePath("")]
+heart_icons = [null, null, null]
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
 mana_bar = NodePath("HBoxContainer/Holder/ManaBar")
 boss_hp_bar = NodePath("BossBar")
@@ -70,31 +77,31 @@ text = "00"
 
 [node name="TextureProgressBar" type="TextureProgressBar" parent="HBoxContainer/Holder"]
 layout_mode = 0
-offset_left = 13.788681
-offset_top = 15.041276
-offset_right = 165.66379
-offset_bottom = 45.041275
-scale = Vector2(0.21362264, 0.5078016)
+offset_left = 16.627533
+offset_top = 16.921429
+offset_right = 168.50264
+offset_bottom = 46.92143
+scale = Vector2(0.27689847, 0.6582143)
 texture_under = ExtResource("2_ftv5m")
 texture_progress = ExtResource("3_sv046")
 
 [node name="TextureProgressBar2" type="TextureProgressBar" parent="HBoxContainer/Holder"]
 layout_mode = 0
-offset_left = 4.0554953
-offset_top = 9.400794
-offset_right = 65.95393
-offset_bottom = 71.25207
-scale = Vector2(0.21362264, 0.5078016)
+offset_left = 0.8110986
+offset_top = 1.8801594
+offset_right = 62.709538
+offset_bottom = 63.73143
+scale = Vector2(0.3417864, 0.8124592)
 texture_under = ExtResource("4_016od")
 texture_over = ExtResource("5_cqml6")
 
 [node name="ManaBar" type="TextureProgressBar" parent="HBoxContainer/Holder"]
 layout_mode = 0
-offset_left = 13.383135
-offset_top = 28.202377
-offset_right = 166.38313
-offset_bottom = 47.202377
-scale = Vector2(0.21362264, 0.4706111)
+offset_left = 16.221981
+offset_top = 31.962694
+offset_right = 169.22198
+offset_bottom = 50.962692
+scale = Vector2(0.27689844, 0.6100078)
 texture_under = ExtResource("4_b1pas")
 texture_progress = ExtResource("5_016od")
 
@@ -107,60 +114,76 @@ scale = Vector2(1.6899998, 1.6899998)
 texture_under = ExtResource("6_cqml6")
 texture_progress = ExtResource("7_crc4m")
 
-[node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("up_button", "down_button", "left_button", "right_button")]
-offset_left = 278.0
-offset_top = 140.0
-offset_right = 398.0
-offset_bottom = 260.0
+[node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("state_texture", "up_button", "down_button", "left_button", "right_button")]
+offset_left = 337.0
+offset_top = 196.00002
+offset_right = 457.0
+offset_bottom = 316.0
+scale = Vector2(0.58228296, 0.58228296)
+theme_override_styles/panel = SubResource("StyleBoxEmpty_power_panel")
 script = ExtResource("5_is2x6")
+state_texture = NodePath("StateTexture")
 up_button = NodePath("Ultimate")
 down_button = NodePath("Placeholder")
 left_button = NodePath("Defend")
 right_button = NodePath("Special")
-up_normal_texture = ExtResource("6_btn1")
-up_selected_texture = ExtResource("7_btn1_used")
-down_normal_texture = ExtResource("8_btn2")
-down_selected_texture = ExtResource("9_btn2_used")
-left_normal_texture = ExtResource("10_btn3")
-left_selected_texture = ExtResource("11_btn3_used")
-right_normal_texture = ExtResource("12_btn4")
-right_selected_texture = ExtResource("13_btn4_used")
+active_panel_texture = ExtResource("23_panel_frame5")
+inactive_panel_texture = ExtResource("19_016od")
+activation_frames = Array[Texture2D]([ExtResource("19_016od"), ExtResource("20_panel_active"), ExtResource("21_panel_frame3"), ExtResource("22_panel_frame4"), ExtResource("23_panel_frame5")])
+up_normal_texture = ExtResource("16_e85wo")
+up_selected_texture = ExtResource("17_civdl")
+down_normal_texture = ExtResource("18_1j8pg")
+down_selected_texture = ExtResource("19_qvn4r")
+left_normal_texture = ExtResource("20_dh4pb")
+left_selected_texture = ExtResource("21_putjb")
+right_normal_texture = ExtResource("22_invt5")
+right_selected_texture = ExtResource("23_o7n0q")
+disabled_texture = ExtResource("19_016od")
 metadata/_edit_use_anchors_ = true
+
+[node name="StateTexture" type="TextureRect" parent="Panel"]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 120.0
+mouse_filter = 2
+texture = ExtResource("19_016od")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Ultimate" type="TextureRect" parent="Panel"]
 layout_mode = 0
-offset_left = 42.0
-offset_top = 4.0
-offset_right = 78.0
-offset_bottom = 40.0
-texture = ExtResource("6_btn1")
+offset_left = 28.0
+offset_top = -2.0
+offset_right = 88.0
+offset_bottom = 65.0
+texture = ExtResource("16_e85wo")
 stretch_mode = 5
 
 [node name="Placeholder" type="TextureRect" parent="Panel"]
 layout_mode = 0
-offset_left = 42.0
-offset_top = 80.0
-offset_right = 78.0
-offset_bottom = 116.0
-texture = ExtResource("8_btn2")
+offset_left = 30.0
+offset_top = 64.0
+offset_right = 90.0
+offset_bottom = 135.0
+texture = ExtResource("18_1j8pg")
 stretch_mode = 5
 
 [node name="Defend" type="TextureRect" parent="Panel"]
 layout_mode = 0
-offset_left = 4.0
-offset_top = 42.0
-offset_right = 40.0
-offset_bottom = 78.0
-texture = ExtResource("10_btn3")
+offset_left = -6.0
+offset_top = 34.0
+offset_right = 55.0
+offset_bottom = 97.0
+texture = ExtResource("20_dh4pb")
 stretch_mode = 5
 
 [node name="Special" type="TextureRect" parent="Panel"]
 layout_mode = 0
-offset_left = 80.0
-offset_top = 42.0
-offset_right = 116.0
-offset_bottom = 78.0
-texture = ExtResource("12_btn4")
+offset_left = 58.0
+offset_top = 35.0
+offset_right = 133.0
+offset_bottom = 96.0
+texture = ExtResource("22_invt5")
 stretch_mode = 5
 
 [node name="PauseMenu" type="Panel" parent="."]
