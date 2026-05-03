@@ -14,6 +14,7 @@ enum Form { NORMAL, SUPER }
 
 @export_group("Stats")
 @export var max_health: int = 6
+@export var take_stomp_damage: bool = true
 var health: int = max_health
 
 @export_group("Movement")
@@ -22,6 +23,10 @@ var health: int = max_health
 @export var stop_distance: float = 60.0
 @export var aggro_range: float = 450.0
 @export var turn_horizontal_threshold: float = 32.0
+
+@export_group("Water")
+@export_range(0.05, 1.0, 0.05) var water_speed_multiplier: float = 0.55
+@export_range(0.05, 1.0, 0.05) var water_gravity_multiplier: float = 0.35
 
 @export_group("Attack")
 @export var damage: int = 2
@@ -63,6 +68,8 @@ var cooldown_t := 0.0
 var facing_dir := -1
 var hud_visible := false
 var attack_hitbox_base_position: Vector2 = Vector2.ZERO
+var in_water: bool = false
+var water_zone_overlap_count: int = 0
 
 # =========================================================
 
@@ -143,7 +150,7 @@ func handle_chase(dist):
 	if dist <= stop_distance:
 		velocity.x = 0
 	else:
-		velocity.x = facing_dir * speed
+		velocity.x = facing_dir * get_water_speed()
 		update_sprite_direction(facing_dir)
 
 	if dist <= attack_range and cooldown_t <= 0:
@@ -166,8 +173,9 @@ func get_horizontal_chase_direction() -> int:
 
 func start_attack():
 	cooldown_t = attack_cooldown
+	velocity.x = 0
 
-	play_attack_animation()
+	restart_attack_animation()
 
 	if uses_frame_based_hitbox():
 		await run_attack_hitbox_by_frames(get_attack_anim())
@@ -248,7 +256,10 @@ func die():
 # =========================================================
 
 func _on_hurtbox_area_entered(area):
-	if area.is_in_group("player_stomper"):
+	if area == null or state == State.DEAD:
+		return
+
+	if take_stomp_damage and area.is_in_group("player_stomper"):
 		take_damage(get_damage_from_area(area, 1))
 
 
@@ -305,7 +316,26 @@ func is_hud_visible() -> bool:
 
 func apply_gravity(delta):
 	if not is_on_floor():
-		velocity.y += gravity * delta
+		velocity.y += gravity * get_water_gravity_multiplier() * delta
+
+# =========================================================
+
+func enter_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count += 1
+	in_water = true
+
+
+func exit_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count = max(water_zone_overlap_count - 1, 0)
+	in_water = water_zone_overlap_count > 0
+
+
+func get_water_speed() -> float:
+	return speed * (water_speed_multiplier if in_water else 1.0)
+
+
+func get_water_gravity_multiplier() -> float:
+	return water_gravity_multiplier if in_water else 1.0
 
 # =========================================================
 
@@ -388,6 +418,10 @@ func get_attack_anim():
 
 func play_attack_animation():
 	play_animation(get_attack_anim())
+
+func restart_attack_animation():
+	if has_animation(get_attack_anim()):
+		sprite.play(get_attack_anim())
 
 func play_animation(anim):
 	if has_animation(anim) and sprite.animation != anim:

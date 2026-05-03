@@ -1,204 +1,8 @@
-[gd_scene load_steps=42 format=3 uid="uid://bxwaorviofm3w"]
+[gd_scene load_steps=10 format=3 uid="uid://bxwaorviofm3w"]
 
-[ext_resource type="Texture2D" uid="uid://bi03taar753" path="res://sprites/img/background/titulo/preto1.png" id="1_15gka"]
 [ext_resource type="Script" uid="uid://cx7ula7bxnjv4" path="res://scripts/title.gd" id="1_y12so"]
-[ext_resource type="Texture2D" uid="uid://bkhsbfwka4gqw" path="res://sprites/img/background/titulo/bg_4.png" id="2_77ghk"]
-[ext_resource type="Texture2D" uid="uid://cgaylwx7lnqna" path="res://sprites/img/logoprojog.jpg" id="4_j7fkm"]
-[ext_resource type="Texture2D" uid="uid://c1wvd3iu3i0gl" path="res://sprites/img/background/titulo/bg_5.png" id="4_r2t5r"]
-[ext_resource type="Texture2D" uid="uid://coh3wdrj77jd8" path="res://sprites/img/background/titulo/animacao/bg_3/bg_3-Sheet.png" id="5_mou5i"]
-[ext_resource type="Texture2D" uid="uid://ti17al0ug0d8" path="res://sprites/img/background/titulo/animacao/bg_2/bg_2-Sheet.png" id="6_ss2qd"]
-[ext_resource type="Texture2D" uid="uid://cwliycx745eik" path="res://sprites/img/background/titulo/animacao/bg_1/bg_1-Sheet.png" id="7_14sl4"]
 [ext_resource type="FontFile" uid="uid://tb0dgy82p4df" path="res://sprites/img/background/fundo/Rev Mini Pixel.ttf" id="8_mcqsg"]
 [ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://music/A Alegria Pixelada.wav" id="9_7wsge"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tq2gh"]
-atlas = ExtResource("5_mou5i")
-region = Rect2(0, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_enpti"]
-atlas = ExtResource("5_mou5i")
-region = Rect2(420, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gliw4"]
-atlas = ExtResource("5_mou5i")
-region = Rect2(840, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_513tv"]
-atlas = ExtResource("5_mou5i")
-region = Rect2(1260, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gnuob"]
-atlas = ExtResource("5_mou5i")
-region = Rect2(1680, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_xce6r"]
-atlas = ExtResource("5_mou5i")
-region = Rect2(2100, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_1i3wn"]
-atlas = ExtResource("5_mou5i")
-region = Rect2(2520, 0, 420, 280)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_t2lld"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_tq2gh")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_enpti")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_gliw4")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_513tv")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_gnuob")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_xce6r")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_1i3wn")
-}],
-"loop": true,
-"name": &"default",
-"speed": 10.0
-}]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_lwuvm"]
-atlas = ExtResource("6_ss2qd")
-region = Rect2(0, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_cva7t"]
-atlas = ExtResource("6_ss2qd")
-region = Rect2(420, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_b3urf"]
-atlas = ExtResource("6_ss2qd")
-region = Rect2(840, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ja2ok"]
-atlas = ExtResource("6_ss2qd")
-region = Rect2(1260, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_xobca"]
-atlas = ExtResource("6_ss2qd")
-region = Rect2(1680, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_e0iq2"]
-atlas = ExtResource("6_ss2qd")
-region = Rect2(2100, 0, 420, 280)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_lk421"]
-atlas = ExtResource("6_ss2qd")
-region = Rect2(2520, 0, 420, 280)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_eldcj"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_lwuvm")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_cva7t")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_b3urf")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ja2ok")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_xobca")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_e0iq2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_lk421")
-}],
-"loop": true,
-"name": &"default",
-"speed": 10.0
-}]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_6wxxs"]
-atlas = ExtResource("7_14sl4")
-region = Rect2(0, 140, 420, 140)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_crvrx"]
-atlas = ExtResource("7_14sl4")
-region = Rect2(420, 140, 420, 140)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_oij53"]
-atlas = ExtResource("7_14sl4")
-region = Rect2(840, 140, 420, 140)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ulqww"]
-atlas = ExtResource("7_14sl4")
-region = Rect2(1260, 140, 420, 140)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_sewk3"]
-atlas = ExtResource("7_14sl4")
-region = Rect2(1680, 140, 420, 140)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_wu0bt"]
-atlas = ExtResource("7_14sl4")
-region = Rect2(2100, 140, 420, 140)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_7ju1s"]
-atlas = ExtResource("7_14sl4")
-region = Rect2(2520, 140, 420, 140)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_qxdjn"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_6wxxs")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_crvrx")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_oij53")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ulqww")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_sewk3")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_wu0bt")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_7ju1s")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_6wxxs")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_7ju1s")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_6wxxs")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_7ju1s")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_6wxxs")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_7ju1s")
-}],
-"loop": true,
-"name": &"default",
-"speed": 3.0
-}]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qui40"]
 bg_color = Color(0.34, 0.0595, 0.0714, 0.94)
@@ -213,6 +17,10 @@ corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2vbo6"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
 bg_color = Color(0.0196078, 0.0215686, 0.0392157, 0.88)
 border_width_left = 1
 border_width_top = 1
@@ -223,24 +31,20 @@ corner_radius_top_left = 2
 corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
-content_margin_left = 10.0
-content_margin_right = 10.0
-content_margin_top = 4.0
-content_margin_bottom = 4.0
 expand_margin_top = 1.0
 
 [sub_resource type="Theme" id="Theme_50u4b"]
 Button/colors/font_color = Color(1, 1, 1, 1)
 Button/colors/font_focus_color = Color(1, 0.92, 0.64, 1)
 Button/colors/font_hover_color = Color(1, 0.92, 0.64, 1)
-Button/fonts/font = ExtResource("8_mcqsg")
 Button/font_sizes/font_size = 8
-Button/styles/hover = SubResource("StyleBoxFlat_qui40")
+Button/fonts/font = ExtResource("8_mcqsg")
 Button/styles/focus = SubResource("StyleBoxFlat_qui40")
+Button/styles/hover = SubResource("StyleBoxFlat_qui40")
 Button/styles/normal = SubResource("StyleBoxFlat_2vbo6")
 HSlider/colors/font_color = Color(1, 1, 1, 1)
-Label/fonts/font = ExtResource("8_mcqsg")
 Label/font_sizes/font_size = 8
+Label/fonts/font = ExtResource("8_mcqsg")
 Label/styles/normal = SubResource("StyleBoxFlat_2vbo6")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_01s65"]
@@ -252,41 +56,25 @@ border_width_bottom = 1
 border_color = Color(1, 0.55, 0.35, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_di2en"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
 bg_color = Color(0.03, 0.015, 0.018, 0.9)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.62, 0.28, 0.2, 1)
-content_margin_left = 10.0
-content_margin_right = 10.0
-content_margin_top = 4.0
-content_margin_bottom = 4.0
 
 [sub_resource type="Theme" id="Theme_8he0a"]
 Button/colors/font_color = Color(1, 1, 1, 1)
 Button/colors/font_hover_color = Color(1, 0.86, 0.62, 1)
-Button/fonts/font = ExtResource("8_mcqsg")
 Button/font_sizes/font_size = 8
-Button/styles/hover = SubResource("StyleBoxFlat_01s65")
+Button/fonts/font = ExtResource("8_mcqsg")
 Button/styles/focus = SubResource("StyleBoxFlat_01s65")
+Button/styles/hover = SubResource("StyleBoxFlat_01s65")
 Button/styles/normal = SubResource("StyleBoxFlat_di2en")
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_panel"]
-bg_color = Color(0.015, 0.016, 0.035, 0.82)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.74, 0.61, 0.34, 0.96)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-content_margin_left = 12.0
-content_margin_top = 10.0
-content_margin_right = 12.0
-content_margin_bottom = 10.0
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -299,64 +87,24 @@ script = ExtResource("1_y12so")
 metadata/_edit_vertical_guides_ = [199.0]
 metadata/_edit_horizontal_guides_ = [77.0]
 
-[node name="Bg_0" type="TextureRect" parent="."]
+[node name="IntroBlackBackground" type="ColorRect" parent="."]
 layout_mode = 0
 offset_right = 420.0
 offset_bottom = 280.0
-texture = ExtResource("1_15gka")
+color = Color(0, 0, 0, 1)
 
-[node name="TextureRect" type="TextureRect" parent="."]
-layout_mode = 0
-offset_left = 347.0
-offset_top = 206.0
-offset_right = 409.0
-offset_bottom = 268.0
-texture = ExtResource("4_j7fkm")
-expand_mode = 2
-stretch_mode = 4
-
-[node name="Bg_3" type="TextureRect" parent="."]
+[node name="MenuIntroBackground" type="TextureRect" parent="."]
 layout_mode = 0
 offset_right = 420.0
 offset_bottom = 280.0
-texture = ExtResource("4_r2t5r")
+expand_mode = 1
 
-[node name="Bg_1" type="TextureRect" parent="."]
+[node name="LogoIntro" type="TextureRect" parent="."]
 layout_mode = 0
-offset_right = 422.0
+offset_right = 420.0
 offset_bottom = 280.0
-texture = ExtResource("2_77ghk")
-
-[node name="Bubble_boy" type="AnimatedSprite2D" parent="."]
-position = Vector2(99.5, 212)
-scale = Vector2(0.47857141, 0.47857141)
-sprite_frames = SubResource("SpriteFrames_t2lld")
-autoplay = "default"
-frame_progress = 0.37413
-
-[node name="Bolinha" type="AnimatedSprite2D" parent="."]
-position = Vector2(102, 212)
-scale = Vector2(0.4857143, 0.4857143)
-sprite_frames = SubResource("SpriteFrames_eldcj")
-autoplay = "default"
-frame_progress = 0.569063
-
-[node name="Titulo" type="AnimatedSprite2D" parent="."]
-position = Vector2(99.999985, 30.000015)
-scale = Vector2(0.57945865, 0.5857143)
-sprite_frames = SubResource("SpriteFrames_qxdjn")
-autoplay = "default"
-frame = 3
-frame_progress = 0.49152
-
-[node name="MenuBackdrop" type="Panel" parent="."]
-layout_mode = 0
-offset_left = 156.0
-offset_top = 50.0
-offset_right = 405.0
-offset_bottom = 266.0
-theme = SubResource("Theme_50u4b")
-theme_override_styles/panel = SubResource("StyleBoxFlat_menu_panel")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 0
@@ -364,15 +112,14 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="MainMenu" type="HBoxContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 178.0
-offset_top = 74.0
+offset_top = 156.0
 offset_right = -30.0
-offset_bottom = -46.0
+offset_bottom = 36.0
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
@@ -380,18 +127,6 @@ alignment = 1
 [node name="VBoxContainer" type="VBoxContainer" parent="MainMenu"]
 layout_mode = 2
 theme_override_constants/separation = 6
-
-[node name="MenuTitle" type="Label" parent="MainMenu/VBoxContainer"]
-layout_mode = 2
-theme = SubResource("Theme_50u4b")
-text = "SUPER BUBBLE BOY"
-horizontal_alignment = 1
-
-[node name="MenuSubtitle" type="Label" parent="MainMenu/VBoxContainer"]
-layout_mode = 2
-theme = SubResource("Theme_50u4b")
-text = "Aventura"
-horizontal_alignment = 1
 
 [node name="Start" type="Button" parent="MainMenu/VBoxContainer"]
 custom_minimum_size = Vector2(190, 22)
@@ -485,6 +220,7 @@ theme = SubResource("Theme_50u4b")
 text = "VOLTAR"
 
 [node name="ControlsMenu" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 0
 offset_left = 172.0
 offset_top = 58.0

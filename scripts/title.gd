@@ -15,6 +15,18 @@ extends Control
 @onready var menu = $MainMenu
 @onready var config_menu = $ConfigMenu
 @onready var botoes_menu = $ControlsMenu
+@onready var logo_intro: TextureRect = $LogoIntro
+@onready var menu_intro_background: TextureRect = $MenuIntroBackground
+
+const LOGO_INTRO_PATH: String = "res://sprites/menu/logo_intro/LogoRes%d.png"
+const MENU_INTRO_PATH: String = "res://sprites/menu/menu_intro/menu%d.png"
+const LOGO_INTRO_FRAME_COUNT: int = 28
+const MENU_INTRO_FRAME_COUNT: int = 56
+const LOGO_INTRO_FPS: float = 12.0
+const MENU_INTRO_FPS: float = 14.0
+const MENU_IDLE_LOOP_FIRST_FRAME: int = 51
+const MENU_IDLE_LOOP_LAST_FRAME: int = 56
+const MENU_IDLE_LOOP_FPS: float = 8.0
 
 
 # ================================
@@ -71,9 +83,10 @@ extends Control
 # ================================
 # Guarda qual ação está esperando receber uma nova tecla/botão
 var awaiting_rebind_action: String = ""
+var intro_running: bool = true
 
 # Teclas que você não deixa usar no rebind (pra evitar travar navegação/confirmar/sair)
-var forbidden_keys = [
+var forbidden_keys: Array[int] = [
 	KEY_ESCAPE,
 	KEY_ENTER,
 	KEY_KP_ENTER
@@ -85,9 +98,13 @@ var forbidden_keys = [
 # ================================
 func _ready():
 	# Estado inicial: mostra o menu principal e esconde as outras telas
-	menu.visible = true
+	menu.visible = false
 	config_menu.visible = false
 	botoes_menu.visible = false
+	if logo_intro:
+		logo_intro.visible = true
+	if menu_intro_background:
+		menu_intro_background.visible = true
 
 	# --- Conecta botões do menu principal ---
 	_connect_pressed_once(btn_iniciar, _on_iniciar)        # inicia o jogo/cutscene
@@ -132,6 +149,7 @@ func _ready():
 
 	# Atualiza o texto dos botões com o input atual (ex: "Pulo: Space")
 	_update_control_labels()
+	_play_startup_intro()
 
 
 func _connect_pressed_once(button: BaseButton, callable: Callable) -> void:
@@ -144,15 +162,77 @@ func _connect_pressed_once(button: BaseButton, callable: Callable) -> void:
 func _connect_rebind_button_once(button: BaseButton, action_name: String) -> void:
 	if button == null:
 		return
-	var action_callable := func(): _start_rebind(action_name)
+	var action_callable: Callable = func(): _start_rebind(action_name)
 	if not button.pressed.is_connected(action_callable):
 		button.pressed.connect(action_callable)
+
+
+func _play_startup_intro() -> void:
+	await _play_frame_sequence(logo_intro, LOGO_INTRO_PATH, LOGO_INTRO_FRAME_COUNT, LOGO_INTRO_FPS, false)
+
+	if logo_intro:
+		logo_intro.visible = false
+
+	await _play_frame_sequence(menu_intro_background, MENU_INTRO_PATH, MENU_INTRO_FRAME_COUNT, MENU_INTRO_FPS, true)
+
+	intro_running = false
+	menu.visible = true
+	_loop_menu_idle_animation()
+
+
+func _play_frame_sequence(target: TextureRect, path_pattern: String, frame_count: int, fps: float, keep_last_frame: bool) -> void:
+	if target == null:
+		return
+
+	var frame_delay: float = 1.0 / maxf(fps, 1.0)
+	target.visible = true
+
+	for frame_number in range(1, frame_count + 1):
+		var frame_path: String = path_pattern % frame_number
+		if ResourceLoader.exists(frame_path):
+			var texture: Texture2D = load(frame_path) as Texture2D
+			if texture:
+				target.texture = texture
+
+		await get_tree().create_timer(frame_delay).timeout
+
+	if not keep_last_frame:
+		target.visible = false
+
+
+func _loop_menu_idle_animation() -> void:
+	if menu_intro_background == null:
+		return
+
+	var frame_delay: float = 1.0 / maxf(MENU_IDLE_LOOP_FPS, 1.0)
+
+	while is_inside_tree():
+		for frame_number in range(MENU_IDLE_LOOP_FIRST_FRAME, MENU_IDLE_LOOP_LAST_FRAME + 1):
+			_set_menu_intro_frame(frame_number)
+			await get_tree().create_timer(frame_delay).timeout
+
+		for frame_number in range(MENU_IDLE_LOOP_LAST_FRAME - 1, MENU_IDLE_LOOP_FIRST_FRAME, -1):
+			_set_menu_intro_frame(frame_number)
+			await get_tree().create_timer(frame_delay).timeout
+
+
+func _set_menu_intro_frame(frame_number: int) -> void:
+	var frame_path: String = MENU_INTRO_PATH % frame_number
+	if not ResourceLoader.exists(frame_path):
+		return
+
+	var texture: Texture2D = load(frame_path) as Texture2D
+	if texture:
+		menu_intro_background.texture = texture
 
 
 # ================================
 #          INPUT REBIND
 # ================================
 func _input(event: InputEvent):
+	if intro_running:
+		return
+
 	# Se não estiver no modo "esperando rebind", ignora tudo
 	if awaiting_rebind_action == "":
 		return
@@ -188,24 +268,32 @@ func _on_sair():
 	get_tree().quit()
 
 func _open_config_menu():
+	if intro_running:
+		return
 	# Troca visibilidade: só a config fica visível
 	menu.visible = false
 	config_menu.visible = true
 	botoes_menu.visible = false
 
 func _back_to_menu():
+	if intro_running:
+		return
 	# Volta para o menu principal
 	menu.visible = true
 	config_menu.visible = false
 	botoes_menu.visible = false
 
 func _open_botoes_menu():
+	if intro_running:
+		return
 	# Abre a tela de rebind/controles
 	menu.visible = false
 	config_menu.visible = false
 	botoes_menu.visible = true
 
 func _back_to_config_menu():
+	if intro_running:
+		return
 	# Volta do rebind para config
 	menu.visible = false
 	config_menu.visible = true
@@ -285,6 +373,6 @@ func _get_current_input_name(action: String) -> String:
 
 
 func _set_rebind_prompt(text: String) -> void:
-	var prompt := $ControlsMenu/ScrollContainer/VBoxContainer.get_node_or_null("RebindPrompt")
+	var prompt: Node = $ControlsMenu/ScrollContainer/VBoxContainer.get_node_or_null("RebindPrompt")
 	if prompt:
-		prompt.text = text
+		(prompt as Label).text = text

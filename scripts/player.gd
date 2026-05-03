@@ -113,9 +113,10 @@ var on_ground := false
 
 var form: Form = Form.NORMAL
 var state: State = State.IDLE
-var mode: GameMode = GameMode.PLATAFORMA
+var mode: GameMode = GameMode.METROIDVANIA
 
 var in_water: bool = false
+var water_zone_overlap_count: int = 0
 var target_form: Form = Form.NORMAL
 var is_bouncing_from_enemy := false
 var combo_lock := false
@@ -133,7 +134,6 @@ var current_attack_area: Area2D
 var attack_window_serial: int = 0
 var fatal_hit_sequence_running: bool = false
 var hurt_sequence_running: bool = false
-var pending_game_over_after_death: bool = false
 
 var unlocked_forms = {
 	Form.NORMAL: true,
@@ -181,9 +181,6 @@ func _input(event):
 		return
 
 	if event.is_action_released("hud_menu"):
-		if hud_menu_selection_locked:
-			get_viewport().set_input_as_handled()
-			return
 		close_hud_menu()
 		return
 
@@ -476,34 +473,25 @@ func enable_metroidvania_mode() -> void:
 
 
 func enable_plataforma_mode() -> void:
-	mode = GameMode.PLATAFORMA
-	print("🎮 Modo Plataforma ativado!")
+	mode = GameMode.METROIDVANIA
+	print("🎮 Modo Plataforma ignorado: gameplay atual usa apenas Metroidvania.")
 	restore_resources_full()
-
-	if force_normal_form_in_platform_mode:
-		force_form(Form.NORMAL)
 
 
 func can_transform() -> bool:
-	if mode != GameMode.METROIDVANIA:
-		return false
 	return unlocked_forms.get(Form.BUBBLE, false) or unlocked_forms.get(Form.SUPER, false)
 
 
 func can_dash_global() -> bool:
-	return mode == GameMode.METROIDVANIA
+	return true
 
 
 func can_use_mana_system() -> bool:
-	if mode == GameMode.METROIDVANIA:
-		return true
-	return platform_mode_uses_mana
+	return true
 
 
 func can_use_mana_attacks() -> bool:
-	if mode == GameMode.METROIDVANIA:
-		return true
-	return platform_mode_allows_mana_attacks
+	return true
 
 
 func restore_resources_full() -> void:
@@ -546,6 +534,31 @@ func apply_water_physics(delta: float) -> void:
 	velocity.x *= 0.92
 
 
+func enter_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count += 1
+	if water_zone_overlap_count > 1:
+		return
+
+	in_water = true
+	if state != State.DEAD:
+		change_state(State.SWIM)
+
+
+func exit_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count = max(water_zone_overlap_count - 1, 0)
+	if water_zone_overlap_count > 0:
+		return
+
+	in_water = false
+	if state == State.DEAD:
+		return
+
+	if is_on_floor():
+		change_state(State.IDLE)
+	else:
+		change_state(State.JUMP)
+
+
 func handle_jump() -> void:
 	match form:
 		Form.BUBBLE:
@@ -583,8 +596,6 @@ func toggle_transform(target: Form) -> void:
 
 func start_transform(new_form: Form) -> void:
 	if state in [State.DEAD, State.HURT]:
-		return
-	if mode != GameMode.METROIDVANIA:
 		return
 	if new_form != Form.NORMAL and not unlocked_forms.get(new_form, false):
 		return
@@ -767,18 +778,15 @@ func start_normal_attack() -> void:
 	trigger_attack_window(normal_attack_active_time)
 
 
-func take_damage(amount: int = 1, source: Node = null) -> void:
+func take_damage(amount: int = 1, _source: Node = null) -> void:
 	if is_invincible or state in [State.DEAD, State.HURT]:
 		return
 	if defending and state == State.DEFEND:
 		return
 
-	var is_fatal_hit := mode == GameMode.PLATAFORMA
-	var force_continue_after_death := is_boss_damage_source(source)
+	var is_fatal_hit := false
 
-	if mode == GameMode.PLATAFORMA:
-		pass
-	elif stats and stats.has_method("take_damage"):
+	if stats and stats.has_method("take_damage"):
 		stats.take_damage(amount)
 		if stats.current_health <= 0:
 			is_fatal_hit = true
@@ -786,7 +794,7 @@ func take_damage(amount: int = 1, source: Node = null) -> void:
 		is_fatal_hit = true
 
 	if is_fatal_hit:
-		_on_fatal_hit(force_continue_after_death)
+		_on_fatal_hit()
 		return
 
 	start_invincibility()
@@ -809,25 +817,11 @@ func start_invincibility() -> void:
 	is_invincible = false
 
 
-func _on_fatal_hit(force_continue_after_death: bool = false) -> void:
+func _on_fatal_hit() -> void:
 	if fatal_hit_sequence_running or state == State.DEAD:
 		return
 
-	if mode == GameMode.PLATAFORMA and GameManager:
-		pending_game_over_after_death = GameManager.consume_life() <= 0
-	if force_continue_after_death:
-		pending_game_over_after_death = true
-
 	await play_fatal_hit_sequence()
-
-
-func is_boss_damage_source(source: Node) -> bool:
-	var current := source
-	while current != null:
-		if current.is_in_group("boss"):
-			return true
-		current = current.get_parent()
-	return false
 
 
 func respawn_player() -> void:
@@ -838,10 +832,12 @@ func respawn_player() -> void:
 	if stats and stats.has_method("restore_all"):
 		stats.restore_all()
 	else:
-		if mode == GameMode.METROIDVANIA and stats and stats.has_method("reset_health_full"):
+		if stats and stats.has_method("reset_health_full"):
 			stats.reset_health_full()
 		if stats and stats.has_method("reset_mana_full"):
 			stats.reset_mana_full()
+
+	update_audio_by_form()
 
 	is_invincible = true
 	var tree := get_tree()
@@ -850,6 +846,7 @@ func respawn_player() -> void:
 		if timer:
 			await timer.timeout
 	is_invincible = false
+	fatal_hit_sequence_running = false
 
 
 func open_hud_menu() -> void:
@@ -869,8 +866,10 @@ func open_hud_menu() -> void:
 		hud.update_action_selection("none")
 
 
-func close_hud_menu() -> void:
+func close_hud_menu(keep_panel_active: bool = false) -> void:
 	if not hud_menu_open:
+		if not keep_panel_active and hud and hud.has_method("hide_menu"):
+			hud.hide_menu()
 		return
 
 	hud_menu_open = false
@@ -878,18 +877,22 @@ func close_hud_menu() -> void:
 	hud_menu_axis_locked = false
 	hud_menu_selection_locked = false
 
-	if hud and hud.has_method("hide_menu"):
+	if not keep_panel_active and hud and hud.has_method("hide_menu"):
 		hud.hide_menu()
 
 
 func process_hud_menu_selection() -> void:
-	if hud_menu_selection_locked:
-		return
-
 	var direction := get_hud_menu_direction()
 
 	if direction == Vector2.ZERO:
 		hud_menu_axis_locked = false
+		hud_menu_selection_locked = false
+		hud_menu_selection = HudMenuAction.NONE
+		if hud and hud.has_method("update_action_selection"):
+			hud.update_action_selection("none")
+		return
+
+	if hud_menu_selection_locked:
 		return
 
 	if hud_menu_axis_locked:
@@ -965,7 +968,12 @@ func execute_hud_menu_action(action_name: String) -> void:
 			start_defense()
 
 	await get_tree().create_timer(0.45).timeout
-	close_hud_menu()
+	if hud_menu_open and get_hud_menu_direction() == Vector2.ZERO:
+		hud_menu_axis_locked = false
+		hud_menu_selection_locked = false
+		hud_menu_selection = HudMenuAction.NONE
+		if hud and hud.has_method("update_action_selection"):
+			hud.update_action_selection("none")
 
 
 func activate_attack_area() -> void:
@@ -1101,6 +1109,21 @@ func get_active_attack_cooldown(index: int) -> float:
 	return active_attack_cooldowns[index]
 
 
+func get_active_attack_cooldown_progress(index: int = -1) -> float:
+	if index < 0:
+		index = selected_active_attack_index
+	if index < 0 or index >= active_attack_timers.size():
+		return 1.0
+
+	var cooldown := maxf(get_active_attack_cooldown(index), 0.001)
+	return clampf(1.0 - (active_attack_timers[index] / cooldown), 0.0, 1.0)
+
+
+func get_ultimate_cooldown_progress() -> float:
+	var cooldown := maxf(ultimate_attack_cooldown, 0.001)
+	return clampf(1.0 - (ultimate_cooldown_timer / cooldown), 0.0, 1.0)
+
+
 func get_active_attack_mana_cost(index: int) -> float:
 	return active_attack_mana_costs[index]
 
@@ -1170,9 +1193,6 @@ func handle_level_timeout() -> void:
 	if fatal_hit_sequence_running or state == State.DEAD:
 		return
 
-	if mode == GameMode.PLATAFORMA and GameManager:
-		pending_game_over_after_death = GameManager.consume_life() <= 0
-
 	await play_fatal_hit_sequence()
 
 
@@ -1227,7 +1247,7 @@ func play_death_sequence() -> void:
 	if not is_inside_tree():
 		return
 
-	restart_level_from_beginning()
+	await respawn_player()
 
 
 func wait_for_current_sprite_animation(anim_name: StringName, minimum_duration: float = 0.0) -> void:
@@ -1263,20 +1283,7 @@ func get_death_animation_name() -> StringName:
 
 
 func restart_level_from_beginning() -> void:
-	if pending_game_over_after_death:
-		pending_game_over_after_death = false
-		if GameManager:
-			GameManager.call_deferred("goto_continue")
-		return
-
-	var tree := get_tree()
-	if tree == null:
-		return
-	if tree.current_scene:
-		tree.call_deferred("reload_current_scene")
-		return
-	if GameManager:
-		GameManager.call_deferred("restart_current_level")
+	await respawn_player()
 
 
 func connect_stomper_signals(stomper: Area2D) -> void:

@@ -1,5 +1,55 @@
 # Change Log
 
+## 2026-05-03
+
+### Title intro and menu background replacement
+
+- Updated `Cenas/Title.tscn` to add full-screen `LogoIntro` and `MenuIntroBackground` texture layers
+- Updated `scripts/title.gd` so opening the game first plays `sprites/menu/logo_intro/LogoRes1..28.png`
+- After the studio logo, the title screen now plays `sprites/menu/menu_intro/menu1..56.png` and keeps the last frame as the menu background
+- Hid the previous title background/title animation nodes so the new menu intro art replaces the old visuals while preserving the existing buttons, config menu, and controls menu
+- Removed the previous title/menu visual nodes and simplified the main menu to only `INICIAR`, `CONFIGURACOES`, and `SAIR`
+- Added a looping idle menu animation that ping-pongs through `menu51.png` to `menu56.png` after the menu intro finishes
+
+### Reusable tilemap water system
+
+- Added `Cenas/water_tilemap.tscn` as a reusable water scene with a `TileMapLayer` for painting water tiles
+- Added `scripts/water_tilemap.gd` to scan painted water tiles and generate merged `Area2D` water volumes at runtime
+- Added simple two-frame tile animation using `agua-Recovered1.png` and `agua-Recovered2.png`
+- Updated `Cenas/water.gd` so legacy manual water areas delegate water enter/exit behavior to the player when available
+- Added `enter_water_zone` and `exit_water_zone` hooks to the player, slime, and boss scripts
+- Player water behavior remains centralized in `scripts/player.gd`; slimes and boss now slow movement/gravity while inside generated water volumes
+
+## 2026-04-29
+
+### Single metroidvania gameplay paradigm
+
+- Changed `scripts/player.gd` so gameplay now starts and behaves as metroidvania by default
+- Kept legacy mode methods/enums for scene/script compatibility, but platform mode no longer drives runtime rules
+- Changed fatal player damage from boss, slime, hazards, or timeout to play hurt/death and respawn at the last checkpoint with HP/mana restored
+- Removed Continue-scene routing and platform life consumption from the active player death flow
+- Updated checkpoints so their legacy `checkpoint_mode` export no longer changes gameplay mode
+- Updated Bubble/Super power-ups so they restore HP without touching platform lives
+
+### Pause menu actions
+
+- Added pause-menu buttons for continuing, returning to the main menu, and quitting the game
+- Wired the pause menu actions through `scripts/hud.gd` while keeping TAB as the open/close input
+
+### Documentation sync
+
+- Updated `docs/project_context.md` and `docs/how_to_play.md` for the metroidvania-only rule and checkpoint death flow
+
+### Level 1 scene sync
+
+- Removed the old `checkpoint_mode` override from the `BubbleUp2` checkpoint instance in `Cenas/level1.tscn`
+- Confirmed the level's initial checkpoint and player respawn position remain aligned at `Vector2(182, 214)`
+
+### HUD visual assets
+
+- Added the new HUD asset set under `sprites/assets/hud/`
+- Updated `Cenas/hud.tscn` to use the new life, mana, ultimate bubble, and stamina textures
+
 ## 2026-04-05
 
 ### Baseline documentation
