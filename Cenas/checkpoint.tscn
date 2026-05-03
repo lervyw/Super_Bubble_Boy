@@ -101,6 +101,6 @@ gravity = Vector2(0, 0)
 initial_velocity_min = 50.0
 initial_velocity_max = 150.0
 scale_amount_max = 4.0
-color = Color(1, 0.8509804, 0, 1)
+color = Color(0.37983415, 0.9534591, 1, 1)
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

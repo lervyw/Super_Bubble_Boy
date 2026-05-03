@@ -1,5 +1,25 @@
 # Change Log
 
+## 2026-05-03
+
+### Title intro and menu background replacement
+
+- Updated `Cenas/Title.tscn` to add full-screen `LogoIntro` and `MenuIntroBackground` texture layers
+- Updated `scripts/title.gd` so opening the game first plays `sprites/menu/logo_intro/LogoRes1..28.png`
+- After the studio logo, the title screen now plays `sprites/menu/menu_intro/menu1..56.png` and keeps the last frame as the menu background
+- Hid the previous title background/title animation nodes so the new menu intro art replaces the old visuals while preserving the existing buttons, config menu, and controls menu
+- Removed the previous title/menu visual nodes and simplified the main menu to only `INICIAR`, `CONFIGURACOES`, and `SAIR`
+- Added a looping idle menu animation that ping-pongs through `menu51.png` to `menu56.png` after the menu intro finishes
+
+### Reusable tilemap water system
+
+- Added `Cenas/water_tilemap.tscn` as a reusable water scene with a `TileMapLayer` for painting water tiles
+- Added `scripts/water_tilemap.gd` to scan painted water tiles and generate merged `Area2D` water volumes at runtime
+- Added simple two-frame tile animation using `agua-Recovered1.png` and `agua-Recovered2.png`
+- Updated `Cenas/water.gd` so legacy manual water areas delegate water enter/exit behavior to the player when available
+- Added `enter_water_zone` and `exit_water_zone` hooks to the player, slime, and boss scripts
+- Player water behavior remains centralized in `scripts/player.gd`; slimes and boss now slow movement/gravity while inside generated water volumes
+
 ## 2026-04-29
 
 ### Single metroidvania gameplay paradigm

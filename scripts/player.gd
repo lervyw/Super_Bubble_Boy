@@ -116,6 +116,7 @@ var state: State = State.IDLE
 var mode: GameMode = GameMode.METROIDVANIA
 
 var in_water: bool = false
+var water_zone_overlap_count: int = 0
 var target_form: Form = Form.NORMAL
 var is_bouncing_from_enemy := false
 var combo_lock := false
@@ -180,9 +181,6 @@ func _input(event):
 		return
 
 	if event.is_action_released("hud_menu"):
-		if hud_menu_selection_locked:
-			get_viewport().set_input_as_handled()
-			return
 		close_hud_menu()
 		return
 
@@ -536,6 +534,31 @@ func apply_water_physics(delta: float) -> void:
 	velocity.x *= 0.92
 
 
+func enter_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count += 1
+	if water_zone_overlap_count > 1:
+		return
+
+	in_water = true
+	if state != State.DEAD:
+		change_state(State.SWIM)
+
+
+func exit_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count = max(water_zone_overlap_count - 1, 0)
+	if water_zone_overlap_count > 0:
+		return
+
+	in_water = false
+	if state == State.DEAD:
+		return
+
+	if is_on_floor():
+		change_state(State.IDLE)
+	else:
+		change_state(State.JUMP)
+
+
 func handle_jump() -> void:
 	match form:
 		Form.BUBBLE:
@@ -843,8 +866,10 @@ func open_hud_menu() -> void:
 		hud.update_action_selection("none")
 
 
-func close_hud_menu() -> void:
+func close_hud_menu(keep_panel_active: bool = false) -> void:
 	if not hud_menu_open:
+		if not keep_panel_active and hud and hud.has_method("hide_menu"):
+			hud.hide_menu()
 		return
 
 	hud_menu_open = false
@@ -852,18 +877,22 @@ func close_hud_menu() -> void:
 	hud_menu_axis_locked = false
 	hud_menu_selection_locked = false
 
-	if hud and hud.has_method("hide_menu"):
+	if not keep_panel_active and hud and hud.has_method("hide_menu"):
 		hud.hide_menu()
 
 
 func process_hud_menu_selection() -> void:
-	if hud_menu_selection_locked:
-		return
-
 	var direction := get_hud_menu_direction()
 
 	if direction == Vector2.ZERO:
 		hud_menu_axis_locked = false
+		hud_menu_selection_locked = false
+		hud_menu_selection = HudMenuAction.NONE
+		if hud and hud.has_method("update_action_selection"):
+			hud.update_action_selection("none")
+		return
+
+	if hud_menu_selection_locked:
 		return
 
 	if hud_menu_axis_locked:
@@ -939,7 +968,12 @@ func execute_hud_menu_action(action_name: String) -> void:
 			start_defense()
 
 	await get_tree().create_timer(0.45).timeout
-	close_hud_menu()
+	if hud_menu_open and get_hud_menu_direction() == Vector2.ZERO:
+		hud_menu_axis_locked = false
+		hud_menu_selection_locked = false
+		hud_menu_selection = HudMenuAction.NONE
+		if hud and hud.has_method("update_action_selection"):
+			hud.update_action_selection("none")
 
 
 func activate_attack_area() -> void:
@@ -1073,6 +1107,21 @@ func get_active_attack_name(index: int) -> StringName:
 
 func get_active_attack_cooldown(index: int) -> float:
 	return active_attack_cooldowns[index]
+
+
+func get_active_attack_cooldown_progress(index: int = -1) -> float:
+	if index < 0:
+		index = selected_active_attack_index
+	if index < 0 or index >= active_attack_timers.size():
+		return 1.0
+
+	var cooldown := maxf(get_active_attack_cooldown(index), 0.001)
+	return clampf(1.0 - (active_attack_timers[index] / cooldown), 0.0, 1.0)
+
+
+func get_ultimate_cooldown_progress() -> float:
+	var cooldown := maxf(ultimate_attack_cooldown, 0.001)
+	return clampf(1.0 - (ultimate_cooldown_timer / cooldown), 0.0, 1.0)
 
 
 func get_active_attack_mana_cost(index: int) -> float:

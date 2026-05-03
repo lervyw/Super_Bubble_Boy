@@ -82,10 +82,12 @@ func enter_water() -> void:
 	if overlap_count > 1:
 		return
 
-	player.in_water = true
-
-	if player.has_method("change_state") and player.state != player.State.DEAD:
-		player.change_state(player.State.SWIM)
+	if player.has_method("enter_water_zone"):
+		player.enter_water_zone(self)
+	else:
+		player.in_water = true
+		if player.has_method("change_state") and player.state != player.State.DEAD:
+			player.change_state(player.State.SWIM)
 
 	print("💧 Entrou na água")
 
@@ -99,12 +101,14 @@ func exit_water() -> void:
 	if overlap_count > 0:
 		return
 
-	player.in_water = false
-
-	if player.has_method("change_state") and player.state != player.State.DEAD:
-		if player.is_on_floor():
-			player.change_state(player.State.IDLE)
-		else:
-			player.change_state(player.State.JUMP)
+	if player.has_method("exit_water_zone"):
+		player.exit_water_zone(self)
+	else:
+		player.in_water = false
+		if player.has_method("change_state") and player.state != player.State.DEAD:
+			if player.is_on_floor():
+				player.change_state(player.State.IDLE)
+			else:
+				player.change_state(player.State.JUMP)
 
 	print("🌊 Saiu da água")
