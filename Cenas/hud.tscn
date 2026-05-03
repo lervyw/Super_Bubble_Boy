@@ -99,9 +99,9 @@ texture_under = ExtResource("4_b1pas")
 texture_progress = ExtResource("5_016od")
 
 [node name="BossBar" type="TextureProgressBar" parent="."]
-offset_left = 48.0
-offset_top = 230.99998
-offset_right = 201.0
+offset_left = 47.000004
+offset_top = 230.99997
+offset_right = 200.0
 offset_bottom = 258.0
 scale = Vector2(1.6899998, 1.6899998)
 texture_under = ExtResource("6_cqml6")
