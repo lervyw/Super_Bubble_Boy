@@ -8,6 +8,8 @@
 - Added player camera framing for metroidvania play: vertical offset keeps the player lower on screen, drag margins stabilize movement, and a small smoothed horizontal look-ahead shows slightly more space ahead
 - Added a mobile `PAUSE` touch button
 - Added mobile HUD-wheel selection actions so holding the power-menu button can select up/down/left/right powers using touch controls
+- Replaced mobile direction buttons with a virtual touch wheel: dragging controls movement normally, and dragging while the power wheel is open selects the power direction without moving the player
+- Kept gravity active during the power wheel, normal attacks, special/ultimate attacks, defense, and transformations so the player can no longer float in midair by attacking
 - Updated input rebinding to capture and save joypad axes, including Xbox/PS4 LT/L2 and RT/R2 trigger events
 - Normalized saved gamepad binds to device `-1` so the mapping is not locked to a single connected controller slot
 - Updated the controls menu labels to show common Xbox/PlayStation names for face buttons, shoulders, D-pad, analog axes, and triggers

@@ -162,8 +162,9 @@ Recent history before new work:
 - `scripts/level_1.gd` can create `scripts/mobile_controls.gd` at runtime through the `Mobile Controls` export group
 - The overlay appears automatically on Android/iOS/touchscreen devices when `mobile_controls_enabled` is true
 - `mobile_controls_show_on_desktop` can be enabled in the Inspector to test the touch overlay on desktop
-- The mobile layout follows a common mobile gamepad pattern: left D-pad for movement/crouch and right thumb buttons for jump, attack, dash, power menu, and Normal/Bubble/Super transforms
-- The mobile overlay also exposes `PAUSE` and HUD-wheel direction buttons for selecting actions while holding the power menu
+- The mobile layout uses a left virtual touch wheel for movement/crouch and right thumb buttons for jump, attack, dash, power menu, and Normal/Bubble/Super transforms
+- When the power menu is held open, the same touch wheel switches from movement to HUD-wheel direction selection and does not move the player until the power menu closes
+- The mobile overlay also exposes `PAUSE`
 
 ## Display Settings
 
@@ -176,6 +177,7 @@ Recent history before new work:
 - The active player camera is `player/Camera` in `Cenas/player.tscn`
 - `scripts/player.gd` configures camera smoothing, drag margins, a modest horizontal look-ahead, and a vertical offset that keeps the player slightly below center for metroidvania-style framing
 - Level-specific camera limits are still the safest way to prevent widescreen from revealing unfinished/offstage map areas
+- Attack, special attack, defense, transform, and power-wheel states keep vertical gravity active; they only stop horizontal movement.
 
 ## Level Timer
 

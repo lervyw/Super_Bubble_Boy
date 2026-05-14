@@ -294,7 +294,11 @@ func _physics_process(delta: float) -> void:
 		dash_cooldown_timer -= delta
 
 	if hud_menu_open:
-		velocity = Vector2.ZERO
+		if in_water:
+			apply_water_physics(delta)
+		else:
+			apply_normal_gravity(delta)
+		velocity.x = 0.0
 		move_and_slide()
 		return
 
@@ -886,11 +890,11 @@ func check_quick_form_selection() -> void:
 
 
 func special_attack_state() -> void:
-	velocity = Vector2.ZERO
+	velocity.x = 0.0
 
 
 func defend_state() -> void:
-	velocity = Vector2.ZERO
+	velocity.x = 0.0
 
 
 func enable_metroidvania_mode() -> void:
@@ -1111,7 +1115,7 @@ func jump_state() -> void:
 
 
 func attack_state() -> void:
-	velocity = Vector2.ZERO
+	velocity.x = 0.0
 
 
 func crouch_state() -> void:
@@ -1141,7 +1145,7 @@ func dash_state() -> void:
 
 
 func transform_state() -> void:
-	velocity = Vector2.ZERO
+	velocity.x = 0.0
 
 
 func dead_state() -> void:
