@@ -24,13 +24,10 @@ const LOGO_INTRO_FRAME_COUNT: int = 28
 const MENU_INTRO_FRAME_COUNT: int = 56
 const LOGO_INTRO_FPS: float = 12.0
 const MENU_INTRO_FPS: float = 14.0
-const MENU_IDLE_LOOP_FIRST_FRAME: int = 1
-const MENU_IDLE_LOOP_LAST_FRAME: int = 11
+const MENU_IDLE_LOOP_FIRST_FRAME: int = 51
+const MENU_IDLE_LOOP_LAST_FRAME: int = 56
 const MENU_IDLE_LOOP_FPS: float = 8.0
 const JOYPAD_AXIS_REBIND_THRESHOLD: float = 0.55
-const CENTER_MENU_WIDTH: float = 220.0
-const MAIN_MENU_HEIGHT: float = 104.0
-const CONFIG_MENU_HEIGHT: float = 194.0
 
 
 # ================================
@@ -101,10 +98,6 @@ var forbidden_keys: Array[int] = [
 #             READY
 # ================================
 func _ready():
-	_apply_menu_layout()
-	if not get_viewport().size_changed.is_connected(_apply_menu_layout):
-		get_viewport().size_changed.connect(_apply_menu_layout)
-
 	# Estado inicial: mostra o menu principal e esconde as outras telas
 	menu.visible = false
 	config_menu.visible = false
@@ -160,58 +153,6 @@ func _ready():
 	_play_startup_intro()
 
 
-func _apply_menu_layout() -> void:
-	var viewport_size := get_viewport_rect().size
-
-	var black_background := get_node_or_null("IntroBlackBackground") as ColorRect
-	if black_background:
-		_fill_control(black_background)
-
-	for node in [menu_intro_background, logo_intro]:
-		if node:
-			_fill_control(node)
-			node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-
-	_center_panel(menu, viewport_size, Vector2(CENTER_MENU_WIDTH, MAIN_MENU_HEIGHT))
-	_center_panel(config_menu, viewport_size, Vector2(CENTER_MENU_WIDTH, CONFIG_MENU_HEIGHT))
-
-	var controls_height := maxf(viewport_size.y - 38.0, 180.0)
-	_center_panel(botoes_menu, viewport_size, Vector2(232.0, controls_height))
-
-	var controls_scroll := $ControlsMenu/ScrollContainer as ScrollContainer
-	if controls_scroll:
-		controls_scroll.custom_minimum_size = Vector2(220.0, controls_height)
-
-
-func _fill_control(node: Control) -> void:
-	node.anchor_left = 0.0
-	node.anchor_top = 0.0
-	node.anchor_right = 1.0
-	node.anchor_bottom = 1.0
-	node.offset_left = 0.0
-	node.offset_top = 0.0
-	node.offset_right = 0.0
-	node.offset_bottom = 0.0
-
-
-func _center_panel(panel: Control, viewport_size: Vector2, panel_size: Vector2) -> void:
-	if not panel:
-		return
-
-	var width := minf(panel_size.x, viewport_size.x - 24.0)
-	var height := minf(panel_size.y, viewport_size.y - 24.0)
-
-	panel.anchor_left = 0.5
-	panel.anchor_top = 0.5
-	panel.anchor_right = 0.5
-	panel.anchor_bottom = 0.5
-	panel.offset_left = -width * 0.5
-	panel.offset_top = -height * 0.5
-	panel.offset_right = width * 0.5
-	panel.offset_bottom = height * 0.5
-
-
 func _connect_pressed_once(button: BaseButton, callable: Callable) -> void:
 	if button == null:
 		return
@@ -233,7 +174,7 @@ func _play_startup_intro() -> void:
 	if logo_intro:
 		logo_intro.visible = false
 
-	_set_menu_intro_frame(MENU_IDLE_LOOP_FIRST_FRAME)
+	await _play_frame_sequence(menu_intro_background, MENU_INTRO_PATH, MENU_INTRO_FRAME_COUNT, MENU_INTRO_FPS, true)
 
 	intro_running = false
 	menu.visible = true
