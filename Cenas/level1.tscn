@@ -799,6 +799,7 @@ sources/13 = SubResource("TileSetAtlasSource_v51a0")
 sources/14 = SubResource("TileSetAtlasSource_v8j1p")
 
 [node name="level1" type="Node2D" node_paths=PackedStringArray("player", "stats")]
+position = Vector2(1, 0)
 script = ExtResource("1_o25p7")
 player = NodePath("player")
 stats = NodePath("player/Stats")
