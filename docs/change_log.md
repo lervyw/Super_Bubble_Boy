@@ -2,6 +2,10 @@
 
 ## 2026-05-14
 
+### Mobile button swap
+
+- Swapped the mobile `A` and `Y` button actions so `Y` jumps and `A` opens the power wheel.
+
 ### Stretched screen fill
 
 - Changed stretch aspect from `expand` to `ignore` so the game canvas stretches to fill the whole window instead of preserving its fixed aspect ratio.

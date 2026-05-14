@@ -12,10 +12,10 @@ const JOYSTICK_KNOB_SIZE := Vector2(32, 32)
 
 var controls: Array[Dictionary] = [
 	{"name": "Pause", "action": "pause_menu", "label": "PAUSE", "group": "top_right", "pos": Vector2(0, 0), "size": PAUSE_BUTTON_SIZE},
-	{"name": "Jump", "action": "jump", "label": "A", "group": "right_pad", "pos": Vector2(54, 0), "size": BUTTON_SIZE},
+	{"name": "HudMenu", "action": "hud_menu", "label": "A", "group": "right_pad", "pos": Vector2(54, 0), "size": BUTTON_SIZE},
 	{"name": "Attack", "action": "attack", "label": "X", "group": "right_pad", "pos": Vector2(0, 54), "size": BUTTON_SIZE},
 	{"name": "Dash", "action": "dash", "label": "B", "group": "right_pad", "pos": Vector2(108, 54), "size": BUTTON_SIZE},
-	{"name": "HudMenu", "action": "hud_menu", "label": "Y", "group": "right_pad", "pos": Vector2(54, 108), "size": BUTTON_SIZE},
+	{"name": "Jump", "action": "jump", "label": "Y", "group": "right_pad", "pos": Vector2(54, 108), "size": BUTTON_SIZE},
 	{"name": "Normal", "action": "normal", "label": "N", "group": "right_pad", "pos": Vector2(0, -44), "size": SMALL_BUTTON_SIZE},
 	{"name": "Bubble", "action": "forma1", "label": "BOL", "group": "right_pad", "pos": Vector2(46, -44), "size": SMALL_BUTTON_SIZE},
 	{"name": "Super", "action": "forma2", "label": "SUP", "group": "right_pad", "pos": Vector2(92, -44), "size": SMALL_BUTTON_SIZE},
