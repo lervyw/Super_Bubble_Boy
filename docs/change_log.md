@@ -2,6 +2,11 @@
 
 ## 2026-05-14
 
+### Widescreen fill
+
+- Changed the desktop window override to `1600x900` for a larger 16:9 default window.
+- Set stretch aspect to `expand` so widescreen displays use the full available screen area instead of keeping fixed-aspect letterboxing.
+
 ### Transform gravity fix
 
 - Froze player velocity during form transformation so gravity cannot move the character while transform hitboxes are disabled, preventing the player from falling through the ground.

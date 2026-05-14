@@ -169,8 +169,8 @@ Recent history before new work:
 ## Display Settings
 
 - Internal pixel-art viewport remains `420x280`
-- The game window opens at `1260x840`, an integer 3x scale
-- Stretch mode is `canvas_items` with aspect `keep`, so the game frame stays centered with its original aspect ratio.
+- The game window opens at `1600x900`, a larger 16:9 default desktop window
+- Stretch mode is `canvas_items` with aspect `expand`, so widescreen displays fill the available screen area without distorting the pixel-art viewport.
 
 ## Camera Framing
 
