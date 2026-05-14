@@ -6,6 +6,7 @@ extends Control
 @onready var btn_voltar = $VBoxContainer/Voltar
 
 var awaiting_action := ""
+const JOYPAD_AXIS_REBIND_THRESHOLD: float = 0.55
 
 
 func _ready():
@@ -53,6 +54,14 @@ func _input(event):
 	elif event is InputEventJoypadButton and event.pressed:
 		ConfigManager.rebind_action(awaiting_action, event)
 		print("Ação", awaiting_action, "→", event.button_index)
+		awaiting_action = ""
+		accept_event()
+
+	elif event is InputEventJoypadMotion and absf(event.axis_value) >= JOYPAD_AXIS_REBIND_THRESHOLD:
+		var joy_event := event.duplicate() as InputEventJoypadMotion
+		joy_event.axis_value = 1.0 if event.axis_value > 0.0 else -1.0
+		ConfigManager.rebind_action(awaiting_action, joy_event)
+		print("Ação", awaiting_action, "→ eixo", joy_event.axis, joy_event.axis_value)
 		awaiting_action = ""
 		accept_event()
 

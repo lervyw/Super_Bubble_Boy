@@ -27,6 +27,7 @@ const MENU_INTRO_FPS: float = 14.0
 const MENU_IDLE_LOOP_FIRST_FRAME: int = 51
 const MENU_IDLE_LOOP_LAST_FRAME: int = 56
 const MENU_IDLE_LOOP_FPS: float = 8.0
+const JOYPAD_AXIS_REBIND_THRESHOLD: float = 0.55
 
 
 # ================================
@@ -242,9 +243,6 @@ func _input(event: InputEvent):
 		# Bloqueia teclas proibidas
 		if event.keycode in forbidden_keys:
 			return
-		# Evita inputs sem caractere (algumas teclas especiais)
-		if event.unicode == 0:
-			return
 
 		# Finaliza o rebind usando esse evento
 		_finish_rebind(event)
@@ -253,6 +251,13 @@ func _input(event: InputEvent):
 	# --- Rebind por controle (joypad) ---
 	if event is InputEventJoypadButton and event.pressed:
 		_finish_rebind(event)
+		return
+
+	# --- Rebind por eixo/gatilho do controle (analógico, LT/L2, RT/R2) ---
+	if event is InputEventJoypadMotion and absf(event.axis_value) >= JOYPAD_AXIS_REBIND_THRESHOLD:
+		var joy_event := event.duplicate() as InputEventJoypadMotion
+		joy_event.axis_value = 1.0 if event.axis_value > 0.0 else -1.0
+		_finish_rebind(joy_event)
 		return
 
 
@@ -306,8 +311,8 @@ func _back_to_config_menu():
 func _start_rebind(action_name: String):
 	# Entra no modo "aguardando input" e define qual ação será alterada
 	awaiting_rebind_action = action_name
-	_set_rebind_prompt("Pressione uma tecla ou botão")
-	print("Pressione um botão para redefinir:", action_name)
+	_set_rebind_prompt("Pressione tecla, botão, analógico ou gatilho")
+	print("Pressione tecla, botão, analógico ou gatilho para redefinir:", action_name)
 
 func _finish_rebind(event: InputEvent):
 	# Aplica o rebind no ConfigManager (provavelmente mexe no InputMap e salva)
@@ -366,7 +371,10 @@ func _get_current_input_name(action: String) -> String:
 
 	# Se for controle, mostra o índice do botão
 	if ev is InputEventJoypadButton:
-		return "Botão %d" % ev.button_index
+		return _get_joy_button_name(ev.button_index)
+
+	if ev is InputEventJoypadMotion:
+		return _get_joy_axis_name(ev.axis, ev.axis_value)
 
 	# Fallback pra casos não tratados (mouse, eixo analógico, etc.)
 	return "<desconhecido>"
@@ -376,3 +384,52 @@ func _set_rebind_prompt(text: String) -> void:
 	var prompt: Node = $ControlsMenu/ScrollContainer/VBoxContainer.get_node_or_null("RebindPrompt")
 	if prompt:
 		(prompt as Label).text = text
+
+
+func _get_joy_button_name(button_index: int) -> String:
+	match button_index:
+		0:
+			return "A / X"
+		1:
+			return "B / Circulo"
+		2:
+			return "X / Quadrado"
+		3:
+			return "Y / Triangulo"
+		4:
+			return "Back / Share"
+		6:
+			return "Start / Options"
+		9:
+			return "LB / L1"
+		10:
+			return "RB / R1"
+		11:
+			return "D-Pad Cima"
+		12:
+			return "D-Pad Baixo"
+		13:
+			return "D-Pad Esquerda"
+		14:
+			return "D-Pad Direita"
+		_:
+			return "Botao %d" % button_index
+
+
+func _get_joy_axis_name(axis: int, axis_value: float) -> String:
+	var direction := "+" if axis_value >= 0.0 else "-"
+	match axis:
+		0:
+			return "Analogico Esquerdo %sX" % direction
+		1:
+			return "Analogico Esquerdo %sY" % direction
+		2:
+			return "Analogico Direito %sX" % direction
+		3:
+			return "Analogico Direito %sY" % direction
+		4:
+			return "LT / L2"
+		5:
+			return "RT / R2"
+		_:
+			return "Eixo %d%s" % [axis, direction]

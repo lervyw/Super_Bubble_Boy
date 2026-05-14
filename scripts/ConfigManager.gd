@@ -74,6 +74,8 @@ func rebind_action(action: String, event: InputEvent):
 	# DUPLICA o evento
 	# (evita problemas por reutilizar o mesmo objeto InputEvent)
 	var ev := event.duplicate()
+	if ev is InputEventJoypadButton or ev is InputEventJoypadMotion:
+		ev.device = -1
 	InputMap.action_add_event(action, ev)
 
 	# Converte o evento para string e salva
@@ -82,6 +84,9 @@ func rebind_action(action: String, event: InputEvent):
 
 
 func apply_loaded_inputs():
+	if not settings.has("inputs") or typeof(settings["inputs"]) != TYPE_DICTIONARY:
+		settings["inputs"] = {}
+
 	# Reaplica todos os inputs salvos no arquivo de config
 	for action in settings["inputs"].keys():
 		var ev_str = settings["inputs"][action]
@@ -106,11 +111,18 @@ func _event_to_string(event: InputEvent) -> String:
 
 	if event is InputEventKey:
 		# Ex: "Key:32"
-		return "Key:%s" % event.physical_keycode
+		var keycode: int = event.physical_keycode
+		if keycode == 0:
+			keycode = event.keycode
+		return "Key:%s" % keycode
 
 	if event is InputEventJoypadButton:
 		# Ex: "JoyButton:0"
 		return "JoyButton:%s" % event.button_index
+
+	if event is InputEventJoypadMotion:
+		# Ex: "JoyAxis:5:1.000" (RT/R2). O sinal diferencia esquerda/direita em eixos analógicos.
+		return "JoyAxis:%s:%.3f" % [event.axis, event.axis_value]
 
 	# Caso não seja um tipo suportado
 	return "Unknown"
@@ -132,7 +144,18 @@ func _string_to_event(str: String) -> InputEvent:
 	if str.begins_with("JoyButton:"):
 		var btn = str.split(":")[1].to_int()
 		var ev = InputEventJoypadButton.new()
+		ev.device = -1
 		ev.button_index = btn
+		return ev
+
+	if str.begins_with("JoyAxis:"):
+		var parts := str.split(":")
+		if parts.size() < 3:
+			return null
+		var ev = InputEventJoypadMotion.new()
+		ev.device = -1
+		ev.axis = parts[1].to_int()
+		ev.axis_value = parts[2].to_float()
 		return ev
 
 	# Caso não reconheça o formato
@@ -166,6 +189,7 @@ func _load():
 	# Se o JSON for válido, carrega os dados
 	if typeof(parse) == TYPE_DICTIONARY:
 		settings = parse
+		_ensure_settings_schema()
 		apply_loaded_inputs()  # Aplica inputs salvos
 		print("📂 Config carregado com sucesso.")
 	else:
@@ -179,3 +203,14 @@ func _apply_settings():
 	set_volume("master", settings["volume_master"])
 	set_volume("music", settings["volume_music"])
 	set_volume("sfx", settings["volume_sfx"])
+
+
+func _ensure_settings_schema() -> void:
+	if not settings.has("volume_master"):
+		settings["volume_master"] = 0.0
+	if not settings.has("volume_music"):
+		settings["volume_music"] = 0.0
+	if not settings.has("volume_sfx"):
+		settings["volume_sfx"] = 0.0
+	if not settings.has("inputs") or typeof(settings["inputs"]) != TYPE_DICTIONARY:
+		settings["inputs"] = {}

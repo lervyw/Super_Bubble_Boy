@@ -49,6 +49,15 @@ extends Node2D
 
 
 # ================================
+#         CONTROLES MOBILE
+# ================================
+@export_group("Mobile Controls")
+
+@export var mobile_controls_enabled: bool = true
+@export var mobile_controls_show_on_desktop: bool = false
+
+
+# ================================
 #        PRÓXIMO NÍVEL
 # ================================
 @export_group("Next Level")
@@ -102,6 +111,7 @@ func _ready() -> void:
 	# Configura automaticamente todas as spawn zones
 	setup_spawn_zones()
 	setup_level_timer()
+	setup_mobile_controls()
 
 
 # ================================
@@ -158,6 +168,28 @@ func setup_level_timer() -> void:
 	elif level_timer.has_method("pause_timer"):
 		level_timer.pause_timer()
 	level_timer.visible = level_timer_enabled
+
+
+func setup_mobile_controls() -> void:
+	if not mobile_controls_enabled:
+		return
+	if has_node("MobileControls"):
+		return
+
+	var os_name := OS.get_name()
+	var should_show := mobile_controls_show_on_desktop or os_name == "Android" or os_name == "iOS" or DisplayServer.is_touchscreen_available()
+	if not should_show:
+		return
+
+	var script := load("res://scripts/mobile_controls.gd") as Script
+	if not script:
+		push_warning("Mobile controls script não encontrado.")
+		return
+
+	var controls := CanvasLayer.new()
+	controls.name = "MobileControls"
+	controls.set_script(script)
+	add_child(controls)
 
 
 # ================================

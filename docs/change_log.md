@@ -1,5 +1,17 @@
 # Change Log
 
+## 2026-05-14
+
+### Gamepad and mobile controls
+
+- Updated input rebinding to capture and save joypad axes, including Xbox/PS4 LT/L2 and RT/R2 trigger events
+- Normalized saved gamepad binds to device `-1` so the mapping is not locked to a single connected controller slot
+- Updated the controls menu labels to show common Xbox/PlayStation names for face buttons, shoulders, D-pad, analog axes, and triggers
+- Added default controller movement support for left/right via D-pad and left analog stick
+- Added default trigger mappings: `LT/L2` for defense and `RT/R2` for special attack
+- Moved the default normal-form controller bind off `RT/R2` to avoid conflicting with special attack
+- Added a runtime mobile controls overlay for touch devices: left D-pad movement plus right-side jump, attack, dash, power menu, and form transform buttons
+
 ## 2026-05-10
 
 ### Selectable passive powers

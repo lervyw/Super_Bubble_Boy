@@ -153,7 +153,16 @@ Recent history before new work:
 - The config screen exposes Master, Music, and SFX volume sliders
 - The controls menu now includes a dedicated `Ultimate` rebind button for `ultimate_attack`
 - The controls menu also exposes left, right, crouch, dash, and pause rebinding entries
+- Control rebinding supports keyboard, joypad buttons, analog axes, and Xbox/PS4 trigger axes (`LT/L2`, `RT/R2`)
+- Saved joypad bindings are normalized to any controller device so Xbox/PS4 mappings survive controller reconnect/order changes
 - Title button signal wiring was aligned with the current script method names to avoid broken presses at runtime
+
+## Android / Mobile Controls
+
+- `scripts/level_1.gd` can create `scripts/mobile_controls.gd` at runtime through the `Mobile Controls` export group
+- The overlay appears automatically on Android/iOS/touchscreen devices when `mobile_controls_enabled` is true
+- `mobile_controls_show_on_desktop` can be enabled in the Inspector to test the touch overlay on desktop
+- The mobile layout follows a common mobile gamepad pattern: left D-pad for movement/crouch and right thumb buttons for jump, attack, dash, power menu, and Normal/Bubble/Super transforms
 
 ## Display Settings
 
