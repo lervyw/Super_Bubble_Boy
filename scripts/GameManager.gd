@@ -22,8 +22,7 @@ var player_score: int = 0
 
 func goto_continue() -> void:
 	print("🎬 Mudando para Continue...")
-	# Usa call_deferred para evitar erro em callbacks de física
-	get_tree().call_deferred("change_scene_to_file", CONTINUE_PATH)
+	_change_scene(CONTINUE_PATH, true)
 
 func goto_level(level_path: String) -> void:
 	if not ResourceLoader.exists(level_path):
@@ -32,12 +31,12 @@ func goto_level(level_path: String) -> void:
 	
 	current_level_path = level_path
 	print("🎬 Carregando nível: " + level_path)
-	get_tree().change_scene_to_file(level_path)
+	_change_scene(level_path)
 
 func goto_title() -> void:
 	current_level_path = ""
 	print("🎬 Voltando ao menu principal...")
-	get_tree().change_scene_to_file(TITLE_PATH)
+	_change_scene(TITLE_PATH)
 
 func restart_current_level() -> void:
 	if current_level_path.is_empty():
@@ -56,6 +55,21 @@ func goto_level1() -> void:
 
 func goto_cutscene() -> void:
 	goto_level(CUTSCENE_PATH)
+
+
+func _change_scene(scene_path: String, deferred: bool = false) -> void:
+	var host := get_tree().get_first_node_in_group("game_scene_host")
+	if host and host.has_method("change_game_scene"):
+		if deferred:
+			host.call_deferred("change_game_scene", scene_path)
+		else:
+			host.change_game_scene(scene_path)
+		return
+
+	if deferred:
+		get_tree().call_deferred("change_scene_to_file", scene_path)
+	else:
+		get_tree().change_scene_to_file(scene_path)
 
 # =======================
 # ===== GAME STATE ======

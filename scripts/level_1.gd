@@ -173,6 +173,8 @@ func setup_level_timer() -> void:
 func setup_mobile_controls() -> void:
 	if not mobile_controls_enabled:
 		return
+	if get_tree().get_first_node_in_group("game_scene_host"):
+		return
 	if has_node("MobileControls"):
 		return
 

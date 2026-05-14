@@ -4,6 +4,8 @@
 
 ### Gamepad and mobile controls
 
+- Added `Cenas/mobile_root.tscn` as the main scene, hosting the existing game inside a centered `420x280` `SubViewport` while mobile controls render on the real fullscreen viewport outside the game area
+- Routed `GameManager` scene changes through the mobile viewport host when present, preserving the centered game frame across title, cutscene, continue, and level transitions
 - Changed display stretch aspect to `expand` so Android widescreen fills the available screen without distorting the pixel-art viewport
 - Added player camera framing for metroidvania play: vertical offset keeps the player lower on screen, drag margins stabilize movement, and a small smoothed horizontal look-ahead shows slightly more space ahead
 - Added a mobile `PAUSE` touch button
