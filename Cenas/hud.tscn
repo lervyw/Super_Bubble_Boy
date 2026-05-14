@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://4v1mv6nx587x"]
+[gd_scene load_steps=26 format=3 uid="uid://4v1mv6nx587x"]
 
 [ext_resource type="Script" uid="uid://c73t1ba5irapk" path="res://scripts/hud.gd" id="1_uow6a"]
 [ext_resource type="Texture2D" uid="uid://p2sjqryksujc" path="res://sprites/assets/hud/vida2.png" id="2_ftv5m"]
@@ -23,21 +23,27 @@
 [ext_resource type="Texture2D" uid="uid://x7uwvdtyo36u" path="res://sprites/assets/power_wheel/hud poderes4.png" id="22_panel_frame4"]
 [ext_resource type="Texture2D" uid="uid://chfnxeemn25rc" path="res://sprites/assets/tempo_bolhoso2.png" id="23_o7n0q"]
 [ext_resource type="Texture2D" uid="uid://dqgnm8xab67a7" path="res://sprites/assets/power_wheel/hud poderes5.png" id="23_panel_frame5"]
+[ext_resource type="Texture2D" uid="uid://ctoamifsknvhu" path="res://sprites/assets/icone-ult.png" id="24_ult_icon"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_power_panel"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "boss_hp_bar", "menu_panel", "pause_menu_panel", "passive_toggle", "resume_button", "main_menu_button", "quit_button")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "ultimate_ready_icon", "boss_hp_bar", "menu_panel", "pause_menu_panel", "warning_label", "passive_toggle", "passive_selector", "selected_passive_icon", "resume_button", "main_menu_button", "quit_button", "ultimate_cooldown_bar")]
 script = ExtResource("1_uow6a")
 heart_icons = [null, null, null]
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
 mana_bar = NodePath("HBoxContainer/Holder/ManaBar")
+ultimate_ready_icon = NodePath("UltimateReadyIcon")
 boss_hp_bar = NodePath("BossBar")
 menu_panel = NodePath("Panel")
 pause_menu_panel = NodePath("PauseMenu")
+warning_label = NodePath("WarningLabel")
 passive_toggle = NodePath("PauseMenu/VBoxContainer/PassiveToggle")
+passive_selector = NodePath("PauseMenu/VBoxContainer/PassiveSelector")
+selected_passive_icon = NodePath("SelectedPassiveIcon")
 resume_button = NodePath("PauseMenu/VBoxContainer/ResumeButton")
 main_menu_button = NodePath("PauseMenu/VBoxContainer/MainMenuButton")
 quit_button = NodePath("PauseMenu/VBoxContainer/QuitButton")
+ultimate_cooldown_bar = NodePath("UltimateCooldownBar")
 metadata/_edit_vertical_guides_ = [152.0]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -85,16 +91,6 @@ scale = Vector2(0.27689847, 0.6582143)
 texture_under = ExtResource("2_ftv5m")
 texture_progress = ExtResource("3_sv046")
 
-[node name="TextureProgressBar2" type="TextureProgressBar" parent="HBoxContainer/Holder"]
-layout_mode = 0
-offset_left = 0.8110986
-offset_top = 1.8801594
-offset_right = 62.709538
-offset_bottom = 63.73143
-scale = Vector2(0.3417864, 0.8124592)
-texture_under = ExtResource("4_016od")
-texture_over = ExtResource("5_cqml6")
-
 [node name="ManaBar" type="TextureProgressBar" parent="HBoxContainer/Holder"]
 layout_mode = 0
 offset_left = 16.221981
@@ -113,6 +109,35 @@ offset_bottom = 258.0
 scale = Vector2(1.6899998, 1.6899998)
 texture_under = ExtResource("6_cqml6")
 texture_progress = ExtResource("7_crc4m")
+
+[node name="UltimateCooldownBar" type="TextureProgressBar" parent="."]
+offset_left = -6.0
+offset_top = -3.0
+offset_right = 54.0
+offset_bottom = 57.0
+fill_mode = 3
+texture_under = ExtResource("4_016od")
+texture_progress = ExtResource("5_cqml6")
+
+[node name="UltimateReadyIcon" type="TextureRect" parent="."]
+offset_left = 9.0
+offset_top = 16.0
+offset_right = 73.0
+offset_bottom = 80.0
+scale = Vector2(0.41401416, 0.41964948)
+texture = ExtResource("24_ult_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SelectedPassiveIcon" type="TextureRect" parent="."]
+visible = false
+offset_left = 8.0
+offset_top = 86.0
+offset_right = 40.0
+offset_bottom = 118.0
+texture = ExtResource("18_1j8pg")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("state_texture", "up_button", "down_button", "left_button", "right_button")]
 offset_left = 337.0
@@ -186,11 +211,44 @@ offset_bottom = 96.0
 texture = ExtResource("22_invt5")
 stretch_mode = 5
 
+[node name="WarningLabel" type="Label" parent="."]
+visible = false
+offset_left = 110.0
+offset_top = 104.0
+offset_right = 310.0
+offset_bottom = 128.0
+theme_override_font_sizes/font_size = 14
+text = "sem mana suficiente"
+horizontal_alignment = 1
+
 [node name="PauseMenu" type="Panel" parent="."]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FrostOverlay" type="ColorRect" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.62, 0.88, 1, 0.18)
+
+[node name="FrostPanel" type="Panel" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -128.0
+offset_top = -126.0
+offset_right = 128.0
+offset_bottom = 126.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -201,10 +259,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -86.0
-offset_top = -82.0
-offset_right = 86.0
-offset_bottom = 82.0
+offset_left = -108.0
+offset_top = -112.0
+offset_right = 108.0
+offset_bottom = 112.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -216,6 +274,14 @@ horizontal_alignment = 1
 [node name="PassiveToggle" type="CheckButton" parent="PauseMenu/VBoxContainer"]
 layout_mode = 2
 text = "Passiva"
+
+[node name="PassiveLabel" type="Label" parent="PauseMenu/VBoxContainer"]
+layout_mode = 2
+text = "Poder passivo"
+horizontal_alignment = 1
+
+[node name="PassiveSelector" type="OptionButton" parent="PauseMenu/VBoxContainer"]
+layout_mode = 2
 
 [node name="ResumeButton" type="Button" parent="PauseMenu/VBoxContainer"]
 layout_mode = 2

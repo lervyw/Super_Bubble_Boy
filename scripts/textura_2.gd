@@ -89,10 +89,32 @@ func _ready() -> void:
 	if not animation_finished.is_connected(_on_animation_finished):
 		animation_finished.connect(_on_animation_finished)
 
+	ensure_run_animations()
 	disable_all_hitboxes()
 	deactivate_all_attack_areas()
 	deactivate_all_special_attack_areas()
 	refresh_hitbox_for_current_state()
+
+
+func ensure_run_animations() -> void:
+	duplicate_animation_if_missing(&"walk", &"run", 13.0)
+	duplicate_animation_if_missing(&"walk_super", &"run_super", 13.0)
+
+
+func duplicate_animation_if_missing(source: StringName, target: StringName, target_speed: float) -> void:
+	if not sprite_frames:
+		return
+	if sprite_frames.has_animation(target):
+		return
+	if not sprite_frames.has_animation(source):
+		return
+
+	sprite_frames.add_animation(target)
+	sprite_frames.set_animation_loop(target, sprite_frames.get_animation_loop(source))
+	sprite_frames.set_animation_speed(target, target_speed)
+
+	for i in range(sprite_frames.get_frame_count(source)):
+		sprite_frames.add_frame(target, sprite_frames.get_frame_texture(source, i), sprite_frames.get_frame_duration(source, i))
 
 # ================================
 #            PROCESS
@@ -105,6 +127,8 @@ func _process(_delta: float) -> void:
 		Input.get_axis("ui_left", "ui_right"),
 		Input.get_axis("ui_up", "ui_down")
 	)
+	if direction.x == 0.0:
+		direction.x = Input.get_axis("left", "right")
 
 	if not is_player_using_hud_menu():
 		verify_position(direction)
@@ -273,11 +297,16 @@ func handle_defend_animation() -> void:
 	play_if_different(anim_name)
 
 func handle_movement_animation(direction: Vector2) -> void:
+	var use_run: bool = player.has_method("is_passive_run_boosting") and player.is_passive_run_boosting()
+
 	match player.form:
 		player.Form.NORMAL:
 			if direction.x != 0.0:
 				activate_hitbox_for_state("walk")
-				play_if_different(&"walk")
+				if use_run and sprite_frames.has_animation(&"run"):
+					play_if_different(&"run")
+				else:
+					play_if_different(&"walk")
 			else:
 				activate_hitbox_for_state("idle")
 				play_if_different(&"idle")
@@ -292,7 +321,12 @@ func handle_movement_animation(direction: Vector2) -> void:
 		player.Form.SUPER:
 			if direction.x != 0.0:
 				activate_hitbox_for_state("walk")
-				play_if_different(&"walk_super")
+				if use_run and sprite_frames.has_animation(&"run_super"):
+					play_if_different(&"run_super")
+				elif use_run and sprite_frames.has_animation(&"run"):
+					play_if_different(&"run")
+				else:
+					play_if_different(&"walk_super")
 			else:
 				activate_hitbox_for_state("idle")
 				play_if_different(&"idle_super")

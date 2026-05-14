@@ -17,6 +17,7 @@ enum Form { NORMAL, BUBBLE, SUPER }
 enum GameMode { PLATAFORMA, METROIDVANIA }
 enum HudMenuAction { NONE, ULTIMATE, PLACEHOLDER, SPECIAL_ATTACK, DEFEND }
 enum AttackKind { NONE, NORMAL, PASSIVE, ACTIVE_SUPER, ULTIMATE, DEFEND }
+enum PassivePower { NONE, ORBIT_BUBBLE, GROUND_STOMP, QUICK_RUN }
 
 const ATTACK_META_DAMAGE := &"attack_damage"
 const ATTACK_META_KIND := &"attack_kind"
@@ -81,6 +82,32 @@ var hud_menu_selection_locked := false
 @export var passive_attack_requires_target: bool = false
 @export var passive_attack_area_path: NodePath = NodePath("AttackHitbox")
 
+@export_group("Selectable Passive Powers")
+@export var selected_passive_power: PassivePower = PassivePower.NONE
+@export var orbit_bubble_damage: int = 1
+@export_range(8.0, 96.0, 1.0) var orbit_bubble_radius: float = 34.0
+@export_range(0.5, 12.0, 0.1) var orbit_bubble_speed: float = 4.5
+@export_range(0.0, 32.0, 0.5) var orbit_bubble_zigzag_amplitude: float = 12.0
+@export_range(0.5, 20.0, 0.1) var orbit_bubble_zigzag_speed: float = 6.0
+@export_range(4.0, 32.0, 0.5) var orbit_bubble_hit_radius: float = 11.0
+@export var orbit_bubble_visual_scale: Vector2 = Vector2(0.48, 0.48)
+@export var orbit_bubble_texture: Texture2D = preload("res://sprites/assets/bolha_guardian1.png")
+@export var ground_stomp_damage: int = 2
+@export_range(40.0, 260.0, 1.0) var ground_stomp_radius: float = 72.0
+@export_range(200.0, 1600.0, 10.0) var ground_stomp_fall_speed: float = 900.0
+@export_range(0.05, 0.6, 0.01) var ground_stomp_active_time: float = 0.12
+@export_range(0.1, 3.0, 0.05) var ground_stomp_cooldown: float = 0.55
+@export var ground_stomp_particle_texture: Texture2D = preload("res://sprites/assets/bolha_guardian1.png")
+@export_range(2, 16, 1) var ground_stomp_particle_count: int = 9
+@export var ground_stomp_particle_scale: Vector2 = Vector2(0.32, 0.32)
+@export var ground_stomp_particle_offset: Vector2 = Vector2(0.0, 18.0)
+@export_range(8.0, 120.0, 1.0) var ground_stomp_particle_spread: float = 54.0
+@export_range(0.1, 1.5, 0.05) var ground_stomp_particle_lifetime: float = 0.45
+@export_range(0.05, 0.5, 0.01) var quick_run_double_tap_window: float = 0.25
+@export_range(0.2, 6.0, 0.1) var quick_run_duration: float = 2.0
+@export_range(1.0, 4.0, 0.05) var quick_run_speed_multiplier: float = 1.65
+@export_range(0.0, 5.0, 0.05) var quick_run_cooldown: float = 0.5
+
 @export_group("Active Super Attacks")
 @export var active_attack_names: Array[StringName] = [&"super_attack_1"]
 @export var active_attack_cooldowns: Array[float] = [1.5]
@@ -93,7 +120,7 @@ var hud_menu_selection_locked := false
 @export_group("Ultimate Attack")
 @export var ultimate_attack_enabled: bool = true
 @export var ultimate_attack_id: StringName = &"ultimate_attack"
-@export_range(0.1, 30.0, 0.1) var ultimate_attack_cooldown: float = 8.0
+@export_range(0.1, 60.0, 0.1) var ultimate_attack_cooldown: float = 20.0
 @export var ultimate_attack_damage: int = 10
 @export var ultimate_attack_area_path: NodePath = NodePath("AttackHitbox")
 @export var allow_ultimate_input: bool = true
@@ -127,6 +154,7 @@ var is_invincible: bool = false
 
 var active_attack_timers: Array[float] = []
 var ultimate_cooldown_timer: float = 0.0
+var ultimate_cooldown_node: Timer
 var current_attack_kind: AttackKind = AttackKind.NONE
 var current_attack_id: StringName = &""
 var current_attack_damage: int = 0
@@ -134,6 +162,21 @@ var current_attack_area: Area2D
 var attack_window_serial: int = 0
 var fatal_hit_sequence_running: bool = false
 var hurt_sequence_running: bool = false
+var orbit_bubble_area: Area2D
+var orbit_bubble_shape: CollisionShape2D
+var orbit_bubble_time: float = 0.0
+var ground_stomp_active: bool = false
+var ground_stomp_cooldown_timer: float = 0.0
+var ground_stomp_area: Area2D
+var ground_stomp_shape: CollisionShape2D
+var quick_run_active: bool = false
+var quick_run_timer: float = 0.0
+var quick_run_cooldown_timer: float = 0.0
+var quick_run_direction: int = 0
+var last_tap_direction: int = 0
+var last_tap_time_left: float = 0.0
+var was_left_pressed: bool = false
+var was_right_pressed: bool = false
 
 var unlocked_forms = {
 	Form.NORMAL: true,
@@ -167,6 +210,9 @@ func _ready() -> void:
 	connect_stomper_signals(stomper_bubble)
 	connect_stomper_signals(stomper_super)
 	register_combat_area_groups()
+	setup_ultimate_cooldown_timer()
+	setup_selectable_passive_nodes()
+	apply_selected_passive_power()
 	refresh_stompers_for_current_form()
 	update_audio_by_form()
 	passive_attack_timer = passive_attack_interval
@@ -214,6 +260,7 @@ func _physics_process(delta: float) -> void:
 	refresh_stompers_for_current_form()
 	update_attack_cooldowns(delta)
 	process_passive_attack(delta)
+	process_selectable_passives(delta)
 
 	if is_bouncing_from_enemy:
 		is_bouncing_from_enemy = false
@@ -238,6 +285,7 @@ func _physics_process(delta: float) -> void:
 	handle_input()
 	handle_state(delta)
 	move_and_slide()
+	process_ground_stomp_landing()
 
 
 func normalize_attack_configuration() -> void:
@@ -286,8 +334,41 @@ func update_attack_cooldowns(delta: float) -> void:
 		if active_attack_timers[i] > 0.0:
 			active_attack_timers[i] = max(active_attack_timers[i] - delta, 0.0)
 
-	if ultimate_cooldown_timer > 0.0:
-		ultimate_cooldown_timer = max(ultimate_cooldown_timer - delta, 0.0)
+	update_ultimate_cooldown_from_timer()
+
+
+func setup_ultimate_cooldown_timer() -> void:
+	ultimate_cooldown_node = Timer.new()
+	ultimate_cooldown_node.name = "UltimateCooldownTimer"
+	ultimate_cooldown_node.one_shot = true
+	ultimate_cooldown_node.wait_time = maxf(ultimate_attack_cooldown, 0.1)
+	add_child(ultimate_cooldown_node)
+
+	if not ultimate_cooldown_node.timeout.is_connected(_on_ultimate_cooldown_timeout):
+		ultimate_cooldown_node.timeout.connect(_on_ultimate_cooldown_timeout)
+
+
+func start_ultimate_cooldown() -> void:
+	ultimate_cooldown_timer = ultimate_attack_cooldown
+	if not ultimate_cooldown_node:
+		return
+
+	ultimate_cooldown_node.stop()
+	ultimate_cooldown_node.wait_time = maxf(ultimate_attack_cooldown, 0.1)
+	ultimate_cooldown_node.start()
+
+
+func update_ultimate_cooldown_from_timer() -> void:
+	if not ultimate_cooldown_node:
+		return
+	if ultimate_cooldown_node.is_stopped():
+		ultimate_cooldown_timer = 0.0
+	else:
+		ultimate_cooldown_timer = ultimate_cooldown_node.time_left
+
+
+func _on_ultimate_cooldown_timeout() -> void:
+	ultimate_cooldown_timer = 0.0
 
 
 func process_passive_attack(delta: float) -> void:
@@ -326,6 +407,332 @@ func configure_passive_attack(interval: float, active_time: float, damage: int) 
 	passive_attack_damage = max(damage, 1)
 	if passive_attack_enabled:
 		passive_attack_timer = passive_attack_interval
+
+
+func get_passive_power_names() -> Array[String]:
+	return [
+		"Nenhuma",
+		"Bolha protetora",
+		"Stomp no chao",
+		"Corrida rapida"
+	]
+
+
+func set_selected_passive_power(power_index: int) -> void:
+	selected_passive_power = clampi(power_index, PassivePower.NONE, PassivePower.QUICK_RUN)
+	apply_selected_passive_power()
+
+
+func get_selected_passive_power() -> int:
+	return int(selected_passive_power)
+
+
+func apply_selected_passive_power() -> void:
+	passive_attack_enabled = false
+	ground_stomp_active = false
+	quick_run_active = false
+	quick_run_timer = 0.0
+	quick_run_direction = 0
+
+	if orbit_bubble_area:
+		orbit_bubble_area.visible = selected_passive_power == PassivePower.ORBIT_BUBBLE
+		set_area_collision_enabled(orbit_bubble_area, selected_passive_power == PassivePower.ORBIT_BUBBLE)
+
+	if ground_stomp_area:
+		set_area_collision_enabled(ground_stomp_area, false)
+
+
+func setup_selectable_passive_nodes() -> void:
+	setup_orbit_bubble_node()
+	setup_ground_stomp_node()
+
+
+func setup_orbit_bubble_node() -> void:
+	if orbit_bubble_area:
+		return
+
+	orbit_bubble_area = Area2D.new()
+	orbit_bubble_area.name = "PassiveOrbitBubble"
+	orbit_bubble_area.add_to_group("player_attack")
+	orbit_bubble_area.set_meta(ATTACK_META_DAMAGE, max(orbit_bubble_damage, 1))
+	orbit_bubble_area.set_meta(ATTACK_META_KIND, int(AttackKind.PASSIVE))
+	orbit_bubble_area.set_meta(ATTACK_META_ID, "orbit_bubble")
+	add_child(orbit_bubble_area)
+
+	orbit_bubble_shape = CollisionShape2D.new()
+	var shape := CircleShape2D.new()
+	shape.radius = orbit_bubble_hit_radius
+	orbit_bubble_shape.shape = shape
+	orbit_bubble_area.add_child(orbit_bubble_shape)
+
+	var sprite := Sprite2D.new()
+	sprite.name = "Sprite2D"
+	sprite.texture = orbit_bubble_texture
+	sprite.scale = orbit_bubble_visual_scale
+	orbit_bubble_area.add_child(sprite)
+
+	orbit_bubble_area.visible = false
+	set_area_collision_enabled(orbit_bubble_area, false)
+
+
+func setup_ground_stomp_node() -> void:
+	if ground_stomp_area:
+		return
+
+	ground_stomp_area = Area2D.new()
+	ground_stomp_area.name = "PassiveGroundStompArea"
+	ground_stomp_area.set_meta(ATTACK_META_DAMAGE, max(ground_stomp_damage, 1))
+	ground_stomp_area.set_meta(ATTACK_META_KIND, int(AttackKind.PASSIVE))
+	ground_stomp_area.set_meta(ATTACK_META_ID, "ground_stomp")
+	add_child(ground_stomp_area)
+
+	ground_stomp_shape = CollisionShape2D.new()
+	var shape := CircleShape2D.new()
+	shape.radius = ground_stomp_radius
+	ground_stomp_shape.shape = shape
+	ground_stomp_area.add_child(ground_stomp_shape)
+
+	set_area_collision_enabled(ground_stomp_area, false)
+
+
+func process_selectable_passives(delta: float) -> void:
+	if last_tap_time_left > 0.0:
+		last_tap_time_left = max(last_tap_time_left - delta, 0.0)
+	if ground_stomp_cooldown_timer > 0.0:
+		ground_stomp_cooldown_timer = max(ground_stomp_cooldown_timer - delta, 0.0)
+	if quick_run_cooldown_timer > 0.0:
+		quick_run_cooldown_timer = max(quick_run_cooldown_timer - delta, 0.0)
+
+	if selected_passive_power == PassivePower.ORBIT_BUBBLE:
+		update_orbit_bubble(delta)
+	elif orbit_bubble_area and orbit_bubble_area.visible:
+		orbit_bubble_area.visible = false
+		set_area_collision_enabled(orbit_bubble_area, false)
+
+	if selected_passive_power == PassivePower.GROUND_STOMP:
+		check_ground_stomp_input()
+
+	if selected_passive_power == PassivePower.QUICK_RUN:
+		check_quick_run_input(delta)
+	else:
+		quick_run_active = false
+
+	update_quick_run_timer(delta)
+
+
+func update_orbit_bubble(delta: float) -> void:
+	if not orbit_bubble_area:
+		return
+
+	orbit_bubble_time += delta
+	orbit_bubble_area.visible = true
+	set_area_collision_enabled(orbit_bubble_area, true)
+	orbit_bubble_area.set_meta(ATTACK_META_DAMAGE, max(orbit_bubble_damage, 1))
+
+	var radius := orbit_bubble_radius + sin(orbit_bubble_time * orbit_bubble_zigzag_speed) * orbit_bubble_zigzag_amplitude
+	orbit_bubble_area.position = Vector2(cos(orbit_bubble_time * orbit_bubble_speed), sin(orbit_bubble_time * orbit_bubble_speed)) * radius
+
+
+func check_ground_stomp_input() -> void:
+	if ground_stomp_active:
+		return
+	if ground_stomp_cooldown_timer > 0.0:
+		return
+	if is_on_floor():
+		return
+	if not is_down_pressed():
+		return
+	if not Input.is_action_just_pressed("attack"):
+		return
+
+	ground_stomp_active = true
+	velocity.y = abs(ground_stomp_fall_speed)
+	change_state(State.JUMP)
+
+
+func process_ground_stomp_landing() -> void:
+	if not ground_stomp_active:
+		return
+	if not is_on_floor():
+		return
+
+	ground_stomp_active = false
+	ground_stomp_cooldown_timer = ground_stomp_cooldown
+	trigger_ground_stomp_burst()
+
+
+func trigger_ground_stomp_burst() -> void:
+	if not ground_stomp_area:
+		return
+
+	ground_stomp_area.global_position = get_ground_stomp_origin()
+	ground_stomp_area.set_meta(ATTACK_META_DAMAGE, max(ground_stomp_damage, 1))
+	set_area_collision_enabled(ground_stomp_area, true)
+	spawn_ground_stomp_particles()
+	apply_passive_area_damage_once(ground_stomp_area, max(ground_stomp_damage, 1))
+	_close_ground_stomp_burst()
+
+
+func get_current_stomper() -> Area2D:
+	match form:
+		Form.BUBBLE:
+			return stomper_bubble
+		Form.SUPER:
+			return stomper_super
+		_:
+			return stomper_normal
+
+
+func get_ground_stomp_origin() -> Vector2:
+	var stomper := get_current_stomper()
+	if stomper:
+		for child in stomper.get_children():
+			if child is CollisionShape2D:
+				return (child as CollisionShape2D).global_position
+		return stomper.global_position
+	return global_position + ground_stomp_particle_offset
+
+
+func spawn_ground_stomp_particles() -> void:
+	if not ground_stomp_particle_texture:
+		return
+
+	var root := Node2D.new()
+	root.name = "GroundStompBubbleParticles"
+	root.z_index = 50
+	var particle_parent: Node = get_tree().current_scene if get_tree().current_scene else get_parent()
+	particle_parent.add_child(root)
+	root.global_position = get_ground_stomp_origin()
+
+	var count: int = max(ground_stomp_particle_count, 1)
+	for i in range(count):
+		var particle := Sprite2D.new()
+		particle.texture = ground_stomp_particle_texture
+		particle.scale = ground_stomp_particle_scale
+		particle.modulate = Color(1, 1, 1, 0.9)
+		particle.z_index = 50
+		root.add_child(particle)
+
+		var side := -1.0 if i % 2 == 0 else 1.0
+		var step := float(i / 2 + 1) / float(count / 2 + 1)
+		var target := Vector2(
+			side * ground_stomp_particle_spread * step,
+			-10.0 - ground_stomp_particle_spread * 0.35 * step
+		)
+		var tween := create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(particle, "position", target, ground_stomp_particle_lifetime).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(particle, "scale", ground_stomp_particle_scale * 1.35, ground_stomp_particle_lifetime)
+		tween.tween_property(particle, "modulate:a", 0.0, ground_stomp_particle_lifetime)
+
+	await get_tree().create_timer(ground_stomp_particle_lifetime).timeout
+	if is_instance_valid(root):
+		root.queue_free()
+
+
+func apply_passive_area_damage_once(area: Area2D, damage: int) -> void:
+	await get_tree().physics_frame
+	if not is_instance_valid(area):
+		return
+
+	var damaged_targets := {}
+	for overlapping_area in area.get_overlapping_areas():
+		var target := resolve_attack_receiver_target(overlapping_area)
+		if target and target.has_method("take_damage") and not damaged_targets.has(target):
+			damaged_targets[target] = true
+			target.take_damage(damage)
+
+	for body in area.get_overlapping_bodies():
+		var target := resolve_attack_receiver_target(body)
+		if target and target.has_method("take_damage") and not damaged_targets.has(target):
+			damaged_targets[target] = true
+			target.take_damage(damage)
+
+
+func resolve_attack_receiver_target(node: Node) -> Node:
+	var current := node
+	while current != null:
+		if current.name == "AttackReceiver" or current.is_in_group("stompable"):
+			return current.get_parent()
+		if current.is_in_group("enemy") or current.is_in_group("slime") or current.is_in_group("boss"):
+			return current
+		current = current.get_parent()
+	return null
+
+
+func _close_ground_stomp_burst() -> void:
+	await get_tree().create_timer(ground_stomp_active_time).timeout
+	if ground_stomp_area:
+		set_area_collision_enabled(ground_stomp_area, false)
+
+
+func check_quick_run_input(_delta: float) -> void:
+	var left_pressed := is_left_pressed()
+	var right_pressed := is_right_pressed()
+
+	if left_pressed and not was_left_pressed:
+		register_quick_run_tap(-1)
+	if right_pressed and not was_right_pressed:
+		register_quick_run_tap(1)
+
+	was_left_pressed = left_pressed
+	was_right_pressed = right_pressed
+
+
+func register_quick_run_tap(direction: int) -> void:
+	if quick_run_active or quick_run_cooldown_timer > 0.0:
+		last_tap_direction = direction
+		last_tap_time_left = quick_run_double_tap_window
+		return
+
+	if last_tap_direction == direction and last_tap_time_left > 0.0:
+		start_quick_run(direction)
+	else:
+		last_tap_direction = direction
+		last_tap_time_left = quick_run_double_tap_window
+
+
+func start_quick_run(direction: int) -> void:
+	quick_run_active = true
+	quick_run_timer = quick_run_duration
+	quick_run_direction = direction
+	last_tap_time_left = 0.0
+	last_tap_direction = 0
+
+
+func update_quick_run_timer(delta: float) -> void:
+	if not quick_run_active:
+		return
+
+	quick_run_timer = max(quick_run_timer - delta, 0.0)
+	if quick_run_timer <= 0.0 or not is_forward_pressed(quick_run_direction):
+		quick_run_active = false
+		quick_run_direction = 0
+		quick_run_cooldown_timer = quick_run_cooldown
+
+
+func is_passive_run_boosting() -> bool:
+	return selected_passive_power == PassivePower.QUICK_RUN and quick_run_active
+
+
+func is_left_pressed() -> bool:
+	return Input.is_action_pressed("left") or Input.is_action_pressed("ui_left")
+
+
+func is_right_pressed() -> bool:
+	return Input.is_action_pressed("right") or Input.is_action_pressed("ui_right")
+
+
+func is_down_pressed() -> bool:
+	return Input.is_action_pressed("crouch") or Input.is_action_pressed("ui_down")
+
+
+func is_forward_pressed(direction: int) -> bool:
+	if direction < 0:
+		return is_left_pressed()
+	if direction > 0:
+		return is_right_pressed()
+	return false
 
 
 func handle_input() -> void:
@@ -372,13 +779,12 @@ func start_special_attack() -> void:
 func start_ultimate_attack() -> void:
 	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
-	if not ultimate_attack_enabled:
-		return
-	if not can_use_mana_attacks():
-		return
-	if ultimate_cooldown_timer > 0.0:
+	if not can_use_ultimate_attack():
+		if can_attempt_ultimate_attack() and not has_full_mana_for_ultimate():
+			show_mana_warning()
 		return
 	if not consume_ultimate_mana():
+		show_mana_warning()
 		return
 
 	defending = false
@@ -388,7 +794,7 @@ func start_ultimate_attack() -> void:
 		AttackKind.ULTIMATE,
 		ultimate_attack_id
 	)
-	ultimate_cooldown_timer = ultimate_attack_cooldown
+	start_ultimate_cooldown()
 	change_state(State.SPECIAL_ATTACK)
 	trigger_attack_window(ultimate_attack_active_time)
 
@@ -648,7 +1054,7 @@ func idle_state() -> void:
 
 	if Input.is_action_just_pressed("jump") and on_ground:
 		change_state(State.JUMP)
-	elif abs(Input.get_axis("ui_left", "ui_right")) > 0:
+	elif abs(get_horizontal_axis()) > 0:
 		change_state(State.WALK)
 	elif Input.is_action_just_pressed("attack"):
 		start_normal_attack()
@@ -698,7 +1104,7 @@ func dash_state() -> void:
 		dash_timer = dash_time
 		dash_cooldown_timer = dash_cooldown
 
-		var dir: int = int(sign(Input.get_axis("ui_left", "ui_right")))
+		var dir: int = int(sign(get_horizontal_axis()))
 		if dir == 0:
 			dir = -1 if $Sprite2D.flip_h else 1
 
@@ -726,7 +1132,7 @@ func hurt_state() -> void:
 
 
 func swim_state() -> void:
-	var dir_x := Input.get_axis("ui_left", "ui_right")
+	var dir_x := get_horizontal_axis()
 	var dir_y := Input.get_axis("ui_up", "ui_down")
 
 	var swim_speed := speed * 0.5
@@ -746,7 +1152,7 @@ func swim_state() -> void:
 
 
 func handle_horizontal_input() -> void:
-	var dir := Input.get_axis("ui_left", "ui_right")
+	var dir := get_horizontal_axis()
 	var current_speed := speed
 
 	if in_water:
@@ -758,10 +1164,20 @@ func handle_horizontal_input() -> void:
 			Form.SUPER:
 				current_speed *= 0.5
 
+	if is_passive_run_boosting():
+		current_speed *= quick_run_speed_multiplier
+
 	velocity.x = dir * current_speed
 
 	if dir != 0:
 		$Sprite2D.flip_h = dir < 0
+
+
+func get_horizontal_axis() -> float:
+	var dir := Input.get_axis("ui_left", "ui_right")
+	if dir == 0.0:
+		dir = Input.get_axis("left", "right")
+	return dir
 
 
 func change_state(new_state: State) -> void:
@@ -1121,7 +1537,47 @@ func get_active_attack_cooldown_progress(index: int = -1) -> float:
 
 func get_ultimate_cooldown_progress() -> float:
 	var cooldown := maxf(ultimate_attack_cooldown, 0.001)
+	if ultimate_cooldown_node and not ultimate_cooldown_node.is_stopped():
+		return clampf(1.0 - (ultimate_cooldown_node.time_left / maxf(ultimate_cooldown_node.wait_time, 0.001)), 0.0, 1.0)
 	return clampf(1.0 - (ultimate_cooldown_timer / cooldown), 0.0, 1.0)
+
+
+func get_ultimate_hud_progress() -> float:
+	if not allow_ultimate_input or not ultimate_attack_enabled or not can_use_mana_attacks():
+		return 0.0
+	return get_ultimate_cooldown_progress()
+
+
+func get_mana_ratio() -> float:
+	if not stats:
+		return 1.0
+	if not "current_mana" in stats or not "max_mana" in stats:
+		return 1.0
+
+	var max_mana_value: float = maxf(float(stats.max_mana), 0.001)
+	return clampf(float(stats.current_mana) / max_mana_value, 0.0, 1.0)
+
+
+func can_use_ultimate_attack() -> bool:
+	if not can_attempt_ultimate_attack():
+		return false
+	return has_full_mana_for_ultimate()
+
+
+func can_attempt_ultimate_attack() -> bool:
+	if not allow_ultimate_input:
+		return false
+	if not ultimate_attack_enabled:
+		return false
+	if not can_use_mana_attacks():
+		return false
+	if ultimate_cooldown_timer > 0.0:
+		return false
+	return true
+
+
+func has_full_mana_for_ultimate() -> bool:
+	return get_mana_ratio() >= 1.0
 
 
 func get_active_attack_mana_cost(index: int) -> float:
@@ -1153,7 +1609,10 @@ func consume_attack_mana(amount: float) -> bool:
 		return true
 	if not stats or not stats.has_method("consume_mana"):
 		return true
-	return stats.consume_mana(amount)
+	var consumed: bool = stats.consume_mana(amount)
+	if not consumed:
+		show_mana_warning()
+	return consumed
 
 
 func consume_ultimate_mana() -> bool:
@@ -1164,6 +1623,11 @@ func consume_ultimate_mana() -> bool:
 	if stats.has_method("consume_all_mana"):
 		return stats.consume_all_mana()
 	return false
+
+
+func show_mana_warning() -> void:
+	if hud and hud.has_method("show_mana_warning"):
+		hud.show_mana_warning("sem mana suficiente")
 
 
 func update_audio_by_form() -> void:

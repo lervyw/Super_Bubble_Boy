@@ -18,8 +18,8 @@ var current_health: int = 5
 
 @export_group("Mana")
 @export var max_mana: float = 100.0
-@export_range(0.0, 100.0, 0.1) var mana_regen_per_second: float = 20.0
-@export_range(0.0, 10.0, 0.05) var mana_regen_delay: float = 0.75
+@export_range(0.0, 100.0, 0.1) var mana_regen_per_second: float = 8.0
+@export_range(0.0, 10.0, 0.05) var mana_regen_delay: float = 1.2
 var current_mana: float = 100.0
 var mana_regen_block_timer: float = 0.0
 
