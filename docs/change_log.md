@@ -4,6 +4,7 @@
 
 ### Gamepad and mobile controls
 
+- Centered the title/config/controls menus and changed the title background loop to cover the expanded viewport with a ping-pong animation from `menu1.png` through `menu11.png`
 - Changed display stretch aspect to `expand` so Android widescreen fills the available screen without distorting the pixel-art viewport
 - Added player camera framing for metroidvania play: vertical offset keeps the player lower on screen, drag margins stabilize movement, and a small smoothed horizontal look-ahead shows slightly more space ahead
 - Added a mobile `PAUSE` touch button
