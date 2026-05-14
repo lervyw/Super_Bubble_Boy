@@ -32,6 +32,9 @@ var warning_tween: Tween
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_apply_responsive_layout()
+	if not get_viewport().size_changed.is_connected(_apply_responsive_layout):
+		get_viewport().size_changed.connect(_apply_responsive_layout)
 
 	if menu_panel:
 		menu_panel.visible = true
@@ -101,6 +104,110 @@ func _process(delta: float) -> void:
 	_update_selected_passive_icon()
 	_update_menu_panel_state()
 	_update_pause_menu_state()
+
+
+func _apply_responsive_layout() -> void:
+	var viewport_size := get_viewport().get_visible_rect().size
+
+	var status_root := get_node_or_null("HBoxContainer") as Control
+	if status_root:
+		status_root.anchor_left = 0.0
+		status_root.anchor_top = 0.0
+		status_root.anchor_right = 0.0
+		status_root.anchor_bottom = 0.0
+		status_root.offset_left = 8.0
+		status_root.offset_top = 6.0
+		status_root.offset_right = 188.0
+		status_root.offset_bottom = 64.0
+		status_root.scale = Vector2(2.0, 1.1)
+
+	if ultimate_cooldown_bar:
+		ultimate_cooldown_bar.anchor_left = 0.0
+		ultimate_cooldown_bar.anchor_top = 0.0
+		ultimate_cooldown_bar.anchor_right = 0.0
+		ultimate_cooldown_bar.anchor_bottom = 0.0
+		ultimate_cooldown_bar.position = Vector2(6.0, 4.0)
+	if ultimate_ready_icon:
+		ultimate_ready_icon.anchor_left = 0.0
+		ultimate_ready_icon.anchor_top = 0.0
+		ultimate_ready_icon.anchor_right = 0.0
+		ultimate_ready_icon.anchor_bottom = 0.0
+		ultimate_ready_icon.position = Vector2(15.0, 23.0)
+
+	if selected_passive_icon:
+		selected_passive_icon.anchor_left = 0.0
+		selected_passive_icon.anchor_top = 0.0
+		selected_passive_icon.anchor_right = 0.0
+		selected_passive_icon.anchor_bottom = 0.0
+		selected_passive_icon.position = Vector2(14.0, 84.0)
+
+	if boss_hp_bar:
+		boss_hp_bar.anchor_left = 0.5
+		boss_hp_bar.anchor_top = 1.0
+		boss_hp_bar.anchor_right = 0.5
+		boss_hp_bar.anchor_bottom = 1.0
+		boss_hp_bar.offset_left = -129.0
+		boss_hp_bar.offset_top = -42.0
+		boss_hp_bar.offset_right = 129.0
+		boss_hp_bar.offset_bottom = -16.0
+		boss_hp_bar.scale = Vector2.ONE
+
+	if menu_panel:
+		menu_panel.anchor_left = 1.0
+		menu_panel.anchor_top = 1.0
+		menu_panel.anchor_right = 1.0
+		menu_panel.anchor_bottom = 1.0
+		menu_panel.offset_left = -92.0
+		menu_panel.offset_top = -94.0
+		menu_panel.offset_right = -22.0
+		menu_panel.offset_bottom = -24.0
+		menu_panel.scale = Vector2(0.58, 0.58)
+
+	if warning_label:
+		warning_label.anchor_left = 0.5
+		warning_label.anchor_top = 0.42
+		warning_label.anchor_right = 0.5
+		warning_label.anchor_bottom = 0.42
+		warning_label.offset_left = -110.0
+		warning_label.offset_top = -12.0
+		warning_label.offset_right = 110.0
+		warning_label.offset_bottom = 14.0
+
+	if pause_menu_panel:
+		pause_menu_panel.anchor_left = 0.0
+		pause_menu_panel.anchor_top = 0.0
+		pause_menu_panel.anchor_right = 1.0
+		pause_menu_panel.anchor_bottom = 1.0
+		pause_menu_panel.offset_left = 0.0
+		pause_menu_panel.offset_top = 0.0
+		pause_menu_panel.offset_right = 0.0
+		pause_menu_panel.offset_bottom = 0.0
+
+	var frost_panel := get_node_or_null("PauseMenu/FrostPanel") as Control
+	if frost_panel:
+		var panel_width := minf(276.0, viewport_size.x - 32.0)
+		var panel_height := minf(252.0, viewport_size.y - 28.0)
+		frost_panel.anchor_left = 0.5
+		frost_panel.anchor_top = 0.5
+		frost_panel.anchor_right = 0.5
+		frost_panel.anchor_bottom = 0.5
+		frost_panel.offset_left = -panel_width * 0.5
+		frost_panel.offset_top = -panel_height * 0.5
+		frost_panel.offset_right = panel_width * 0.5
+		frost_panel.offset_bottom = panel_height * 0.5
+
+	var pause_box := get_node_or_null("PauseMenu/VBoxContainer") as Control
+	if pause_box:
+		var box_width := minf(232.0, viewport_size.x - 56.0)
+		var box_height := minf(224.0, viewport_size.y - 56.0)
+		pause_box.anchor_left = 0.5
+		pause_box.anchor_top = 0.5
+		pause_box.anchor_right = 0.5
+		pause_box.anchor_bottom = 0.5
+		pause_box.offset_left = -box_width * 0.5
+		pause_box.offset_top = -box_height * 0.5
+		pause_box.offset_right = box_width * 0.5
+		pause_box.offset_bottom = box_height * 0.5
 
 
 func _update_hearts() -> void:

@@ -171,6 +171,7 @@ Recent history before new work:
 - Internal pixel-art viewport remains `420x280`
 - The game window opens at `1260x840`, an integer 3x scale
 - Stretch mode is `canvas_items` with aspect `expand`, so widescreen/mobile displays fill the screen without distorting the pixel-art viewport
+- HUD/menu/cutscene scripts now apply responsive layout at runtime, so full-screen backgrounds cover expanded widescreen viewports and UI panels are repositioned from viewport size instead of fixed 420x280 offsets
 
 ## Camera Framing
 

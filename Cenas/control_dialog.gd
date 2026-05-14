@@ -31,6 +31,9 @@ var current_dialog_index: int = 0
 
 func _ready() -> void:
 	print("🎬 Cutscene iniciada")
+	_apply_responsive_layout()
+	if not get_viewport().size_changed.is_connected(_apply_responsive_layout):
+		get_viewport().size_changed.connect(_apply_responsive_layout)
 	
 	# Configura o primeiro diálogo
 	if dialogs.size() > 0:
@@ -43,6 +46,73 @@ func _ready() -> void:
 	if advance_button:
 		advance_button.pressed.connect(_on_advance_button_pressed)
 		print("✅ Botão de avançar conectado")
+
+
+func _apply_responsive_layout() -> void:
+	var viewport_size := get_viewport_rect().size
+	_fill_screen(self)
+
+	var background := get_node_or_null("Background") as TextureRect
+	if background:
+		_fill_screen(background)
+		background.scale = Vector2.ONE
+		background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+
+	var dialog_border := get_node_or_null("Border") as TextureRect
+	if dialog_border:
+		dialog_border.anchor_left = 0.5
+		dialog_border.anchor_top = 0.0
+		dialog_border.anchor_right = 0.5
+		dialog_border.anchor_bottom = 0.0
+		dialog_border.offset_left = -132.0
+		dialog_border.offset_top = 18.0
+		dialog_border.offset_right = 132.0
+		dialog_border.offset_bottom = 166.0
+		dialog_border.scale = Vector2.ONE
+		dialog_border.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		dialog_border.stretch_mode = TextureRect.STRETCH_SCALE
+
+	var dialog_container := get_node_or_null("Node/CharacterNode/MarginContainer") as Control
+	if dialog_container:
+		dialog_container.anchor_left = 0.5
+		dialog_container.anchor_top = 0.0
+		dialog_container.anchor_right = 0.5
+		dialog_container.anchor_bottom = 0.0
+		dialog_container.offset_left = -104.0
+		dialog_container.offset_top = 30.0
+		dialog_container.offset_right = 104.0
+		dialog_container.offset_bottom = 136.0
+
+	if advance_button:
+		advance_button.anchor_left = 0.5
+		advance_button.anchor_top = 0.0
+		advance_button.anchor_right = 0.5
+		advance_button.anchor_bottom = 0.0
+		advance_button.offset_left = -58.0
+		advance_button.offset_top = minf(190.0, viewport_size.y - 48.0)
+		advance_button.offset_right = 58.0
+		advance_button.offset_bottom = minf(222.0, viewport_size.y - 16.0)
+		advance_button.scale = Vector2.ONE
+
+	var fernanda := get_node_or_null("Node/CharacterNode/AnimatedSprite2D") as AnimatedSprite2D
+	if fernanda:
+		fernanda.position = Vector2(viewport_size.x * 0.78, viewport_size.y * 0.72)
+
+	var bubble := get_node_or_null("Node/AnimatedSprite2D") as AnimatedSprite2D
+	if bubble:
+		bubble.position = Vector2(viewport_size.x * 0.22, viewport_size.y * 0.72)
+
+
+func _fill_screen(node: Control) -> void:
+	node.anchor_left = 0.0
+	node.anchor_top = 0.0
+	node.anchor_right = 1.0
+	node.anchor_bottom = 1.0
+	node.offset_left = 0.0
+	node.offset_top = 0.0
+	node.offset_right = 0.0
+	node.offset_bottom = 0.0
 
 func _input(event: InputEvent) -> void:
 	# Detecta clique do mouse, tecla de ação ou botão do controle

@@ -28,6 +28,8 @@ const MENU_IDLE_LOOP_FIRST_FRAME: int = 51
 const MENU_IDLE_LOOP_LAST_FRAME: int = 56
 const MENU_IDLE_LOOP_FPS: float = 8.0
 const JOYPAD_AXIS_REBIND_THRESHOLD: float = 0.55
+const MENU_PANEL_WIDTH: float = 212.0
+const MENU_RIGHT_MARGIN: float = 28.0
 
 
 # ================================
@@ -98,6 +100,10 @@ var forbidden_keys: Array[int] = [
 #             READY
 # ================================
 func _ready():
+	_apply_responsive_layout()
+	if not get_viewport().size_changed.is_connected(_apply_responsive_layout):
+		get_viewport().size_changed.connect(_apply_responsive_layout)
+
 	# Estado inicial: mostra o menu principal e esconde as outras telas
 	menu.visible = false
 	config_menu.visible = false
@@ -151,6 +157,54 @@ func _ready():
 	# Atualiza o texto dos botões com o input atual (ex: "Pulo: Space")
 	_update_control_labels()
 	_play_startup_intro()
+
+
+func _apply_responsive_layout() -> void:
+	var viewport_size := get_viewport_rect().size
+
+	for node in [$IntroBlackBackground, menu_intro_background, logo_intro]:
+		if node is Control:
+			_fill_screen(node)
+			if node is TextureRect:
+				node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+
+	_place_menu_panel(menu, viewport_size, 0.58, 112.0)
+	_place_menu_panel(config_menu, viewport_size, 0.50, 188.0)
+	_place_menu_panel(botoes_menu, viewport_size, 0.50, viewport_size.y - 36.0)
+
+	var controls_scroll := $ControlsMenu/ScrollContainer as ScrollContainer
+	if controls_scroll:
+		controls_scroll.custom_minimum_size = Vector2(MENU_PANEL_WIDTH, maxf(viewport_size.y - 46.0, 160.0))
+
+
+func _fill_screen(node: Control) -> void:
+	node.anchor_left = 0.0
+	node.anchor_top = 0.0
+	node.anchor_right = 1.0
+	node.anchor_bottom = 1.0
+	node.offset_left = 0.0
+	node.offset_top = 0.0
+	node.offset_right = 0.0
+	node.offset_bottom = 0.0
+
+
+func _place_menu_panel(panel: Control, viewport_size: Vector2, center_y_ratio: float, panel_height: float) -> void:
+	if not panel:
+		return
+
+	var height := minf(panel_height, viewport_size.y - 24.0)
+	var left := maxf(viewport_size.x - MENU_PANEL_WIDTH - MENU_RIGHT_MARGIN, 16.0)
+	var top := clampf(viewport_size.y * center_y_ratio - height * 0.5, 12.0, maxf(viewport_size.y - height - 12.0, 12.0))
+
+	panel.anchor_left = 0.0
+	panel.anchor_top = 0.0
+	panel.anchor_right = 0.0
+	panel.anchor_bottom = 0.0
+	panel.offset_left = left
+	panel.offset_top = top
+	panel.offset_right = left + MENU_PANEL_WIDTH
+	panel.offset_bottom = top + height
 
 
 func _connect_pressed_once(button: BaseButton, callable: Callable) -> void:
