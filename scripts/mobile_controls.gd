@@ -32,6 +32,7 @@ var joystick_vector := Vector2.ZERO
 var joystick_touch_index := -1
 var joystick_active := false
 var joystick_was_power_mode := false
+var controls_hidden_for_pause := false
 var virtual_pressed: Dictionary = {}
 
 
@@ -47,6 +48,10 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	_update_pause_visibility()
+	if controls_hidden_for_pause:
+		return
+
 	_apply_joystick_actions()
 
 
@@ -55,6 +60,9 @@ func _exit_tree() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if controls_hidden_for_pause:
+		return
+
 	if event is InputEventScreenTouch:
 		if event.pressed and joystick_touch_index == -1 and _is_inside_joystick(event.position):
 			joystick_touch_index = event.index
@@ -163,6 +171,22 @@ func _update_layout() -> void:
 
 		label.position = position
 		label.size = size
+
+
+func _update_pause_visibility() -> void:
+	var should_hide := get_tree().paused
+	if controls_hidden_for_pause == should_hide:
+		return
+
+	controls_hidden_for_pause = should_hide
+	if controls_hidden_for_pause:
+		_reset_joystick()
+	else:
+		joystick_was_power_mode = false
+
+	for child in get_children():
+		if child is CanvasItem:
+			child.visible = not controls_hidden_for_pause
 
 
 func _is_inside_joystick(position: Vector2) -> bool:

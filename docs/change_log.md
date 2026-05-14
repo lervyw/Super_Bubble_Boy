@@ -2,6 +2,11 @@
 
 ## 2026-05-14
 
+### Mobile pause overlay
+
+- Hid the mobile touch controls while the pause menu is open and restored them when leaving pause.
+- Released virtual joystick actions when entering pause so movement/power selection cannot remain stuck.
+
 ### Mobile button swap
 
 - Swapped the mobile `A` and `Y` button actions so `Y` jumps and `A` opens the power wheel.
