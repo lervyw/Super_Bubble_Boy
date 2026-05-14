@@ -4,6 +4,8 @@
 
 ### Gamepad and mobile controls
 
+- Reverted the centered `SubViewport` wrapper experiment and restored the title scene as the main scene
+- Changed display stretch aspect back to `keep`, restoring the centered fixed-aspect game frame with letterboxing
 - Changed display stretch aspect to `expand` so Android widescreen fills the available screen without distorting the pixel-art viewport
 - Added player camera framing for metroidvania play: vertical offset keeps the player lower on screen, drag margins stabilize movement, and a small smoothed horizontal look-ahead shows slightly more space ahead
 - Added a mobile `PAUSE` touch button
