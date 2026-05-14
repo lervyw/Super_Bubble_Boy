@@ -2,6 +2,10 @@
 
 ## 2026-05-14
 
+### Stretched screen fill
+
+- Changed stretch aspect from `expand` to `ignore` so the game canvas stretches to fill the whole window instead of preserving its fixed aspect ratio.
+
 ### Widescreen fill
 
 - Changed the desktop window override to `1600x900` for a larger 16:9 default window.
