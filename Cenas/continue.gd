@@ -56,9 +56,6 @@ var dialogs_finished: bool = false
 func _ready() -> void:
 	print("🎮 Continue Screen carregado")
 	print("   Nível atual: " + GameManager.get_current_level())
-	_apply_responsive_layout()
-	if not get_viewport().size_changed.is_connected(_apply_responsive_layout):
-		get_viewport().size_changed.connect(_apply_responsive_layout)
 
 	# Inicializa diálogos
 	if dialogs.size() > 0 and DialogBox:
@@ -78,86 +75,6 @@ func _ready() -> void:
 	# Inicia timer automático se necessário
 	if not start_timer_after_dialogs or dialogs.is_empty():
 		start_countdown()
-
-
-func _apply_responsive_layout() -> void:
-	var viewport_size := get_viewport_rect().size
-	_fill_screen(self)
-
-	var background := get_node_or_null("Background") as TextureRect
-	if background:
-		_fill_screen(background)
-		background.scale = Vector2.ONE
-		background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-
-	var dialog_border := get_node_or_null("Border") as TextureRect
-	if dialog_border:
-		dialog_border.anchor_left = 0.5
-		dialog_border.anchor_top = 0.0
-		dialog_border.anchor_right = 0.5
-		dialog_border.anchor_bottom = 0.0
-		dialog_border.offset_left = -132.0
-		dialog_border.offset_top = 18.0
-		dialog_border.offset_right = 132.0
-		dialog_border.offset_bottom = 166.0
-		dialog_border.scale = Vector2.ONE
-		dialog_border.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		dialog_border.stretch_mode = TextureRect.STRETCH_SCALE
-
-	var dialog_container := get_node_or_null("Node/CharacterNode/MarginContainer") as Control
-	if dialog_container:
-		dialog_container.anchor_left = 0.5
-		dialog_container.anchor_top = 0.0
-		dialog_container.anchor_right = 0.5
-		dialog_container.anchor_bottom = 0.0
-		dialog_container.offset_left = -104.0
-		dialog_container.offset_top = 30.0
-		dialog_container.offset_right = 104.0
-		dialog_container.offset_bottom = 136.0
-
-	if timer_label:
-		timer_label.anchor_left = 0.5
-		timer_label.anchor_top = 0.0
-		timer_label.anchor_right = 0.5
-		timer_label.anchor_bottom = 0.0
-		timer_label.offset_left = -18.0
-		timer_label.offset_top = 150.0
-		timer_label.offset_right = 22.0
-		timer_label.offset_bottom = 178.0
-
-	_place_button(continue_button, viewport_size, Vector2(-58.0, 186.0))
-	_place_button(quit_button, viewport_size, Vector2(-58.0, 226.0))
-
-	if animated_sprite:
-		animated_sprite.position = Vector2(viewport_size.x * 0.72, viewport_size.y * 0.66)
-
-
-func _fill_screen(node: Control) -> void:
-	node.anchor_left = 0.0
-	node.anchor_top = 0.0
-	node.anchor_right = 1.0
-	node.anchor_bottom = 1.0
-	node.offset_left = 0.0
-	node.offset_top = 0.0
-	node.offset_right = 0.0
-	node.offset_bottom = 0.0
-
-
-func _place_button(button: Button, viewport_size: Vector2, base_offset: Vector2) -> void:
-	if not button:
-		return
-
-	var y := minf(base_offset.y, viewport_size.y - 52.0)
-	button.anchor_left = 0.5
-	button.anchor_top = 0.0
-	button.anchor_right = 0.5
-	button.anchor_bottom = 0.0
-	button.offset_left = base_offset.x
-	button.offset_top = y
-	button.offset_right = base_offset.x + 116.0
-	button.offset_bottom = y + 32.0
-	button.scale = Vector2.ONE
 
 
 # =======================

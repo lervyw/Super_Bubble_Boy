@@ -10,8 +10,6 @@
 - Added mobile HUD-wheel selection actions so holding the power-menu button can select up/down/left/right powers using touch controls
 - Replaced mobile direction buttons with a virtual touch wheel: dragging controls movement normally, and dragging while the power wheel is open selects the power direction without moving the player
 - Kept gravity active during the power wheel, normal attacks, special/ultimate attacks, defense, and transformations so the player can no longer float in midair by attacking
-- Made HUD, pause menu, title menu backgrounds, title/config/control panels, and level-transition cutscene screens recalculate their layout from the expanded viewport
-- Changed menu and cutscene background images to cover the widened screen instead of staying trapped in the old 420x280 area
 - Updated input rebinding to capture and save joypad axes, including Xbox/PS4 LT/L2 and RT/R2 trigger events
 - Normalized saved gamepad binds to device `-1` so the mapping is not locked to a single connected controller slot
 - Updated the controls menu labels to show common Xbox/PlayStation names for face buttons, shoulders, D-pad, analog axes, and triggers
