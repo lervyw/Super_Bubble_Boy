@@ -2,6 +2,11 @@
 
 ## 2026-05-14
 
+### Transform gravity fix
+
+- Froze player velocity during form transformation so gravity cannot move the character while transform hitboxes are disabled, preventing the player from falling through the ground.
+- Kept gravity behavior unchanged for aerial attacks and other combat states.
+
 ### Gamepad and mobile controls
 
 - Reverted the centered `SubViewport` wrapper experiment and restored the title scene as the main scene

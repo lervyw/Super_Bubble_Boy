@@ -1145,7 +1145,7 @@ func dash_state() -> void:
 
 
 func transform_state() -> void:
-	velocity.x = 0.0
+	velocity = Vector2.ZERO
 
 
 func dead_state() -> void:
