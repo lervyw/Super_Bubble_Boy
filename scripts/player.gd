@@ -40,6 +40,16 @@ var hud_menu_selection_locked := false
 @export var audio_super: AudioStreamPlayer
 @export var hud: CanvasLayer
 
+@export_group("Camera Framing")
+@export var camera_vertical_offset: float = -18.0
+@export var camera_lookahead_distance: float = 18.0
+@export_range(0.1, 20.0, 0.1) var camera_offset_smoothing: float = 5.0
+@export_range(0.1, 20.0, 0.1) var camera_position_smoothing_speed: float = 6.0
+@export_range(0.0, 1.0, 0.01) var camera_drag_left_margin: float = 0.35
+@export_range(0.0, 1.0, 0.01) var camera_drag_right_margin: float = 0.35
+@export_range(0.0, 1.0, 0.01) var camera_drag_top_margin: float = 0.25
+@export_range(0.0, 1.0, 0.01) var camera_drag_bottom_margin: float = 0.38
+
 @export_group("Modes")
 @export var platform_mode_uses_mana: bool = false
 @export var platform_mode_allows_mana_attacks: bool = false
@@ -132,6 +142,7 @@ var hud_menu_selection_locked := false
 
 @onready var attack_area: Area2D = $AttackHitbox
 @onready var attack_collision: CollisionShape2D = $AttackHitbox/AttackCollisionShape
+@onready var player_camera: Camera2D = $Camera
 
 var dash_timer := 0.0
 var dash_cooldown_timer := 0.0
@@ -186,6 +197,7 @@ var unlocked_forms = {
 
 
 func _ready() -> void:
+	ensure_optional_input_actions()
 	normalize_attack_configuration()
 
 	if $Sprite2D and $Sprite2D.has_signal("attack_finished"):
@@ -213,9 +225,16 @@ func _ready() -> void:
 	setup_ultimate_cooldown_timer()
 	setup_selectable_passive_nodes()
 	apply_selected_passive_power()
+	setup_camera_framing()
 	refresh_stompers_for_current_form()
 	update_audio_by_form()
 	passive_attack_timer = passive_attack_interval
+
+
+func ensure_optional_input_actions() -> void:
+	for action_name in ["hud_select_up", "hud_select_down", "hud_select_left", "hud_select_right"]:
+		if not InputMap.has_action(action_name):
+			InputMap.add_action(action_name)
 
 
 func _input(event):
@@ -245,6 +264,8 @@ func _input(event):
 
 
 func _process(_delta: float) -> void:
+	update_camera_framing(_delta)
+
 	if state == State.HURT:
 		return
 
@@ -1335,16 +1356,49 @@ func get_hud_menu_direction() -> Vector2:
 		return direction
 
 	var keyboard_direction := Vector2.ZERO
-	if Input.is_action_pressed("ui_left"):
+	if Input.is_action_pressed("ui_left") or Input.is_action_pressed("left") or Input.is_action_pressed("hud_select_left"):
 		keyboard_direction.x -= 1.0
-	if Input.is_action_pressed("ui_right"):
+	if Input.is_action_pressed("ui_right") or Input.is_action_pressed("right") or Input.is_action_pressed("hud_select_right"):
 		keyboard_direction.x += 1.0
-	if Input.is_action_pressed("ui_up"):
+	if Input.is_action_pressed("ui_up") or Input.is_action_pressed("jump") or Input.is_action_pressed("hud_select_up"):
 		keyboard_direction.y -= 1.0
-	if Input.is_action_pressed("ui_down"):
+	if Input.is_action_pressed("ui_down") or Input.is_action_pressed("crouch") or Input.is_action_pressed("hud_select_down"):
 		keyboard_direction.y += 1.0
 
 	return keyboard_direction.normalized() if keyboard_direction != Vector2.ZERO else Vector2.ZERO
+
+
+func setup_camera_framing() -> void:
+	if not player_camera:
+		return
+
+	player_camera.position_smoothing_enabled = true
+	player_camera.position_smoothing_speed = camera_position_smoothing_speed
+	player_camera.drag_horizontal_enabled = true
+	player_camera.drag_vertical_enabled = true
+	player_camera.drag_left_margin = camera_drag_left_margin
+	player_camera.drag_right_margin = camera_drag_right_margin
+	player_camera.drag_top_margin = camera_drag_top_margin
+	player_camera.drag_bottom_margin = camera_drag_bottom_margin
+	player_camera.offset = Vector2(get_camera_lookahead_direction() * camera_lookahead_distance, camera_vertical_offset)
+
+
+func update_camera_framing(delta: float) -> void:
+	if not player_camera:
+		return
+
+	var target_offset := Vector2(get_camera_lookahead_direction() * camera_lookahead_distance, camera_vertical_offset)
+	var weight := clampf(delta * camera_offset_smoothing, 0.0, 1.0)
+	player_camera.offset = player_camera.offset.lerp(target_offset, weight)
+
+
+func get_camera_lookahead_direction() -> float:
+	var dir := get_horizontal_axis()
+	if absf(dir) > 0.1:
+		return -1.0 if dir < 0.0 else 1.0
+	if has_node("Sprite2D") and $Sprite2D.flip_h:
+		return -1.0
+	return 1.0
 
 
 func select_hud_menu_action(action: HudMenuAction) -> void:

@@ -2031,8 +2031,16 @@ position = Vector2(-2, 0.5)
 shape = SubResource("RectangleShape2D_e2nbm")
 
 [node name="Camera" type="Camera2D" parent="."]
+offset = Vector2(18, -18)
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0
 limit_bottom = 300
 drag_horizontal_enabled = true
+drag_vertical_enabled = true
+drag_left_margin = 0.35
+drag_right_margin = 0.35
+drag_top_margin = 0.25
+drag_bottom_margin = 0.38
 
 [node name="audio_normal" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("4_4q8k4")

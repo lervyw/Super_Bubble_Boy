@@ -4,6 +4,10 @@
 
 ### Gamepad and mobile controls
 
+- Changed display stretch aspect to `expand` so Android widescreen fills the available screen without distorting the pixel-art viewport
+- Added player camera framing for metroidvania play: vertical offset keeps the player lower on screen, drag margins stabilize movement, and a small smoothed horizontal look-ahead shows slightly more space ahead
+- Added a mobile `PAUSE` touch button
+- Added mobile HUD-wheel selection actions so holding the power-menu button can select up/down/left/right powers using touch controls
 - Updated input rebinding to capture and save joypad axes, including Xbox/PS4 LT/L2 and RT/R2 trigger events
 - Normalized saved gamepad binds to device `-1` so the mapping is not locked to a single connected controller slot
 - Updated the controls menu labels to show common Xbox/PlayStation names for face buttons, shoulders, D-pad, analog axes, and triggers

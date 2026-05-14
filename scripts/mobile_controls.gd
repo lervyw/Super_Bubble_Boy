@@ -2,21 +2,27 @@ extends CanvasLayer
 
 const BUTTON_SIZE := Vector2(46, 46)
 const SMALL_BUTTON_SIZE := Vector2(38, 38)
+const PAUSE_BUTTON_SIZE := Vector2(54, 30)
 const EDGE_PADDING := 18.0
 const BOTTOM_PADDING := 18.0
 const BUTTON_GAP := 8.0
 
 var controls: Array[Dictionary] = [
-	{"name": "Left", "action": "left", "label": "<", "pos": Vector2(0, 0), "size": BUTTON_SIZE},
-	{"name": "Right", "action": "right", "label": ">", "pos": Vector2(108, 0), "size": BUTTON_SIZE},
-	{"name": "Down", "action": "crouch", "label": "v", "pos": Vector2(54, 42), "size": BUTTON_SIZE},
-	{"name": "Jump", "action": "jump", "label": "A", "pos": Vector2(54, 0), "size": BUTTON_SIZE},
-	{"name": "Attack", "action": "attack", "label": "X", "pos": Vector2(0, 54), "size": BUTTON_SIZE},
-	{"name": "Dash", "action": "dash", "label": "B", "pos": Vector2(108, 54), "size": BUTTON_SIZE},
-	{"name": "HudMenu", "action": "hud_menu", "label": "Y", "pos": Vector2(54, 108), "size": BUTTON_SIZE},
-	{"name": "Normal", "action": "normal", "label": "N", "pos": Vector2(0, -44), "size": SMALL_BUTTON_SIZE},
-	{"name": "Bubble", "action": "forma1", "label": "BOL", "pos": Vector2(46, -44), "size": SMALL_BUTTON_SIZE},
-	{"name": "Super", "action": "forma2", "label": "SUP", "pos": Vector2(92, -44), "size": SMALL_BUTTON_SIZE},
+	{"name": "Pause", "action": "pause_menu", "label": "PAUSE", "group": "top_right", "pos": Vector2(0, 0), "size": PAUSE_BUTTON_SIZE},
+	{"name": "Left", "action": "left", "label": "<", "group": "left_pad", "pos": Vector2(0, 0), "size": BUTTON_SIZE},
+	{"name": "Right", "action": "right", "label": ">", "group": "left_pad", "pos": Vector2(108, 0), "size": BUTTON_SIZE},
+	{"name": "Down", "action": "crouch", "label": "v", "group": "left_pad", "pos": Vector2(54, 42), "size": BUTTON_SIZE},
+	{"name": "Jump", "action": "jump", "label": "A", "group": "right_pad", "pos": Vector2(54, 0), "size": BUTTON_SIZE},
+	{"name": "Attack", "action": "attack", "label": "X", "group": "right_pad", "pos": Vector2(0, 54), "size": BUTTON_SIZE},
+	{"name": "Dash", "action": "dash", "label": "B", "group": "right_pad", "pos": Vector2(108, 54), "size": BUTTON_SIZE},
+	{"name": "HudMenu", "action": "hud_menu", "label": "Y", "group": "right_pad", "pos": Vector2(54, 108), "size": BUTTON_SIZE},
+	{"name": "PowerUp", "action": "hud_select_up", "label": "^", "group": "left_pad", "pos": Vector2(58, -90), "size": SMALL_BUTTON_SIZE},
+	{"name": "PowerLeft", "action": "hud_select_left", "label": "<", "group": "left_pad", "pos": Vector2(18, -50), "size": SMALL_BUTTON_SIZE},
+	{"name": "PowerRight", "action": "hud_select_right", "label": ">", "group": "left_pad", "pos": Vector2(98, -50), "size": SMALL_BUTTON_SIZE},
+	{"name": "PowerDown", "action": "hud_select_down", "label": "v", "group": "left_pad", "pos": Vector2(58, -10), "size": SMALL_BUTTON_SIZE},
+	{"name": "Normal", "action": "normal", "label": "N", "group": "right_pad", "pos": Vector2(0, -44), "size": SMALL_BUTTON_SIZE},
+	{"name": "Bubble", "action": "forma1", "label": "BOL", "group": "right_pad", "pos": Vector2(46, -44), "size": SMALL_BUTTON_SIZE},
+	{"name": "Super", "action": "forma2", "label": "SUP", "group": "right_pad", "pos": Vector2(92, -44), "size": SMALL_BUTTON_SIZE},
 ]
 
 var button_nodes: Dictionary = {}
@@ -65,6 +71,7 @@ func _update_layout() -> void:
 		viewport_size.x - EDGE_PADDING - BUTTON_SIZE.x * 3.0 - BUTTON_GAP * 2.0,
 		viewport_size.y - BOTTOM_PADDING - BUTTON_SIZE.y * 3.0 - BUTTON_GAP * 2.0
 	)
+	var top_right_base := Vector2(viewport_size.x - EDGE_PADDING - PAUSE_BUTTON_SIZE.x, EDGE_PADDING)
 
 	for item in controls:
 		var button_name: String = item["name"]
@@ -74,7 +81,13 @@ func _update_layout() -> void:
 			continue
 
 		var size: Vector2 = item["size"]
-		var base := left_base if button_name in ["Left", "Right", "Down"] else right_base
+		var group: String = item["group"]
+		var base := left_base
+		match group:
+			"right_pad":
+				base = right_base
+			"top_right":
+				base = top_right_base
 		var position: Vector2 = base + item["pos"]
 		button.position = position
 
