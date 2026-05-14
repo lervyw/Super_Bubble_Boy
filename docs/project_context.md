@@ -159,21 +159,18 @@ Recent history before new work:
 
 ## Android / Mobile Controls
 
-- `res://Cenas/mobile_root.tscn` is now the project main scene. It hosts the current game scene inside a centered `420x280` `SubViewport` and leaves the real fullscreen viewport available for mobile controls.
-- `scripts/GameManager.gd` routes scene changes through the active `game_scene_host` when the mobile root is present.
 - `scripts/level_1.gd` can create `scripts/mobile_controls.gd` at runtime through the `Mobile Controls` export group
 - The overlay appears automatically on Android/iOS/touchscreen devices when `mobile_controls_enabled` is true
 - `mobile_controls_show_on_desktop` can be enabled in the Inspector to test the touch overlay on desktop
 - The mobile layout uses a left virtual touch wheel for movement/crouch and right thumb buttons for jump, attack, dash, power menu, and Normal/Bubble/Super transforms
 - When the power menu is held open, the same touch wheel switches from movement to HUD-wheel direction selection and does not move the player until the power menu closes
 - The mobile overlay also exposes `PAUSE`
-- The root mobile overlay is only shown for gameplay scenes, so title/cutscene/continue screens keep their normal presentation inside the centered game frame.
 
 ## Display Settings
 
 - Internal pixel-art viewport remains `420x280`
 - The game window opens at `1260x840`, an integer 3x scale
-- Stretch mode is `canvas_items` with aspect `expand` for the outer root; the playable game frame itself is preserved by the centered `SubViewport`.
+- Stretch mode is `canvas_items` with aspect `expand`, so widescreen/mobile displays fill the screen without distorting the pixel-art viewport
 
 ## Camera Framing
 
