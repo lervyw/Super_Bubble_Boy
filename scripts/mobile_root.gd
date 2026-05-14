@@ -1,8 +1,6 @@
 extends Control
 
 const BASE_GAME_SIZE := Vector2i(420, 280)
-const RENDER_SCALE := 2
-const RENDER_GAME_SIZE := BASE_GAME_SIZE * RENDER_SCALE
 const INITIAL_SCENE_PATH := "res://Cenas/Title.tscn"
 const MOBILE_CONTROLS_SCRIPT := preload("res://scripts/mobile_controls.gd")
 const GAMEPLAY_SCENE_PATHS := ["res://Cenas/level1.tscn", "res://Cenas/level2.tscn"]
@@ -46,8 +44,7 @@ func change_game_scene(scene_path: String) -> void:
 
 
 func _setup_viewport() -> void:
-	game_viewport.size = RENDER_GAME_SIZE
-	game_viewport.canvas_transform = Transform2D.IDENTITY.scaled(Vector2.ONE * float(RENDER_SCALE))
+	game_viewport.size = BASE_GAME_SIZE
 	game_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	game_viewport.handle_input_locally = true
 	game_container.stretch = true

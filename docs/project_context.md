@@ -160,7 +160,6 @@ Recent history before new work:
 ## Android / Mobile Controls
 
 - `res://Cenas/mobile_root.tscn` is now the project main scene. It hosts the current game scene inside a centered `420x280` `SubViewport` and leaves the real fullscreen viewport available for mobile controls.
-- The mobile wrapper renders at `840x560` using a 2x canvas transform, so the game keeps the same logical `420x280` framing but is upscaled less aggressively on phones.
 - `scripts/GameManager.gd` routes scene changes through the active `game_scene_host` when the mobile root is present.
 - `scripts/level_1.gd` can create `scripts/mobile_controls.gd` at runtime through the `Mobile Controls` export group
 - The overlay appears automatically on Android/iOS/touchscreen devices when `mobile_controls_enabled` is true
