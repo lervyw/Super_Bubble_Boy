@@ -71,7 +71,7 @@ func _on_body_entered(body: Node2D) -> void:
 func _try_hit(node: Node) -> void:
 	var target := _resolve_target(node)
 	if target and target.has_method("take_damage"):
-		target.take_damage(damage, self)
+		target.take_damage(damage)
 		queue_free()
 
 
