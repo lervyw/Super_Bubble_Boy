@@ -2,6 +2,12 @@
 
 ## 2026-05-16
 
+### Slime attack range, aquatic recovery, and gamepad menus
+
+- Reduced slime attack trigger ranges so normal, aquatic, and flying slimes move closer before biting.
+- Added optional out-of-water flop behavior for swimming slimes so aquatic enemies fall and can try to move back toward the last water area.
+- Added runtime controller UI mappings and initial focus for the title and pause menus so Xbox/PS4 D-pad/left stick and face buttons can navigate/confirm.
+
 ### Aquatic slime swimming
 
 - Added a `SWIM` movement mode to `scripts/slime.gd` with pulsed swimming, drag, vertical follow, and zig-zag motion for aquatic enemies.

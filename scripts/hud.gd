@@ -24,6 +24,7 @@ extends CanvasLayer
 const PASSIVE_ICON_ORBIT := preload("res://sprites/assets/bolha_guardian1.png")
 const PASSIVE_ICON_STOMP := preload("res://sprites/assets/bolha_ressonante.png")
 const PASSIVE_ICON_RUN := preload("res://sprites/assets/Corrida.png")
+const UI_JOYPAD_DEADZONE: float = 0.5
 
 var boss_target: Node = null
 var pause_menu_open: bool = false
@@ -32,6 +33,7 @@ var warning_tween: Tween
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_ensure_controller_ui_actions()
 
 	if menu_panel:
 		menu_panel.visible = true
@@ -84,6 +86,10 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause_menu"):
 		toggle_pause_menu()
+		get_viewport().set_input_as_handled()
+		return
+	if pause_menu_open and event.is_action_pressed("ui_cancel"):
+		close_pause_menu()
 		get_viewport().set_input_as_handled()
 
 
@@ -385,6 +391,7 @@ func open_pause_menu() -> void:
 
 	if pause_menu_panel:
 		pause_menu_panel.visible = true
+		_grab_focus_deferred(resume_button)
 
 	if passive_toggle and player and "passive_attack_enabled" in player:
 		passive_toggle.set_pressed_no_signal(player.passive_attack_enabled)
@@ -402,6 +409,65 @@ func close_pause_menu() -> void:
 		pause_menu_panel.visible = false
 
 	get_tree().paused = false
+
+
+func _grab_focus_deferred(control: Control) -> void:
+	if not control:
+		return
+	control.call_deferred("grab_focus")
+
+
+func _ensure_controller_ui_actions() -> void:
+	_ensure_action("ui_accept")
+	_ensure_action("ui_select")
+	_ensure_action("ui_cancel")
+	_ensure_action("ui_up")
+	_ensure_action("ui_down")
+	_ensure_action("ui_left")
+	_ensure_action("ui_right")
+	_ensure_action("pause_menu")
+
+	_add_joy_button_once("ui_accept", 0)
+	_add_joy_button_once("ui_select", 0)
+	_add_joy_button_once("ui_cancel", 1)
+	_add_joy_button_once("ui_up", 11)
+	_add_joy_button_once("ui_down", 12)
+	_add_joy_button_once("ui_left", 13)
+	_add_joy_button_once("ui_right", 14)
+	_add_joy_button_once("pause_menu", 6)
+
+	_add_joy_axis_once("ui_left", 0, -1.0)
+	_add_joy_axis_once("ui_right", 0, 1.0)
+	_add_joy_axis_once("ui_up", 1, -1.0)
+	_add_joy_axis_once("ui_down", 1, 1.0)
+
+
+func _ensure_action(action_name: StringName) -> void:
+	if not InputMap.has_action(action_name):
+		InputMap.add_action(action_name, UI_JOYPAD_DEADZONE)
+
+
+func _add_joy_button_once(action_name: StringName, button_index: int) -> void:
+	for event in InputMap.action_get_events(action_name):
+		if event is InputEventJoypadButton and event.button_index == button_index:
+			return
+
+	var joy_event := InputEventJoypadButton.new()
+	joy_event.device = -1
+	joy_event.button_index = button_index
+	InputMap.action_add_event(action_name, joy_event)
+
+
+func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -> void:
+	for event in InputMap.action_get_events(action_name):
+		if event is InputEventJoypadMotion and event.axis == axis and sign(event.axis_value) == sign(axis_value):
+			return
+
+	var joy_event := InputEventJoypadMotion.new()
+	joy_event.device = -1
+	joy_event.axis = axis
+	joy_event.axis_value = axis_value
+	InputMap.action_add_event(action_name, joy_event)
 
 
 func _on_passive_toggle_toggled(enabled: bool) -> void:

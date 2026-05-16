@@ -30,6 +30,7 @@ const MENU_IDLE_LOOP_FPS: float = 8.0
 const JOYPAD_AXIS_REBIND_THRESHOLD: float = 0.55
 const JOYPAD_TRIGGER_REBIND_THRESHOLD: float = 0.20
 const JOYPAD_TRIGGER_AXES: Array[int] = [4, 5]
+const UI_JOYPAD_DEADZONE: float = 0.5
 
 
 # ================================
@@ -100,6 +101,8 @@ var forbidden_keys: Array[int] = [
 #             READY
 # ================================
 func _ready():
+	_ensure_controller_ui_actions()
+
 	# Estado inicial: mostra o menu principal e esconde as outras telas
 	menu.visible = false
 	config_menu.visible = false
@@ -180,6 +183,7 @@ func _play_startup_intro() -> void:
 
 	intro_running = false
 	menu.visible = true
+	_grab_focus_deferred(btn_iniciar)
 	_loop_menu_idle_animation()
 
 
@@ -301,6 +305,7 @@ func _open_config_menu():
 	menu.visible = false
 	config_menu.visible = true
 	botoes_menu.visible = false
+	_grab_focus_deferred(btn_cfg_botoes)
 
 func _back_to_menu():
 	if intro_running:
@@ -309,6 +314,7 @@ func _back_to_menu():
 	menu.visible = true
 	config_menu.visible = false
 	botoes_menu.visible = false
+	_grab_focus_deferred(btn_iniciar)
 
 func _open_botoes_menu():
 	if intro_running:
@@ -317,6 +323,7 @@ func _open_botoes_menu():
 	menu.visible = false
 	config_menu.visible = false
 	botoes_menu.visible = true
+	_grab_focus_deferred(btn_pulo)
 
 func _back_to_config_menu():
 	if intro_running:
@@ -325,6 +332,64 @@ func _back_to_config_menu():
 	menu.visible = false
 	config_menu.visible = true
 	botoes_menu.visible = false
+	_grab_focus_deferred(btn_cfg_botoes)
+
+
+func _grab_focus_deferred(control: Control) -> void:
+	if not control:
+		return
+	control.call_deferred("grab_focus")
+
+
+func _ensure_controller_ui_actions() -> void:
+	_ensure_action("ui_accept")
+	_ensure_action("ui_select")
+	_ensure_action("ui_cancel")
+	_ensure_action("ui_up")
+	_ensure_action("ui_down")
+	_ensure_action("ui_left")
+	_ensure_action("ui_right")
+
+	_add_joy_button_once("ui_accept", 0)
+	_add_joy_button_once("ui_select", 0)
+	_add_joy_button_once("ui_cancel", 1)
+	_add_joy_button_once("ui_up", 11)
+	_add_joy_button_once("ui_down", 12)
+	_add_joy_button_once("ui_left", 13)
+	_add_joy_button_once("ui_right", 14)
+
+	_add_joy_axis_once("ui_left", 0, -1.0)
+	_add_joy_axis_once("ui_right", 0, 1.0)
+	_add_joy_axis_once("ui_up", 1, -1.0)
+	_add_joy_axis_once("ui_down", 1, 1.0)
+
+
+func _ensure_action(action_name: StringName) -> void:
+	if not InputMap.has_action(action_name):
+		InputMap.add_action(action_name, UI_JOYPAD_DEADZONE)
+
+
+func _add_joy_button_once(action_name: StringName, button_index: int) -> void:
+	for event in InputMap.action_get_events(action_name):
+		if event is InputEventJoypadButton and event.button_index == button_index:
+			return
+
+	var joy_event := InputEventJoypadButton.new()
+	joy_event.device = -1
+	joy_event.button_index = button_index
+	InputMap.action_add_event(action_name, joy_event)
+
+
+func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -> void:
+	for event in InputMap.action_get_events(action_name):
+		if event is InputEventJoypadMotion and event.axis == axis and sign(event.axis_value) == sign(axis_value):
+			return
+
+	var joy_event := InputEventJoypadMotion.new()
+	joy_event.device = -1
+	joy_event.axis = axis
+	joy_event.axis_value = axis_value
+	InputMap.action_add_event(action_name, joy_event)
 
 
 # ================================

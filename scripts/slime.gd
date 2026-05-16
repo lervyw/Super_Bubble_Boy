@@ -31,6 +31,11 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 @export var swim_zigzag_frequency: float = 5.0
 @export var swim_zigzag_vertical_bias: float = 0.65
 @export var swim_vertical_follow_strength: float = 0.55
+@export var swim_flop_to_water_enabled: bool = true
+@export var swim_flop_interval: float = 0.55
+@export var swim_flop_horizontal_strength: float = 85.0
+@export var swim_flop_vertical_strength: float = 150.0
+@export var swim_out_of_water_gravity_multiplier: float = 1.0
 
 @export_group("Water")
 @export_range(0.05, 1.0, 0.05) var water_speed_multiplier: float = 0.55
@@ -48,7 +53,7 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 @export_group("Attack")
 @export var attack_mode: AttackMode = AttackMode.HITBOX
 @export var damage: int = 1
-@export var attack_range: float = 48.0
+@export var attack_range: float = 24.0
 @export var hitbox_active_time: float = 0.10
 @export var attack_cooldown: float = 0.85
 @export_range(0.0, 5.0, 0.05) var hit_reaction_time: float = 1.0
@@ -93,8 +98,11 @@ var facing_dir: int = -1
 var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 var fly_time: float = 0.0
 var swim_impulse_t: float = 0.0
+var swim_flop_t: float = 0.0
 var in_water: bool = false
 var water_zone_overlap_count: int = 0
+var last_water_position: Vector2 = Vector2.ZERO
+var has_last_water_position: bool = false
 
 
 func _ready():
@@ -131,10 +139,15 @@ func _physics_process(delta):
 		jump_t -= delta
 	if swim_impulse_t > 0:
 		swim_impulse_t -= delta
+	if swim_flop_t > 0:
+		swim_flop_t -= delta
 	fly_time += delta
 
 	if move_mode == MoveMode.SWIM:
-		apply_swim_drag(delta)
+		if in_water:
+			apply_swim_drag(delta)
+		else:
+			process_swim_out_of_water(delta)
 	elif move_mode != MoveMode.FLY and not is_on_floor():
 		velocity.y += gravity * get_water_gravity_multiplier() * delta
 	elif move_mode == MoveMode.FLY:
@@ -222,6 +235,8 @@ func move_flying_towards_player(dir: int) -> void:
 
 
 func move_swimming_towards_player(dir: int) -> void:
+	if not in_water:
+		return
 	if swim_impulse_t > 0:
 		return
 
@@ -245,14 +260,51 @@ func apply_swim_drag(delta: float) -> void:
 	velocity = velocity.move_toward(Vector2.ZERO, swim_drag * 100.0 * delta)
 
 
-func enter_water_zone(_water: Node = null) -> void:
+func process_swim_out_of_water(delta: float) -> void:
+	velocity.y += gravity * swim_out_of_water_gravity_multiplier * delta
+
+	if not swim_flop_to_water_enabled:
+		return
+
+	if swim_flop_t > 0:
+		return
+
+	var horizontal_dir := facing_dir
+	if has_last_water_position:
+		var delta_to_water: float = last_water_position.x - global_position.x
+		if absf(delta_to_water) > turn_horizontal_threshold:
+			horizontal_dir = int(sign(delta_to_water))
+	elif is_instance_valid(player):
+		var delta_to_player: float = player.global_position.x - global_position.x
+		if absf(delta_to_player) > turn_horizontal_threshold:
+			horizontal_dir = int(sign(delta_to_player))
+
+	if horizontal_dir != 0:
+		facing_dir = horizontal_dir
+		update_sprite_direction(horizontal_dir)
+		velocity.x = horizontal_dir * swim_flop_horizontal_strength
+
+	if is_on_floor():
+		velocity.y = -swim_flop_vertical_strength
+
+	swim_flop_t = swim_flop_interval
+
+
+func enter_water_zone(water: Node = null) -> void:
 	water_zone_overlap_count += 1
 	in_water = true
+	if water is Node2D:
+		last_water_position = water.global_position
+		has_last_water_position = true
+	swim_flop_t = 0.0
 
 
-func exit_water_zone(_water: Node = null) -> void:
+func exit_water_zone(water: Node = null) -> void:
 	water_zone_overlap_count = max(water_zone_overlap_count - 1, 0)
 	in_water = water_zone_overlap_count > 0
+	if water is Node2D:
+		last_water_position = water.global_position
+		has_last_water_position = true
 
 
 func get_water_speed_multiplier() -> float:
