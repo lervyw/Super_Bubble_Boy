@@ -2,6 +2,10 @@
 
 ## 2026-05-16
 
+### Boss chase pressure
+
+- Added a projectile chase distance so the boss keeps pursuing the player instead of stopping to shoot at every projectile-range opportunity.
+
 ### More aggressive boss AI
 
 - Added a separate boss projectile attack range so the boss can use `attack2` before reaching melee range.

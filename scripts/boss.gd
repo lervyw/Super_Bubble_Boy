@@ -43,6 +43,7 @@ var health: int = max_health
 @export_range(0.0, 1.0, 0.05) var projectile_attack_chance: float = 0.35
 @export var projectile_attack_range: float = 240.0
 @export var projectile_min_range: float = 42.0
+@export var projectile_chase_distance: float = 150.0
 @export var projectile_attack_animation: StringName = &"attack2"
 @export_range(0, 99, 1) var projectile_attack_fire_frame: int = 6
 @export var projectile_mouth_offset: Vector2 = Vector2(38.0, -27.0)
@@ -233,6 +234,7 @@ func can_use_projectile_attack(dist: float) -> bool:
 	return projectile_attack_scene != null \
 		and has_animation(projectile_attack_animation) \
 		and dist <= projectile_attack_range \
+		and dist >= projectile_chase_distance \
 		and dist >= projectile_min_range
 
 
