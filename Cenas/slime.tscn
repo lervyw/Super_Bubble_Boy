@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://orok10r1p86e"]
+[gd_scene load_steps=33 format=3 uid="uid://orok10r1p86e"]
 
 [ext_resource type="Script" uid="uid://ckovbwcre5vgq" path="res://scripts/slime.gd" id="1_4p1wq"]
 [ext_resource type="Texture2D" uid="uid://defe4ik31ltgk" path="res://sprites/characters/slime.png" id="2_2w4kv"]
@@ -30,7 +30,7 @@ region = Rect2(259, 0, 32, 31)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_s17gf"]
 atlas = ExtResource("2_t887w")
-region = Rect2(291, 0, 32, 31)
+region = Rect2(290, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8djdq"]
 atlas = ExtResource("2_2w4kv")
@@ -95,6 +95,10 @@ region = Rect2(36, 0, 32, 31)
 [sub_resource type="AtlasTexture" id="AtlasTexture_rho4d"]
 atlas = ExtResource("2_t887w")
 region = Rect2(4, 0, 32, 31)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wrqlr"]
+atlas = ExtResource("2_t887w")
+region = Rect2(288, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_7ftlq"]
 animations = [{
@@ -206,6 +210,9 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_rho4d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wrqlr")
 }],
 "loop": false,
 "name": &"default1",
@@ -281,7 +288,7 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_m7g7x"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2w4kv"]
-size = Vector2(19, 21)
+size = Vector2(25, 21)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack_receiver"]
 size = Vector2(26, 18)
@@ -301,9 +308,9 @@ metadata/_edit_vertical_guides_ = [-11.0]
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(3, -4)
 sprite_frames = SubResource("SpriteFrames_7ftlq")
-animation = &"walk"
-frame = 5
-frame_progress = 0.35248095
+animation = &"attack"
+frame = 6
+frame_progress = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["slime"]]
 shape = SubResource("CircleShape2D_m7g7x")
@@ -311,7 +318,7 @@ shape = SubResource("CircleShape2D_m7g7x")
 [node name="AttackHitbox" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
-position = Vector2(-3.5, -0.5)
+position = Vector2(-6.5, -0.5)
 shape = SubResource("RectangleShape2D_2w4kv")
 
 [node name="AttackReceiver" type="Area2D" parent="."]
