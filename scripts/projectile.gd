@@ -11,6 +11,7 @@ const PROJECTILE_DIRECT_DAMAGE_META := &"projectile_direct_damage"
 @export var vertical_wave_amplitude: float = 0.0
 @export var vertical_wave_speed: float = 7.0
 @export var is_player_projectile: bool = false
+@export var sprite_faces_left: bool = false
 @export var attack_id: StringName = &"projectile"
 @export var hit_groups: Array[StringName] = []
 @export var hurtbox_groups: Array[StringName] = []
@@ -36,7 +37,7 @@ func _ready() -> void:
 
 	var sprite := get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 	if sprite:
-		sprite.flip_h = direction.x < 0.0
+		sprite.flip_h = direction.x > 0.0 if sprite_faces_left else direction.x < 0.0
 		sprite.play()
 
 

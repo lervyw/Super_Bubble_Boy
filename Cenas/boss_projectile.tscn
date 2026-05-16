@@ -26,6 +26,7 @@ script = ExtResource("1_projectile")
 speed = 150.0
 max_distance = 300.0
 damage = 2
+sprite_faces_left = true
 attack_id = &"boss_projectile"
 hit_groups = Array[StringName]([&"jogador"])
 hurtbox_groups = Array[StringName]([&"player_hurtbox"])
