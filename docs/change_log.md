@@ -2,6 +2,11 @@
 
 ## 2026-05-16
 
+### Pause menu art layout
+
+- Rebuilt the pause menu layout around the new 420x280 `sprites/assets/pause_menu/pause1.png` frame.
+- Repositioned pause actions and passive controls into the drawn panel slots and restyled the controls to sit over the pixel-art menu.
+
 ### Controller scroll in title controls menu
 
 - Made the title controls ScrollContainer follow focused buttons so D-pad/left-stick navigation scrolls down to hidden remap options.

@@ -45,7 +45,7 @@ func _ready() -> void:
 		apply_pause_menu_aero_style()
 	if passive_toggle:
 		passive_toggle.process_mode = Node.PROCESS_MODE_ALWAYS
-		passive_toggle.visible = false
+		passive_toggle.visible = true
 		if not passive_toggle.toggled.is_connected(_on_passive_toggle_toggled):
 			passive_toggle.toggled.connect(_on_passive_toggle_toggled)
 	if passive_selector:
@@ -526,38 +526,27 @@ func get_passive_icon(power_index: int) -> Texture2D:
 
 
 func apply_pause_menu_aero_style() -> void:
-	var glass_panel: Panel = null
-	if pause_menu_panel:
-		glass_panel = pause_menu_panel.get_node_or_null("FrostPanel") as Panel
-	if glass_panel:
-		var panel_style := StyleBoxFlat.new()
-		panel_style.bg_color = Color(0.44, 0.78, 1.0, 0.30)
-		panel_style.border_color = Color(0.86, 0.98, 1.0, 0.78)
-		panel_style.set_border_width_all(2)
-		panel_style.set_corner_radius_all(16)
-		panel_style.shadow_color = Color(0.02, 0.22, 0.45, 0.30)
-		panel_style.shadow_size = 18
-		glass_panel.add_theme_stylebox_override("panel", panel_style)
-
-	for button in [resume_button, main_menu_button, quit_button, passive_selector]:
+	for button in [resume_button, main_menu_button, quit_button, passive_selector, passive_toggle]:
 		if button:
 			var normal_style := StyleBoxFlat.new()
-			normal_style.bg_color = Color(0.65, 0.90, 1.0, 0.45)
-			normal_style.border_color = Color(0.92, 1.0, 1.0, 0.85)
+			normal_style.bg_color = Color(0.05, 0.35, 0.40, 0.35)
+			normal_style.border_color = Color(0.70, 1.0, 1.0, 0.55)
 			normal_style.set_border_width_all(1)
-			normal_style.set_corner_radius_all(10)
+			normal_style.set_corner_radius_all(2)
 			button.add_theme_stylebox_override("normal", normal_style)
 
 			var hover_style := normal_style.duplicate() as StyleBoxFlat
-			hover_style.bg_color = Color(0.82, 0.97, 1.0, 0.68)
+			hover_style.bg_color = Color(0.70, 1.0, 1.0, 0.28)
 			button.add_theme_stylebox_override("hover", hover_style)
 
 			var pressed_style := normal_style.duplicate() as StyleBoxFlat
-			pressed_style.bg_color = Color(0.35, 0.75, 1.0, 0.62)
+			pressed_style.bg_color = Color(0.95, 1.0, 1.0, 0.40)
 			button.add_theme_stylebox_override("pressed", pressed_style)
+			button.add_theme_stylebox_override("focus", hover_style)
 
-			button.add_theme_color_override("font_color", Color(0.02, 0.19, 0.34, 1.0))
-			button.add_theme_color_override("font_hover_color", Color(0.0, 0.28, 0.52, 1.0))
+			button.add_theme_color_override("font_color", Color(0.94, 1.0, 1.0, 1.0))
+			button.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0, 1.0))
+			button.add_theme_color_override("font_focus_color", Color(1.0, 1.0, 1.0, 1.0))
 
 
 func _on_main_menu_pressed() -> void:

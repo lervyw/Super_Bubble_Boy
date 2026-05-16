@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://4v1mv6nx587x"]
+[gd_scene load_steps=27 format=3 uid="uid://4v1mv6nx587x"]
 
 [ext_resource type="Script" uid="uid://c73t1ba5irapk" path="res://scripts/hud.gd" id="1_uow6a"]
 [ext_resource type="Texture2D" uid="uid://p2sjqryksujc" path="res://sprites/assets/hud/vida2.png" id="2_ftv5m"]
@@ -24,6 +24,7 @@
 [ext_resource type="Texture2D" uid="uid://chfnxeemn25rc" path="res://sprites/assets/tempo_bolhoso2.png" id="23_o7n0q"]
 [ext_resource type="Texture2D" uid="uid://dqgnm8xab67a7" path="res://sprites/assets/power_wheel/hud poderes5.png" id="23_panel_frame5"]
 [ext_resource type="Texture2D" uid="uid://ctoamifsknvhu" path="res://sprites/assets/icone-ult.png" id="24_ult_icon"]
+[ext_resource type="Texture2D" uid="uid://lcn6rpxarlr0" path="res://sprites/assets/pause_menu/pause1.png" id="25_pause_frame"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_power_panel"]
 
@@ -228,6 +229,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_power_panel")
 
 [node name="FrostOverlay" type="ColorRect" parent="PauseMenu"]
 layout_mode = 1
@@ -236,66 +238,95 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.62, 0.88, 1, 0.18)
+color = Color(0.0, 0.08, 0.12, 0.32)
 
-[node name="FrostPanel" type="Panel" parent="PauseMenu"]
+[node name="PauseFrame" type="TextureRect" parent="PauseMenu"]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -128.0
-offset_top = -126.0
-offset_right = 128.0
-offset_bottom = 126.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("25_pause_frame")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenu"]
+[node name="VBoxContainer" type="Control" parent="PauseMenu"]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -108.0
-offset_top = -112.0
-offset_right = 108.0
-offset_bottom = 112.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 
 [node name="Title" type="Label" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+visible = false
+layout_mode = 0
+offset_left = 149.0
+offset_top = 28.0
+offset_right = 271.0
+offset_bottom = 48.0
 text = "Menu"
 horizontal_alignment = 1
 
 [node name="PassiveToggle" type="CheckButton" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
-text = "Passiva"
+layout_mode = 0
+offset_left = 90.0
+offset_top = 174.0
+offset_right = 187.0
+offset_bottom = 194.0
+theme_override_font_sizes/font_size = 8
+text = "Passiva ligada"
 
 [node name="PassiveLabel" type="Label" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+visible = false
+layout_mode = 0
+offset_left = 206.0
+offset_top = 126.0
+offset_right = 302.0
+offset_bottom = 137.0
+theme_override_font_sizes/font_size = 8
 text = "Poder passivo"
 horizontal_alignment = 1
 
 [node name="PassiveSelector" type="OptionButton" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+layout_mode = 0
+offset_left = 205.0
+offset_top = 139.0
+offset_right = 301.0
+offset_bottom = 161.0
+theme_override_font_sizes/font_size = 8
 
 [node name="ResumeButton" type="Button" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+layout_mode = 0
+offset_left = 90.0
+offset_top = 84.0
+offset_right = 188.0
+offset_bottom = 104.0
+theme_override_font_sizes/font_size = 8
 text = "Continuar"
 
 [node name="MainMenuButton" type="Button" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+layout_mode = 0
+offset_left = 90.0
+offset_top = 108.0
+offset_right = 188.0
+offset_bottom = 128.0
+theme_override_font_sizes/font_size = 8
 text = "Menu principal"
 
 [node name="QuitButton" type="Button" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+layout_mode = 0
+offset_left = 90.0
+offset_top = 132.0
+offset_right = 188.0
+offset_bottom = 152.0
+theme_override_font_sizes/font_size = 8
 text = "Sair do jogo"
 
 [node name="Hint" type="Label" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
-text = "TAB para voltar"
+layout_mode = 0
+offset_left = 205.0
+offset_top = 198.0
+offset_right = 301.0
+offset_bottom = 214.0
+theme_override_font_sizes/font_size = 8
+text = "B/TAB volta"
 horizontal_alignment = 1
