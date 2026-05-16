@@ -2,6 +2,13 @@
 
 ## 2026-05-16
 
+### Level 1 biome spawn areas
+
+- Wired `Area_Terra`, `Area_Agua`, and `Area_Ceu` in `Cenas/level1.tscn` as spawn zones for normal, aquatic, and flying slimes.
+- Updated `scripts/SpawnZone.gd` so spawn areas act only as region markers and no longer collide/detect the player unless `spawn_on_enter` is enabled.
+- Added world-collision validation for spawn positions so enemies are not placed inside tile collisions or cramped solid spaces.
+- Added floor snapping for non-flying enemies so ground/aquatic slimes spawn on valid tile surfaces inside their spawn region.
+
 ### Slime hit reaction animation
 
 - Updated `scripts/slime.gd` so all slime enemies play `got_hit` when they take non-fatal player damage.
