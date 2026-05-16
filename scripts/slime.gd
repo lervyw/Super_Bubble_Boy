@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 const ATTACK_META_DAMAGE := &"attack_damage"
 
-enum MoveMode { WALK, JUMP, FLY }
+enum MoveMode { WALK, JUMP, FLY, SWIM }
 enum AttackMode { CONTACT, HITBOX }
 enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 
@@ -21,6 +21,16 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 @export var fly_vertical_follow: bool = true
 @export var fly_zigzag_amplitude: float = 70.0
 @export var fly_zigzag_frequency: float = 5.0
+
+@export_group("Swim Movement")
+@export var swim_impulse_interval: float = 0.75
+@export var swim_impulse_interval_variance: float = 0.18
+@export var swim_impulse_strength: float = 120.0
+@export var swim_vertical_impulse_strength: float = 80.0
+@export var swim_drag: float = 5.0
+@export var swim_zigzag_frequency: float = 5.0
+@export var swim_zigzag_vertical_bias: float = 0.65
+@export var swim_vertical_follow_strength: float = 0.55
 
 @export_group("Water")
 @export_range(0.05, 1.0, 0.05) var water_speed_multiplier: float = 0.55
@@ -82,6 +92,7 @@ var attack_serial: int = 0
 var facing_dir: int = -1
 var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 var fly_time: float = 0.0
+var swim_impulse_t: float = 0.0
 var in_water: bool = false
 var water_zone_overlap_count: int = 0
 
@@ -118,9 +129,13 @@ func _physics_process(delta):
 		cooldown_t -= delta
 	if jump_t > 0:
 		jump_t -= delta
+	if swim_impulse_t > 0:
+		swim_impulse_t -= delta
 	fly_time += delta
 
-	if move_mode != MoveMode.FLY and not is_on_floor():
+	if move_mode == MoveMode.SWIM:
+		apply_swim_drag(delta)
+	elif move_mode != MoveMode.FLY and not is_on_floor():
 		velocity.y += gravity * get_water_gravity_multiplier() * delta
 	elif move_mode == MoveMode.FLY:
 		velocity.y = 0
@@ -183,6 +198,8 @@ func move_towards_player(dist):
 				velocity.y = jump_force * get_water_jump_multiplier()
 		MoveMode.FLY:
 			move_flying_towards_player(dir)
+		MoveMode.SWIM:
+			move_swimming_towards_player(dir)
 
 
 func move_flying_towards_player(dir: int) -> void:
@@ -202,6 +219,30 @@ func move_flying_towards_player(dir: int) -> void:
 
 			velocity.x = horizontal_dir * get_water_speed()
 			velocity.y = sin(fly_time * fly_zigzag_frequency) * fly_zigzag_amplitude * get_water_speed_multiplier()
+
+
+func move_swimming_towards_player(dir: int) -> void:
+	if swim_impulse_t > 0:
+		return
+
+	var to_player := player.global_position - global_position
+	var horizontal_dir := dir
+	if horizontal_dir == 0:
+		horizontal_dir = facing_dir
+
+	var vertical_dir: float = sign(to_player.y) * swim_vertical_follow_strength
+	var zigzag_dir: float = sin(fly_time * swim_zigzag_frequency)
+	var final_vertical_dir: float = clampf(vertical_dir + zigzag_dir * swim_zigzag_vertical_bias, -1.0, 1.0)
+
+	velocity.x = horizontal_dir * swim_impulse_strength * get_water_speed_multiplier()
+	velocity.y = final_vertical_dir * swim_vertical_impulse_strength * get_water_speed_multiplier()
+
+	var interval_variance: float = randf_range(-swim_impulse_interval_variance, swim_impulse_interval_variance)
+	swim_impulse_t = maxf(swim_impulse_interval + interval_variance, 0.1)
+
+
+func apply_swim_drag(delta: float) -> void:
+	velocity = velocity.move_toward(Vector2.ZERO, swim_drag * 100.0 * delta)
 
 
 func enter_water_zone(_water: Node = null) -> void:

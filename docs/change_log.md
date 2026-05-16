@@ -2,6 +2,13 @@
 
 ## 2026-05-16
 
+### Aquatic slime swimming
+
+- Added a `SWIM` movement mode to `scripts/slime.gd` with pulsed swimming, drag, vertical follow, and zig-zag motion for aquatic enemies.
+- Configured `Cenas/slime_aquatico.tscn` to use the new swim movement instead of ground walking.
+- Updated `scripts/SpawnZone.gd` so swimming enemies are not snapped to floor spawn positions.
+- Set `Area_Terra`, `Area_Agua`, and `Area_Ceu` in level 1 to spawn 8 slimes each with 8 simultaneous alive slots.
+
 ### Repeated slime bite attacks
 
 - Fixed slime hitbox attack flow so a completed bite does not wait through the full attack animation a second time before resuming AI.

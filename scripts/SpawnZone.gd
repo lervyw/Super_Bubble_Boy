@@ -318,7 +318,8 @@ func should_snap_enemy_to_floor(enemy_instance: Node) -> bool:
 		return false
 	if not has_property(enemy_instance, "move_mode"):
 		return false
-	return int(enemy_instance.get("move_mode")) != 2
+	var move_mode := int(enemy_instance.get("move_mode"))
+	return move_mode != 2 and move_mode != 3
 
 func has_property(target: Object, property_name: StringName) -> bool:
 	for property in target.get_property_list():
