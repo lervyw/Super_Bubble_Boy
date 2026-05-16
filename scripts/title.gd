@@ -15,6 +15,7 @@ extends Control
 @onready var menu = $MainMenu
 @onready var config_menu = $ConfigMenu
 @onready var botoes_menu = $ControlsMenu
+@onready var controls_scroll: ScrollContainer = $ControlsMenu/ScrollContainer
 @onready var logo_intro: TextureRect = $LogoIntro
 @onready var menu_intro_background: TextureRect = $MenuIntroBackground
 
@@ -152,6 +153,7 @@ func _ready():
 
 	# Volta do menu de controles para o menu de config
 	_connect_pressed_once(btn_voltar_botoes, _back_to_config_menu)
+	_setup_controls_scroll_focus()
 
 	# Atualiza o texto dos botões com o input atual (ex: "Pulo: Space")
 	_update_control_labels()
@@ -323,6 +325,8 @@ func _open_botoes_menu():
 	menu.visible = false
 	config_menu.visible = false
 	botoes_menu.visible = true
+	if controls_scroll:
+		controls_scroll.scroll_vertical = 0
 	_grab_focus_deferred(btn_pulo)
 
 func _back_to_config_menu():
@@ -339,6 +343,61 @@ func _grab_focus_deferred(control: Control) -> void:
 	if not control:
 		return
 	control.call_deferred("grab_focus")
+	call_deferred("_scroll_focused_control_into_view", control)
+
+
+func _setup_controls_scroll_focus() -> void:
+	if controls_scroll:
+		controls_scroll.set("follow_focus", true)
+
+	var control_buttons: Array[Control] = [
+		btn_pulo,
+		btn_bolha,
+		btn_super,
+		btn_normal_form,
+		btn_menu,
+		btn_ataque,
+		btn_ataque_especial,
+		btn_defesa,
+		btn_combo1,
+		btn_combo2,
+		btn_combo3,
+		btn_combo4,
+		btn_ultimate,
+		btn_esquerda,
+		btn_direita,
+		btn_agachar,
+		btn_dash,
+		btn_pause,
+		btn_voltar_botoes,
+	]
+
+	for button in control_buttons:
+		var focus_callable := _on_control_button_focus_entered.bind(button)
+		if button and not button.focus_entered.is_connected(focus_callable):
+			button.focus_entered.connect(focus_callable)
+
+
+func _on_control_button_focus_entered(control: Control) -> void:
+	_scroll_focused_control_into_view(control)
+
+
+func _scroll_focused_control_into_view(control: Control) -> void:
+	if not controls_scroll or not control:
+		return
+	if not botoes_menu.visible:
+		return
+
+	var top := control.position.y
+	var bottom := top + control.size.y
+	var view_top := float(controls_scroll.scroll_vertical)
+	var view_bottom := view_top + controls_scroll.size.y
+	var padding := 12.0
+
+	if top < view_top + padding:
+		controls_scroll.scroll_vertical = max(int(top - padding), 0)
+	elif bottom > view_bottom - padding:
+		controls_scroll.scroll_vertical = max(int(bottom - controls_scroll.size.y + padding), 0)
 
 
 func _ensure_controller_ui_actions() -> void:

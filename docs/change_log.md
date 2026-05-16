@@ -2,6 +2,10 @@
 
 ## 2026-05-16
 
+### Controller scroll in title controls menu
+
+- Made the title controls ScrollContainer follow focused buttons so D-pad/left-stick navigation scrolls down to hidden remap options.
+
 ### Respawn enemy separation
 
 - Added a player respawn cleanup step that pushes nearby slimes/enemies away from the checkpoint before and after the player is moved.
