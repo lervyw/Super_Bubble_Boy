@@ -137,7 +137,7 @@ var hud_menu_waiting_for_neutral := false
 @export var bubble_projectile_damage: int = 2
 @export_range(0.0, 100.0, 1.0) var bubble_projectile_mana_cost: float = 12.0
 @export_range(0.1, 10.0, 0.1) var bubble_projectile_cooldown: float = 1.0
-@export var bubble_projectile_spawn_offset: Vector2 = Vector2(18.0, -12.0)
+@export var bubble_projectile_spawn_offset: Vector2 = Vector2(18.0, -6.0)
 @export var bubble_projectile_animation: StringName = &"attack_projectile"
 
 @export_group("Ultimate Attack")

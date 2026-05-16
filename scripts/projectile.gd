@@ -12,6 +12,8 @@ const PROJECTILE_DIRECT_DAMAGE_META := &"projectile_direct_damage"
 @export var vertical_wave_speed: float = 7.0
 @export var is_player_projectile: bool = false
 @export var sprite_faces_left: bool = false
+@export var projectile_group: StringName = &""
+@export var destroyed_by_projectile_groups: Array[StringName] = []
 @export var attack_id: StringName = &"projectile"
 @export var hit_groups: Array[StringName] = []
 @export var hurtbox_groups: Array[StringName] = []
@@ -23,6 +25,8 @@ var wave_time: float = 0.0
 
 func _ready() -> void:
 	start_position = global_position
+	if projectile_group != &"":
+		add_to_group(projectile_group)
 	if is_player_projectile:
 		add_to_group("player_attack")
 		set_meta(ATTACK_META_DAMAGE, damage)
@@ -70,6 +74,10 @@ func _on_body_entered(body: Node2D) -> void:
 
 
 func _try_hit(node: Node) -> void:
+	if _matches_groups(node, destroyed_by_projectile_groups):
+		queue_free()
+		return
+
 	var target := _resolve_target(node)
 	if target and target.has_method("take_damage"):
 		target.take_damage(damage)

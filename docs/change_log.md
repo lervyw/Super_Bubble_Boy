@@ -2,6 +2,11 @@
 
 ## 2026-05-16
 
+### Projectile collision and spawn tuning
+
+- Made boss projectiles despawn when colliding with player bubble projectiles.
+- Lowered the player bubble projectile spawn point slightly.
+
 ### Player projectile animation
 
 - Made the player bubble projectile action play the `attack_projectile` animation instead of the generic special attack animation.

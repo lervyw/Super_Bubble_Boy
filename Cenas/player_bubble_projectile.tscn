@@ -29,6 +29,7 @@ damage = 2
 vertical_wave_amplitude = 24.0
 vertical_wave_speed = 8.0
 is_player_projectile = true
+projectile_group = &"player_projectile"
 attack_id = &"bubble_projectile"
 hit_groups = Array[StringName]([&"enemy", &"slime", &"boss", &"stompable"])
 hurtbox_groups = Array[StringName]([&"stompable"])
