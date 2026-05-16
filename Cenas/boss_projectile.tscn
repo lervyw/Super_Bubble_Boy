@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/projectile.gd" id="1_projectile"]
+[ext_resource type="Texture2D" uid="uid://6e8sd8b4qlgm" path="res://sprites/characters/projectiles/projectile1.png" id="2_frame1"]
+[ext_resource type="Texture2D" uid="uid://c1i4kxvndighy" path="res://sprites/characters/projectiles/projectile2.png" id="3_frame2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_boss_projectile"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_frame1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_frame2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 8.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_boss_projectile"]
+radius = 12.0
+
+[node name="BossProjectile" type="Area2D"]
+script = ExtResource("1_projectile")
+speed = 150.0
+max_distance = 300.0
+damage = 2
+attack_id = &"boss_projectile"
+hit_groups = Array[StringName]([&"jogador"])
+hurtbox_groups = Array[StringName]([&"player_hurtbox"])
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_boss_projectile")
+animation = &"default"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_boss_projectile")

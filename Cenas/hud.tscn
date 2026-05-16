@@ -151,17 +151,17 @@ script = ExtResource("5_is2x6")
 state_texture = NodePath("StateTexture")
 up_button = NodePath("Ultimate")
 down_button = NodePath("Placeholder")
-left_button = NodePath("Defend")
+left_button = NodePath("BubbleProjectile")
 right_button = NodePath("Special")
 active_panel_texture = ExtResource("23_panel_frame5")
 inactive_panel_texture = ExtResource("19_016od")
 activation_frames = Array[Texture2D]([ExtResource("19_016od"), ExtResource("20_panel_active"), ExtResource("21_panel_frame3"), ExtResource("22_panel_frame4"), ExtResource("23_panel_frame5")])
 up_normal_texture = ExtResource("16_e85wo")
 up_selected_texture = ExtResource("17_civdl")
-down_normal_texture = ExtResource("18_1j8pg")
-down_selected_texture = ExtResource("19_qvn4r")
-left_normal_texture = ExtResource("20_dh4pb")
-left_selected_texture = ExtResource("21_putjb")
+down_normal_texture = ExtResource("20_dh4pb")
+down_selected_texture = ExtResource("21_putjb")
+left_normal_texture = ExtResource("18_1j8pg")
+left_selected_texture = ExtResource("19_qvn4r")
 right_normal_texture = ExtResource("22_invt5")
 right_selected_texture = ExtResource("23_o7n0q")
 disabled_texture = ExtResource("19_016od")
@@ -191,16 +191,16 @@ offset_left = 30.0
 offset_top = 64.0
 offset_right = 90.0
 offset_bottom = 135.0
-texture = ExtResource("18_1j8pg")
+texture = ExtResource("20_dh4pb")
 stretch_mode = 5
 
-[node name="Defend" type="TextureRect" parent="Panel"]
+[node name="BubbleProjectile" type="TextureRect" parent="Panel"]
 layout_mode = 0
 offset_left = -6.0
 offset_top = 34.0
 offset_right = 55.0
 offset_bottom = 97.0
-texture = ExtResource("20_dh4pb")
+texture = ExtResource("18_1j8pg")
 stretch_mode = 5
 
 [node name="Special" type="TextureRect" parent="Panel"]

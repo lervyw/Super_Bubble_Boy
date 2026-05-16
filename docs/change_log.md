@@ -2,6 +2,13 @@
 
 ## 2026-05-16
 
+### Boss and player projectiles
+
+- Added reusable projectile scenes for boss fireballs and player bubble shots using the new `sprites/characters/projectiles/` sprites.
+- Added a periodic boss `attack2` projectile attack that fires from the mouth on the seventh visual frame and despawns after traveling a fixed distance.
+- Changed the left power-wheel action from defense to a forward-floating bubble projectile that damages the first enemy it touches.
+- Swapped the power-wheel left and bottom action sprites so the square/X positions use the intended icons.
+
 ### Pause passive toggle behavior
 
 - Changed the pause menu passive toggle so it enables/disables the selected passive powers instead of the old passive attack foundation.

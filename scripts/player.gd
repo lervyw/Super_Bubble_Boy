@@ -15,7 +15,7 @@ enum State {
 
 enum Form { NORMAL, BUBBLE, SUPER }
 enum GameMode { PLATAFORMA, METROIDVANIA }
-enum HudMenuAction { NONE, ULTIMATE, PLACEHOLDER, SPECIAL_ATTACK, DEFEND }
+enum HudMenuAction { NONE, ULTIMATE, PLACEHOLDER, SPECIAL_ATTACK, BUBBLE_PROJECTILE }
 enum AttackKind { NONE, NORMAL, PASSIVE, ACTIVE_SUPER, ULTIMATE, DEFEND }
 enum PassivePower { NONE, ORBIT_BUBBLE, GROUND_STOMP, QUICK_RUN }
 
@@ -132,6 +132,13 @@ var hud_menu_waiting_for_neutral := false
 @export var active_attack_active_times: Array[float] = [0.22]
 @export var selected_active_attack_index: int = 0
 
+@export_group("Bubble Projectile")
+@export var bubble_projectile_scene: PackedScene = preload("res://Cenas/player_bubble_projectile.tscn")
+@export var bubble_projectile_damage: int = 2
+@export_range(0.0, 100.0, 1.0) var bubble_projectile_mana_cost: float = 12.0
+@export_range(0.1, 10.0, 0.1) var bubble_projectile_cooldown: float = 1.0
+@export var bubble_projectile_spawn_offset: Vector2 = Vector2(18.0, -12.0)
+
 @export_group("Ultimate Attack")
 @export var ultimate_attack_enabled: bool = true
 @export var ultimate_attack_id: StringName = &"ultimate_attack"
@@ -177,6 +184,7 @@ var is_invincible: bool = false
 var active_attack_timers: Array[float] = []
 var ultimate_cooldown_timer: float = 0.0
 var ultimate_cooldown_node: Timer
+var bubble_projectile_cooldown_timer: float = 0.0
 var current_attack_kind: AttackKind = AttackKind.NONE
 var current_attack_id: StringName = &""
 var current_attack_damage: int = 0
@@ -369,6 +377,8 @@ func update_attack_cooldowns(delta: float) -> void:
 	for i in range(active_attack_timers.size()):
 		if active_attack_timers[i] > 0.0:
 			active_attack_timers[i] = max(active_attack_timers[i] - delta, 0.0)
+	if bubble_projectile_cooldown_timer > 0.0:
+		bubble_projectile_cooldown_timer = max(bubble_projectile_cooldown_timer - delta, 0.0)
 
 	update_ultimate_cooldown_from_timer()
 
@@ -870,6 +880,43 @@ func start_defense() -> void:
 
 	defending = true
 	change_state(State.DEFEND)
+
+
+func start_bubble_projectile() -> void:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
+		return
+	if bubble_projectile_scene == null:
+		return
+	if bubble_projectile_cooldown_timer > 0.0:
+		return
+	if not can_use_mana_attacks():
+		return
+	if not consume_attack_mana(bubble_projectile_mana_cost):
+		return
+
+	defending = false
+	bubble_projectile_cooldown_timer = bubble_projectile_cooldown
+	spawn_bubble_projectile()
+	change_state(State.SPECIAL_ATTACK)
+	await get_tree().create_timer(0.18).timeout
+	if state == State.SPECIAL_ATTACK:
+		change_state(State.IDLE)
+
+
+func spawn_bubble_projectile() -> void:
+	var projectile := bubble_projectile_scene.instantiate()
+	var dir := get_facing_direction()
+	projectile.global_position = global_position + Vector2(bubble_projectile_spawn_offset.x * dir, bubble_projectile_spawn_offset.y)
+	if projectile.has_method("setup"):
+		projectile.setup(Vector2(float(dir), 0.0), bubble_projectile_damage)
+	var parent := get_tree().current_scene if get_tree().current_scene else get_parent()
+	parent.add_child(projectile)
+
+
+func get_facing_direction() -> int:
+	if has_node("Sprite2D") and $Sprite2D.flip_h:
+		return -1
+	return 1
 
 
 func stop_defense() -> void:
@@ -1434,7 +1481,7 @@ func process_hud_menu_selection() -> void:
 		if direction.x > 0.0:
 			select_hud_menu_action(HudMenuAction.SPECIAL_ATTACK)
 		else:
-			select_hud_menu_action(HudMenuAction.DEFEND)
+			select_hud_menu_action(HudMenuAction.BUBBLE_PROJECTILE)
 	else:
 		if direction.y < 0.0:
 			select_hud_menu_action(HudMenuAction.ULTIMATE)
@@ -1530,10 +1577,10 @@ func select_hud_menu_action(action: HudMenuAction) -> void:
 			if hud and hud.has_method("update_action_selection"):
 				hud.update_action_selection("attack_special")
 			execute_hud_menu_action("attack_special")
-		HudMenuAction.DEFEND:
+		HudMenuAction.BUBBLE_PROJECTILE:
 			if hud and hud.has_method("update_action_selection"):
-				hud.update_action_selection("defend")
-			execute_hud_menu_action("defend")
+				hud.update_action_selection("bubble_projectile")
+			execute_hud_menu_action("bubble_projectile")
 
 
 func execute_hud_menu_action(action_name: String) -> void:
@@ -1544,8 +1591,8 @@ func execute_hud_menu_action(action_name: String) -> void:
 			pass
 		"attack_special":
 			start_special_attack()
-		"defend":
-			start_defense()
+		"bubble_projectile":
+			start_bubble_projectile()
 
 	await get_tree().create_timer(0.45).timeout
 	if hud_menu_open and get_hud_menu_direction() == Vector2.ZERO:
@@ -1697,6 +1744,11 @@ func get_active_attack_cooldown_progress(index: int = -1) -> float:
 
 	var cooldown := maxf(get_active_attack_cooldown(index), 0.001)
 	return clampf(1.0 - (active_attack_timers[index] / cooldown), 0.0, 1.0)
+
+
+func get_bubble_projectile_cooldown_progress() -> float:
+	var cooldown := maxf(bubble_projectile_cooldown, 0.001)
+	return clampf(1.0 - (bubble_projectile_cooldown_timer / cooldown), 0.0, 1.0)
 
 
 func get_ultimate_cooldown_progress() -> float:

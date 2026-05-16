@@ -531,6 +531,9 @@ func _on_attack_receiver_area_entered(area):
 	if area == null or dying:
 		return
 
+	if area.has_meta(&"projectile_direct_damage"):
+		return
+
 	if area.is_in_group("player_attack"):
 		take_damage(get_damage_from_area(area, 1))
 

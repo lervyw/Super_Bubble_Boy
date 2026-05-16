@@ -92,7 +92,7 @@ func set_action_selection(action_name: String) -> void:
 				_highlight_button(up_button, up_selected_texture)
 		"placeholder":
 			_highlight_button(down_button, down_selected_texture)
-		"defend":
+		"bubble_projectile":
 			_highlight_button(left_button, left_selected_texture)
 		"attack_special":
 			if special_attack_enabled:
@@ -113,7 +113,7 @@ func set_ultimate_cooldown_progress(progress: float) -> void:
 	_set_button_cooldown_progress(up_button, clampf(progress, 0.0, 1.0))
 
 
-func set_defend_cooldown_progress(progress: float) -> void:
+func set_bubble_projectile_cooldown_progress(progress: float) -> void:
 	if progress < 1.0:
 		_reset_button_visual(left_button, left_normal_texture)
 	_set_button_cooldown_progress(left_button, clampf(progress, 0.0, 1.0))

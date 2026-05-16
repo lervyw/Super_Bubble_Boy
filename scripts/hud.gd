@@ -238,8 +238,8 @@ func _update_menu_panel_state() -> void:
 		menu_panel.set_ultimate_enabled(player.allow_ultimate_input and player.ultimate_attack_enabled and player.can_use_mana_attacks())
 	if menu_panel.has_method("set_special_attack_cooldown_progress") and player and player.has_method("get_active_attack_cooldown_progress"):
 		menu_panel.set_special_attack_cooldown_progress(player.get_active_attack_cooldown_progress())
-	if menu_panel.has_method("set_defend_cooldown_progress"):
-		menu_panel.set_defend_cooldown_progress(1.0)
+	if menu_panel.has_method("set_bubble_projectile_cooldown_progress") and player and player.has_method("get_bubble_projectile_cooldown_progress"):
+		menu_panel.set_bubble_projectile_cooldown_progress(player.get_bubble_projectile_cooldown_progress())
 	if menu_panel.has_method("set_placeholder_cooldown_progress"):
 		menu_panel.set_placeholder_cooldown_progress(1.0)
 

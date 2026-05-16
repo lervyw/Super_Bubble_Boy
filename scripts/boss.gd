@@ -36,6 +36,14 @@ var health: int = max_health
 @export_range(-1, 99, 1) var attack_hitbox_start_frame: int = -1
 @export_range(-1, 99, 1) var attack_hitbox_end_frame: int = -1
 
+@export_group("Projectile Attack")
+@export var projectile_attack_scene: PackedScene = preload("res://Cenas/boss_projectile.tscn")
+@export_range(0.0, 1.0, 0.05) var projectile_attack_chance: float = 0.35
+@export var projectile_attack_animation: StringName = &"attack2"
+@export_range(0, 99, 1) var projectile_attack_fire_frame: int = 6
+@export var projectile_mouth_offset: Vector2 = Vector2(38.0, -27.0)
+@export var projectile_damage: int = 2
+
 @export_group("Animations")
 @export var idle_animation: StringName = &"idle"
 @export var walk_animation: StringName = &"walk"
@@ -70,12 +78,15 @@ var hud_visible := false
 var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 var in_water: bool = false
 var water_zone_overlap_count: int = 0
+var rng := RandomNumberGenerator.new()
+var current_attack_animation: StringName = &""
 
 # =========================================================
 
 func _ready():
 	if not is_in_group("boss"):
 		add_to_group("boss")
+	rng.randomize()
 
 	health = max_health
 	player = get_tree().get_first_node_in_group(player_group)
@@ -175,6 +186,11 @@ func start_attack():
 	cooldown_t = attack_cooldown
 	velocity.x = 0
 
+	if should_use_projectile_attack():
+		await start_projectile_attack()
+		return
+
+	current_attack_animation = get_attack_anim()
 	restart_attack_animation()
 
 	if uses_frame_based_hitbox():
@@ -193,6 +209,62 @@ func start_attack():
 	await wait_for_animation(get_attack_anim())
 
 	state = State.CHASE
+	current_attack_animation = &""
+
+# =========================================================
+
+func should_use_projectile_attack() -> bool:
+	return projectile_attack_scene != null and has_animation(projectile_attack_animation) and rng.randf() <= projectile_attack_chance
+
+
+func start_projectile_attack() -> void:
+	current_attack_animation = projectile_attack_animation
+	if hitbox_shape:
+		hitbox_shape.disabled = true
+
+	if sprite:
+		sprite.play(projectile_attack_animation)
+
+	await fire_projectile_on_animation_frame(projectile_attack_animation, projectile_attack_fire_frame)
+	await wait_for_animation(projectile_attack_animation)
+
+	state = State.CHASE
+	current_attack_animation = &""
+
+
+func fire_projectile_on_animation_frame(anim: StringName, target_frame: int) -> void:
+	if not sprite or not has_animation(anim):
+		spawn_projectile()
+		return
+
+	var fired := false
+	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing():
+		if not fired and sprite.frame >= target_frame:
+			spawn_projectile()
+			fired = true
+			return
+		await get_tree().process_frame
+
+	if not fired:
+		spawn_projectile()
+
+
+func spawn_projectile() -> void:
+	if projectile_attack_scene == null:
+		return
+
+	var projectile := projectile_attack_scene.instantiate()
+	projectile.global_position = get_projectile_spawn_position()
+	var dir := Vector2(float(facing_dir), 0.0)
+	if projectile.has_method("setup"):
+		projectile.setup(dir, projectile_damage)
+	var parent := get_tree().current_scene if get_tree().current_scene else get_parent()
+	parent.add_child(projectile)
+
+
+func get_projectile_spawn_position() -> Vector2:
+	var local_offset := Vector2(absf(projectile_mouth_offset.x) * float(facing_dir), projectile_mouth_offset.y)
+	return global_position + local_offset
 
 # =========================================================
 
@@ -265,6 +337,9 @@ func _on_hurtbox_area_entered(area):
 
 func _on_attack_receiver_area_entered(area):
 	if area == null or state == State.DEAD:
+		return
+
+	if area.has_meta(&"projectile_direct_damage"):
 		return
 
 	if area.is_in_group("player_attack"):
@@ -417,11 +492,15 @@ func get_attack_anim():
 # =========================================================
 
 func play_attack_animation():
-	play_animation(get_attack_anim())
+	play_animation(get_current_attack_anim())
 
 func restart_attack_animation():
-	if has_animation(get_attack_anim()):
-		sprite.play(get_attack_anim())
+	var anim := get_current_attack_anim()
+	if has_animation(anim):
+		sprite.play(anim)
+
+func get_current_attack_anim() -> StringName:
+	return current_attack_animation if current_attack_animation != &"" else get_attack_anim()
 
 func play_animation(anim):
 	if has_animation(anim) and sprite.animation != anim:
