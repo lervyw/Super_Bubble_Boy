@@ -1,27 +1,27 @@
 extends CanvasLayer
 
-const BUTTON_SIZE := Vector2(46, 46)
-const SMALL_BUTTON_SIZE := Vector2(38, 38)
-const PAUSE_BUTTON_SIZE := Vector2(54, 30)
-const EDGE_PADDING := 18.0
-const BOTTOM_PADDING := 18.0
-const BUTTON_GAP := 8.0
-const JOYSTICK_RADIUS := 56.0
+const BUTTON_SIZE := Vector2(36, 36)
+const SMALL_BUTTON_SIZE := Vector2(30, 30)
+const PAUSE_BUTTON_SIZE := Vector2(44, 24)
+const EDGE_PADDING := 12.0
+const BOTTOM_PADDING := 12.0
+const BUTTON_GAP := 5.0
+const JOYSTICK_RADIUS := 44.0
 const JOYSTICK_DEADZONE := 0.24
-const JOYSTICK_KNOB_SIZE := Vector2(32, 32)
+const JOYSTICK_KNOB_SIZE := Vector2(24, 24)
 
 var controls: Array[Dictionary] = [
 	{"name": "Pause", "action": "pause_menu", "label": "PAUSE", "group": "top_right", "pos": Vector2(0, 0), "size": PAUSE_BUTTON_SIZE},
-	{"name": "HudMenu", "action": "hud_menu", "label": "A", "group": "right_pad", "pos": Vector2(54, 0), "size": BUTTON_SIZE},
-	{"name": "Attack", "action": "attack", "label": "X", "group": "right_pad", "pos": Vector2(0, 54), "size": BUTTON_SIZE},
-	{"name": "Dash", "action": "dash", "label": "B", "group": "right_pad", "pos": Vector2(108, 54), "size": BUTTON_SIZE},
-	{"name": "Jump", "action": "jump", "label": "Y", "group": "right_pad", "pos": Vector2(54, 108), "size": BUTTON_SIZE},
-	{"name": "Normal", "action": "normal", "label": "N", "group": "right_pad", "pos": Vector2(0, -44), "size": SMALL_BUTTON_SIZE},
-	{"name": "Bubble", "action": "forma1", "label": "BOL", "group": "right_pad", "pos": Vector2(46, -44), "size": SMALL_BUTTON_SIZE},
-	{"name": "Super", "action": "forma2", "label": "SUP", "group": "right_pad", "pos": Vector2(92, -44), "size": SMALL_BUTTON_SIZE},
+	{"name": "HudMenu", "action": "hud_menu", "label": "A", "group": "right_pad", "pos": Vector2(41, 0), "size": BUTTON_SIZE},
+	{"name": "Attack", "action": "attack", "label": "X", "group": "right_pad", "pos": Vector2(0, 41), "size": BUTTON_SIZE},
+	{"name": "Dash", "action": "dash", "label": "B", "group": "right_pad", "pos": Vector2(82, 41), "size": BUTTON_SIZE},
+	{"name": "Jump", "action": "jump", "label": "Y", "group": "right_pad", "pos": Vector2(41, 82), "size": BUTTON_SIZE},
+	{"name": "Normal", "action": "normal", "label": "N", "group": "right_pad", "pos": Vector2(6, -34), "size": SMALL_BUTTON_SIZE},
+	{"name": "Bubble", "action": "forma1", "label": "BOL", "group": "right_pad", "pos": Vector2(41, -34), "size": SMALL_BUTTON_SIZE},
+	{"name": "Super", "action": "forma2", "label": "SUP", "group": "right_pad", "pos": Vector2(76, -34), "size": SMALL_BUTTON_SIZE},
 ]
 
-var joystick_actions := ["left", "right", "crouch", "hud_select_up", "hud_select_down", "hud_select_left", "hud_select_right"]
+var joystick_actions := ["left", "right", "crouch", "swim_up", "hud_select_up", "hud_select_down", "hud_select_left", "hud_select_right"]
 var button_nodes: Dictionary = {}
 var label_nodes: Dictionary = {}
 var joystick_base: TextureRect
@@ -130,7 +130,7 @@ func _create_buttons() -> void:
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		label.add_theme_font_size_override("font_size", 11)
+		label.add_theme_font_size_override("font_size", 9)
 		label.add_theme_color_override("font_color", Color(0.94, 1.0, 1.0, 0.95))
 		add_child(label)
 		label_nodes[button_name] = label
@@ -138,7 +138,7 @@ func _create_buttons() -> void:
 
 func _update_layout() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
-	joystick_center = Vector2(EDGE_PADDING + JOYSTICK_RADIUS + 18.0, viewport_size.y - BOTTOM_PADDING - JOYSTICK_RADIUS - 8.0)
+	joystick_center = Vector2(EDGE_PADDING + JOYSTICK_RADIUS + 10.0, viewport_size.y - BOTTOM_PADDING - JOYSTICK_RADIUS - 4.0)
 
 	if joystick_base:
 		joystick_base.position = joystick_center - Vector2.ONE * JOYSTICK_RADIUS
@@ -146,8 +146,8 @@ func _update_layout() -> void:
 	if joystick_knob:
 		_update_knob_position()
 	if joystick_hint:
-		joystick_hint.position = joystick_center + Vector2(-58.0, JOYSTICK_RADIUS + 2.0)
-		joystick_hint.size = Vector2(116.0, 16.0)
+		joystick_hint.position = joystick_center + Vector2(-46.0, JOYSTICK_RADIUS + 1.0)
+		joystick_hint.size = Vector2(92.0, 14.0)
 
 	var right_base := Vector2(
 		viewport_size.x - EDGE_PADDING - BUTTON_SIZE.x * 3.0 - BUTTON_GAP * 2.0,
@@ -222,6 +222,8 @@ func _apply_joystick_actions() -> void:
 	var power_mode := Input.is_action_pressed("hud_menu")
 	if power_mode != joystick_was_power_mode:
 		_release_joystick_actions()
+		joystick_vector = Vector2.ZERO
+		_update_knob_position()
 		joystick_was_power_mode = power_mode
 
 	if not joystick_active or joystick_vector.length() < JOYSTICK_DEADZONE:
@@ -233,7 +235,7 @@ func _apply_joystick_actions() -> void:
 		_press_direction_actions("hud_select_left", "hud_select_right", "hud_select_up", "hud_select_down")
 	else:
 		_release_power_select_actions()
-		_press_direction_actions("left", "right", "", "crouch")
+		_press_direction_actions("left", "right", "swim_up", "crouch")
 
 
 func _press_direction_actions(left_action: String, right_action: String, up_action: String, down_action: String) -> void:
@@ -269,7 +271,7 @@ func _release_action(action_name: String) -> void:
 
 
 func _release_movement_actions() -> void:
-	for action_name in ["left", "right", "crouch"]:
+	for action_name in ["left", "right", "crouch", "swim_up"]:
 		_release_action(action_name)
 
 

@@ -7,6 +7,8 @@ extends Control
 
 var awaiting_action := ""
 const JOYPAD_AXIS_REBIND_THRESHOLD: float = 0.55
+const JOYPAD_TRIGGER_REBIND_THRESHOLD: float = 0.20
+const JOYPAD_TRIGGER_AXES: Array[int] = [4, 5]
 
 
 func _ready():
@@ -57,13 +59,34 @@ func _input(event):
 		awaiting_action = ""
 		accept_event()
 
-	elif event is InputEventJoypadMotion and absf(event.axis_value) >= JOYPAD_AXIS_REBIND_THRESHOLD:
-		var joy_event := event.duplicate() as InputEventJoypadMotion
-		joy_event.axis_value = 1.0 if event.axis_value > 0.0 else -1.0
+	elif event is InputEventJoypadMotion:
+		var joy_event := _normalize_joy_motion_for_rebind(event)
+		if not joy_event:
+			return
 		ConfigManager.rebind_action(awaiting_action, joy_event)
 		print("Ação", awaiting_action, "→ eixo", joy_event.axis, joy_event.axis_value)
 		awaiting_action = ""
 		accept_event()
+
+
+func _normalize_joy_motion_for_rebind(event: InputEventJoypadMotion) -> InputEventJoypadMotion:
+	var joy_event := event.duplicate() as InputEventJoypadMotion
+
+	if _is_joypad_trigger_axis(event.axis):
+		if event.axis_value < JOYPAD_TRIGGER_REBIND_THRESHOLD:
+			return null
+		joy_event.axis_value = 1.0
+		return joy_event
+
+	if absf(event.axis_value) < JOYPAD_AXIS_REBIND_THRESHOLD:
+		return null
+
+	joy_event.axis_value = 1.0 if event.axis_value > 0.0 else -1.0
+	return joy_event
+
+
+func _is_joypad_trigger_axis(axis: int) -> bool:
+	return axis in JOYPAD_TRIGGER_AXES
 
 
 # =========================================

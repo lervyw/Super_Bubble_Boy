@@ -27,6 +27,7 @@ var hud_menu_open := false
 var hud_menu_selection: HudMenuAction = HudMenuAction.NONE
 var hud_menu_axis_locked := false
 var hud_menu_selection_locked := false
+var hud_menu_waiting_for_neutral := false
 
 @export_group("Movement")
 @export var speed := 150.0
@@ -39,6 +40,9 @@ var hud_menu_selection_locked := false
 @export var audio_normal: AudioStreamPlayer
 @export var audio_super: AudioStreamPlayer
 @export var hud: CanvasLayer
+
+@export_group("Water Jump")
+@export_range(1.0, 3.0, 0.05) var water_up_jump_multiplier: float = 1.35
 
 @export_group("Camera Framing")
 @export var camera_vertical_offset: float = -18.0
@@ -232,7 +236,7 @@ func _ready() -> void:
 
 
 func ensure_optional_input_actions() -> void:
-	for action_name in ["hud_select_up", "hud_select_down", "hud_select_left", "hud_select_right"]:
+	for action_name in ["hud_select_up", "hud_select_down", "hud_select_left", "hud_select_right", "swim_up"]:
 		if not InputMap.has_action(action_name):
 			InputMap.add_action(action_name)
 
@@ -991,22 +995,24 @@ func exit_water_zone(_water: Node = null) -> void:
 
 
 func handle_jump() -> void:
+	var water_jump_multiplier := water_up_jump_multiplier if in_water and is_swim_up_pressed() else 1.0
+
 	match form:
 		Form.BUBBLE:
 			if in_water:
-				velocity.y = -100
+				velocity.y = -100 * water_jump_multiplier
 				bubble_jump_count += 1
 			elif bubble_jump_count < max_bubble_jumps:
 				velocity.y = -50
 				bubble_jump_count += 1
 		Form.SUPER:
 			if in_water:
-				velocity.y = -120
+				velocity.y = -120 * water_jump_multiplier
 			elif is_on_floor():
 				velocity.y = super_jump_force
 		_:
 			if in_water:
-				velocity.y = -150
+				velocity.y = -150 * water_jump_multiplier
 			elif is_on_floor():
 				velocity.y = jump_force
 
@@ -1158,7 +1164,7 @@ func hurt_state() -> void:
 
 func swim_state() -> void:
 	var dir_x := get_horizontal_axis()
-	var dir_y := Input.get_axis("ui_up", "ui_down")
+	var dir_y := get_vertical_swim_axis()
 
 	var swim_speed := speed * 0.5
 	match form:
@@ -1203,6 +1209,17 @@ func get_horizontal_axis() -> float:
 	if dir == 0.0:
 		dir = Input.get_axis("left", "right")
 	return dir
+
+
+func get_vertical_swim_axis() -> float:
+	var dir := Input.get_axis("ui_up", "ui_down")
+	if dir == 0.0:
+		dir = Input.get_axis("swim_up", "crouch")
+	return dir
+
+
+func is_swim_up_pressed() -> bool:
+	return Input.is_action_pressed("ui_up") or Input.is_action_pressed("swim_up")
 
 
 func change_state(new_state: State) -> void:
@@ -1298,7 +1315,8 @@ func open_hud_menu() -> void:
 	hud_menu_selection = HudMenuAction.NONE
 	hud_menu_axis_locked = false
 	hud_menu_selection_locked = false
-	velocity = Vector2.ZERO
+	hud_menu_waiting_for_neutral = get_raw_hud_menu_direction() != Vector2.ZERO
+	velocity.x = 0.0
 
 	if hud and hud.has_method("show_menu"):
 		hud.show_menu()
@@ -1317,6 +1335,7 @@ func close_hud_menu(keep_panel_active: bool = false) -> void:
 	hud_menu_selection = HudMenuAction.NONE
 	hud_menu_axis_locked = false
 	hud_menu_selection_locked = false
+	hud_menu_waiting_for_neutral = false
 
 	if not keep_panel_active and hud and hud.has_method("hide_menu"):
 		hud.hide_menu()
@@ -1355,18 +1374,36 @@ func process_hud_menu_selection() -> void:
 
 
 func get_hud_menu_direction() -> Vector2:
-	var direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down", 0.35)
-	if direction != Vector2.ZERO:
-		return direction
+	var direction := get_raw_hud_menu_direction()
+	if hud_menu_waiting_for_neutral:
+		if direction == Vector2.ZERO:
+			hud_menu_waiting_for_neutral = false
+		return Vector2.ZERO
 
-	var keyboard_direction := Vector2.ZERO
-	if Input.is_action_pressed("ui_left") or Input.is_action_pressed("left") or Input.is_action_pressed("hud_select_left"):
+	return direction
+
+
+func get_raw_hud_menu_direction() -> Vector2:
+	var keyboard_direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down", 0.35)
+	if keyboard_direction != Vector2.ZERO:
+		return keyboard_direction
+
+	if Input.is_action_pressed("hud_select_left"):
 		keyboard_direction.x -= 1.0
-	if Input.is_action_pressed("ui_right") or Input.is_action_pressed("right") or Input.is_action_pressed("hud_select_right"):
+	if Input.is_action_pressed("hud_select_right"):
 		keyboard_direction.x += 1.0
-	if Input.is_action_pressed("ui_up") or Input.is_action_pressed("jump") or Input.is_action_pressed("hud_select_up"):
+	if Input.is_action_pressed("hud_select_up"):
 		keyboard_direction.y -= 1.0
-	if Input.is_action_pressed("ui_down") or Input.is_action_pressed("crouch") or Input.is_action_pressed("hud_select_down"):
+	if Input.is_action_pressed("hud_select_down"):
+		keyboard_direction.y += 1.0
+
+	if Input.is_action_pressed("left"):
+		keyboard_direction.x -= 1.0
+	if Input.is_action_pressed("right"):
+		keyboard_direction.x += 1.0
+	if Input.is_action_pressed("jump"):
+		keyboard_direction.y -= 1.0
+	if Input.is_action_pressed("crouch"):
 		keyboard_direction.y += 1.0
 
 	return keyboard_direction.normalized() if keyboard_direction != Vector2.ZERO else Vector2.ZERO

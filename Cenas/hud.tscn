@@ -102,10 +102,10 @@ texture_under = ExtResource("4_b1pas")
 texture_progress = ExtResource("5_016od")
 
 [node name="BossBar" type="TextureProgressBar" parent="."]
-offset_left = 47.000004
-offset_top = 230.99997
-offset_right = 200.0
-offset_bottom = 258.0
+offset_left = 75.0
+offset_top = 233.0
+offset_right = 228.0
+offset_bottom = 260.00003
 scale = Vector2(1.6899998, 1.6899998)
 texture_under = ExtResource("6_cqml6")
 texture_progress = ExtResource("7_crc4m")
@@ -140,10 +140,10 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("state_texture", "up_button", "down_button", "left_button", "right_button")]
-offset_left = 337.0
-offset_top = 196.00002
-offset_right = 457.0
-offset_bottom = 316.0
+offset_left = 166.0
+offset_top = 1.0
+offset_right = 286.0
+offset_bottom = 120.999985
 scale = Vector2(0.58228296, 0.58228296)
 theme_override_styles/panel = SubResource("StyleBoxEmpty_power_panel")
 script = ExtResource("5_is2x6")

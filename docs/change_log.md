@@ -1,5 +1,28 @@
 # Change Log
 
+## 2026-05-15
+
+### Compact mobile controls
+
+- Reduced mobile button, transform button, pause button, joystick, and joystick knob sizes.
+- Tightened mobile button spacing and edge padding so the touch controls occupy less screen space.
+- Reduced mobile button label font size to fit the smaller controls.
+
+### Gamepad trigger rebinding
+
+- Changed the controls menu to capture LT/L2 and RT/R2 with trigger-specific logic instead of treating them like generic analog-stick drift.
+- Lowered trigger rebind activation to `0.20` and only accepts positive trigger press values for axes 4 and 5.
+- Applied a `0.20` InputMap deadzone when an action is mapped to a trigger so gameplay recognizes the trigger before a full press.
+- Kept generic analog-axis remapping on the stricter `0.55` threshold for sticks.
+
+### Power wheel gravity and mobile swim jump
+
+- Kept vertical velocity when opening the power wheel so the player can keep falling while the wheel is open.
+- Changed power-wheel selection to use only the dedicated `hud_select_*` actions, preventing movement/jump/crouch inputs from selecting powers.
+- Restored physical keyboard/gamepad direction selection for the power wheel, but waits for held directions to return to neutral after opening so movement already being held does not instantly select a power.
+- Reset the mobile joystick when switching into power-wheel mode so a held movement direction does not instantly select a power.
+- Added mobile `swim_up` joystick input and a stronger water jump when pressing up + jump in water.
+
 ## 2026-05-14
 
 ### Mobile pause overlay

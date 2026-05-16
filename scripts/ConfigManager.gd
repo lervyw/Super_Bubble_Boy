@@ -10,6 +10,8 @@ extends Node
 
 # Caminho do arquivo de configuração salvo no sistema do jogador
 const CONFIG_PATH := "user://config.json"
+const JOYPAD_TRIGGER_ACTION_DEADZONE: float = 0.20
+const JOYPAD_TRIGGER_AXES: Array[int] = [4, 5]
 
 
 # ================================
@@ -77,6 +79,7 @@ func rebind_action(action: String, event: InputEvent):
 	if ev is InputEventJoypadButton or ev is InputEventJoypadMotion:
 		ev.device = -1
 	InputMap.action_add_event(action, ev)
+	_apply_action_deadzone_for_event(action, ev)
 
 	# Converte o evento para string e salva
 	settings["inputs"][action] = _event_to_string(ev)
@@ -100,6 +103,7 @@ func apply_loaded_inputs():
 			# Remove binds antigos e aplica o carregado
 			InputMap.action_erase_events(action)
 			InputMap.action_add_event(action, event)
+			_apply_action_deadzone_for_event(action, event)
 
 
 # ============================================================
@@ -160,6 +164,11 @@ func _string_to_event(str: String) -> InputEvent:
 
 	# Caso não reconheça o formato
 	return null
+
+
+func _apply_action_deadzone_for_event(action: String, event: InputEvent) -> void:
+	if event is InputEventJoypadMotion and event.axis in JOYPAD_TRIGGER_AXES:
+		InputMap.action_set_deadzone(action, JOYPAD_TRIGGER_ACTION_DEADZONE)
 
 
 # ============================================================
