@@ -54,6 +54,7 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 @export var attack_mode: AttackMode = AttackMode.HITBOX
 @export var damage: int = 1
 @export var attack_range: float = 24.0
+@export var attack_vertical_range: float = 42.0
 @export var hitbox_active_time: float = 0.10
 @export var attack_cooldown: float = 0.85
 @export_range(0.0, 5.0, 0.05) var hit_reaction_time: float = 1.0
@@ -168,7 +169,7 @@ func _physics_process(delta):
 		move_and_slide()
 		return
 
-	if attack_mode == AttackMode.HITBOX and not stunned and not attacking and cooldown_t <= 0 and dist <= attack_range:
+	if attack_mode == AttackMode.HITBOX and not stunned and not attacking and cooldown_t <= 0 and is_player_in_hitbox_attack_range():
 		start_attack()
 		return
 
@@ -336,6 +337,17 @@ func get_horizontal_chase_direction() -> int:
 		return 0
 
 	return int(sign(horizontal_delta))
+
+
+func is_player_in_hitbox_attack_range() -> bool:
+	if not is_instance_valid(player):
+		return false
+
+	var to_player := player.global_position - global_position
+	if to_player.length() <= attack_range:
+		return true
+
+	return absf(to_player.x) <= attack_range and absf(to_player.y) <= attack_vertical_range
 
 
 # ✅ NOVA FUNÇÃO RESPONSÁVEL POR VIRAR O SPRITE
