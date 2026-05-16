@@ -2,6 +2,11 @@
 
 ## 2026-05-16
 
+### Respawn enemy separation
+
+- Added a player respawn cleanup step that pushes nearby slimes/enemies away from the checkpoint before and after the player is moved.
+- This prevents enemies that were overlapping the player at death from remaining stacked on top of the player after respawn.
+
 ### Slime attack range, aquatic recovery, and gamepad menus
 
 - Reduced slime attack trigger ranges so normal, aquatic, and flying slimes move closer before biting.

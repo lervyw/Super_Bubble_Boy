@@ -144,6 +144,12 @@ var hud_menu_waiting_for_neutral := false
 @export var respawn_position: Vector2 = Vector2(288, 207)
 @export var stats: Node = null
 
+@export_group("Respawn Enemy Separation")
+@export var clear_enemies_on_respawn: bool = true
+@export var respawn_enemy_clear_radius: float = 56.0
+@export var respawn_enemy_push_distance: float = 96.0
+@export var respawn_enemy_lift: float = 16.0
+
 @onready var attack_area: Area2D = $AttackHitbox
 @onready var attack_collision: CollisionShape2D = $AttackHitbox/AttackCollisionShape
 @onready var player_camera: Camera2D = $Camera
@@ -1283,9 +1289,15 @@ func _on_fatal_hit() -> void:
 
 
 func respawn_player() -> void:
+	if clear_enemies_on_respawn:
+		separate_enemies_from_respawn_point()
+
 	global_position = respawn_position
 	velocity = Vector2.ZERO
 	change_state(State.IDLE)
+
+	if clear_enemies_on_respawn:
+		separate_enemies_from_respawn_point()
 
 	if stats and stats.has_method("restore_all"):
 		stats.restore_all()
@@ -1305,6 +1317,33 @@ func respawn_player() -> void:
 			await timer.timeout
 	is_invincible = false
 	fatal_hit_sequence_running = false
+
+
+func separate_enemies_from_respawn_point() -> void:
+	var enemy_groups: Array[StringName] = [&"slime", &"enemy"]
+	var handled: Dictionary = {}
+
+	for group_name in enemy_groups:
+		for enemy in get_tree().get_nodes_in_group(group_name):
+			if not is_instance_valid(enemy) or handled.has(enemy):
+				continue
+			if not enemy is Node2D:
+				continue
+
+			handled[enemy] = true
+			var enemy_node := enemy as Node2D
+			var offset := enemy_node.global_position - respawn_position
+			if offset.length() > respawn_enemy_clear_radius:
+				continue
+
+			var push_dir := offset.normalized()
+			if push_dir == Vector2.ZERO:
+				var player_sprite := get_node_or_null("Sprite2D") as AnimatedSprite2D
+				push_dir = Vector2.LEFT if player_sprite and player_sprite.flip_h else Vector2.RIGHT
+
+			enemy_node.global_position = respawn_position + push_dir * respawn_enemy_push_distance - Vector2(0.0, respawn_enemy_lift)
+			if "velocity" in enemy_node:
+				enemy_node.set("velocity", push_dir * 80.0)
 
 
 func open_hud_menu() -> void:
