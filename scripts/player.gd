@@ -138,6 +138,7 @@ var hud_menu_waiting_for_neutral := false
 @export_range(0.0, 100.0, 1.0) var bubble_projectile_mana_cost: float = 12.0
 @export_range(0.1, 10.0, 0.1) var bubble_projectile_cooldown: float = 1.0
 @export var bubble_projectile_spawn_offset: Vector2 = Vector2(18.0, -12.0)
+@export var bubble_projectile_animation: StringName = &"attack_projectile"
 
 @export_group("Ultimate Attack")
 @export var ultimate_attack_enabled: bool = true
@@ -189,6 +190,7 @@ var current_attack_kind: AttackKind = AttackKind.NONE
 var current_attack_id: StringName = &""
 var current_attack_damage: int = 0
 var current_attack_area: Area2D
+var special_attack_animation_override: StringName = &""
 var attack_window_serial: int = 0
 var fatal_hit_sequence_running: bool = false
 var hurt_sequence_running: bool = false
@@ -896,9 +898,15 @@ func start_bubble_projectile() -> void:
 
 	defending = false
 	bubble_projectile_cooldown_timer = bubble_projectile_cooldown
-	spawn_bubble_projectile()
+	special_attack_animation_override = bubble_projectile_animation
 	change_state(State.SPECIAL_ATTACK)
-	await get_tree().create_timer(0.18).timeout
+
+	spawn_bubble_projectile()
+
+	var animation_time := get_sprite_animation_duration(bubble_projectile_animation)
+	await get_tree().create_timer(maxf(animation_time, 0.18)).timeout
+	if special_attack_animation_override == bubble_projectile_animation:
+		special_attack_animation_override = &""
 	if state == State.SPECIAL_ATTACK:
 		change_state(State.IDLE)
 
@@ -1620,6 +1628,7 @@ func deactivate_attack_area() -> void:
 func _on_attack_finished() -> void:
 	deactivate_attack_area()
 	defending = false
+	special_attack_animation_override = &""
 
 	if state not in [State.DEAD, State.HURT]:
 		change_state(State.IDLE)

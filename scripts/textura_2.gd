@@ -255,6 +255,12 @@ func handle_attack_animation() -> void:
 func handle_special_attack_animation() -> void:
 	activate_hitbox_for_state("attack")
 
+	if "special_attack_animation_override" in player:
+		var override_anim: StringName = player.special_attack_animation_override
+		if override_anim != &"" and sprite_frames.has_animation(override_anim):
+			play_if_different(override_anim)
+			return
+
 	var anim_name: StringName = &""
 
 	match player.form:
@@ -637,7 +643,7 @@ func _on_animation_finished() -> void:
 	]
 
 	match anim_name:
-		&"attack", &"attack_super", &"attack_bubble", &"parry_super", &"parry", &"parry_bubble":
+		&"attack", &"attack_super", &"attack_bubble", &"attack_projectile", &"parry_super", &"parry", &"parry_bubble":
 			deactivate_all_attack_areas()
 			deactivate_all_special_attack_areas()
 			refresh_hitbox_for_current_state()
