@@ -2,6 +2,11 @@
 
 ## 2026-05-16
 
+### Pause passive toggle behavior
+
+- Changed the pause menu passive toggle so it enables/disables the selected passive powers instead of the old passive attack foundation.
+- Renamed the toggle label to `Poderes ligados` to make its behavior clearer.
+
 ### Pause menu art layout
 
 - Rebuilt the pause menu layout around the new 420x280 `sprites/assets/pause_menu/pause1.png` frame.

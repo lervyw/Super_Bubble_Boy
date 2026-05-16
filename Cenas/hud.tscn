@@ -238,13 +238,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0, 0.08, 0.12, 0.32)
+color = Color(0, 0.08, 0.12, 0.32)
 
 [node name="PauseFrame" type="TextureRect" parent="PauseMenu"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("25_pause_frame")
 expand_mode = 1
@@ -255,6 +257,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Title" type="Label" parent="PauseMenu/VBoxContainer"]
 visible = false
@@ -273,7 +277,7 @@ offset_top = 174.0
 offset_right = 187.0
 offset_bottom = 194.0
 theme_override_font_sizes/font_size = 8
-text = "Passiva ligada"
+text = "Poderes ligados"
 
 [node name="PassiveLabel" type="Label" parent="PauseMenu/VBoxContainer"]
 visible = false

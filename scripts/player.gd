@@ -98,6 +98,7 @@ var hud_menu_waiting_for_neutral := false
 
 @export_group("Selectable Passive Powers")
 @export var selected_passive_power: PassivePower = PassivePower.NONE
+@export var passive_powers_enabled: bool = true
 @export var orbit_bubble_damage: int = 1
 @export_range(8.0, 96.0, 1.0) var orbit_bubble_radius: float = 34.0
 @export_range(0.5, 12.0, 0.1) var orbit_bubble_speed: float = 4.5
@@ -470,11 +471,32 @@ func apply_selected_passive_power() -> void:
 	quick_run_direction = 0
 
 	if orbit_bubble_area:
-		orbit_bubble_area.visible = selected_passive_power == PassivePower.ORBIT_BUBBLE
-		set_area_collision_enabled(orbit_bubble_area, selected_passive_power == PassivePower.ORBIT_BUBBLE)
+		var orbit_enabled := passive_powers_enabled and selected_passive_power == PassivePower.ORBIT_BUBBLE
+		orbit_bubble_area.visible = orbit_enabled
+		set_area_collision_enabled(orbit_bubble_area, orbit_enabled)
 
 	if ground_stomp_area:
 		set_area_collision_enabled(ground_stomp_area, false)
+
+
+func set_passive_powers_enabled(enabled: bool) -> void:
+	passive_powers_enabled = enabled
+	if not enabled:
+		ground_stomp_active = false
+		quick_run_active = false
+		quick_run_timer = 0.0
+		quick_run_direction = 0
+		if orbit_bubble_area:
+			orbit_bubble_area.visible = false
+			set_area_collision_enabled(orbit_bubble_area, false)
+		if ground_stomp_area:
+			set_area_collision_enabled(ground_stomp_area, false)
+	else:
+		apply_selected_passive_power()
+
+
+func are_passive_powers_enabled() -> bool:
+	return passive_powers_enabled
 
 
 func setup_selectable_passive_nodes() -> void:
@@ -537,6 +559,14 @@ func process_selectable_passives(delta: float) -> void:
 		ground_stomp_cooldown_timer = max(ground_stomp_cooldown_timer - delta, 0.0)
 	if quick_run_cooldown_timer > 0.0:
 		quick_run_cooldown_timer = max(quick_run_cooldown_timer - delta, 0.0)
+
+	if not passive_powers_enabled:
+		if orbit_bubble_area and orbit_bubble_area.visible:
+			orbit_bubble_area.visible = false
+			set_area_collision_enabled(orbit_bubble_area, false)
+		ground_stomp_active = false
+		quick_run_active = false
+		return
 
 	if selected_passive_power == PassivePower.ORBIT_BUBBLE:
 		update_orbit_bubble(delta)
@@ -747,7 +777,7 @@ func update_quick_run_timer(delta: float) -> void:
 
 
 func is_passive_run_boosting() -> bool:
-	return selected_passive_power == PassivePower.QUICK_RUN and quick_run_active
+	return passive_powers_enabled and selected_passive_power == PassivePower.QUICK_RUN and quick_run_active
 
 
 func is_left_pressed() -> bool:

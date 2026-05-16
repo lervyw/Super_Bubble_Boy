@@ -247,9 +247,10 @@ func _update_menu_panel_state() -> void:
 func _update_pause_menu_state() -> void:
 	if not pause_menu_open:
 		return
-	if passive_toggle and player and "passive_attack_enabled" in player:
-		if passive_toggle.button_pressed != player.passive_attack_enabled:
-			passive_toggle.set_pressed_no_signal(player.passive_attack_enabled)
+	if passive_toggle and player:
+		var passives_enabled := _are_player_passives_enabled()
+		if passive_toggle.button_pressed != passives_enabled:
+			passive_toggle.set_pressed_no_signal(passives_enabled)
 	if passive_selector and player and player.has_method("get_selected_passive_power"):
 		var selected: int = player.get_selected_passive_power()
 		if passive_selector.selected != selected:
@@ -393,8 +394,8 @@ func open_pause_menu() -> void:
 		pause_menu_panel.visible = true
 		_grab_focus_deferred(resume_button)
 
-	if passive_toggle and player and "passive_attack_enabled" in player:
-		passive_toggle.set_pressed_no_signal(player.passive_attack_enabled)
+	if passive_toggle and player:
+		passive_toggle.set_pressed_no_signal(_are_player_passives_enabled())
 	if passive_selector and player and player.has_method("get_selected_passive_power"):
 		setup_passive_selector()
 		var selected: int = player.get_selected_passive_power()
@@ -471,8 +472,14 @@ func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -
 
 
 func _on_passive_toggle_toggled(enabled: bool) -> void:
-	if player and player.has_method("set_passive_attack_enabled"):
-		player.set_passive_attack_enabled(enabled)
+	if player and player.has_method("set_passive_powers_enabled"):
+		player.set_passive_powers_enabled(enabled)
+
+
+func _are_player_passives_enabled() -> bool:
+	if player and player.has_method("are_passive_powers_enabled"):
+		return player.are_passive_powers_enabled()
+	return true
 
 
 func setup_passive_selector() -> void:
