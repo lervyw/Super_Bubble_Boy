@@ -78,6 +78,7 @@ var stunned: bool = false
 var dying: bool = false
 var hit_reaction_active: bool = false
 var hit_reaction_serial: int = 0
+var attack_serial: int = 0
 var facing_dir: int = -1
 var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 var fly_time: float = 0.0
@@ -290,27 +291,52 @@ func process_contact_attack():
 
 
 func start_attack():
-	attacking = true
-	cooldown_t = attack_cooldown
+	if attacking or stunned or dying:
+		return
 
-	play_attack_animation()
+	attacking = true
+	attack_serial += 1
+	var current_attack_serial := attack_serial
+	cooldown_t = attack_cooldown
+	velocity.x = 0
+
+	play_attack_animation(true)
 
 	if uses_frame_based_hitbox():
-		await run_attack_hitbox_by_frames(attack_animation)
+		await run_attack_hitbox_by_frames(attack_animation, current_attack_serial)
 	else:
-		await wait_for_attack_hitbox_start()
+		var animation_duration: float = get_animation_duration(attack_animation)
+		var hitbox_start_delay: float = get_attack_hitbox_start_delay()
+
+		if hitbox_start_delay > 0:
+			await get_tree().create_timer(hitbox_start_delay).timeout
+			if not is_current_attack(current_attack_serial):
+				return
 
 		if hitbox_shape:
 			hitbox_shape.disabled = false
 
 		await get_tree().create_timer(hitbox_active_time).timeout
+		if not is_current_attack(current_attack_serial):
+			if hitbox_shape:
+				hitbox_shape.disabled = true
+			return
 
 		if hitbox_shape:
 			hitbox_shape.disabled = true
 
-	await wait_for_animation(attack_animation)
+		var remaining_animation_time: float = maxf(animation_duration - hitbox_start_delay - hitbox_active_time, 0.0)
+		if remaining_animation_time > 0:
+			await get_tree().create_timer(remaining_animation_time).timeout
+			if not is_current_attack(current_attack_serial):
+				return
 
 	attacking = false
+	update_animation()
+
+
+func is_current_attack(serial: int) -> bool:
+	return attacking and not dying and not stunned and serial == attack_serial
 
 
 func take_damage(amount):
@@ -320,6 +346,7 @@ func take_damage(amount):
 	health -= max(amount, 1)
 	stunned = true
 	attacking = false
+	attack_serial += 1
 	hit_reaction_serial += 1
 	var current_hit_reaction := hit_reaction_serial
 
@@ -456,7 +483,7 @@ func uses_frame_based_hitbox() -> bool:
 	return attack_hitbox_start_frame >= 0 and attack_hitbox_end_frame >= attack_hitbox_start_frame
 
 
-func run_attack_hitbox_by_frames(anim: StringName) -> void:
+func run_attack_hitbox_by_frames(anim: StringName, serial: int) -> void:
 	if not sprite or not has_animation(anim):
 		return
 
@@ -464,7 +491,7 @@ func run_attack_hitbox_by_frames(anim: StringName) -> void:
 		hitbox_shape.disabled = true
 
 	var last_frame := -1
-	while attacking and sprite.animation == anim and sprite.is_playing():
+	while is_current_attack(serial) and sprite.animation == anim and sprite.is_playing():
 		var frame := sprite.frame
 		if frame != last_frame:
 			update_attack_hitbox_frame_state(frame)
@@ -503,7 +530,10 @@ func play_idle_animation():
 func play_walk_animation():
 	play_animation(walk_animation)
 
-func play_attack_animation():
+func play_attack_animation(restart: bool = false):
+	if restart:
+		restart_animation(attack_animation)
+		return
 	play_animation(attack_animation)
 
 
@@ -516,11 +546,9 @@ func wait_for_animation(anim):
 		await get_tree().create_timer(duration).timeout
 
 
-func wait_for_attack_hitbox_start():
+func get_attack_hitbox_start_delay() -> float:
 	var total = get_animation_duration(attack_animation)
-	var delay = maxf(total - hitbox_active_time, 0)
-	if delay > 0:
-		await get_tree().create_timer(delay).timeout
+	return maxf(total - hitbox_active_time, 0)
 
 
 func get_animation_duration(anim):
@@ -540,3 +568,12 @@ func has_animation(anim):
 func play_animation(anim):
 	if has_animation(anim) and sprite.animation != anim:
 		sprite.play(anim)
+
+
+func restart_animation(anim: StringName) -> void:
+	if not has_animation(anim):
+		return
+	sprite.stop()
+	sprite.animation = anim
+	sprite.set_frame_and_progress(0, 0.0)
+	sprite.play(anim)

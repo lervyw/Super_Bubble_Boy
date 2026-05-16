@@ -2,6 +2,12 @@
 
 ## 2026-05-16
 
+### Repeated slime bite attacks
+
+- Fixed slime hitbox attack flow so a completed bite does not wait through the full attack animation a second time before resuming AI.
+- Restarted the attack animation at the start of each bite, allowing normal slimes to keep approaching and biting repeatedly while the player remains in range.
+- Added attack sequence cancellation cleanup so interrupted bite hitboxes do not stay active.
+
 ### Level 1 biome spawn areas
 
 - Wired `Area_Terra`, `Area_Agua`, and `Area_Ceu` in `Cenas/level1.tscn` as spawn zones for normal, aquatic, and flying slimes.
