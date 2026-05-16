@@ -15,6 +15,8 @@ enum Form { NORMAL, SUPER }
 @export_group("Stats")
 @export var max_health: int = 6
 @export var take_stomp_damage: bool = true
+@export_range(0.0, 2.0, 0.05) var hit_stun_time: float = 0.2
+@export var interrupt_attack_on_damage: bool = false
 var health: int = max_health
 
 @export_group("Movement")
@@ -39,6 +41,8 @@ var health: int = max_health
 @export_group("Projectile Attack")
 @export var projectile_attack_scene: PackedScene = preload("res://Cenas/boss_projectile.tscn")
 @export_range(0.0, 1.0, 0.05) var projectile_attack_chance: float = 0.35
+@export var projectile_attack_range: float = 240.0
+@export var projectile_min_range: float = 42.0
 @export var projectile_attack_animation: StringName = &"attack2"
 @export_range(0, 99, 1) var projectile_attack_fire_frame: int = 6
 @export var projectile_mouth_offset: Vector2 = Vector2(38.0, -27.0)
@@ -164,9 +168,9 @@ func handle_chase(dist):
 		velocity.x = facing_dir * get_water_speed()
 		update_sprite_direction(facing_dir)
 
-	if dist <= attack_range and cooldown_t <= 0:
+	if cooldown_t <= 0 and should_start_attack(dist):
 		state = State.ATTACK
-		start_attack()
+		start_attack(dist)
 		return
 
 
@@ -182,11 +186,11 @@ func get_horizontal_chase_direction() -> int:
 
 # =========================================================
 
-func start_attack():
+func start_attack(dist: float = 0.0):
 	cooldown_t = attack_cooldown
 	velocity.x = 0
 
-	if should_use_projectile_attack():
+	if should_use_projectile_attack(dist):
 		await start_projectile_attack()
 		return
 
@@ -213,8 +217,23 @@ func start_attack():
 
 # =========================================================
 
-func should_use_projectile_attack() -> bool:
-	return projectile_attack_scene != null and has_animation(projectile_attack_animation) and rng.randf() <= projectile_attack_chance
+func should_start_attack(dist: float) -> bool:
+	return dist <= attack_range or can_use_projectile_attack(dist)
+
+
+func should_use_projectile_attack(dist: float) -> bool:
+	if not can_use_projectile_attack(dist):
+		return false
+	if dist > attack_range:
+		return true
+	return rng.randf() <= projectile_attack_chance
+
+
+func can_use_projectile_attack(dist: float) -> bool:
+	return projectile_attack_scene != null \
+		and has_animation(projectile_attack_animation) \
+		and dist <= projectile_attack_range \
+		and dist >= projectile_min_range
 
 
 func start_projectile_attack() -> void:
@@ -283,8 +302,14 @@ func take_damage(amount):
 		die()
 		return
 
+	if state == State.ATTACK and not interrupt_attack_on_damage:
+		return
+
 	state = State.STUN
-	await get_tree().create_timer(0.5).timeout
+	velocity.x = 0.0
+	await get_tree().create_timer(hit_stun_time).timeout
+	if state == State.DEAD or state == State.TRANSFORM:
+		return
 	state = State.CHASE
 
 # =========================================================

@@ -2,6 +2,12 @@
 
 ## 2026-05-16
 
+### More aggressive boss AI
+
+- Added a separate boss projectile attack range so the boss can use `attack2` before reaching melee range.
+- Reduced boss hit stun and prevented regular hits from interrupting attacks already in progress.
+- Increased the level boss movement speed, attack frequency, and projectile chance for a more aggressive fight.
+
 ### Boss and player projectiles
 
 - Added reusable projectile scenes for boss fireballs and player bubble shots using the new `sprites/characters/projectiles/` sprites.

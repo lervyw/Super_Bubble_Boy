@@ -590,7 +590,12 @@ collision_layer = 2
 script = ExtResource("1_faq14")
 max_health = 40
 take_stomp_damage = false
+hit_stun_time = 0.15
+speed = 105.0
 stop_distance = 20.0
+attack_cooldown = 0.75
+projectile_attack_chance = 0.5
+projectile_attack_range = 280.0
 attack_hitbox_start_frame = 3
 attack_hitbox_end_frame = 4
 
