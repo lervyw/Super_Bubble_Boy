@@ -1,5 +1,13 @@
 # Change Log
 
+## 2026-05-16
+
+### Slime enemy variants
+
+- Added `Cenas/slime_aquatico.tscn` as a slime variant that reuses `scripts/slime.gd` with aquatic sprite animations and water-oriented movement tuning.
+- Added `Cenas/slime_voador.tscn` as a slime variant that reuses `scripts/slime.gd` with flying sprite animations and zig-zag flight movement.
+- Both variants define their own `idle`, `walk`, `attack`, and `death` `SpriteFrames` using the new slime sheets under `sprites/characters/`.
+
 ## 2026-05-15
 
 ### Compact mobile controls

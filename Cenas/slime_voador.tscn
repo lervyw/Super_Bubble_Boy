@@ -1,0 +1,164 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="PackedScene" uid="uid://orok10r1p86e" path="res://Cenas/slime.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://cm66laqiecvo2" path="res://sprites/characters/Slime_voador-Sheet.png" id="2_sheet"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_idle_0"]
+atlas = ExtResource("2_sheet")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_idle_1"]
+atlas = ExtResource("2_sheet")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_idle_2"]
+atlas = ExtResource("2_sheet")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_idle_3"]
+atlas = ExtResource("2_sheet")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walk_4"]
+atlas = ExtResource("2_sheet")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_attack_5"]
+atlas = ExtResource("2_sheet")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_attack_6"]
+atlas = ExtResource("2_sheet")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_attack_7"]
+atlas = ExtResource("2_sheet")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_attack_8"]
+atlas = ExtResource("2_sheet")
+region = Rect2(512, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_death_9"]
+atlas = ExtResource("2_sheet")
+region = Rect2(576, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_death_10"]
+atlas = ExtResource("2_sheet")
+region = Rect2(640, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_death_11"]
+atlas = ExtResource("2_sheet")
+region = Rect2(704, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_death_12"]
+atlas = ExtResource("2_sheet")
+region = Rect2(768, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_death_13"]
+atlas = ExtResource("2_sheet")
+region = Rect2(832, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_death_14"]
+atlas = ExtResource("2_sheet")
+region = Rect2(896, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_voador"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_attack_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_attack_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_attack_7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_attack_8")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_death_9")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_death_10")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_death_11")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_death_12")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_death_13")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_death_14")
+}],
+"loop": false,
+"name": &"death",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_idle_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_idle_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_idle_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_idle_3")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_idle_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_idle_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_idle_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_idle_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_walk_4")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 9.0
+}]
+
+[node name="slime_voador" instance=ExtResource("1_base")]
+move_mode = 2
+speed = 62.0
+fly_mode = 2
+fly_y_speed = 55.0
+fly_zigzag_amplitude = 45.0
+fly_zigzag_frequency = 5.5
+aggro_range = 300.0
+stop_distance = 18.0
+attack_range = 46.0
+attack_cooldown = 0.95
+attack_hitbox_start_frame = 2
+attack_hitbox_end_frame = 3
+max_health = 2
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+position = Vector2(0, -11)
+sprite_frames = SubResource("SpriteFrames_voador")
+animation = &"idle"
