@@ -2,6 +2,11 @@
 
 ## 2026-05-16
 
+### Slime hit reaction animation
+
+- Updated `scripts/slime.gd` so all slime enemies play `got_hit` when they take non-fatal player damage.
+- Added `got_hit` SpriteFrames to the aquatic and flying slime variants.
+
 ### Slime enemy variants
 
 - Added `Cenas/slime_aquatico.tscn` as a slime variant that reuses `scripts/slime.gd` with aquatic sprite animations and water-oriented movement tuning.

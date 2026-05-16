@@ -41,6 +41,7 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 @export var attack_range: float = 48.0
 @export var hitbox_active_time: float = 0.10
 @export var attack_cooldown: float = 0.85
+@export_range(0.0, 5.0, 0.05) var hit_reaction_time: float = 1.0
 @export var contact_attack_requires_fall: bool = false
 @export var contact_attack_min_speed_y: float = 10.0
 @export_range(-1, 99, 1) var attack_hitbox_start_frame: int = -1
@@ -60,6 +61,7 @@ var health: int = max_health
 @export var idle_animation: StringName = &"idle"
 @export var walk_animation: StringName = &"walk"
 @export var attack_animation: StringName = &"attack"
+@export var got_hit_animation: StringName = &"got_hit"
 @export var death_animation: StringName = &"death"
 
 @onready var sprite: AnimatedSprite2D = get_node_or_null(sprite_path)
@@ -74,6 +76,8 @@ var jump_t: float = 0.0
 var attacking: bool = false
 var stunned: bool = false
 var dying: bool = false
+var hit_reaction_active: bool = false
+var hit_reaction_serial: int = 0
 var facing_dir: int = -1
 var attack_hitbox_base_position: Vector2 = Vector2.ZERO
 var fly_time: float = 0.0
@@ -316,13 +320,39 @@ func take_damage(amount):
 	health -= max(amount, 1)
 	stunned = true
 	attacking = false
+	hit_reaction_serial += 1
+	var current_hit_reaction := hit_reaction_serial
+
+	if hitbox_shape:
+		hitbox_shape.disabled = true
 
 	if health <= 0:
 		die()
 		return
 
-	await get_tree().create_timer(1.0).timeout
+	await play_hit_reaction(current_hit_reaction)
+
+	if dying or current_hit_reaction != hit_reaction_serial:
+		return
+
 	stunned = false
+
+
+func play_hit_reaction(reaction_serial: int) -> void:
+	hit_reaction_active = true
+
+	if has_animation(got_hit_animation):
+		play_animation(got_hit_animation)
+
+	var reaction_time := hit_reaction_time
+	if has_animation(got_hit_animation):
+		reaction_time = maxf(reaction_time, get_animation_duration(got_hit_animation))
+
+	if reaction_time > 0:
+		await get_tree().create_timer(reaction_time).timeout
+
+	if reaction_serial == hit_reaction_serial:
+		hit_reaction_active = false
 
 
 func die():
@@ -457,7 +487,9 @@ func update_animation():
 	if sprite == null or dying:
 		return
 
-	if attacking:
+	if hit_reaction_active:
+		play_animation(got_hit_animation)
+	elif attacking:
 		play_attack_animation()
 	elif abs(velocity.x) > 5 or (move_mode == MoveMode.FLY and abs(velocity.y) > 5):
 		play_walk_animation()

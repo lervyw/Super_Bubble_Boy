@@ -107,6 +107,14 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_death_9")
+}],
+"loop": false,
+"name": &"got_hit",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_idle_0")
 }, {
 "duration": 1.0,
