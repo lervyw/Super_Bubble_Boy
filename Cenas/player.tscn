@@ -528,6 +528,17 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_rxqvy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2umio")
+}],
+"loop": false,
+"name": &"attack_projectile",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_wfmqy")
 }, {
 "duration": 1.0,
@@ -1977,7 +1988,7 @@ stats = NodePath("Stats")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="." node_paths=PackedStringArray("player", "stats", "special_attack_area_normal", "special_attack_area_bubble", "special_attack_area_super", "body_idle_normal", "body_walk_normal", "body_jump_normal", "body_fall_normal", "body_crouch_normal", "body_dash_normal", "body_swim_normal", "body_attack_normal", "body_defend_normal", "body_dead_normal", "body_idle_bubble", "body_walk_bubble", "body_jump_bubble", "body_fall_bubble", "body_crouch_bubble", "body_dash_bubble", "body_swim_bubble", "body_attack_bubble", "body_defend_bubble", "body_dead_bubble", "body_idle_super", "body_walk_super", "body_jump_super", "body_fall_super", "body_crouch_super", "body_dash_super", "body_swim_super", "body_attack_super", "body_defend_super", "body_dead_super", "attack_area_normal", "attack_area_bubble", "attack_area_super")]
 sprite_frames = SubResource("SpriteFrames_nwtu0")
-animation = &"walk_super"
+animation = &"attack_projectile"
 script = ExtResource("3_ybr15")
 player = NodePath("..")
 stats = NodePath("../Stats")
@@ -2032,14 +2043,14 @@ shape = SubResource("RectangleShape2D_e2nbm")
 
 [node name="Camera" type="Camera2D" parent="."]
 offset = Vector2(18, -18)
+limit_bottom = 300
 position_smoothing_enabled = true
 position_smoothing_speed = 6.0
-limit_bottom = 300
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 drag_left_margin = 0.35
-drag_right_margin = 0.35
 drag_top_margin = 0.25
+drag_right_margin = 0.35
 drag_bottom_margin = 0.38
 
 [node name="audio_normal" type="AudioStreamPlayer" parent="."]
