@@ -4,8 +4,8 @@
 
 ### Respawn enemy carry fix
 
-- Restored player respawn enemy separation in `scripts/player.gd`.
-- Moved nearby slimes/enemies away from both the player's pre-respawn position and the checkpoint position so enemies standing on the player are not carried through the respawn teleport.
+- Added a temporary player body-collision release during respawn so slimes standing on the player are not carried through the teleport.
+- Avoided repositioning nearby slimes/enemies during respawn so they are not pushed into level tiles.
 
 ### Slime player-head sliding
 

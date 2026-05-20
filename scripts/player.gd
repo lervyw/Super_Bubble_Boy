@@ -154,10 +154,8 @@ var hud_menu_waiting_for_neutral := false
 @export var stats: Node = null
 
 @export_group("Respawn Enemy Separation")
-@export var clear_enemies_on_respawn: bool = true
-@export var respawn_enemy_clear_radius: float = 56.0
-@export var respawn_enemy_push_distance: float = 96.0
-@export var respawn_enemy_lift: float = 16.0
+@export var release_enemy_contacts_on_respawn: bool = true
+@export_range(1, 5, 1) var respawn_collision_release_frames: int = 2
 
 @onready var attack_area: Area2D = $AttackHitbox
 @onready var attack_collision: CollisionShape2D = $AttackHitbox/AttackCollisionShape
@@ -1374,15 +1372,18 @@ func _on_fatal_hit() -> void:
 
 
 func respawn_player() -> void:
-	if clear_enemies_on_respawn:
-		separate_enemies_from_point(global_position)
+	var body_collision_states: Dictionary = {}
+	if release_enemy_contacts_on_respawn:
+		body_collision_states = set_player_body_collisions_disabled(true)
+		await wait_physics_frames(respawn_collision_release_frames)
 
 	global_position = respawn_position
 	velocity = Vector2.ZERO
 	change_state(State.IDLE)
 
-	if clear_enemies_on_respawn:
-		separate_enemies_from_point(respawn_position)
+	if release_enemy_contacts_on_respawn:
+		await wait_physics_frames(1)
+		restore_player_body_collision_states(body_collision_states)
 
 	if stats and stats.has_method("restore_all"):
 		stats.restore_all()
@@ -1404,31 +1405,39 @@ func respawn_player() -> void:
 	fatal_hit_sequence_running = false
 
 
-func separate_enemies_from_point(origin: Vector2) -> void:
-	var enemy_groups: Array[StringName] = [&"slime", &"enemy"]
-	var handled: Dictionary = {}
+func wait_physics_frames(frame_count: int) -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
 
-	for group_name in enemy_groups:
-		for enemy in get_tree().get_nodes_in_group(group_name):
-			if not is_instance_valid(enemy) or handled.has(enemy):
-				continue
-			if not enemy is Node2D:
-				continue
+	for _i in range(maxi(frame_count, 0)):
+		await tree.physics_frame
 
-			handled[enemy] = true
-			var enemy_node := enemy as Node2D
-			var offset := enemy_node.global_position - origin
-			if offset.length() > respawn_enemy_clear_radius:
-				continue
 
-			var push_dir := offset.normalized()
-			if push_dir == Vector2.ZERO:
-				var player_sprite := get_node_or_null("Sprite2D") as AnimatedSprite2D
-				push_dir = Vector2.LEFT if player_sprite and player_sprite.flip_h else Vector2.RIGHT
+func set_player_body_collisions_disabled(disabled: bool) -> Dictionary:
+	var previous_states: Dictionary = {}
 
-			enemy_node.global_position = origin + push_dir * respawn_enemy_push_distance - Vector2(0.0, respawn_enemy_lift)
-			if "velocity" in enemy_node:
-				enemy_node.set("velocity", push_dir * 80.0)
+	for shape in get_player_body_collision_shapes():
+		previous_states[shape] = shape.disabled
+		shape.disabled = disabled
+
+	return previous_states
+
+
+func restore_player_body_collision_states(previous_states: Dictionary) -> void:
+	for shape in previous_states.keys():
+		if is_instance_valid(shape):
+			(shape as CollisionShape2D).disabled = previous_states[shape]
+
+
+func get_player_body_collision_shapes() -> Array[CollisionShape2D]:
+	var shapes: Array[CollisionShape2D] = []
+
+	for child in get_children():
+		if child is CollisionShape2D and child.is_in_group("player"):
+			shapes.append(child)
+
+	return shapes
 
 
 func open_hud_menu() -> void:
