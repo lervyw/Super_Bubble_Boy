@@ -50,6 +50,11 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 @export var separation_distance: float = 20.0
 @export var separation_strength: float = 45.0
 
+@export_group("Player Separation")
+@export var prevent_player_platform_carry: bool = true
+@export_range(0.0, 400.0, 1.0) var head_slide_force: float = 180.0
+@export_range(0.0, 300.0, 1.0) var head_slide_min_player_speed: float = 20.0
+
 @export_group("Attack")
 @export var attack_mode: AttackMode = AttackMode.HITBOX
 @export var damage: int = 1
@@ -109,6 +114,9 @@ var has_last_water_position: bool = false
 func _ready():
 	if not is_in_group("slime"):
 		add_to_group("slime")
+
+	if prevent_player_platform_carry:
+		platform_floor_layers = 0
 
 	player = get_tree().get_first_node_in_group(player_group)
 
@@ -181,7 +189,9 @@ func _physics_process(delta):
 		update_animation()
 		return
 
+	separate_from_player()
 	move_towards_player(dist)
+	separate_from_player()
 	move_and_slide()
 	process_contact_attack()
 	update_animation()
@@ -393,6 +403,31 @@ func process_contact_attack():
 			apply_damage_to(target)
 			cooldown_t = attack_cooldown
 			return
+
+
+func separate_from_player():
+	if not is_instance_valid(player):
+		return
+
+	var offset := global_position - player.global_position
+	var dist := offset.length()
+	if dist > stop_distance * 2.0 or dist < 1.0:
+		return
+
+	var push_dir := offset.normalized()
+	var separation_dist := stop_distance * 2.0 - dist
+	var base_push := separation_dist * 6.0
+
+	if offset.y < 0 and absf(offset.x) < stop_distance:
+		base_push = maxf(base_push, 120.0)
+		var player_velocity := Vector2.ZERO
+		if "velocity" in player:
+			player_velocity = player.get("velocity")
+		if absf(player_velocity.x) >= head_slide_min_player_speed:
+			push_dir = Vector2(-sign(player_velocity.x), -0.2).normalized()
+			base_push = maxf(base_push, head_slide_force)
+
+	velocity += push_dir * base_push
 
 
 func start_attack():

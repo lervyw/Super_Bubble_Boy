@@ -1375,14 +1375,14 @@ func _on_fatal_hit() -> void:
 
 func respawn_player() -> void:
 	if clear_enemies_on_respawn:
-		separate_enemies_from_respawn_point()
+		separate_enemies_from_point(global_position)
 
 	global_position = respawn_position
 	velocity = Vector2.ZERO
 	change_state(State.IDLE)
 
 	if clear_enemies_on_respawn:
-		separate_enemies_from_respawn_point()
+		separate_enemies_from_point(respawn_position)
 
 	if stats and stats.has_method("restore_all"):
 		stats.restore_all()
@@ -1404,7 +1404,7 @@ func respawn_player() -> void:
 	fatal_hit_sequence_running = false
 
 
-func separate_enemies_from_respawn_point() -> void:
+func separate_enemies_from_point(origin: Vector2) -> void:
 	var enemy_groups: Array[StringName] = [&"slime", &"enemy"]
 	var handled: Dictionary = {}
 
@@ -1417,7 +1417,7 @@ func separate_enemies_from_respawn_point() -> void:
 
 			handled[enemy] = true
 			var enemy_node := enemy as Node2D
-			var offset := enemy_node.global_position - respawn_position
+			var offset := enemy_node.global_position - origin
 			if offset.length() > respawn_enemy_clear_radius:
 				continue
 
@@ -1426,7 +1426,7 @@ func separate_enemies_from_respawn_point() -> void:
 				var player_sprite := get_node_or_null("Sprite2D") as AnimatedSprite2D
 				push_dir = Vector2.LEFT if player_sprite and player_sprite.flip_h else Vector2.RIGHT
 
-			enemy_node.global_position = respawn_position + push_dir * respawn_enemy_push_distance - Vector2(0.0, respawn_enemy_lift)
+			enemy_node.global_position = origin + push_dir * respawn_enemy_push_distance - Vector2(0.0, respawn_enemy_lift)
 			if "velocity" in enemy_node:
 				enemy_node.set("velocity", push_dir * 80.0)
 

@@ -1,5 +1,17 @@
 # Change Log
 
+## 2026-05-20
+
+### Respawn enemy carry fix
+
+- Restored player respawn enemy separation in `scripts/player.gd`.
+- Moved nearby slimes/enemies away from both the player's pre-respawn position and the checkpoint position so enemies standing on the player are not carried through the respawn teleport.
+
+### Slime player-head sliding
+
+- Prevented slimes from inheriting player movement as a moving platform while standing on the player.
+- Added a stronger lateral slide force when a slime is above the player and the player starts walking, so the slime slips off instead of riding on the player's head.
+
 ## 2026-05-16
 
 ### Projectile collision and spawn tuning
