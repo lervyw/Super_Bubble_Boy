@@ -6,3 +6,6 @@
 android_release_keystore_credentials.txt
 *.keystore
 *.jks
+
+# APK build artifacts
+*.apk

@@ -498,31 +498,35 @@ func _update_control_labels():
 
 
 func _get_current_input_name(action: String) -> String:
-	# Pega os eventos (inputs) cadastrados nessa ação no InputMap
 	var events = InputMap.action_get_events(action)
-
-	# Se não tem nada configurado, mostra "<nenhum>"
 	if events.is_empty():
 		return "<nenhum>"
 
-	# Pega o primeiro evento (você está exibindo só 1 binding por ação)
-	var ev = events[0]
+	var has_controller := ControllerMapper.has_controller()
+	var ev: InputEvent = events[0]
 
-	# Se for teclado, converte keycode para string legível
+	for event in events:
+		if has_controller:
+			if event is InputEventJoypadButton or event is InputEventJoypadMotion:
+				ev = event
+				break
+		else:
+			if event is InputEventKey:
+				ev = event
+				break
+
 	if ev is InputEventKey:
 		var keycode: int = ev.physical_keycode
 		if keycode == 0:
 			keycode = ev.keycode
 		return OS.get_keycode_string(keycode)
 
-	# Se for controle, mostra o índice do botão
 	if ev is InputEventJoypadButton:
 		return _get_joy_button_name(ev.button_index)
 
 	if ev is InputEventJoypadMotion:
 		return _get_joy_axis_name(ev.axis, ev.axis_value)
 
-	# Fallback pra casos não tratados (mouse, eixo analógico, etc.)
 	return "<desconhecido>"
 
 
@@ -533,49 +537,37 @@ func _set_rebind_prompt(text: String) -> void:
 
 
 func _get_joy_button_name(button_index: int) -> String:
-	match button_index:
-		0:
-			return "A / X"
-		1:
-			return "B / Circulo"
-		2:
-			return "X / Quadrado"
-		3:
-			return "Y / Triangulo"
-		4:
-			return "Back / Share"
-		6:
-			return "Start / Options"
-		9:
-			return "LB / L1"
-		10:
-			return "RB / R1"
-		11:
-			return "D-Pad Cima"
-		12:
-			return "D-Pad Baixo"
-		13:
-			return "D-Pad Esquerda"
-		14:
-			return "D-Pad Direita"
-		_:
-			return "Botao %d" % button_index
+	return ControllerMapper.get_button_name(button_index) if ControllerMapper.has_controller() else _legacy_joy_button_name(button_index)
 
 
 func _get_joy_axis_name(axis: int, axis_value: float) -> String:
+	return ControllerMapper.get_axis_name(axis, axis_value) if ControllerMapper.has_controller() else _legacy_joy_axis_name(axis, axis_value)
+
+
+func _legacy_joy_button_name(button_index: int) -> String:
+	match button_index:
+		0: return "A / X"
+		1: return "B / Circulo"
+		2: return "X / Quadrado"
+		3: return "Y / Triangulo"
+		4: return "Back / Share"
+		6: return "Start / Options"
+		9: return "LB / L1"
+		10: return "RB / R1"
+		11: return "D-Pad Cima"
+		12: return "D-Pad Baixo"
+		13: return "D-Pad Esquerda"
+		14: return "D-Pad Direita"
+		_: return "Botao %d" % button_index
+
+
+func _legacy_joy_axis_name(axis: int, axis_value: float) -> String:
 	var direction := "+" if axis_value >= 0.0 else "-"
 	match axis:
-		0:
-			return "Analogico Esquerdo %sX" % direction
-		1:
-			return "Analogico Esquerdo %sY" % direction
-		2:
-			return "Analogico Direito %sX" % direction
-		3:
-			return "Analogico Direito %sY" % direction
-		4:
-			return "LT / L2"
-		5:
-			return "RT / R2"
-		_:
-			return "Eixo %d%s" % [axis, direction]
+		0: return "Analogico Esquerdo %sX" % direction
+		1: return "Analogico Esquerdo %sY" % direction
+		2: return "Analogico Direito %sX" % direction
+		3: return "Analogico Direito %sY" % direction
+		4: return "LT / L2"
+		5: return "RT / R2"
+		_: return "Eixo %d%s" % [axis, direction]

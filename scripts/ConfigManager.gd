@@ -23,9 +23,9 @@ var settings := {
 	"volume_music": 0.0,
 	"volume_sfx": 0.0,
 
-	# Inputs personalizados pelo jogador
-	"inputs": {
-		# Ex: "jump": "Key:32"
+	"inputs_keyboard": {
+	},
+	"inputs_controller": {
 	}
 }
 
@@ -66,44 +66,64 @@ func get_volume(bus_name: String) -> float:
 # ============================================================
 
 func rebind_action(action: String, event: InputEvent):
-	# Garante que a ação exista no InputMap
 	if not InputMap.has_action(action):
 		InputMap.add_action(action)
 
-	# Remove qualquer input antigo dessa ação
-	InputMap.action_erase_events(action)
-
-	# DUPLICA o evento
-	# (evita problemas por reutilizar o mesmo objeto InputEvent)
+	var is_joypad := event is InputEventJoypadButton or event is InputEventJoypadMotion
 	var ev := event.duplicate()
-	if ev is InputEventJoypadButton or ev is InputEventJoypadMotion:
+	if is_joypad:
 		ev.device = -1
+
+	var to_remove: Array[InputEvent] = []
+	for existing in InputMap.action_get_events(action):
+		if is_joypad == (existing is InputEventJoypadButton or existing is InputEventJoypadMotion):
+			to_remove.append(existing)
+
+	for e in to_remove:
+		InputMap.action_erase_event(action, e)
+
 	InputMap.action_add_event(action, ev)
 	_apply_action_deadzone_for_event(action, ev)
 
-	# Converte o evento para string e salva
-	settings["inputs"][action] = _event_to_string(ev)
+	if is_joypad:
+		_remove_conflicting_joypad_events(action, ev)
+
+	var storage_key := "inputs_controller" if is_joypad else "inputs_keyboard"
+	settings[storage_key][action] = _event_to_string(ev)
 	_save()
 
 
 func apply_loaded_inputs():
-	if not settings.has("inputs") or typeof(settings["inputs"]) != TYPE_DICTIONARY:
-		settings["inputs"] = {}
+	if not settings.has("inputs_keyboard") or typeof(settings["inputs_keyboard"]) != TYPE_DICTIONARY:
+		settings["inputs_keyboard"] = {}
+	if not settings.has("inputs_controller") or typeof(settings["inputs_controller"]) != TYPE_DICTIONARY:
+		settings["inputs_controller"] = {}
 
-	# Reaplica todos os inputs salvos no arquivo de config
-	for action in settings["inputs"].keys():
-		var ev_str = settings["inputs"][action]
-		var event = _string_to_event(ev_str)
+	for entry in [["inputs_keyboard", false], ["inputs_controller", true]]:
+		var storage_key := entry[0] as String
+		var is_joypad := entry[1] as bool
+		for action in settings[storage_key].keys():
+			var ev_str = settings[storage_key][action]
+			var event = _string_to_event(ev_str)
+			if not event:
+				continue
 
-		if event:
-			# Garante que a ação exista
 			if not InputMap.has_action(action):
 				InputMap.add_action(action)
 
-			# Remove binds antigos e aplica o carregado
-			InputMap.action_erase_events(action)
+			var to_remove: Array[InputEvent] = []
+			for existing in InputMap.action_get_events(action):
+				if is_joypad == (existing is InputEventJoypadButton or existing is InputEventJoypadMotion):
+					to_remove.append(existing)
+
+			for e in to_remove:
+				InputMap.action_erase_event(action, e)
+
 			InputMap.action_add_event(action, event)
 			_apply_action_deadzone_for_event(action, event)
+
+			if is_joypad:
+				_remove_conflicting_joypad_events(action, event)
 
 
 # ============================================================
@@ -171,6 +191,26 @@ func _apply_action_deadzone_for_event(action: String, event: InputEvent) -> void
 		InputMap.action_set_deadzone(action, JOYPAD_TRIGGER_ACTION_DEADZONE)
 
 
+func _remove_conflicting_joypad_events(source_action: String, event: InputEvent) -> void:
+	for other_action in InputMap.get_actions():
+		if other_action == source_action:
+			continue
+		var to_remove: Array[InputEvent] = []
+		for existing in InputMap.action_get_events(other_action):
+			if _is_same_physical_input(existing, event):
+				to_remove.append(existing)
+		for e in to_remove:
+			InputMap.action_erase_event(other_action, e)
+
+
+func _is_same_physical_input(a: InputEvent, b: InputEvent) -> bool:
+	if a is InputEventJoypadButton and b is InputEventJoypadButton:
+		return a.button_index == b.button_index
+	if a is InputEventJoypadMotion and b is InputEventJoypadMotion:
+		return a.axis == b.axis and sign(a.axis_value) == sign(b.axis_value)
+	return false
+
+
 # ============================================================
 #           SALVAR / CARREGAR CONFIG
 # ============================================================
@@ -221,5 +261,18 @@ func _ensure_settings_schema() -> void:
 		settings["volume_music"] = 0.0
 	if not settings.has("volume_sfx"):
 		settings["volume_sfx"] = 0.0
-	if not settings.has("inputs") or typeof(settings["inputs"]) != TYPE_DICTIONARY:
-		settings["inputs"] = {}
+	if not settings.has("inputs_keyboard") or typeof(settings["inputs_keyboard"]) != TYPE_DICTIONARY:
+		settings["inputs_keyboard"] = {}
+	if not settings.has("inputs_controller") or typeof(settings["inputs_controller"]) != TYPE_DICTIONARY:
+		settings["inputs_controller"] = {}
+	if settings.has("inputs"):
+		var old = settings["inputs"]
+		if typeof(old) == TYPE_DICTIONARY:
+			for action in old:
+				var ev_str = old[action]
+				if ev_str.begins_with("Key:"):
+					settings["inputs_keyboard"][action] = ev_str
+				else:
+					settings["inputs_controller"][action] = ev_str
+		settings.erase("inputs")
+		_save()
