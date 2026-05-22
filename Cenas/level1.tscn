@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=4 uid="uid://bmeqa3g35tp1i"]
+[gd_scene load_steps=49 format=4 uid="uid://bmeqa3g35tp1i"]
 
 [ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://sprites/img/tiles/pedra.png" id="1_djts0"]
 [ext_resource type="Script" uid="uid://b32be5wkrk8lo" path="res://scripts/level_1.gd" id="1_o25p7"]
@@ -29,6 +29,7 @@
 [ext_resource type="Script" uid="uid://ce2nqxnlfritd" path="res://scripts/SpawnZone.gd" id="26_spawn"]
 [ext_resource type="PackedScene" uid="uid://dqvuipwyhgwve" path="res://Cenas/slime_aquatico.tscn" id="27_aqua"]
 [ext_resource type="PackedScene" path="res://Cenas/slime_voador.tscn" id="28_fly"]
+[ext_resource type="PackedScene" uid="uid://bo2w3vc1bhchp" path="res://Cenas/power_checkpoint.tscn" id="29_power"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_he0a0"]
 texture = ExtResource("1_djts0")
@@ -904,6 +905,21 @@ position = Vector2(182, 214)
 [node name="BubbleUp3" parent="." node_paths=PackedStringArray("player") instance=ExtResource("17_etkem")]
 position = Vector2(740, 222)
 player = NodePath("../player")
+
+[node name="PowerCheckpoint1" parent="." instance=ExtResource("29_power")]
+position = Vector2(300, 210)
+
+[node name="PowerCheckpoint2" parent="." instance=ExtResource("29_power")]
+position = Vector2(650, 210)
+unlock_slot = 1
+
+[node name="PowerCheckpoint3" parent="." instance=ExtResource("29_power")]
+position = Vector2(830, 210)
+unlock_slot = 2
+
+[node name="PowerCheckpoint4" parent="." instance=ExtResource("29_power")]
+position = Vector2(1000, 210)
+unlock_slot = 3
 
 [node name="ParallaxBackground" parent="." instance=ExtResource("3_itj36")]
 

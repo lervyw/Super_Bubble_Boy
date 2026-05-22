@@ -258,7 +258,11 @@ func handle_special_attack_animation() -> void:
 	if "special_attack_animation_override" in player:
 		var override_anim: StringName = player.special_attack_animation_override
 		if override_anim != &"" and sprite_frames.has_animation(override_anim):
-			play_if_different(override_anim)
+			if override_anim in [&"bubble_throw", &"bubble_throw_arrive"]:
+				if animation != override_anim:
+					play(override_anim)
+			else:
+				play_if_different(override_anim)
 			return
 
 	var anim_name: StringName = &""
@@ -647,6 +651,12 @@ func _on_animation_finished() -> void:
 			deactivate_all_attack_areas()
 			deactivate_all_special_attack_areas()
 			refresh_hitbox_for_current_state()
+			attack_finished.emit()
+
+		&"bubble_throw", &"bubble_throw_arrive":
+			refresh_hitbox_for_current_state()
+			deactivate_all_attack_areas()
+			deactivate_all_special_attack_areas()
 			attack_finished.emit()
 
 		_:

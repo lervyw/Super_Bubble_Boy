@@ -25,22 +25,25 @@
 [ext_resource type="Texture2D" uid="uid://dqgnm8xab67a7" path="res://sprites/assets/power_wheel/hud poderes5.png" id="23_panel_frame5"]
 [ext_resource type="Texture2D" uid="uid://ctoamifsknvhu" path="res://sprites/assets/icone-ult.png" id="24_ult_icon"]
 [ext_resource type="Texture2D" uid="uid://lcn6rpxarlr0" path="res://sprites/assets/pause_menu/pause1.png" id="25_pause_frame"]
+[ext_resource type="Texture2D" uid="uid://dymwby7mri44v" path="res://sprites/assets/bolha_ressonante.png" id="26_pk3l"]
+[ext_resource type="Texture2D" uid="uid://bflyvfpem4ffw" path="res://sprites/assets/Corrida.png" id="27_qwer4"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_power_panel"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "ultimate_ready_icon", "boss_hp_bar", "menu_panel", "pause_menu_panel", "warning_label", "passive_toggle", "passive_selector", "selected_passive_icon", "resume_button", "main_menu_button", "quit_button", "ultimate_cooldown_bar")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "stamina_bar", "ultimate_ready_icon", "boss_hp_bar", "menu_panel", "pause_menu_panel", "warning_label", "passive_toggle", "passive_icons", "pause_passive_icons", "resume_button", "main_menu_button", "quit_button", "ultimate_cooldown_bar")]
 script = ExtResource("1_uow6a")
 heart_icons = [null, null, null]
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
 mana_bar = NodePath("HBoxContainer/Holder/ManaBar")
+stamina_bar = NodePath("HBoxContainer/Holder/StaminaBar")
 ultimate_ready_icon = NodePath("UltimateReadyIcon")
 boss_hp_bar = NodePath("BossBar")
 menu_panel = NodePath("Panel")
 pause_menu_panel = NodePath("PauseMenu")
 warning_label = NodePath("WarningLabel")
 passive_toggle = NodePath("PauseMenu/VBoxContainer/PassiveToggle")
-passive_selector = NodePath("PauseMenu/VBoxContainer/PassiveSelector")
-selected_passive_icon = NodePath("SelectedPassiveIcon")
+passive_icons = [NodePath("PassiveIconOrbit"), NodePath("PassiveIconStomp"), NodePath("PassiveIconRun")]
+pause_passive_icons = [NodePath("PauseMenu/VBoxContainer/PassiveIcons/Orbit"), NodePath("PauseMenu/VBoxContainer/PassiveIcons/Stomp"), NodePath("PauseMenu/VBoxContainer/PassiveIcons/Run")]
 resume_button = NodePath("PauseMenu/VBoxContainer/ResumeButton")
 main_menu_button = NodePath("PauseMenu/VBoxContainer/MainMenuButton")
 quit_button = NodePath("PauseMenu/VBoxContainer/QuitButton")
@@ -102,6 +105,16 @@ scale = Vector2(0.27689844, 0.6100078)
 texture_under = ExtResource("4_b1pas")
 texture_progress = ExtResource("5_016od")
 
+[node name="StaminaBar" type="TextureProgressBar" parent="HBoxContainer/Holder"]
+layout_mode = 0
+offset_left = 19.060833
+offset_top = 39.50196
+offset_right = 172.06084
+offset_bottom = 58.50196
+scale = Vector2(0.27689844, 0.6100078)
+texture_under = ExtResource("6_cqml6")
+texture_progress = ExtResource("7_crc4m")
+
 [node name="BossBar" type="TextureProgressBar" parent="."]
 offset_left = 75.0
 offset_top = 233.0
@@ -130,15 +143,38 @@ texture = ExtResource("24_ult_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SelectedPassiveIcon" type="TextureRect" parent="."]
-visible = false
-offset_left = 8.0
-offset_top = 86.0
-offset_right = 40.0
-offset_bottom = 118.0
+[node name="PassiveIconOrbit" type="TextureRect" parent="."]
+offset_left = 64.0
+offset_top = 52.000004
+offset_right = 96.0
+offset_bottom = 84.0
+scale = Vector2(0.6, 0.6)
 texture = ExtResource("18_1j8pg")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 1
+
+[node name="PassiveIconStomp" type="TextureRect" parent="."]
+offset_left = 83.0
+offset_top = 52.000004
+offset_right = 115.0
+offset_bottom = 84.0
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("26_pk3l")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 1
+
+[node name="PassiveIconRun" type="TextureRect" parent="."]
+offset_left = 102.0
+offset_top = 52.000004
+offset_right = 134.0
+offset_bottom = 84.0
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("27_qwer4")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 1
 
 [node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("state_texture", "up_button", "down_button", "left_button", "right_button")]
 offset_left = 166.0
@@ -247,7 +283,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
+mouse_filter = 1
 texture = ExtResource("25_pause_frame")
 expand_mode = 1
 stretch_mode = 5
@@ -259,6 +295,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="Title" type="Label" parent="PauseMenu/VBoxContainer"]
 visible = false
@@ -279,24 +316,44 @@ offset_bottom = 194.0
 theme_override_font_sizes/font_size = 8
 text = "Poderes ligados"
 
-[node name="PassiveLabel" type="Label" parent="PauseMenu/VBoxContainer"]
-visible = false
-layout_mode = 0
-offset_left = 206.0
-offset_top = 126.0
-offset_right = 302.0
-offset_bottom = 137.0
-theme_override_font_sizes/font_size = 8
-text = "Poder passivo"
-horizontal_alignment = 1
-
-[node name="PassiveSelector" type="OptionButton" parent="PauseMenu/VBoxContainer"]
+[node name="PassiveIconsLabel" type="Label" parent="PauseMenu/VBoxContainer"]
 layout_mode = 0
 offset_left = 205.0
-offset_top = 139.0
+offset_top = 130.0
 offset_right = 301.0
-offset_bottom = 161.0
-theme_override_font_sizes/font_size = 8
+offset_bottom = 145.0
+theme_override_font_sizes/font_size = 9
+text = "Passivas"
+horizontal_alignment = 1
+
+[node name="PassiveIcons" type="HBoxContainer" parent="PauseMenu/VBoxContainer"]
+layout_mode = 0
+offset_left = 198.0
+offset_top = 148.0
+offset_right = 308.0
+offset_bottom = 184.0
+alignment = 1
+
+[node name="Orbit" type="Button" parent="PauseMenu/VBoxContainer/PassiveIcons"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(32, 32)
+flat = true
+icon = ExtResource("18_1j8pg")
+
+[node name="Stomp" type="Button" parent="PauseMenu/VBoxContainer/PassiveIcons"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(32, 32)
+flat = true
+icon = ExtResource("26_pk3l")
+
+[node name="Run" type="Button" parent="PauseMenu/VBoxContainer/PassiveIcons"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(32, 32)
+flat = true
+icon = ExtResource("27_qwer4")
 
 [node name="ResumeButton" type="Button" parent="PauseMenu/VBoxContainer"]
 layout_mode = 0

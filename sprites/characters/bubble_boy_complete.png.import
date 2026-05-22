@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://licckny45goq"
-path="res://.godot/imported/super_bubble_all.png-549b301a8f205452602b65df79768512.ctex"
+uid="uid://dnry0ni17ltl4"
+path="res://.godot/imported/bubble_boy_complete.png-538c8d50f20c92041b6e85ab4e1aa996.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/characters/super_bubble_all.png"
-dest_files=["res://.godot/imported/super_bubble_all.png-549b301a8f205452602b65df79768512.ctex"]
+source_file="res://sprites/characters/bubble_boy_complete.png"
+dest_files=["res://.godot/imported/bubble_boy_complete.png-538c8d50f20c92041b6e85ab4e1aa996.ctex"]
 
 [params]
 

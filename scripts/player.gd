@@ -16,12 +16,20 @@ enum State {
 enum Form { NORMAL, BUBBLE, SUPER }
 enum GameMode { PLATAFORMA, METROIDVANIA }
 enum HudMenuAction { NONE, ULTIMATE, PLACEHOLDER, SPECIAL_ATTACK, BUBBLE_PROJECTILE }
+enum WheelSlot { ULTIMATE, SPECIAL_ATTACK, BUBBLE_PROJECTILE, PLACEHOLDER }
 enum AttackKind { NONE, NORMAL, PASSIVE, ACTIVE_SUPER, ULTIMATE, DEFEND }
-enum PassivePower { NONE, ORBIT_BUBBLE, GROUND_STOMP, QUICK_RUN }
+enum PassivePower { NONE, GROUND_STOMP, QUICK_RUN }
 
 const ATTACK_META_DAMAGE := &"attack_damage"
 const ATTACK_META_KIND := &"attack_kind"
 const ATTACK_META_ID := &"attack_id"
+
+const STAMINA_COST_DASH: float = 15.0
+const STAMINA_COST_QUICK_RUN_PER_SEC: float = 10.0
+const STAMINA_COST_ATTACK: float = 5.0
+const STAMINA_COST_SPECIAL: float = 10.0
+const STAMINA_COST_DEFEND: float = 0.0
+const STAMINA_COST_DEFEND_HIT: float = 8.0
 
 var hud_menu_open := false
 var hud_menu_selection: HudMenuAction = HudMenuAction.NONE
@@ -99,14 +107,6 @@ var hud_menu_waiting_for_neutral := false
 @export_group("Selectable Passive Powers")
 @export var selected_passive_power: PassivePower = PassivePower.NONE
 @export var passive_powers_enabled: bool = true
-@export var orbit_bubble_damage: int = 1
-@export_range(8.0, 96.0, 1.0) var orbit_bubble_radius: float = 34.0
-@export_range(0.5, 12.0, 0.1) var orbit_bubble_speed: float = 4.5
-@export_range(0.0, 32.0, 0.5) var orbit_bubble_zigzag_amplitude: float = 12.0
-@export_range(0.5, 20.0, 0.1) var orbit_bubble_zigzag_speed: float = 6.0
-@export_range(4.0, 32.0, 0.5) var orbit_bubble_hit_radius: float = 11.0
-@export var orbit_bubble_visual_scale: Vector2 = Vector2(0.48, 0.48)
-@export var orbit_bubble_texture: Texture2D = preload("res://sprites/assets/bolha_guardian1.png")
 @export var ground_stomp_damage: int = 2
 @export_range(40.0, 260.0, 1.0) var ground_stomp_radius: float = 72.0
 @export_range(200.0, 1600.0, 10.0) var ground_stomp_fall_speed: float = 900.0
@@ -148,6 +148,20 @@ var hud_menu_waiting_for_neutral := false
 @export var ultimate_attack_area_path: NodePath = NodePath("AttackHitbox")
 @export var allow_ultimate_input: bool = true
 @export_range(0.05, 1.5, 0.01) var ultimate_attack_active_time: float = 0.3
+
+@export_group("Normal Form Powers (Wheel)")
+@export var protective_bubble_duration: float = 5.0
+@export var protective_bubble_mana_cost: float = 15.0
+@export var protective_bubble_damage: int = 1
+@export var portal_bubble_scene: PackedScene = preload("res://Cenas/portal_bubble_projectile.tscn")
+@export var portal_max_distance: float = 300.0
+@export var portal_mana_cost: float = 10.0
+@export var teleport_bubble_scene: PackedScene = preload("res://Cenas/teleport_bubble_projectile.tscn")
+@export var teleport_bubble_max_distance: float = 250.0
+@export var teleport_bubble_mana_cost: float = 18.0
+@export var ghost_mode_duration: float = 10.0
+@export var ghost_mode_mana_cost: float = 25.0
+@export var ghost_mode_speed_multiplier: float = 1.35
 
 @export_group("Respawn")
 @export var respawn_position: Vector2 = Vector2(288, 207)
@@ -192,9 +206,6 @@ var special_attack_animation_override: StringName = &""
 var attack_window_serial: int = 0
 var fatal_hit_sequence_running: bool = false
 var hurt_sequence_running: bool = false
-var orbit_bubble_area: Area2D
-var orbit_bubble_shape: CollisionShape2D
-var orbit_bubble_time: float = 0.0
 var ground_stomp_active: bool = false
 var ground_stomp_cooldown_timer: float = 0.0
 var ground_stomp_area: Area2D
@@ -208,10 +219,55 @@ var last_tap_time_left: float = 0.0
 var was_left_pressed: bool = false
 var was_right_pressed: bool = false
 
+var protective_bubble_active := false
+var protective_bubble_timer := 0.0
+var protective_bubble_blink_time := 0.0
+var bubble_shield: Area2D
+
+var portals: Array[Node] = []
+var portal_count := 0
+var portal_bubble_traveling := false
+var portal_bubble_ref: Node
+
+var teleport_bubble_active := false
+var teleport_bubble_traveling := false
+var teleport_bubble_ref: Node
+var teleport_bubble_intangible := false
+var teleport_bubble_timer := 0.0
+
+var ghost_mode_active := false
+var ghost_mode_timer := 0.0
+var ghost_mode_blink_time := 0.0
+var saved_collision_layer: int = 0
+
+var camera_follow_target: Node2D
+var camera_follow_timer: float = 0.0
+
 var unlocked_forms = {
 	Form.NORMAL: true,
 	Form.BUBBLE: false,
 	Form.SUPER: false
+}
+
+var unlocked_wheel_slots = {
+	Form.NORMAL: {
+		WheelSlot.ULTIMATE: false,
+		WheelSlot.SPECIAL_ATTACK: false,
+		WheelSlot.BUBBLE_PROJECTILE: false,
+		WheelSlot.PLACEHOLDER: false,
+	},
+	Form.BUBBLE: {
+		WheelSlot.ULTIMATE: false,
+		WheelSlot.SPECIAL_ATTACK: false,
+		WheelSlot.BUBBLE_PROJECTILE: false,
+		WheelSlot.PLACEHOLDER: false,
+	},
+	Form.SUPER: {
+		WheelSlot.ULTIMATE: false,
+		WheelSlot.SPECIAL_ATTACK: false,
+		WheelSlot.BUBBLE_PROJECTILE: false,
+		WheelSlot.PLACEHOLDER: false,
+	}
 }
 
 
@@ -248,6 +304,7 @@ func _ready() -> void:
 	refresh_stompers_for_current_form()
 	update_audio_by_form()
 	passive_attack_timer = passive_attack_interval
+	setup_protective_bubble_shield()
 
 
 func ensure_optional_input_actions() -> void:
@@ -301,6 +358,7 @@ func _physics_process(delta: float) -> void:
 	update_attack_cooldowns(delta)
 	process_passive_attack(delta)
 	process_selectable_passives(delta)
+	process_normal_form_powers(delta)
 
 	if is_bouncing_from_enemy:
 		is_bouncing_from_enemy = false
@@ -458,7 +516,6 @@ func configure_passive_attack(interval: float, active_time: float, damage: int) 
 func get_passive_power_names() -> Array[String]:
 	return [
 		"Nenhuma",
-		"Bolha protetora",
 		"Stomp no chao",
 		"Corrida rapida"
 	]
@@ -480,11 +537,6 @@ func apply_selected_passive_power() -> void:
 	quick_run_timer = 0.0
 	quick_run_direction = 0
 
-	if orbit_bubble_area:
-		var orbit_enabled := passive_powers_enabled and selected_passive_power == PassivePower.ORBIT_BUBBLE
-		orbit_bubble_area.visible = orbit_enabled
-		set_area_collision_enabled(orbit_bubble_area, orbit_enabled)
-
 	if ground_stomp_area:
 		set_area_collision_enabled(ground_stomp_area, false)
 
@@ -496,9 +548,6 @@ func set_passive_powers_enabled(enabled: bool) -> void:
 		quick_run_active = false
 		quick_run_timer = 0.0
 		quick_run_direction = 0
-		if orbit_bubble_area:
-			orbit_bubble_area.visible = false
-			set_area_collision_enabled(orbit_bubble_area, false)
 		if ground_stomp_area:
 			set_area_collision_enabled(ground_stomp_area, false)
 	else:
@@ -510,36 +559,7 @@ func are_passive_powers_enabled() -> bool:
 
 
 func setup_selectable_passive_nodes() -> void:
-	setup_orbit_bubble_node()
 	setup_ground_stomp_node()
-
-
-func setup_orbit_bubble_node() -> void:
-	if orbit_bubble_area:
-		return
-
-	orbit_bubble_area = Area2D.new()
-	orbit_bubble_area.name = "PassiveOrbitBubble"
-	orbit_bubble_area.add_to_group("player_attack")
-	orbit_bubble_area.set_meta(ATTACK_META_DAMAGE, max(orbit_bubble_damage, 1))
-	orbit_bubble_area.set_meta(ATTACK_META_KIND, int(AttackKind.PASSIVE))
-	orbit_bubble_area.set_meta(ATTACK_META_ID, "orbit_bubble")
-	add_child(orbit_bubble_area)
-
-	orbit_bubble_shape = CollisionShape2D.new()
-	var shape := CircleShape2D.new()
-	shape.radius = orbit_bubble_hit_radius
-	orbit_bubble_shape.shape = shape
-	orbit_bubble_area.add_child(orbit_bubble_shape)
-
-	var sprite := Sprite2D.new()
-	sprite.name = "Sprite2D"
-	sprite.texture = orbit_bubble_texture
-	sprite.scale = orbit_bubble_visual_scale
-	orbit_bubble_area.add_child(sprite)
-
-	orbit_bubble_area.visible = false
-	set_area_collision_enabled(orbit_bubble_area, false)
 
 
 func setup_ground_stomp_node() -> void:
@@ -562,6 +582,376 @@ func setup_ground_stomp_node() -> void:
 	set_area_collision_enabled(ground_stomp_area, false)
 
 
+func setup_protective_bubble_shield() -> void:
+	if bubble_shield:
+		return
+	bubble_shield = Area2D.new()
+	bubble_shield.name = "ProtectiveBubbleShield"
+	bubble_shield.set_meta(ATTACK_META_DAMAGE, protective_bubble_damage)
+	bubble_shield.set_meta(ATTACK_META_KIND, int(AttackKind.PASSIVE))
+	bubble_shield.set_meta(ATTACK_META_ID, "protective_bubble")
+	bubble_shield.add_to_group("player_attack")
+	add_child(bubble_shield)
+
+	var shape := CollisionShape2D.new()
+	var circle := CircleShape2D.new()
+	circle.radius = 22.0
+	shape.shape = circle
+	bubble_shield.add_child(shape)
+
+	var sprite := Sprite2D.new()
+	sprite.name = "Sprite2D"
+	sprite.texture = preload("res://sprites/characters/projectiles/projectile_bubble1.png")
+	sprite.scale = Vector2(0.65, 0.65)
+	sprite.modulate = Color(1, 1, 1, 1)
+	sprite.material = null
+	bubble_shield.add_child(sprite)
+
+	bubble_shield.visible = false
+	set_area_collision_enabled(bubble_shield, false)
+
+
+func process_normal_form_powers(delta: float) -> void:
+	if form != Form.NORMAL:
+		_deactivate_protective_bubble()
+		_deactivate_ghost_mode()
+		if teleport_bubble_intangible:
+			_end_teleport_intangibility()
+		return
+
+	_cleanup_invalid_portals()
+	_check_portal_interaction()
+
+	if protective_bubble_active:
+		protective_bubble_timer -= delta
+		protective_bubble_blink_time += delta
+		var t := protective_bubble_timer
+		bubble_shield.position = Vector2(
+			cos(t * 3.0) * 26.0,
+			sin(t * 3.0) * 26.0
+		)
+		var sprite := bubble_shield.get_node_or_null("Sprite2D") as Sprite2D
+		if sprite:
+			var pulse := sin(protective_bubble_blink_time * 8.0) * 0.5 + 0.5
+			var blue := Color(0.3, 0.6, 1.0, 1.0)
+			var white := Color(1.0, 1.0, 1.0, 1.0)
+			sprite.modulate = white.lerp(blue, pulse)
+		if protective_bubble_timer <= 0.0:
+			_deactivate_protective_bubble()
+
+	if ghost_mode_active:
+		ghost_mode_timer -= delta
+		ghost_mode_blink_time += delta
+		var alpha := 0.4 + sin(ghost_mode_blink_time * 16.0) * 0.3
+		modulate.a = clampf(alpha, 0.1, 1.0)
+		if ghost_mode_timer <= 0.0:
+			_deactivate_ghost_mode()
+
+	if teleport_bubble_intangible:
+		teleport_bubble_timer -= delta
+		if teleport_bubble_timer <= 0.0:
+			_end_teleport_intangibility()
+
+
+func _deactivate_protective_bubble() -> void:
+	if not protective_bubble_active:
+		return
+	protective_bubble_active = false
+	protective_bubble_timer = 0.0
+	protective_bubble_blink_time = 0.0
+	if is_instance_valid(bubble_shield):
+		bubble_shield.visible = false
+		set_area_collision_enabled(bubble_shield, false)
+		var sprite := bubble_shield.get_node_or_null("Sprite2D") as Sprite2D
+		if sprite:
+			sprite.modulate.a = 1.0
+
+
+func _end_teleport_intangibility() -> void:
+	teleport_bubble_intangible = false
+	teleport_bubble_timer = 0.0
+	teleport_bubble_traveling = false
+	teleport_bubble_ref = null
+	is_invincible = false
+	modulate.a = 1.0
+
+
+func _do_teleport_arrival() -> void:
+	if teleport_bubble_ref and is_instance_valid(teleport_bubble_ref):
+		var safe_pos := _find_safe_teleport_position(teleport_bubble_ref.global_position)
+		global_position = safe_pos
+		teleport_bubble_ref.queue_free()
+	teleport_bubble_ref = null
+	teleport_bubble_active = false
+	teleport_bubble_traveling = false
+	_end_teleport_intangibility()
+	_play_and_wait_for_arrive()
+
+
+func _on_teleport_bubble_arrived(pos: Vector2) -> void:
+	var safe_pos := _find_safe_teleport_position(pos)
+	global_position = safe_pos
+	_stop_camera_follow()
+	teleport_bubble_ref = null
+	teleport_bubble_active = false
+	teleport_bubble_traveling = false
+	_end_teleport_intangibility()
+	_play_and_wait_for_arrive()
+
+
+func _play_and_wait_for_arrive() -> void:
+	var sprite := $Sprite2D as AnimatedSprite2D
+	if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation(&"bubble_throw_arrive"):
+		special_attack_animation_override = &"bubble_throw_arrive"
+		change_state(State.SPECIAL_ATTACK)
+		sprite.play(&"bubble_throw_arrive")
+		await sprite.animation_finished
+	special_attack_animation_override = &""
+	deactivate_attack_area()
+	defending = false
+	change_state(State.IDLE)
+
+
+func _find_safe_teleport_position(target: Vector2) -> Vector2:
+	var space := get_world_2d().direct_space_state
+	if not space:
+		return target
+	var query := PhysicsShapeQueryParameters2D.new()
+	var shape := CircleShape2D.new()
+	shape.radius = 10.0
+	query.shape = shape
+	query.collision_mask = collision_mask
+	for offset_y in [0, -16, -32, -48, 16]:
+		var test_pos := target + Vector2(0, offset_y)
+		query.transform = Transform2D(0, test_pos)
+		var results := space.intersect_shape(query)
+		if results.is_empty():
+			return test_pos
+	return target
+
+
+func _deactivate_ghost_mode() -> void:
+	if not ghost_mode_active:
+		return
+	ghost_mode_active = false
+	ghost_mode_timer = 0.0
+	is_invincible = false
+	modulate.a = 1.0
+	if saved_collision_layer != 0:
+		collision_layer = saved_collision_layer
+		saved_collision_layer = 0
+	push_out_of_enemies()
+
+
+func push_out_of_enemies() -> void:
+	var push_dir := Vector2.ZERO
+	for body in get_tree().get_nodes_in_group(&"slime"):
+		if not is_instance_valid(body):
+			continue
+		var dist := global_position.distance_to(body.global_position)
+		if dist < 40.0:
+			push_dir += (global_position - body.global_position).normalized() * (1.0 - dist / 40.0)
+	if push_dir != Vector2.ZERO:
+		push_dir = push_dir.normalized() * 80.0
+		velocity += push_dir
+		move_and_slide()
+
+
+func start_protective_bubble() -> void:
+	if protective_bubble_active:
+		return
+	if not can_use_mana_attacks():
+		return
+	if not consume_attack_mana(protective_bubble_mana_cost):
+		return
+	protective_bubble_active = true
+	protective_bubble_timer = protective_bubble_duration
+	if not bubble_shield:
+		setup_protective_bubble_shield()
+	if bubble_shield:
+		bubble_shield.visible = true
+		set_area_collision_enabled(bubble_shield, true)
+
+
+func fire_portal_bubble() -> void:
+	if not can_use_mana_attacks():
+		return
+	if not consume_attack_mana(portal_mana_cost):
+		return
+	if portal_bubble_scene == null:
+		return
+	var bubble := portal_bubble_scene.instantiate()
+	var dir := get_facing_direction()
+	bubble.global_position = global_position + Vector2(18.0 * dir, -6.0)
+	if bubble.has_method("setup"):
+		bubble.setup(Vector2(float(dir), 0.0))
+	var parent := get_tree().current_scene if get_tree().current_scene else get_parent()
+	parent.add_child(bubble)
+	portal_bubble_traveling = true
+	portal_bubble_ref = bubble
+
+	_start_camera_follow(bubble, 2.0)
+
+
+func _on_portal_bubble_hit(pos: Vector2) -> void:
+	if portal_count >= 2:
+		for p in portals:
+			if is_instance_valid(p):
+				p.queue_free()
+		portals.clear()
+		portal_count = 0
+	var portal_scene := preload("res://Cenas/portal.tscn")
+	var portal := portal_scene.instantiate()
+	portal.global_position = pos
+	portal.player_ref = self
+	var parent := get_tree().current_scene if get_tree().current_scene else get_parent()
+	parent.add_child(portal)
+	portals.append(portal)
+	portal_count += 1
+	if portal_count == 2:
+		var a = portals[0]
+		var b = portals[1]
+		if is_instance_valid(a) and is_instance_valid(b):
+			a.linked_portal = b
+			b.linked_portal = a
+	portal_bubble_traveling = false
+	portal_bubble_ref = null
+	_stop_camera_follow()
+
+
+func _cleanup_invalid_portals() -> void:
+	var valid: Array[Node] = []
+	for p in portals:
+		if is_instance_valid(p):
+			valid.append(p)
+		else:
+			portal_count -= 1
+	portals = valid
+	if portal_count < 0:
+		portal_count = 0
+
+
+func deactivate_portal(portal_node: Node) -> void:
+	var idx := portals.find(portal_node)
+	if idx >= 0:
+		portals.remove_at(idx)
+		portal_count -= 1
+		if portal_count == 1 and portals.size() == 1 and is_instance_valid(portals[0]):
+			portals[0].linked_portal = null
+	if is_instance_valid(portal_node):
+		portal_node.queue_free()
+
+
+func _check_portal_interaction() -> void:
+	if portal_count <= 0:
+		return
+	if not Input.is_action_just_pressed("defend"):
+		return
+	var nearest_portal: Node = null
+	var min_dist := 40.0
+	for p in portals:
+		if not is_instance_valid(p):
+			continue
+		var dist := global_position.distance_to(p.global_position)
+		if dist < min_dist:
+			min_dist = dist
+			nearest_portal = p
+	if nearest_portal:
+		deactivate_portal(nearest_portal)
+
+
+func start_teleport_bubble() -> void:
+	if teleport_bubble_active:
+		return
+	if not can_use_mana_attacks():
+		return
+	if not consume_attack_mana(teleport_bubble_mana_cost):
+		return
+	if teleport_bubble_scene == null:
+		return
+	teleport_bubble_active = true
+	special_attack_animation_override = &"bubble_throw"
+	change_state(State.SPECIAL_ATTACK)
+	await _wait_for_animation(&"bubble_throw")
+	special_attack_animation_override = &""
+	if state == State.SPECIAL_ATTACK:
+		change_state(State.IDLE)
+	_fire_teleport_bubble()
+
+
+func play_bubble_throw_animation() -> void:
+	if has_node("Sprite2D"):
+		var sprite := $Sprite2D as AnimatedSprite2D
+		if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation(&"bubble_throw"):
+			sprite.play(&"bubble_throw")
+
+
+func play_bubble_throw_arrive_animation() -> void:
+	if has_node("Sprite2D"):
+		var sprite := $Sprite2D as AnimatedSprite2D
+		if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation(&"bubble_throw_arrive"):
+			sprite.play(&"bubble_throw_arrive")
+
+
+func _wait_for_animation(anim_name: StringName) -> void:
+	var sprite := $Sprite2D as AnimatedSprite2D
+	if not sprite:
+		return
+	if not sprite.sprite_frames or not sprite.sprite_frames.has_animation(anim_name):
+		return
+	if sprite.animation == anim_name and not sprite.is_playing():
+		return
+	await get_tree().process_frame
+	if is_instance_valid(sprite) and sprite.animation == anim_name and sprite.is_playing():
+		await sprite.animation_finished
+
+
+func _fire_teleport_bubble() -> void:
+	if teleport_bubble_scene == null:
+		return
+	var bubble := teleport_bubble_scene.instantiate()
+	var dir := get_facing_direction()
+	var origin := get_node_or_null("origem_throw_teleporte") as Node2D
+	if origin:
+		var origin_pos := origin.position
+		var flipped_pos := Vector2(origin_pos.x * dir, origin_pos.y)
+		bubble.global_position = to_global(flipped_pos)
+	else:
+		bubble.global_position = global_position + Vector2(22.0 * dir, -4.0)
+	if bubble.has_method("setup"):
+		bubble.setup(Vector2(float(dir), 0.0))
+	var parent := get_tree().current_scene if get_tree().current_scene else get_parent()
+	parent.add_child(bubble)
+	_start_camera_follow(bubble, 2.0)
+	teleport_bubble_traveling = true
+	teleport_bubble_ref = bubble
+	teleport_bubble_intangible = true
+	teleport_bubble_timer = 3.0
+	is_invincible = true
+	modulate.a = 0.0
+
+
+func set_player_body_collisions_disabled_for_enemies(disabled: bool) -> void:
+	for child in get_children():
+		if child is CollisionShape2D:
+			child.disabled = disabled
+
+
+func start_ghost_mode() -> void:
+	if ghost_mode_active:
+		return
+	if not can_use_mana_attacks():
+		return
+	if not consume_attack_mana(ghost_mode_mana_cost):
+		return
+	ghost_mode_active = true
+	ghost_mode_timer = ghost_mode_duration
+	ghost_mode_blink_time = 0.0
+	is_invincible = true
+	saved_collision_layer = collision_layer
+	collision_layer = 0
+
+
 func process_selectable_passives(delta: float) -> void:
 	if last_tap_time_left > 0.0:
 		last_tap_time_left = max(last_tap_time_left - delta, 0.0)
@@ -571,18 +961,9 @@ func process_selectable_passives(delta: float) -> void:
 		quick_run_cooldown_timer = max(quick_run_cooldown_timer - delta, 0.0)
 
 	if not passive_powers_enabled:
-		if orbit_bubble_area and orbit_bubble_area.visible:
-			orbit_bubble_area.visible = false
-			set_area_collision_enabled(orbit_bubble_area, false)
 		ground_stomp_active = false
 		quick_run_active = false
 		return
-
-	if selected_passive_power == PassivePower.ORBIT_BUBBLE:
-		update_orbit_bubble(delta)
-	elif orbit_bubble_area and orbit_bubble_area.visible:
-		orbit_bubble_area.visible = false
-		set_area_collision_enabled(orbit_bubble_area, false)
 
 	if selected_passive_power == PassivePower.GROUND_STOMP:
 		check_ground_stomp_input()
@@ -593,19 +974,6 @@ func process_selectable_passives(delta: float) -> void:
 		quick_run_active = false
 
 	update_quick_run_timer(delta)
-
-
-func update_orbit_bubble(delta: float) -> void:
-	if not orbit_bubble_area:
-		return
-
-	orbit_bubble_time += delta
-	orbit_bubble_area.visible = true
-	set_area_collision_enabled(orbit_bubble_area, true)
-	orbit_bubble_area.set_meta(ATTACK_META_DAMAGE, max(orbit_bubble_damage, 1))
-
-	var radius := orbit_bubble_radius + sin(orbit_bubble_time * orbit_bubble_zigzag_speed) * orbit_bubble_zigzag_amplitude
-	orbit_bubble_area.position = Vector2(cos(orbit_bubble_time * orbit_bubble_speed), sin(orbit_bubble_time * orbit_bubble_speed)) * radius
 
 
 func check_ground_stomp_input() -> void:
@@ -779,6 +1147,14 @@ func update_quick_run_timer(delta: float) -> void:
 	if not quick_run_active:
 		return
 
+	if not has_stamina(STAMINA_COST_QUICK_RUN_PER_SEC * delta):
+		quick_run_active = false
+		quick_run_direction = 0
+		quick_run_cooldown_timer = quick_run_cooldown
+		return
+
+	consume_stamina(STAMINA_COST_QUICK_RUN_PER_SEC * delta)
+
 	quick_run_timer = max(quick_run_timer - delta, 0.0)
 	if quick_run_timer <= 0.0 or not is_forward_pressed(quick_run_direction):
 		quick_run_active = false
@@ -811,7 +1187,7 @@ func is_forward_pressed(direction: int) -> bool:
 
 
 func handle_input() -> void:
-	if hud_menu_open or state == State.HURT or state == State.DEAD:
+	if hud_menu_open or state in [State.HURT, State.DEAD, State.SPECIAL_ATTACK]:
 		return
 
 	if Input.is_action_just_pressed("jump"):
@@ -833,6 +1209,9 @@ func start_special_attack() -> void:
 		return
 	if not can_trigger_active_attack(selected_active_attack_index):
 		return
+	if not has_stamina(STAMINA_COST_SPECIAL):
+		show_stamina_warning()
+		return
 
 	var attack_name := get_active_attack_name(selected_active_attack_index)
 	var mana_cost := get_active_attack_mana_cost(selected_active_attack_index)
@@ -840,6 +1219,7 @@ func start_special_attack() -> void:
 		return
 
 	defending = false
+	consume_stamina(STAMINA_COST_SPECIAL)
 	prepare_attack_area(
 		get_active_attack_area(selected_active_attack_index),
 		get_active_attack_damage(selected_active_attack_index),
@@ -1006,6 +1386,35 @@ func can_transform() -> bool:
 	return unlocked_forms.get(Form.BUBBLE, false) or unlocked_forms.get(Form.SUPER, false)
 
 
+func is_wheel_slot_unlocked(slot: WheelSlot) -> bool:
+	return unlocked_wheel_slots.get(form, {}).get(slot, false)
+
+func is_wheel_slot_unlocked_for_form(slot: WheelSlot, f: Form) -> bool:
+	return unlocked_wheel_slots.get(f, {}).get(slot, false)
+
+func get_unlocked_wheel_slots_for_form(f: Form) -> Array[WheelSlot]:
+	var slots: Array[WheelSlot] = []
+	var form_slots = unlocked_wheel_slots.get(f, {})
+	for slot in form_slots.keys():
+		if form_slots[slot]:
+			slots.append(slot)
+	return slots
+
+func get_unlocked_wheel_slots_for_current_form() -> Array[WheelSlot]:
+	return get_unlocked_wheel_slots_for_form(form)
+
+func get_wheel_slot_name(slot: WheelSlot) -> String:
+	match slot:
+		WheelSlot.ULTIMATE:
+			return "ultimate_attack"
+		WheelSlot.SPECIAL_ATTACK:
+			return "attack_special"
+		WheelSlot.BUBBLE_PROJECTILE:
+			return "bubble_projectile"
+		WheelSlot.PLACEHOLDER:
+			return "placeholder"
+	return "none"
+
 func can_dash_global() -> bool:
 	return true
 
@@ -1029,6 +1438,8 @@ func restore_resources_full() -> void:
 		stats.restore_full_health()
 	if stats.has_method("restore_full_mana"):
 		stats.restore_full_mana()
+	if stats.has_method("restore_full_stamina"):
+		stats.restore_full_stamina()
 
 
 func apply_normal_gravity(delta: float) -> void:
@@ -1150,7 +1561,9 @@ func force_form(new_form: Form) -> void:
 func can_dash() -> bool:
 	if not can_dash_global():
 		return false
-	return dash_cooldown_timer <= 0
+	if dash_cooldown_timer > 0:
+		return false
+	return has_stamina(STAMINA_COST_DASH)
 
 
 func handle_state(_delta: float) -> void:
@@ -1221,6 +1634,9 @@ func crouch_state() -> void:
 
 func dash_state() -> void:
 	if dash_timer <= 0.0:
+		if not consume_stamina(STAMINA_COST_DASH):
+			return
+
 		dash_timer = dash_time
 		dash_cooldown_timer = dash_cooldown
 
@@ -1318,8 +1734,12 @@ func change_state(new_state: State) -> void:
 func start_normal_attack() -> void:
 	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
+	if not has_stamina(STAMINA_COST_ATTACK):
+		show_stamina_warning()
+		return
 
 	defending = false
+	consume_stamina(STAMINA_COST_ATTACK)
 	prepare_attack_area(attack_area, normal_attack_damage, AttackKind.NORMAL, normal_attack_id)
 	change_state(State.ATTACK)
 	trigger_attack_window(normal_attack_active_time)
@@ -1329,6 +1749,9 @@ func take_damage(amount: int = 1, _source: Node = null) -> void:
 	if is_invincible or state in [State.DEAD, State.HURT]:
 		return
 	if defending and state == State.DEFEND:
+		if not consume_stamina(STAMINA_COST_DEFEND_HIT):
+			defending = false
+			change_state(State.IDLE)
 		return
 
 	var is_fatal_hit := false
@@ -1561,6 +1984,13 @@ func update_camera_framing(delta: float) -> void:
 	if not player_camera:
 		return
 
+	if camera_follow_target and is_instance_valid(camera_follow_target):
+		camera_follow_timer -= delta
+		player_camera.global_position = camera_follow_target.global_position
+		if camera_follow_timer <= 0.0 or not is_instance_valid(camera_follow_target):
+			_stop_camera_follow()
+		return
+
 	var target_offset := Vector2(get_camera_lookahead_direction() * camera_lookahead_distance, camera_vertical_offset)
 	var weight := clampf(delta * camera_offset_smoothing, 0.0, 1.0)
 	player_camera.offset = player_camera.offset.lerp(target_offset, weight)
@@ -1575,32 +2005,85 @@ func get_camera_lookahead_direction() -> float:
 	return 1.0
 
 
+func _start_camera_follow(target: Node2D, duration: float) -> void:
+	camera_follow_target = target
+	camera_follow_timer = duration
+
+
+func _stop_camera_follow() -> void:
+	camera_follow_target = null
+	camera_follow_timer = 0.0
+	if is_instance_valid(player_camera):
+		player_camera.position = Vector2.ZERO
+
+
+func action_to_wheel_slot(action: HudMenuAction) -> WheelSlot:
+	match action:
+		HudMenuAction.ULTIMATE:
+			return WheelSlot.ULTIMATE
+		HudMenuAction.SPECIAL_ATTACK:
+			return WheelSlot.SPECIAL_ATTACK
+		HudMenuAction.BUBBLE_PROJECTILE:
+			return WheelSlot.BUBBLE_PROJECTILE
+		HudMenuAction.PLACEHOLDER:
+			return WheelSlot.PLACEHOLDER
+		_:
+			return WheelSlot.ULTIMATE
+
 func select_hud_menu_action(action: HudMenuAction) -> void:
 	if hud_menu_selection == action:
 		return
 
+	var slot := action_to_wheel_slot(action)
+	if not is_wheel_slot_unlocked(slot):
+		return
+
 	hud_menu_selection = action
 
+	var action_name := get_hud_action_name(action)
+	if hud and hud.has_method("update_action_selection"):
+		hud.update_action_selection(action_name)
+	execute_hud_menu_action(action_name)
+
+
+func get_hud_action_name(action: HudMenuAction) -> String:
+	var base_name := ""
 	match action:
 		HudMenuAction.ULTIMATE:
-			if hud and hud.has_method("update_action_selection"):
-				hud.update_action_selection("ultimate_attack")
-			execute_hud_menu_action("ultimate_attack")
+			base_name = "ultimate_attack"
 		HudMenuAction.PLACEHOLDER:
-			if hud and hud.has_method("update_action_selection"):
-				hud.update_action_selection("placeholder")
-			execute_hud_menu_action("placeholder")
+			base_name = "placeholder"
 		HudMenuAction.SPECIAL_ATTACK:
-			if hud and hud.has_method("update_action_selection"):
-				hud.update_action_selection("attack_special")
-			execute_hud_menu_action("attack_special")
+			base_name = "attack_special"
 		HudMenuAction.BUBBLE_PROJECTILE:
-			if hud and hud.has_method("update_action_selection"):
-				hud.update_action_selection("bubble_projectile")
-			execute_hud_menu_action("bubble_projectile")
+			base_name = "bubble_projectile"
+	if form == Form.NORMAL:
+		match action:
+			HudMenuAction.ULTIMATE:
+				base_name = "protective_bubble"
+			HudMenuAction.PLACEHOLDER:
+				base_name = "ghost_mode"
+			HudMenuAction.SPECIAL_ATTACK:
+				base_name = "portal"
+			HudMenuAction.BUBBLE_PROJECTILE:
+				base_name = "teleport_bubble"
+	return base_name
 
 
 func execute_hud_menu_action(action_name: String) -> void:
+	if form == Form.NORMAL:
+		match action_name:
+			"protective_bubble":
+				start_protective_bubble()
+			"ghost_mode":
+				start_ghost_mode()
+			"portal":
+				fire_portal_bubble()
+			"teleport_bubble":
+				start_teleport_bubble()
+		_await_hud_release()
+		return
+
 	match action_name:
 		"ultimate_attack":
 			start_ultimate_attack()
@@ -1611,6 +2094,10 @@ func execute_hud_menu_action(action_name: String) -> void:
 		"bubble_projectile":
 			start_bubble_projectile()
 
+	_await_hud_release()
+
+
+func _await_hud_release() -> void:
 	await get_tree().create_timer(0.45).timeout
 	if hud_menu_open and get_hud_menu_direction() == Vector2.ZERO:
 		hud_menu_axis_locked = false
@@ -1834,6 +2321,28 @@ func can_trigger_active_attack(index: int) -> bool:
 	if index < 0 or index >= active_attack_names.size():
 		return false
 	return active_attack_timers[index] <= 0.0
+
+
+func has_stamina(amount: float = 1.0) -> bool:
+	if not stats or not stats.has_method("consume_stamina"):
+		return true
+	return stats.current_stamina >= amount
+
+
+func consume_stamina(amount: float) -> bool:
+	if amount <= 0.0:
+		return true
+	if not stats or not stats.has_method("consume_stamina"):
+		return true
+	var consumed: bool = stats.consume_stamina(amount)
+	if not consumed:
+		show_stamina_warning()
+	return consumed
+
+
+func show_stamina_warning() -> void:
+	if hud and hud.has_method("show_warning_message"):
+		hud.show_warning_message("sem stamina")
 
 
 func consume_attack_mana(amount: float) -> bool:

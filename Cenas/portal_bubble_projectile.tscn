@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/portal_bubble.gd" id="1_portal_bubble"]
+[ext_resource type="Texture2D" uid="uid://cq6jvj7vbioyh" path="res://sprites/characters/projectiles/projectile_bubble1.png" id="2_sprite"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_portal_bubble"]
+radius = 8.0
+
+[node name="PortalBubbleProjectile" type="Area2D"]
+script = ExtResource("1_portal_bubble")
+speed = 200.0
+max_distance = 300.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_sprite")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_portal_bubble")

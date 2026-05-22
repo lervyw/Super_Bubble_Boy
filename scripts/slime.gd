@@ -72,6 +72,17 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 @export var max_health: int = 3
 var health: int = max_health
 
+@export_group("Health Bar")
+@export var health_bar_enabled: bool = true
+@export var health_bar_width: float = 24.0
+@export var health_bar_height: float = 3.0
+@export var health_bar_offset: Vector2 = Vector2(0, -24.0)
+@export var health_bar_show_range: float = 160.0
+@export var health_bar_bg_color: Color = Color(0.15, 0.15, 0.15, 0.85)
+@export var health_bar_fg_color: Color = Color(0.9, 0.15, 0.1, 0.95)
+@export var health_bar_mid_color: Color = Color(0.9, 0.7, 0.1, 0.95)
+@export var health_bar_high_color: Color = Color(0.2, 0.85, 0.15, 0.95)
+
 @export_group("Nodes")
 @export var sprite_path: NodePath = NodePath("AnimatedSprite2D")
 @export var hitbox_path: NodePath = NodePath("AttackHitbox")
@@ -90,6 +101,8 @@ var health: int = max_health
 @onready var hitbox_shape: CollisionShape2D = hitbox.get_node_or_null("CollisionShape2D") if hitbox else null
 @onready var attack_receiver: Area2D = get_node_or_null(attack_receiver_path)
 @onready var hurtbox: Area2D = get_node_or_null(hurtbox_path)
+@onready var health_bar_bg: ColorRect
+@onready var health_bar_fill: ColorRect
 
 var player: Node2D
 var cooldown_t: float = 0.0
@@ -133,6 +146,9 @@ func _ready():
 
 	if hurtbox and not hurtbox.area_entered.is_connected(_on_hurtbox_area_entered):
 		hurtbox.area_entered.connect(_on_hurtbox_area_entered)
+
+	create_health_bar()
+	update_health_bar()
 
 	update_sprite_direction(facing_dir)
 	play_idle_animation()
@@ -195,6 +211,7 @@ func _physics_process(delta):
 	move_and_slide()
 	process_contact_attack()
 	update_animation()
+	update_health_bar_visibility()
 
 
 func move_towards_player(dist):
@@ -371,6 +388,7 @@ func update_sprite_direction(dir: int) -> void:
 		sprite.flip_h = dir < 0
 
 	update_attack_hitbox_direction(dir)
+	update_health_bar()
 
 
 func update_attack_hitbox_direction(dir: int) -> void:
@@ -381,6 +399,76 @@ func update_attack_hitbox_direction(dir: int) -> void:
 		-attack_hitbox_base_position.x if sprite and sprite.flip_h else attack_hitbox_base_position.x,
 		attack_hitbox_base_position.y
 	)
+
+
+# ================================
+#        HEALTH BAR
+# ================================
+func create_health_bar() -> void:
+	if not health_bar_enabled:
+		return
+
+	health_bar_bg = ColorRect.new()
+	health_bar_bg.name = "HealthBarBg"
+	health_bar_bg.size = Vector2(health_bar_width, health_bar_height)
+	health_bar_bg.color = health_bar_bg_color
+	health_bar_bg.position = health_bar_offset - Vector2(health_bar_width * 0.5, 0)
+	add_child(health_bar_bg)
+
+	health_bar_fill = ColorRect.new()
+	health_bar_fill.name = "HealthBarFill"
+	health_bar_fill.size = Vector2(health_bar_width, health_bar_height)
+	health_bar_fill.color = health_bar_fg_color
+	health_bar_fill.position = Vector2.ZERO
+	health_bar_bg.add_child(health_bar_fill)
+
+	health_bar_bg.visible = false
+
+
+func update_health_bar() -> void:
+	if not health_bar_enabled or not health_bar_bg:
+		return
+
+	if max_health <= 0:
+		return
+
+	var ratio: float = float(health) / float(max_health)
+	ratio = clampf(ratio, 0.0, 1.0)
+
+	health_bar_fill.size.x = health_bar_width * ratio
+
+	if ratio > 0.6:
+		health_bar_fill.color = health_bar_high_color
+	elif ratio > 0.3:
+		health_bar_fill.color = health_bar_mid_color
+	else:
+		health_bar_fill.color = health_bar_fg_color
+
+	if sprite and sprite.flip_h:
+		health_bar_bg.position.x = -health_bar_offset.x - health_bar_width * 0.5
+		health_bar_fill.position.x = health_bar_width * (1.0 - ratio)
+		health_bar_fill.size.x = health_bar_width * ratio
+	else:
+		health_bar_bg.position.x = -health_bar_width * 0.5
+		health_bar_fill.position.x = 0.0
+		health_bar_fill.size.x = health_bar_width * ratio
+
+	health_bar_bg.position.y = health_bar_offset.y
+
+
+func update_health_bar_visibility() -> void:
+	if not health_bar_enabled or not health_bar_bg:
+		return
+
+	if dying or health <= 0:
+		health_bar_bg.visible = false
+		return
+
+	var dist_to_player := INF
+	if is_instance_valid(player):
+		dist_to_player = global_position.distance_to(player.global_position)
+
+	health_bar_bg.visible = dist_to_player <= health_bar_show_range
 
 
 func process_contact_attack():
@@ -485,6 +573,7 @@ func take_damage(amount):
 
 	health -= max(amount, 1)
 	stunned = true
+	update_health_bar()
 	attacking = false
 	attack_serial += 1
 	hit_reaction_serial += 1

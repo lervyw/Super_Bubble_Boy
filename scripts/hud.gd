@@ -5,6 +5,7 @@ extends CanvasLayer
 @export var heart_icons: Array[TextureRect] = []
 @export var hp_bar: TextureProgressBar
 @export var mana_bar: TextureProgressBar
+@export var stamina_bar: TextureProgressBar
 @export var ultimate_bar: TextureProgressBar
 @export var ultimate_ready_icon: TextureRect
 @export var boss_hp_bar: TextureProgressBar
@@ -12,8 +13,8 @@ extends CanvasLayer
 @export var pause_menu_panel: Control
 @export var warning_label: Label
 @export var passive_toggle: CheckButton
-@export var passive_selector: OptionButton
-@export var selected_passive_icon: TextureRect
+@export var passive_icons: Array[TextureRect] = []
+@export var pause_passive_icons: Array[Control] = []
 @export var resume_button: Button
 @export var main_menu_button: Button
 @export var quit_button: Button
@@ -21,7 +22,6 @@ extends CanvasLayer
 @export var ultimate_cooldown_bar_position: Vector2 = Vector2(14.0, 19.0)
 @export var ultimate_cooldown_bar_size: Vector2 = Vector2(24.0, 52.0)
 
-const PASSIVE_ICON_ORBIT := preload("res://sprites/assets/bolha_guardian1.png")
 const PASSIVE_ICON_STOMP := preload("res://sprites/assets/bolha_ressonante.png")
 const PASSIVE_ICON_RUN := preload("res://sprites/assets/Corrida.png")
 const UI_JOYPAD_DEADZONE: float = 0.5
@@ -48,13 +48,14 @@ func _ready() -> void:
 		passive_toggle.visible = true
 		if not passive_toggle.toggled.is_connected(_on_passive_toggle_toggled):
 			passive_toggle.toggled.connect(_on_passive_toggle_toggled)
-	if passive_selector:
-		passive_selector.process_mode = Node.PROCESS_MODE_ALWAYS
-		setup_passive_selector()
-		if not passive_selector.item_selected.is_connected(_on_passive_selector_item_selected):
-			passive_selector.item_selected.connect(_on_passive_selector_item_selected)
-	if selected_passive_icon:
-		selected_passive_icon.visible = false
+	for i in pause_passive_icons.size():
+		var icon = pause_passive_icons[i] as Button
+		if icon:
+			icon.process_mode = Node.PROCESS_MODE_ALWAYS
+			if not icon.pressed.is_connected(_on_pause_passive_icon_pressed.bind(i)):
+				icon.pressed.connect(_on_pause_passive_icon_pressed.bind(i))
+
+	_setup_pause_focus_order()
 	if ultimate_bar:
 		ultimate_bar.min_value = 0.0
 		ultimate_bar.max_value = 1.0
@@ -103,8 +104,9 @@ func _process(delta: float) -> void:
 
 	_update_mana_bar()
 	_set_mana_visible(_is_mana_visible())
+	_update_stamina_bar()
 	_update_ultimate_bar(delta)
-	_update_selected_passive_icon()
+	_update_passive_icons()
 	_update_menu_panel_state()
 	_update_pause_menu_state()
 
@@ -134,6 +136,14 @@ func _update_mana_bar() -> void:
 
 	mana_bar.max_value = float(stats.get("max_mana"))
 	mana_bar.value = float(stats.get("current_mana"))
+
+
+func _update_stamina_bar() -> void:
+	if not stamina_bar or not stats:
+		return
+
+	stamina_bar.max_value = float(stats.get("max_stamina"))
+	stamina_bar.value = float(stats.get("current_stamina"))
 
 
 func _update_ultimate_bar(_delta: float) -> void:
@@ -243,6 +253,20 @@ func _update_menu_panel_state() -> void:
 	if menu_panel.has_method("set_placeholder_cooldown_progress"):
 		menu_panel.set_placeholder_cooldown_progress(1.0)
 
+	_sync_wheel_slot_unlocks()
+
+
+func _sync_wheel_slot_unlocks() -> void:
+	if not player or not menu_panel or not menu_panel.has_method("set_slot_unlocked"):
+		return
+	if not player.has_method("is_wheel_slot_unlocked"):
+		return
+
+	menu_panel.set_slot_unlocked("ultimate_attack", player.is_wheel_slot_unlocked(0))
+	menu_panel.set_slot_unlocked("attack_special", player.is_wheel_slot_unlocked(1))
+	menu_panel.set_slot_unlocked("bubble_projectile", player.is_wheel_slot_unlocked(2))
+	menu_panel.set_slot_unlocked("placeholder", player.is_wheel_slot_unlocked(3))
+
 
 func _update_pause_menu_state() -> void:
 	if not pause_menu_open:
@@ -251,11 +275,7 @@ func _update_pause_menu_state() -> void:
 		var passives_enabled := _are_player_passives_enabled()
 		if passive_toggle.button_pressed != passives_enabled:
 			passive_toggle.set_pressed_no_signal(passives_enabled)
-	if passive_selector and player and player.has_method("get_selected_passive_power"):
-		var selected: int = player.get_selected_passive_power()
-		if passive_selector.selected != selected:
-			passive_selector.select(selected)
-		_update_selected_passive_icon(selected)
+	_update_passive_icons()
 
 
 func _set_hearts_visible(v: bool) -> void:
@@ -396,11 +416,7 @@ func open_pause_menu() -> void:
 
 	if passive_toggle and player:
 		passive_toggle.set_pressed_no_signal(_are_player_passives_enabled())
-	if passive_selector and player and player.has_method("get_selected_passive_power"):
-		setup_passive_selector()
-		var selected: int = player.get_selected_passive_power()
-		passive_selector.select(selected)
-		_update_selected_passive_icon(selected)
+	_update_passive_icons()
 
 
 func close_pause_menu() -> void:
@@ -482,58 +498,63 @@ func _are_player_passives_enabled() -> bool:
 	return true
 
 
-func setup_passive_selector() -> void:
-	if not passive_selector:
+func _update_passive_icons() -> void:
+	var selected := 0
+	if player and player.has_method("get_selected_passive_power"):
+		selected = player.get_selected_passive_power()
+
+	_update_icon_list(passive_icons, selected)
+	_update_icon_list(pause_passive_icons, selected)
+
+
+func _update_icon_list(icons: Array, selected_index: int) -> void:
+	for i in icons.size():
+		var icon = icons[i] as CanvasItem
+		if not icon:
+			continue
+		var power_index := i + 1
+		var is_selected := power_index == selected_index
+		icon.modulate = Color(1, 1, 1, 1.0) if is_selected else Color(0.35, 0.35, 0.35, 0.7)
+		icon.visible = true
+
+
+func _setup_pause_focus_order() -> void:
+	var focus_nodes: Array[Control] = []
+	for n in [resume_button, main_menu_button, quit_button, passive_toggle]:
+		if n:
+			focus_nodes.append(n)
+
+	for icon in pause_passive_icons:
+		if icon and icon is Button:
+			focus_nodes.append(icon)
+
+	for i in focus_nodes.size():
+		var current := focus_nodes[i]
+		var next := focus_nodes[(i + 1) % focus_nodes.size()]
+		var prev := focus_nodes[(i - 1 + focus_nodes.size()) % focus_nodes.size()]
+		current.focus_next = current.get_path_to(next)
+		current.focus_previous = current.get_path_to(prev)
+
+
+func _on_pause_passive_icon_pressed(index: int) -> void:
+	if index < 0 or index >= pause_passive_icons.size():
 		return
-	if passive_selector.get_item_count() > 0:
-		return
 
-	var names: Array[String] = ["Nenhuma", "Bolha protetora", "Stomp no chao", "Corrida rapida"]
-	if player and player.has_method("get_passive_power_names"):
-		names = player.get_passive_power_names()
+	var power_index := index + 1
+	var current := 0
+	if player and player.has_method("get_selected_passive_power"):
+		current = player.get_selected_passive_power()
 
-	for i in range(names.size()):
-		var icon := get_passive_icon(i)
-		if icon:
-			passive_selector.add_icon_item(icon, names[i], i)
-		else:
-			passive_selector.add_item(names[i], i)
+	if power_index == current:
+		power_index = 0
 
-
-func _on_passive_selector_item_selected(index: int) -> void:
 	if player and player.has_method("set_selected_passive_power"):
-		player.set_selected_passive_power(index)
-	_update_selected_passive_icon(index)
-
-
-func _update_selected_passive_icon(power_index: int = -1) -> void:
-	if not selected_passive_icon:
-		return
-	if power_index < 0:
-		if player and player.has_method("get_selected_passive_power"):
-			power_index = player.get_selected_passive_power()
-		else:
-			power_index = 0
-
-	var icon := get_passive_icon(power_index)
-	selected_passive_icon.texture = icon
-	selected_passive_icon.visible = icon != null
-
-
-func get_passive_icon(power_index: int) -> Texture2D:
-	match power_index:
-		1:
-			return PASSIVE_ICON_ORBIT
-		2:
-			return PASSIVE_ICON_STOMP
-		3:
-			return PASSIVE_ICON_RUN
-		_:
-			return null
+		player.set_selected_passive_power(power_index)
+	_update_passive_icons()
 
 
 func apply_pause_menu_aero_style() -> void:
-	for button in [resume_button, main_menu_button, quit_button, passive_selector, passive_toggle]:
+	for button in [resume_button, main_menu_button, quit_button, passive_toggle]:
 		if button:
 			var normal_style := StyleBoxFlat.new()
 			normal_style.bg_color = Color(0.05, 0.35, 0.40, 0.35)

@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Cenas/portal.gd" id="1_portal"]
+[ext_resource type="Texture2D" uid="uid://cq6jvj7vbioyh" path="res://sprites/characters/projectiles/projectile_bubble1.png" id="2_sprite"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_portal"]
+radius = 14.0
+
+[node name="Portal" type="Area2D"]
+script = ExtResource("1_portal")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_sprite")
+scale = Vector2(1.2, 1.2)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_portal")

@@ -301,7 +301,7 @@ collision_layer = 4
 script = ExtResource("1_4p1wq")
 stop_distance = 10.0
 attack_hitbox_start_frame = 0
-max_health = 1
+max_health = 3
 metadata/_edit_horizontal_guides_ = [10.0]
 metadata/_edit_vertical_guides_ = [-11.0]
 
