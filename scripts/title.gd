@@ -242,31 +242,45 @@ func _input(event: InputEvent):
 	if intro_running:
 		return
 
-	# Se não estiver no modo "esperando rebind", ignora tudo
-	if awaiting_rebind_action == "":
-		return
-
-	# --- Rebind por teclado ---
-	if event is InputEventKey and event.pressed:
-		# Bloqueia teclas proibidas
-		if event.keycode in forbidden_keys:
+	if awaiting_rebind_action != "":
+		# --- Rebind por teclado ---
+		if event is InputEventKey and event.pressed:
+			if event.keycode in forbidden_keys:
+				return
+			_finish_rebind(event)
 			return
 
-		# Finaliza o rebind usando esse evento
-		_finish_rebind(event)
-		return
-
-	# --- Rebind por controle (joypad) ---
-	if event is InputEventJoypadButton and event.pressed:
-		_finish_rebind(event)
-		return
-
-	# --- Rebind por eixo/gatilho do controle (analógico, LT/L2, RT/R2) ---
-	if event is InputEventJoypadMotion:
-		var joy_event := _normalize_joy_motion_for_rebind(event)
-		if joy_event:
-			_finish_rebind(joy_event)
+		# --- Rebind por controle (joypad) ---
+		if event is InputEventJoypadButton and event.pressed:
+			_finish_rebind(event)
 			return
+
+		# --- Rebind por eixo/gatilho do controle ---
+		if event is InputEventJoypadMotion:
+			var joy_event := _normalize_joy_motion_for_rebind(event)
+			if joy_event:
+				_finish_rebind(joy_event)
+				return
+
+		return
+
+	# --- Navegação por teclado em todos os menus ---
+	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_select"):
+		for btn in [
+			btn_iniciar, btn_config, btn_sair,
+			btn_cfg_botoes, btn_voltar_config,
+			btn_pulo, btn_bolha, btn_super, btn_normal_form, btn_menu, btn_ataque,
+			btn_ataque_especial, btn_defesa, btn_ultimate, btn_esquerda, btn_direita,
+			btn_agachar, btn_dash, btn_pause,
+			btn_combo1, btn_combo2, btn_combo3, btn_combo4,
+			btn_voltar_botoes,
+		]:
+			if btn and btn.has_focus():
+				var vp = get_viewport()
+				btn.pressed.emit()
+				if vp:
+					vp.set_input_as_handled()
+				break
 
 
 func _normalize_joy_motion_for_rebind(event: InputEventJoypadMotion) -> InputEventJoypadMotion:

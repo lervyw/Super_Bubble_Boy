@@ -18,7 +18,7 @@ enum GameMode { PLATAFORMA, METROIDVANIA }
 enum HudMenuAction { NONE, ULTIMATE, PLACEHOLDER, SPECIAL_ATTACK, BUBBLE_PROJECTILE }
 enum WheelSlot { ULTIMATE, SPECIAL_ATTACK, BUBBLE_PROJECTILE, PLACEHOLDER }
 enum AttackKind { NONE, NORMAL, PASSIVE, ACTIVE_SUPER, ULTIMATE, DEFEND }
-enum PassivePower { NONE, GROUND_STOMP, QUICK_RUN }
+enum PassivePower { NONE, GROUND_STOMP, QUICK_RUN, KILL_STOMP }
 
 const ATTACK_META_DAMAGE := &"attack_damage"
 const ATTACK_META_KIND := &"attack_kind"
@@ -26,10 +26,11 @@ const ATTACK_META_ID := &"attack_id"
 
 const STAMINA_COST_DASH: float = 15.0
 const STAMINA_COST_QUICK_RUN_PER_SEC: float = 10.0
-const STAMINA_COST_ATTACK: float = 5.0
+const STAMINA_COST_ATTACK: float = 50.0
 const STAMINA_COST_SPECIAL: float = 10.0
 const STAMINA_COST_DEFEND: float = 0.0
 const STAMINA_COST_DEFEND_HIT: float = 8.0
+const SUPER_STAMINA_MULTIPLIER: float = 0.25
 
 var hud_menu_open := false
 var hud_menu_selection: HudMenuAction = HudMenuAction.NONE
@@ -54,13 +55,14 @@ var hud_menu_waiting_for_neutral := false
 
 @export_group("Camera Framing")
 @export var camera_vertical_offset: float = -18.0
-@export var camera_lookahead_distance: float = 18.0
+@export var camera_lookahead_distance: float = 80.0
 @export_range(0.1, 20.0, 0.1) var camera_offset_smoothing: float = 5.0
 @export_range(0.1, 20.0, 0.1) var camera_position_smoothing_speed: float = 6.0
 @export_range(0.0, 1.0, 0.01) var camera_drag_left_margin: float = 0.35
-@export_range(0.0, 1.0, 0.01) var camera_drag_right_margin: float = 0.35
+@export_range(0.0, 1.0, 0.01) var camera_drag_right_margin: float = 0.10
 @export_range(0.0, 1.0, 0.01) var camera_drag_top_margin: float = 0.25
 @export_range(0.0, 1.0, 0.01) var camera_drag_bottom_margin: float = 0.38
+@export_range(0.0, 200.0, 1.0) var camera_crouch_offset: float = 30.0
 
 @export_group("Modes")
 @export var platform_mode_uses_mana: bool = false
@@ -112,7 +114,7 @@ var hud_menu_waiting_for_neutral := false
 @export_range(200.0, 1600.0, 10.0) var ground_stomp_fall_speed: float = 900.0
 @export_range(0.05, 0.6, 0.01) var ground_stomp_active_time: float = 0.12
 @export_range(0.1, 3.0, 0.05) var ground_stomp_cooldown: float = 0.55
-@export var ground_stomp_particle_texture: Texture2D = preload("res://sprites/assets/bolha_guardian1.png")
+@export var ground_stomp_particle_texture: Texture2D = preload("res://sprites/characters/projectiles/projectile_bubble1.png")
 @export_range(2, 16, 1) var ground_stomp_particle_count: int = 9
 @export var ground_stomp_particle_scale: Vector2 = Vector2(0.32, 0.32)
 @export var ground_stomp_particle_offset: Vector2 = Vector2(0.0, 18.0)
@@ -163,6 +165,22 @@ var hud_menu_waiting_for_neutral := false
 @export var ghost_mode_mana_cost: float = 25.0
 @export var ghost_mode_speed_multiplier: float = 1.35
 
+@export_group("Super Form Powers (Wheel)")
+@export var super_spike_damage: int = 5
+@export_range(0.05, 1.0, 0.01) var super_spike_active_time: float = 0.35
+@export_range(0.1, 10.0, 0.1) var super_spike_cooldown: float = 2.0
+@export_range(0.0, 100.0, 1.0) var super_spike_mana_cost: float = 18.0
+@export var super_launcher_damage: int = 4
+@export_range(0.1, 10.0, 0.1) var super_launcher_cooldown: float = 1.5
+@export_range(0.0, 100.0, 1.0) var super_launcher_mana_cost: float = 14.0
+@export_range(0.1, 20.0, 0.1) var time_bubble_duration: float = 10.0
+@export_range(0.1, 30.0, 0.1) var time_bubble_cooldown: float = 15.0
+@export_range(0.0, 100.0, 1.0) var time_bubble_mana_cost: float = 30.0
+@export_range(0.05, 1.0, 0.01) var super_parry_window: float = 0.45
+@export_range(0.1, 10.0, 0.1) var super_parry_cooldown: float = 1.5
+@export_range(0.0, 100.0, 1.0) var super_parry_mana_cost: float = 8.0
+@export var super_parry_damage: int = 4
+
 @export_group("Respawn")
 @export var respawn_position: Vector2 = Vector2(288, 207)
 @export var stats: Node = null
@@ -174,6 +192,7 @@ var hud_menu_waiting_for_neutral := false
 @onready var attack_area: Area2D = $AttackHitbox
 @onready var attack_collision: CollisionShape2D = $AttackHitbox/AttackCollisionShape
 @onready var player_camera: Camera2D = $Camera
+@onready var shield_area: Area2D = $ShieldHitbox
 
 var dash_timer := 0.0
 var dash_cooldown_timer := 0.0
@@ -190,6 +209,7 @@ var target_form: Form = Form.NORMAL
 var is_bouncing_from_enemy := false
 var combo_lock := false
 var defending := false
+var super_shield_active := false
 var bubble_jump_count := 0
 var max_bubble_jumps := 40
 var is_invincible: bool = false
@@ -210,6 +230,7 @@ var ground_stomp_active: bool = false
 var ground_stomp_cooldown_timer: float = 0.0
 var ground_stomp_area: Area2D
 var ground_stomp_shape: CollisionShape2D
+var ground_stomp_anim_override: StringName = &""
 var quick_run_active: bool = false
 var quick_run_timer: float = 0.0
 var quick_run_cooldown_timer: float = 0.0
@@ -239,6 +260,17 @@ var ghost_mode_active := false
 var ghost_mode_timer := 0.0
 var ghost_mode_blink_time := 0.0
 var saved_collision_layer: int = 0
+
+var super_spike_area: Area2D
+var super_spike_cooldown_timer := 0.0
+var super_launcher_cooldown_timer := 0.0
+var time_bubble_active := false
+var time_bubble_time_left := 0.0
+var time_bubble_cooldown_timer := 0.0
+var time_frozen_nodes: Array[Node] = []
+var super_parry_active := false
+var super_parry_cooldown_timer := 0.0
+var super_parry_serial := 0
 
 var camera_follow_target: Node2D
 var camera_follow_timer: float = 0.0
@@ -284,6 +316,14 @@ func _ready() -> void:
 	if attack_collision:
 		attack_collision.disabled = true
 
+	if shield_area:
+		shield_area.monitoring = false
+		shield_area.monitorable = false
+		if not shield_area.body_entered.is_connected(_on_shield_body_entered):
+			shield_area.body_entered.connect(_on_shield_body_entered)
+		if not shield_area.area_entered.is_connected(_on_shield_area_entered):
+			shield_area.area_entered.connect(_on_shield_area_entered)
+
 	if has_node("Hurtbox"):
 		var hurtbox = $Hurtbox
 		if hurtbox and not hurtbox.body_entered.is_connected(_on_hurtbox_body_entered):
@@ -305,6 +345,7 @@ func _ready() -> void:
 	update_audio_by_form()
 	passive_attack_timer = passive_attack_interval
 	setup_protective_bubble_shield()
+	setup_super_spike_area()
 
 
 func ensure_optional_input_actions() -> void:
@@ -426,9 +467,7 @@ func register_combat_area_groups() -> void:
 	if attack_area and not attack_area.is_in_group("player_attack"):
 		attack_area.add_to_group("player_attack")
 
-	for stomper in [stomper_normal, stomper_bubble, stomper_super]:
-		if stomper and not stomper.is_in_group("player_stomper"):
-			stomper.add_to_group("player_stomper")
+	_update_stomper_group_for_passive()
 
 
 func update_attack_cooldowns(delta: float) -> void:
@@ -437,8 +476,31 @@ func update_attack_cooldowns(delta: float) -> void:
 			active_attack_timers[i] = max(active_attack_timers[i] - delta, 0.0)
 	if bubble_projectile_cooldown_timer > 0.0:
 		bubble_projectile_cooldown_timer = max(bubble_projectile_cooldown_timer - delta, 0.0)
+	super_spike_cooldown_timer = maxf(super_spike_cooldown_timer - delta, 0.0)
+	super_launcher_cooldown_timer = maxf(super_launcher_cooldown_timer - delta, 0.0)
+	time_bubble_cooldown_timer = maxf(time_bubble_cooldown_timer - delta, 0.0)
+	super_parry_cooldown_timer = maxf(super_parry_cooldown_timer - delta, 0.0)
+	update_time_bubble(delta)
 
 	update_ultimate_cooldown_from_timer()
+
+
+func setup_super_spike_area() -> void:
+	if super_spike_area:
+		return
+
+	var example_shape := get_node_or_null("Hitbox_example_spike") as CollisionShape2D
+	if not example_shape:
+		push_warning("Player: Hitbox_example_spike não encontrado.")
+		return
+
+	super_spike_area = Area2D.new()
+	super_spike_area.name = "SuperSpikeHitbox"
+	super_spike_area.add_to_group("player_attack")
+	add_child(super_spike_area)
+	example_shape.reparent(super_spike_area)
+	example_shape.name = "CollisionShape2D"
+	set_area_collision_enabled(super_spike_area, false)
 
 
 func setup_ultimate_cooldown_timer() -> void:
@@ -517,12 +579,13 @@ func get_passive_power_names() -> Array[String]:
 	return [
 		"Nenhuma",
 		"Stomp no chao",
-		"Corrida rapida"
+		"Corrida rapida",
+		"Kill Stomp"
 	]
 
 
 func set_selected_passive_power(power_index: int) -> void:
-	selected_passive_power = clampi(power_index, PassivePower.NONE, PassivePower.QUICK_RUN)
+	selected_passive_power = clampi(power_index, PassivePower.NONE, PassivePower.KILL_STOMP)
 	apply_selected_passive_power()
 
 
@@ -540,6 +603,28 @@ func apply_selected_passive_power() -> void:
 	if ground_stomp_area:
 		set_area_collision_enabled(ground_stomp_area, false)
 
+	_update_stomper_group_for_passive()
+
+
+func _update_stomper_group_for_passive() -> void:
+	var kill_stomp_selected := passive_powers_enabled and selected_passive_power == PassivePower.KILL_STOMP
+	if kill_stomp_selected:
+		_add_stompers_to_kill_group()
+	else:
+		_remove_stompers_from_kill_group()
+
+
+func _add_stompers_to_kill_group() -> void:
+	for stomper in [stomper_normal, stomper_bubble, stomper_super]:
+		if stomper and not stomper.is_in_group("player_stomper"):
+			stomper.add_to_group("player_stomper")
+
+
+func _remove_stompers_from_kill_group() -> void:
+	for stomper in [stomper_normal, stomper_bubble, stomper_super]:
+		if stomper and stomper.is_in_group("player_stomper"):
+			stomper.remove_from_group("player_stomper")
+
 
 func set_passive_powers_enabled(enabled: bool) -> void:
 	passive_powers_enabled = enabled
@@ -550,6 +635,7 @@ func set_passive_powers_enabled(enabled: bool) -> void:
 		quick_run_direction = 0
 		if ground_stomp_area:
 			set_area_collision_enabled(ground_stomp_area, false)
+		_remove_stompers_from_kill_group()
 	else:
 		apply_selected_passive_power()
 
@@ -1003,6 +1089,13 @@ func process_ground_stomp_landing() -> void:
 	ground_stomp_cooldown_timer = ground_stomp_cooldown
 	trigger_ground_stomp_burst()
 
+	var sp = $Sprite2D
+	if sp and sp.sprite_frames and sp.sprite_frames.has_animation(&"bubble_ground_stomp"):
+		ground_stomp_anim_override = &"bubble_ground_stomp"
+		sp.play(&"bubble_ground_stomp")
+		await sp.animation_finished
+		ground_stomp_anim_override = &""
+
 
 func trigger_ground_stomp_burst() -> void:
 	if not ground_stomp_area:
@@ -1052,7 +1145,7 @@ func spawn_ground_stomp_particles() -> void:
 		var particle := Sprite2D.new()
 		particle.texture = ground_stomp_particle_texture
 		particle.scale = ground_stomp_particle_scale
-		particle.modulate = Color(1, 1, 1, 0.9)
+		particle.modulate = Color(1, 1, 1, 1.0)
 		particle.z_index = 50
 		root.add_child(particle)
 
@@ -1110,6 +1203,9 @@ func _close_ground_stomp_burst() -> void:
 
 
 func check_quick_run_input(_delta: float) -> void:
+	if form != Form.NORMAL:
+		return
+
 	var left_pressed := is_left_pressed()
 	var right_pressed := is_right_pressed()
 
@@ -1145,6 +1241,12 @@ func start_quick_run(direction: int) -> void:
 
 func update_quick_run_timer(delta: float) -> void:
 	if not quick_run_active:
+		return
+
+	if form != Form.NORMAL:
+		quick_run_active = false
+		quick_run_direction = 0
+		quick_run_cooldown_timer = quick_run_cooldown
 		return
 
 	if not has_stamina(STAMINA_COST_QUICK_RUN_PER_SEC * delta):
@@ -1219,7 +1321,7 @@ func start_special_attack() -> void:
 		return
 
 	defending = false
-	consume_stamina(STAMINA_COST_SPECIAL)
+	consume_stamina(STAMINA_COST_SPECIAL * (SUPER_STAMINA_MULTIPLIER if form == Form.SUPER else 1.0))
 	prepare_attack_area(
 		get_active_attack_area(selected_active_attack_index),
 		get_active_attack_damage(selected_active_attack_index),
@@ -1262,6 +1364,21 @@ func start_defense() -> void:
 	change_state(State.DEFEND)
 
 
+func start_super_shield() -> void:
+	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
+		return
+
+	if not consume_stamina(STAMINA_COST_DASH):
+		return
+
+	defending = true
+	super_shield_active = true
+	if shield_area:
+		shield_area.monitoring = true
+		shield_area.monitorable = true
+	change_state(State.DEFEND)
+
+
 func start_bubble_projectile() -> void:
 	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
@@ -1287,6 +1404,166 @@ func start_bubble_projectile() -> void:
 		special_attack_animation_override = &""
 	if state == State.SPECIAL_ATTACK:
 		change_state(State.IDLE)
+
+
+func start_super_spike() -> void:
+	if not _can_start_super_wheel_power(super_spike_cooldown_timer):
+		return
+	if not consume_attack_mana(super_spike_mana_cost):
+		return
+	if not super_spike_area:
+		setup_super_spike_area()
+	if not super_spike_area:
+		return
+
+	super_spike_cooldown_timer = super_spike_cooldown
+	special_attack_animation_override = &"super_espinho"
+	prepare_attack_area(super_spike_area, super_spike_damage, AttackKind.ACTIVE_SUPER, &"super_spike")
+	change_state(State.SPECIAL_ATTACK)
+	trigger_attack_window(super_spike_active_time)
+	await _finish_super_power_animation(&"super_espinho")
+
+
+func start_super_launcher() -> void:
+	if not _can_start_super_wheel_power(super_launcher_cooldown_timer):
+		return
+	if bubble_projectile_scene == null:
+		return
+	if not consume_attack_mana(super_launcher_mana_cost):
+		return
+
+	super_launcher_cooldown_timer = super_launcher_cooldown
+	special_attack_animation_override = &"super_lancador"
+	change_state(State.SPECIAL_ATTACK)
+	var animation_time := maxf(get_sprite_animation_duration(&"super_lancador"), 0.3)
+	await get_tree().create_timer(animation_time * 0.55).timeout
+	if state == State.SPECIAL_ATTACK and form == Form.SUPER:
+		spawn_super_launcher_projectile()
+	await get_tree().create_timer(animation_time * 0.45).timeout
+	_finish_super_power_state(&"super_lancador")
+
+
+func spawn_super_launcher_projectile() -> void:
+	var projectile := bubble_projectile_scene.instantiate()
+	var dir := get_facing_direction()
+	projectile.global_position = global_position + Vector2(bubble_projectile_spawn_offset.x * dir, bubble_projectile_spawn_offset.y)
+	if "vertical_wave_amplitude" in projectile:
+		projectile.vertical_wave_amplitude = 0.0
+	if "attack_id" in projectile:
+		projectile.attack_id = &"super_launcher"
+	if projectile.has_method("setup"):
+		projectile.setup(Vector2(float(dir), 0.0), super_launcher_damage)
+	var parent := get_tree().current_scene if get_tree().current_scene else get_parent()
+	parent.add_child(projectile)
+
+
+func start_time_bubble() -> void:
+	if time_bubble_active or not _can_start_super_wheel_power(time_bubble_cooldown_timer):
+		return
+	if not consume_attack_mana(time_bubble_mana_cost):
+		return
+
+	time_bubble_cooldown_timer = time_bubble_cooldown
+	special_attack_animation_override = &"super_warudo"
+	change_state(State.SPECIAL_ATTACK)
+	await get_tree().create_timer(maxf(get_sprite_animation_duration(&"super_warudo"), 0.2)).timeout
+	if form != Form.SUPER or state in [State.DEAD, State.HURT]:
+		_finish_super_power_state(&"super_warudo")
+		return
+
+	_finish_super_power_state(&"super_warudo")
+	time_bubble_active = true
+	time_bubble_time_left = time_bubble_duration
+	_freeze_time_targets()
+
+
+func start_super_parry() -> void:
+	if not _can_start_super_wheel_power(super_parry_cooldown_timer):
+		return
+	if not consume_attack_mana(super_parry_mana_cost):
+		return
+
+	super_parry_cooldown_timer = super_parry_cooldown
+	super_parry_serial += 1
+	var serial := super_parry_serial
+	super_parry_active = true
+	defending = true
+	special_attack_animation_override = &""
+	change_state(State.DEFEND)
+	await get_tree().create_timer(super_parry_window).timeout
+	if serial != super_parry_serial:
+		return
+	super_parry_active = false
+	defending = false
+	if state == State.DEFEND:
+		change_state(State.IDLE if is_on_floor() else State.JUMP)
+
+
+func _can_start_super_wheel_power(cooldown_left: float) -> bool:
+	if form != Form.SUPER or cooldown_left > 0.0:
+		return false
+	return state not in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]
+
+
+func _finish_super_power_animation(animation_name: StringName) -> void:
+	await get_tree().create_timer(maxf(get_sprite_animation_duration(animation_name), 0.2)).timeout
+	_finish_super_power_state(animation_name)
+
+
+func _finish_super_power_state(animation_name: StringName) -> void:
+	if special_attack_animation_override == animation_name:
+		special_attack_animation_override = &""
+	if state == State.SPECIAL_ATTACK:
+		change_state(State.IDLE if is_on_floor() else State.JUMP)
+
+
+func update_time_bubble(delta: float) -> void:
+	if not time_bubble_active:
+		return
+	_freeze_new_time_targets()
+	time_bubble_time_left = maxf(time_bubble_time_left - delta, 0.0)
+	if time_bubble_time_left <= 0.0:
+		_end_time_bubble()
+
+
+func _freeze_time_targets() -> void:
+	time_frozen_nodes.clear()
+	_freeze_new_time_targets()
+
+
+func _freeze_new_time_targets() -> void:
+	for group_name in [&"slime", &"boss", &"enemy", &"boss_projectile"]:
+		for target in get_tree().get_nodes_in_group(group_name):
+			if target == self or target in time_frozen_nodes or not is_instance_valid(target):
+				continue
+			time_frozen_nodes.append(target)
+			if target.has_method("set_time_frozen"):
+				target.set_time_frozen(true)
+			elif target is Node:
+				target.set_process(false)
+				target.set_physics_process(false)
+
+
+func _end_time_bubble() -> void:
+	time_bubble_active = false
+	time_bubble_time_left = 0.0
+	for target in time_frozen_nodes:
+		if not is_instance_valid(target):
+			continue
+		if target.has_method("set_time_frozen"):
+			target.set_time_frozen(false)
+		else:
+			target.set_process(true)
+			target.set_physics_process(true)
+	time_frozen_nodes.clear()
+
+
+func is_time_bubble_active() -> bool:
+	return time_bubble_active
+
+
+func get_time_bubble_time_left() -> float:
+	return time_bubble_time_left
 
 
 func spawn_bubble_projectile() -> void:
@@ -1369,6 +1646,22 @@ func special_attack_state() -> void:
 func defend_state() -> void:
 	velocity.x = 0.0
 
+	if super_shield_active:
+		_update_shield_direction()
+		if shield_area:
+			for body in shield_area.get_overlapping_bodies():
+				_push_enemy_away(body)
+			for area in shield_area.get_overlapping_areas():
+				_push_enemy_away(area)
+
+		if not Input.is_action_pressed("dash"):
+			super_shield_active = false
+			defending = false
+			if shield_area:
+				shield_area.monitoring = false
+				shield_area.monitorable = false
+			change_state(State.IDLE if is_on_floor() else State.JUMP)
+
 
 func enable_metroidvania_mode() -> void:
 	mode = GameMode.METROIDVANIA
@@ -1449,10 +1742,13 @@ func apply_normal_gravity(delta: float) -> void:
 		velocity.y += gravity * dash_fall_factor * delta
 		return
 
-	if form == Form.BUBBLE:
-		velocity.y += 50 * delta
-	else:
-		velocity.y += gravity * delta
+	match form:
+		Form.BUBBLE:
+			velocity.y += 50 * delta
+		Form.SUPER:
+			velocity.y += gravity * 1.5 * delta
+		_:
+			velocity.y += gravity * delta
 
 
 func apply_water_physics(delta: float) -> void:
@@ -1594,7 +1890,10 @@ func idle_state() -> void:
 	elif Input.is_action_pressed("crouch"):
 		change_state(State.CROUCH)
 	elif Input.is_action_just_pressed("dash") and can_dash():
-		change_state(State.DASH)
+		if form == Form.SUPER:
+			start_super_shield()
+		else:
+			change_state(State.DASH)
 
 
 func walk_state() -> void:
@@ -1607,7 +1906,10 @@ func walk_state() -> void:
 	elif Input.is_action_pressed("crouch"):
 		change_state(State.CROUCH)
 	elif Input.is_action_just_pressed("dash") and can_dash():
-		change_state(State.DASH)
+		if form == Form.SUPER:
+			start_super_shield()
+		else:
+			change_state(State.DASH)
 	elif velocity.x == 0:
 		change_state(State.IDLE)
 
@@ -1616,7 +1918,10 @@ func jump_state() -> void:
 	handle_horizontal_input()
 
 	if Input.is_action_just_pressed("dash") and can_dash():
-		change_state(State.DASH)
+		if form == Form.SUPER:
+			start_super_shield()
+		else:
+			change_state(State.DASH)
 
 	if is_on_floor():
 		change_state(State.IDLE)
@@ -1691,6 +1996,9 @@ func handle_horizontal_input() -> void:
 	var dir := get_horizontal_axis()
 	var current_speed := speed
 
+	if form == Form.SUPER:
+		current_speed *= 0.7
+
 	if in_water:
 		match form:
 			Form.NORMAL:
@@ -1707,6 +2015,7 @@ func handle_horizontal_input() -> void:
 
 	if dir != 0:
 		$Sprite2D.flip_h = dir < 0
+		_update_shield_direction()
 
 
 func get_horizontal_axis() -> float:
@@ -1739,14 +2048,17 @@ func start_normal_attack() -> void:
 		return
 
 	defending = false
-	consume_stamina(STAMINA_COST_ATTACK)
+	consume_stamina(STAMINA_COST_ATTACK * (SUPER_STAMINA_MULTIPLIER if form == Form.SUPER else 1.0))
 	prepare_attack_area(attack_area, normal_attack_damage, AttackKind.NORMAL, normal_attack_id)
 	change_state(State.ATTACK)
 	trigger_attack_window(normal_attack_active_time)
 
 
-func take_damage(amount: int = 1, _source: Node = null) -> void:
+func take_damage(amount: int = 1, source: Node = null) -> void:
 	if is_invincible or state in [State.DEAD, State.HURT]:
+		return
+	if super_parry_active and state == State.DEFEND:
+		_resolve_super_parry(source)
 		return
 	if defending and state == State.DEFEND:
 		if not consume_stamina(STAMINA_COST_DEFEND_HIT):
@@ -1769,6 +2081,19 @@ func take_damage(amount: int = 1, _source: Node = null) -> void:
 
 	start_invincibility()
 	play_hurt_reaction()
+
+
+func _resolve_super_parry(source: Node) -> void:
+	super_parry_active = false
+	super_parry_serial += 1
+	defending = false
+	var enemy := _resolve_enemy(source)
+	if enemy and enemy.has_method("take_damage"):
+		enemy.take_damage(super_parry_damage)
+	if source and source.is_in_group("boss_projectile"):
+		source.queue_free()
+	if state == State.DEFEND:
+		change_state(State.IDLE if is_on_floor() else State.JUMP)
 
 
 func start_invincibility() -> void:
@@ -1991,7 +2316,11 @@ func update_camera_framing(delta: float) -> void:
 			_stop_camera_follow()
 		return
 
-	var target_offset := Vector2(get_camera_lookahead_direction() * camera_lookahead_distance, camera_vertical_offset)
+	var vertical_offset := camera_vertical_offset
+	if is_on_floor() and (state == State.CROUCH or is_down_pressed()):
+		vertical_offset += camera_crouch_offset
+
+	var target_offset := Vector2(get_camera_lookahead_direction() * camera_lookahead_distance, vertical_offset)
 	var weight := clampf(delta * camera_offset_smoothing, 0.0, 1.0)
 	player_camera.offset = player_camera.offset.lerp(target_offset, weight)
 
@@ -2067,6 +2396,16 @@ func get_hud_action_name(action: HudMenuAction) -> String:
 				base_name = "portal"
 			HudMenuAction.BUBBLE_PROJECTILE:
 				base_name = "teleport_bubble"
+	elif form == Form.SUPER:
+		match action:
+			HudMenuAction.ULTIMATE:
+				base_name = "super_spike"
+			HudMenuAction.PLACEHOLDER:
+				base_name = "super_parry"
+			HudMenuAction.SPECIAL_ATTACK:
+				base_name = "time_bubble"
+			HudMenuAction.BUBBLE_PROJECTILE:
+				base_name = "super_launcher"
 	return base_name
 
 
@@ -2081,6 +2420,18 @@ func execute_hud_menu_action(action_name: String) -> void:
 				fire_portal_bubble()
 			"teleport_bubble":
 				start_teleport_bubble()
+		_await_hud_release()
+		return
+	if form == Form.SUPER:
+		match action_name:
+			"super_spike":
+				start_super_spike()
+			"super_launcher":
+				start_super_launcher()
+			"time_bubble":
+				start_time_bubble()
+			"super_parry":
+				start_super_parry()
 		_await_hud_release()
 		return
 
@@ -2123,11 +2474,68 @@ func deactivate_attack_area() -> void:
 
 func _on_attack_finished() -> void:
 	deactivate_attack_area()
+
+	if super_shield_active:
+		if not Input.is_action_pressed("dash"):
+			super_shield_active = false
+			defending = false
+			if shield_area:
+				shield_area.monitoring = false
+				shield_area.monitorable = false
+			if state not in [State.DEAD, State.HURT]:
+				change_state(State.IDLE)
+		return
+
 	defending = false
+	super_shield_active = false
 	special_attack_animation_override = &""
 
 	if state not in [State.DEAD, State.HURT]:
 		change_state(State.IDLE)
+
+
+func _on_shield_body_entered(body: Node) -> void:
+	if not super_shield_active:
+		return
+	_push_enemy_away(body)
+
+
+func _on_shield_area_entered(area: Area2D) -> void:
+	if not super_shield_active:
+		return
+	_push_enemy_away(area)
+
+
+func _push_enemy_away(node: Node) -> void:
+	var enemy := _resolve_enemy(node)
+	if not enemy:
+		return
+
+	var dir: Vector2 = (enemy.global_position - global_position).normalized()
+	dir.y = maxf(dir.y, 0.0)
+
+	enemy.global_position += dir * 8.0
+
+	if "velocity" in enemy:
+		enemy.velocity = dir * 2000.0
+
+
+func _update_shield_direction() -> void:
+	if not shield_area:
+		return
+	var shape = shield_area.get_node_or_null("ShieldCollisionShape")
+	if not shape:
+		return
+	shape.position.x = absf(shape.position.x) * (-1 if $Sprite2D.flip_h else 1)
+
+
+func _resolve_enemy(node: Node) -> Node:
+	var current := node
+	while current != null:
+		if current.is_in_group("slime") or current.is_in_group("boss") or current.is_in_group("enemy"):
+			return current
+		current = current.get_parent()
+	return null
 
 
 func prepare_attack_area(area: Area2D, damage: int, kind: AttackKind, attack_id: StringName) -> void:
@@ -2256,6 +2664,23 @@ func get_bubble_projectile_cooldown_progress() -> float:
 	return clampf(1.0 - (bubble_projectile_cooldown_timer / cooldown), 0.0, 1.0)
 
 
+func get_super_wheel_cooldown_progress(slot: WheelSlot) -> float:
+	match slot:
+		WheelSlot.ULTIMATE:
+			return _cooldown_progress(super_spike_cooldown_timer, super_spike_cooldown)
+		WheelSlot.SPECIAL_ATTACK:
+			return _cooldown_progress(time_bubble_cooldown_timer, time_bubble_cooldown)
+		WheelSlot.BUBBLE_PROJECTILE:
+			return _cooldown_progress(super_launcher_cooldown_timer, super_launcher_cooldown)
+		WheelSlot.PLACEHOLDER:
+			return _cooldown_progress(super_parry_cooldown_timer, super_parry_cooldown)
+	return 1.0
+
+
+func _cooldown_progress(time_left: float, duration: float) -> float:
+	return clampf(1.0 - (time_left / maxf(duration, 0.001)), 0.0, 1.0)
+
+
 func get_ultimate_cooldown_progress() -> float:
 	var cooldown := maxf(ultimate_attack_cooldown, 0.001)
 	if ultimate_cooldown_node and not ultimate_cooldown_node.is_stopped():
@@ -2342,7 +2767,7 @@ func consume_stamina(amount: float) -> bool:
 
 func show_stamina_warning() -> void:
 	if hud and hud.has_method("show_warning_message"):
-		hud.show_warning_message("sem stamina")
+		hud.show_warning_message("baixa estamina")
 
 
 func consume_attack_mana(amount: float) -> bool:

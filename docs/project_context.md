@@ -1,6 +1,6 @@
 # Project Context
 
-Last reviewed: 2026-04-29
+Last reviewed: 2026-06-18
 
 ## Overview
 
@@ -74,6 +74,15 @@ Current mode/form rules:
 - The player starts and stays in metroidvania behavior
 - Locked forms still cannot be selected
 - Checkpoints no longer change gameplay mode
+
+Current Super form wheel:
+
+- Up: full-body spike area attack (`super_espinho`)
+- Down: timed attack parry (`parry_super`)
+- Right: 10-second enemy time stop (`super_warudo`)
+- Left: damaging bubble launcher (`super_lancador`)
+- The Time Bubble HUD counter is shown only while time is stopped
+- Collecting the Super form unlocks all four Super wheel slots
 
 Important groups and combat nodes:
 

@@ -1,5 +1,27 @@
 # Change Log
 
+## 2026-06-18
+
+### Super form power wheel
+
+- Replaced the Super form wheel actions with four dedicated powers:
+  area spike attack, bubble launcher, Time Bubble, and parry.
+- Reused `Hitbox_example_spike` as the collision shape for the full-body
+  `super_espinho` area attack.
+- Reused the player bubble projectile foundation for the `super_lancador`
+  damaging projectile.
+- Added a 10-second Time Bubble effect using `super_warudo`; slimes, the boss,
+  newly spawned enemies, and boss projectiles remain frozen while the player
+  can continue attacking.
+- Added a HUD panel showing the remaining Time Bubble duration.
+- Added a timed `parry_super` window that negates incoming damage and
+  counter-damages the attacking enemy.
+- Added independent mana costs, cooldowns, and wheel cooldown indicators for
+  all four Super powers.
+- Positioned the bubble launcher on the left wheel slot and parry on the
+  bottom slot, with their HUD icons aligned to those directions.
+- Unlocking the Super form now also unlocks its four power-wheel slots.
+
 ## 2026-05-20
 
 ### Respawn enemy carry fix

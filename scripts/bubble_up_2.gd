@@ -102,6 +102,10 @@ func collect() -> void:
 
 	# --- Desbloqueio de forma ---
 	player.unlocked_forms[player.Form.SUPER] = true
+	if "unlocked_wheel_slots" in player:
+		var super_slots = player.unlocked_wheel_slots.get(player.Form.SUPER, {})
+		for slot in super_slots.keys():
+			super_slots[slot] = true
 
 	# --- Atualização de respawn (opcional) ---
 	if update_respawn and respawn_node:

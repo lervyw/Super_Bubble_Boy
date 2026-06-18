@@ -21,6 +21,7 @@ const PROJECTILE_DIRECT_DAMAGE_META := &"projectile_direct_damage"
 var direction: Vector2 = Vector2.RIGHT
 var start_position: Vector2
 var wave_time: float = 0.0
+var time_frozen: bool = false
 
 
 func _ready() -> void:
@@ -54,6 +55,8 @@ func setup(spawn_direction: Vector2, projectile_damage: int = -1) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if time_frozen:
+		return
 	wave_time += delta
 	var wave := Vector2.ZERO
 	if vertical_wave_amplitude > 0.0:
@@ -80,8 +83,18 @@ func _try_hit(node: Node) -> void:
 
 	var target := _resolve_target(node)
 	if target and target.has_method("take_damage"):
-		target.take_damage(damage)
+		target.take_damage(damage, self)
 		queue_free()
+
+
+func set_time_frozen(frozen: bool) -> void:
+	time_frozen = frozen
+	var sprite := get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+	if sprite:
+		if frozen:
+			sprite.pause()
+		else:
+			sprite.play()
 
 
 func _resolve_target(node: Node) -> Node:

@@ -102,14 +102,14 @@ func set_action_selection(action_name: String) -> void:
 		_set_button_disabled(right_button)
 
 	match _normalize_action_name(action_name):
-		"ultimate_attack", "protective_bubble":
+		"ultimate_attack", "protective_bubble", "super_spike":
 			if ultimate_enabled:
 				_highlight_button(up_button, up_selected_texture)
-		"placeholder", "ghost_mode":
+		"placeholder", "ghost_mode", "super_parry":
 			_highlight_button(down_button, down_selected_texture)
-		"bubble_projectile", "teleport_bubble":
+		"bubble_projectile", "teleport_bubble", "super_launcher":
 			_highlight_button(left_button, left_selected_texture)
-		"attack_special", "portal":
+		"attack_special", "portal", "time_bubble":
 			if special_attack_enabled:
 				_highlight_button(right_button, right_selected_texture)
 
@@ -125,6 +125,14 @@ func _normalize_action_name(name: String) -> String:
 		"teleport_bubble":
 			return "bubble_projectile"
 		"portal":
+			return "attack_special"
+		"super_spike":
+			return "ultimate_attack"
+		"super_launcher":
+			return "bubble_projectile"
+		"super_parry":
+			return "placeholder"
+		"time_bubble":
 			return "attack_special"
 	return name
 
@@ -312,10 +320,10 @@ func _restore_available_button_visual(node: TextureRect) -> void:
 		return
 
 	var selected := (
-		(node == up_button and (current_action_selection in ["ultimate_attack", "protective_bubble"]))
-		or (node == down_button and (current_action_selection in ["placeholder", "ghost_mode"]))
-		or (node == left_button and (current_action_selection in ["bubble_projectile", "teleport_bubble"]))
-		or (node == right_button and (current_action_selection in ["attack_special", "portal"]))
+		(node == up_button and (current_action_selection in ["ultimate_attack", "protective_bubble", "super_spike"]))
+		or (node == down_button and (current_action_selection in ["placeholder", "ghost_mode", "super_parry"]))
+		or (node == left_button and (current_action_selection in ["bubble_projectile", "teleport_bubble", "super_launcher"]))
+		or (node == right_button and (current_action_selection in ["attack_special", "portal", "time_bubble"]))
 	)
 
 	node.self_modulate = selected_modulate if selected else normal_modulate

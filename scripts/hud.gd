@@ -19,6 +19,8 @@ extends CanvasLayer
 @export var main_menu_button: Button
 @export var quit_button: Button
 @export var ultimate_cooldown_bar: TextureProgressBar
+@export var time_bubble_panel: Control
+@export var time_bubble_label: Label
 @export var ultimate_cooldown_bar_position: Vector2 = Vector2(14.0, 19.0)
 @export var ultimate_cooldown_bar_size: Vector2 = Vector2(24.0, 52.0)
 
@@ -82,6 +84,8 @@ func _ready() -> void:
 			quit_button.pressed.connect(_on_quit_pressed)
 	if boss_hp_bar:
 		boss_hp_bar.visible = false
+	if time_bubble_panel:
+		time_bubble_panel.visible = false
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -92,6 +96,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	if pause_menu_open and event.is_action_pressed("ui_cancel"):
 		close_pause_menu()
 		get_viewport().set_input_as_handled()
+		return
+	if pause_menu_open and (event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_select")):
+		for btn in [resume_button, main_menu_button, quit_button, passive_toggle]:
+			if btn and btn.has_focus():
+				btn.pressed.emit()
+				get_viewport().set_input_as_handled()
+				return
+		for icon in pause_passive_icons:
+			if icon and icon is Button and icon.has_focus():
+				icon.pressed.emit()
+				get_viewport().set_input_as_handled()
+				return
 
 
 func _process(delta: float) -> void:
@@ -109,6 +125,7 @@ func _process(delta: float) -> void:
 	_update_passive_icons()
 	_update_menu_panel_state()
 	_update_pause_menu_state()
+	_update_time_bubble_counter()
 
 
 func _update_hearts() -> void:
@@ -246,14 +263,31 @@ func _update_menu_panel_state() -> void:
 		menu_panel.set_special_attack_enabled(player.can_use_mana_attacks())
 	if menu_panel.has_method("set_ultimate_enabled") and player:
 		menu_panel.set_ultimate_enabled(player.allow_ultimate_input and player.ultimate_attack_enabled and player.can_use_mana_attacks())
-	if menu_panel.has_method("set_special_attack_cooldown_progress") and player and player.has_method("get_active_attack_cooldown_progress"):
-		menu_panel.set_special_attack_cooldown_progress(player.get_active_attack_cooldown_progress())
-	if menu_panel.has_method("set_bubble_projectile_cooldown_progress") and player and player.has_method("get_bubble_projectile_cooldown_progress"):
-		menu_panel.set_bubble_projectile_cooldown_progress(player.get_bubble_projectile_cooldown_progress())
-	if menu_panel.has_method("set_placeholder_cooldown_progress"):
-		menu_panel.set_placeholder_cooldown_progress(1.0)
+	if player.form == player.Form.SUPER and player.has_method("get_super_wheel_cooldown_progress"):
+		menu_panel.set_ultimate_cooldown_progress(player.get_super_wheel_cooldown_progress(0))
+		menu_panel.set_special_attack_cooldown_progress(player.get_super_wheel_cooldown_progress(1))
+		menu_panel.set_bubble_projectile_cooldown_progress(player.get_super_wheel_cooldown_progress(2))
+		menu_panel.set_placeholder_cooldown_progress(player.get_super_wheel_cooldown_progress(3))
+	else:
+		if menu_panel.has_method("set_ultimate_cooldown_progress"):
+			menu_panel.set_ultimate_cooldown_progress(1.0)
+		if menu_panel.has_method("set_special_attack_cooldown_progress") and player and player.has_method("get_active_attack_cooldown_progress"):
+			menu_panel.set_special_attack_cooldown_progress(player.get_active_attack_cooldown_progress())
+		if menu_panel.has_method("set_bubble_projectile_cooldown_progress") and player and player.has_method("get_bubble_projectile_cooldown_progress"):
+			menu_panel.set_bubble_projectile_cooldown_progress(player.get_bubble_projectile_cooldown_progress())
+		if menu_panel.has_method("set_placeholder_cooldown_progress"):
+			menu_panel.set_placeholder_cooldown_progress(1.0)
 
 	_sync_wheel_slot_unlocks()
+
+
+func _update_time_bubble_counter() -> void:
+	if not time_bubble_panel or not time_bubble_label or not player:
+		return
+	var active: bool = player.has_method("is_time_bubble_active") and bool(player.is_time_bubble_active())
+	time_bubble_panel.visible = active
+	if active and player.has_method("get_time_bubble_time_left"):
+		time_bubble_label.text = "%.1f" % player.get_time_bubble_time_left()
 
 
 func _sync_wheel_slot_unlocks() -> void:

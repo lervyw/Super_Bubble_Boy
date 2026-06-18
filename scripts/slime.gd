@@ -122,6 +122,9 @@ var in_water: bool = false
 var water_zone_overlap_count: int = 0
 var last_water_position: Vector2 = Vector2.ZERO
 var has_last_water_position: bool = false
+var time_frozen: bool = false
+var time_frozen_velocity: Vector2 = Vector2.ZERO
+var time_frozen_sprite_was_playing: bool = false
 
 
 func _ready():
@@ -156,6 +159,9 @@ func _ready():
 
 func _physics_process(delta):
 	if dying:
+		return
+	if time_frozen:
+		velocity = Vector2.ZERO
 		return
 
 	if cooldown_t > 0:
@@ -567,7 +573,7 @@ func is_current_attack(serial: int) -> bool:
 	return attacking and not dying and not stunned and serial == attack_serial
 
 
-func take_damage(amount):
+func take_damage(amount, _source: Node = null):
 	if dying:
 		return
 
@@ -585,6 +591,9 @@ func take_damage(amount):
 	if health <= 0:
 		die()
 		return
+	if time_frozen:
+		stunned = false
+		return
 
 	await play_hit_reaction(current_hit_reaction)
 
@@ -592,6 +601,27 @@ func take_damage(amount):
 		return
 
 	stunned = false
+
+
+func set_time_frozen(frozen: bool) -> void:
+	if time_frozen == frozen or dying:
+		return
+	time_frozen = frozen
+
+	if frozen:
+		time_frozen_velocity = velocity
+		velocity = Vector2.ZERO
+		attacking = false
+		attack_serial += 1
+		if hitbox_shape:
+			hitbox_shape.set_deferred("disabled", true)
+		if sprite:
+			time_frozen_sprite_was_playing = sprite.is_playing()
+			sprite.pause()
+	else:
+		velocity = time_frozen_velocity
+		if sprite and time_frozen_sprite_was_playing:
+			sprite.play()
 
 
 func play_hit_reaction(reaction_serial: int) -> void:
@@ -644,7 +674,7 @@ func die():
 
 func apply_damage_to(target):
 	if target.has_method("take_damage"):
-		target.take_damage(damage)
+		target.take_damage(damage, self)
 
 
 func _on_hitbox_body_entered(body):

@@ -85,6 +85,9 @@ var in_water: bool = false
 var water_zone_overlap_count: int = 0
 var rng := RandomNumberGenerator.new()
 var current_attack_animation: StringName = &""
+var time_frozen: bool = false
+var time_frozen_velocity: Vector2 = Vector2.ZERO
+var time_frozen_sprite_was_playing: bool = false
 
 # =========================================================
 
@@ -120,6 +123,9 @@ func _ready():
 
 func _physics_process(delta):
 	if state == State.DEAD:
+		return
+	if time_frozen:
+		velocity = Vector2.ZERO
 		return
 
 	if cooldown_t > 0:
@@ -203,7 +209,7 @@ func start_attack(dist: float = 0.0):
 	else:
 		await wait_for_attack_hitbox_start()
 
-		if hitbox_shape:
+		if hitbox_shape and not time_frozen:
 			hitbox_shape.disabled = false
 
 		await get_tree().create_timer(hitbox_active_time).timeout
@@ -259,19 +265,19 @@ func fire_projectile_on_animation_frame(anim: StringName, target_frame: int) -> 
 		return
 
 	var fired := false
-	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing():
+	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing() and not time_frozen:
 		if not fired and sprite.frame >= target_frame:
 			spawn_projectile()
 			fired = true
 			return
 		await get_tree().process_frame
 
-	if not fired:
+	if not fired and not time_frozen:
 		spawn_projectile()
 
 
 func spawn_projectile() -> void:
-	if projectile_attack_scene == null:
+	if projectile_attack_scene == null or time_frozen:
 		return
 
 	var projectile := projectile_attack_scene.instantiate()
@@ -289,19 +295,20 @@ func get_projectile_spawn_position() -> Vector2:
 
 # =========================================================
 
-func take_damage(amount):
+func take_damage(amount, _source: Node = null):
 	if state == State.DEAD:
 		return
 
 	health -= max(amount, 1)
 	emit_signal("health_changed", max(health, 0), max_health)
 
-	if form == Form.NORMAL and health <= max_health / 2:
-		start_transform()
-		return
-
 	if health <= 0:
 		die()
+		return
+	if time_frozen:
+		return
+	if form == Form.NORMAL and health <= max_health / 2:
+		start_transform()
 		return
 
 	if state == State.ATTACK and not interrupt_attack_on_damage:
@@ -313,6 +320,27 @@ func take_damage(amount):
 	if state == State.DEAD or state == State.TRANSFORM:
 		return
 	state = State.CHASE
+
+
+func set_time_frozen(frozen: bool) -> void:
+	if time_frozen == frozen or state == State.DEAD:
+		return
+	time_frozen = frozen
+
+	if frozen:
+		time_frozen_velocity = velocity
+		velocity = Vector2.ZERO
+		if hitbox_shape:
+			hitbox_shape.set_deferred("disabled", true)
+		if sprite:
+			time_frozen_sprite_was_playing = sprite.is_playing()
+			sprite.pause()
+	else:
+		velocity = time_frozen_velocity
+		if sprite and time_frozen_sprite_was_playing:
+			sprite.play()
+		if form == Form.NORMAL and health <= max_health / 2:
+			call_deferred("start_transform")
 
 # =========================================================
 
