@@ -24,6 +24,8 @@ extends CanvasLayer
 @export var ultimate_cooldown_bar_position: Vector2 = Vector2(14.0, 19.0)
 @export var ultimate_cooldown_bar_size: Vector2 = Vector2(24.0, 52.0)
 
+@export var soap_label: Label
+
 const PASSIVE_ICON_STOMP := preload("res://sprites/assets/bolha_ressonante.png")
 const PASSIVE_ICON_RUN := preload("res://sprites/assets/Corrida.png")
 const UI_JOYPAD_DEADZONE: float = 0.5
@@ -126,6 +128,7 @@ func _process(delta: float) -> void:
 	_update_menu_panel_state()
 	_update_pause_menu_state()
 	_update_time_bubble_counter()
+	_update_soap_counter()
 
 
 func _update_hearts() -> void:
@@ -615,6 +618,12 @@ func _on_main_menu_pressed() -> void:
 	close_pause_menu()
 	if GameManager:
 		GameManager.goto_title()
+
+
+func _update_soap_counter() -> void:
+	if not soap_label:
+		return
+	soap_label.text = str(GameManager.get_soap())
 
 
 func _on_quit_pressed() -> void:

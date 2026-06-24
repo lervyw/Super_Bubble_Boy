@@ -3427,7 +3427,7 @@ size = Vector2(19, 3.5)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2enhl"]
 size = Vector2(63, 63)
 
-[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("audio_normal", "audio_super", "hud", "stomper_normal", "stomper_bubble", "stomper_super", "stats") groups=["jogador"]]
+[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("audio_normal", "audio_super", "hud", "stomper_normal", "stomper_bubble", "stomper_super", "hurtbox_super", "stats") groups=["jogador"]]
 script = ExtResource("1_8vhvd")
 audio_normal = NodePath("audio_normal")
 audio_super = NodePath("audio_super")
@@ -3435,6 +3435,7 @@ hud = NodePath("HUD")
 stomper_normal = NodePath("StompHitboxNormal")
 stomper_bubble = NodePath("StompHitboxBubble")
 stomper_super = NodePath("StompHitboxSuper")
+hurtbox_super = NodePath("HurtboxSuper")
 stats = NodePath("Stats")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="." node_paths=PackedStringArray("player", "stats", "special_attack_area_normal", "special_attack_area_bubble", "special_attack_area_super", "body_idle_normal", "body_walk_normal", "body_jump_normal", "body_fall_normal", "body_crouch_normal", "body_dash_normal", "body_swim_normal", "body_attack_normal", "body_defend_normal", "body_dead_normal", "body_idle_bubble", "body_walk_bubble", "body_jump_bubble", "body_fall_bubble", "body_crouch_bubble", "body_dash_bubble", "body_swim_bubble", "body_attack_bubble", "body_defend_bubble", "body_dead_bubble", "body_idle_super", "body_walk_super", "body_jump_super", "body_fall_super", "body_crouch_super", "body_dash_super", "body_swim_super", "body_attack_super", "body_defend_super", "body_dead_super", "attack_area_normal", "attack_area_bubble", "attack_area_super")]
@@ -3532,6 +3533,12 @@ position = Vector2(-1, 6)
 position = Vector2(1, 3)
 shape = SubResource("RectangleShape2D_bll10")
 
+[node name="HurtboxSuper" type="Area2D" parent="." groups=["player", "player_hurtbox"]]
+position = Vector2(-2, 0.5)
+
+[node name="CollisionShapeSuper" type="CollisionShape2D" parent="HurtboxSuper"]
+shape = SubResource("RectangleShape2D_e2nbm")
+
 [node name="AttackHitbox" type="Area2D" parent="." groups=["killer", "player_attack"]]
 
 [node name="AttackCollisionShape" type="CollisionShape2D" parent="AttackHitbox"]
@@ -3577,3 +3584,4 @@ debug_color = Color(1.3957917e-06, 0.6436006, 0.30272216, 0.41960785)
 [connection signal="timeout" from="Stats/Invencibilidade" to="Stats" method="_on_invencibilidade_timeout"]
 [connection signal="timeout" from="Stats/piscar_timer" to="Stats" method="_on_piscar_timer_timeout"]
 [connection signal="area_entered" from="HurtboxArea" to="." method="_on_hurtbox_body_entered"]
+[connection signal="area_entered" from="HurtboxSuper" to="." method="_on_hurtbox_body_entered"]

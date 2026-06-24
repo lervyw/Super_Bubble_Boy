@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://024m503t0ghq"]
+
+[ext_resource type="Script" uid="uid://cqine1bkckxrr" path="res://scripts/coin.gd" id="1_coin"]
+[ext_resource type="Texture2D" uid="uid://c028uipy5piq7" path="res://sprites/assets/hud/sabao.png" id="2_sabao_icon"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_coin"]
+radius = 6.0
+
+[node name="Coin" type="Area2D"]
+script = ExtResource("1_coin")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("2_sabao_icon")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_coin")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

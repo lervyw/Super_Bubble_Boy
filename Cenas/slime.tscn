@@ -298,6 +298,7 @@ size = Vector2(20, 7)
 
 [node name="slime" type="CharacterBody2D"]
 collision_layer = 4
+collision_mask = 5
 script = ExtResource("1_4p1wq")
 stop_distance = 10.0
 attack_hitbox_start_frame = 0

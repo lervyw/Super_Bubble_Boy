@@ -694,3 +694,6 @@ func _on_animation_finished() -> void:
 
 				if player.has_method("update_audio_by_form"):
 					player.update_audio_by_form()
+
+				if player.has_method("update_hurtbox_for_form"):
+					player.update_hurtbox_for_form()

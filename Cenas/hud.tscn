@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://4v1mv6nx587x"]
+[gd_scene load_steps=30 format=3 uid="uid://4v1mv6nx587x"]
 
 [ext_resource type="Script" uid="uid://c73t1ba5irapk" path="res://scripts/hud.gd" id="1_uow6a"]
 [ext_resource type="Texture2D" uid="uid://p2sjqryksujc" path="res://sprites/assets/hud/vida2.png" id="2_ftv5m"]
@@ -27,10 +27,11 @@
 [ext_resource type="Texture2D" uid="uid://lcn6rpxarlr0" path="res://sprites/assets/pause_menu/pause1.png" id="25_pause_frame"]
 [ext_resource type="Texture2D" uid="uid://dymwby7mri44v" path="res://sprites/assets/bolha_ressonante.png" id="26_pk3l"]
 [ext_resource type="Texture2D" uid="uid://bflyvfpem4ffw" path="res://sprites/assets/Corrida.png" id="27_qwer4"]
+[ext_resource type="Texture2D" uid="uid://c028uipy5piq7" path="res://sprites/assets/hud/sabao.png" id="28_sabao"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_power_panel"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("hp_bar", "mana_bar", "stamina_bar", "ultimate_ready_icon", "boss_hp_bar", "menu_panel", "pause_menu_panel", "warning_label", "passive_toggle", "resume_button", "main_menu_button", "quit_button", "ultimate_cooldown_bar", "time_bubble_panel", "time_bubble_label")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("hp_bar", "mana_bar", "stamina_bar", "ultimate_ready_icon", "boss_hp_bar", "menu_panel", "pause_menu_panel", "warning_label", "passive_toggle", "resume_button", "main_menu_button", "quit_button", "ultimate_cooldown_bar", "time_bubble_panel", "time_bubble_label", "soap_label")]
 script = ExtResource("1_uow6a")
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
 mana_bar = NodePath("HBoxContainer/Holder/ManaBar")
@@ -47,6 +48,7 @@ quit_button = NodePath("PauseMenu/VBoxContainer/QuitButton")
 ultimate_cooldown_bar = NodePath("UltimateCooldownBar")
 time_bubble_panel = NodePath("TimeBubblePanel")
 time_bubble_label = NodePath("TimeBubblePanel/TimeLabel")
+soap_label = NodePath("SoapCounter/Label")
 metadata/_edit_vertical_guides_ = [152.0]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -242,6 +244,26 @@ offset_right = 133.0
 offset_bottom = 96.0
 texture = ExtResource("22_invt5")
 stretch_mode = 5
+
+[node name="SoapCounter" type="HBoxContainer" parent="."]
+offset_left = 8.0
+offset_top = 244.0
+offset_right = 72.0
+offset_bottom = 272.0
+scale = Vector2(1.0, 1.0)
+
+[node name="Icon" type="TextureRect" parent="SoapCounter"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+texture = ExtResource("28_sabao")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SoapCounter"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "0"
+vertical_alignment = 1
 
 [node name="WarningLabel" type="Label" parent="."]
 visible = false

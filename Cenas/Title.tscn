@@ -359,6 +359,30 @@ layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "pausa"
 
+[node name="Controle19" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(198, 20)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda cima"
+
+[node name="Controle20" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(198, 20)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda baixo"
+
+[node name="Controle21" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(198, 20)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda esquerda"
+
+[node name="Controle22" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(198, 20)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda direita"
+
 [node name="Voltar" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(198, 22)
 layout_mode = 2

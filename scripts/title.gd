@@ -74,6 +74,11 @@ const UI_JOYPAD_DEADZONE: float = 0.5
 @onready var btn_dash = $ControlsMenu/ScrollContainer/VBoxContainer/Controle17
 @onready var btn_pause = $ControlsMenu/ScrollContainer/VBoxContainer/Controle18
 
+@onready var btn_roda_cima = $ControlsMenu/ScrollContainer/VBoxContainer/Controle19
+@onready var btn_roda_baixo = $ControlsMenu/ScrollContainer/VBoxContainer/Controle20
+@onready var btn_roda_esquerda = $ControlsMenu/ScrollContainer/VBoxContainer/Controle21
+@onready var btn_roda_direita = $ControlsMenu/ScrollContainer/VBoxContainer/Controle22
+
 @onready var btn_combo1 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle9
 @onready var btn_combo2 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle10
 @onready var btn_combo3 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle11
@@ -146,6 +151,10 @@ func _ready():
 	_connect_rebind_button_once(btn_agachar, "crouch")
 	_connect_rebind_button_once(btn_dash, "dash")
 	_connect_rebind_button_once(btn_pause, "pause_menu")
+	_connect_rebind_button_once(btn_roda_cima, "hud_select_up")
+	_connect_rebind_button_once(btn_roda_baixo, "hud_select_down")
+	_connect_rebind_button_once(btn_roda_esquerda, "hud_select_left")
+	_connect_rebind_button_once(btn_roda_direita, "hud_select_right")
 	_connect_rebind_button_once(btn_combo1, "combo_1")
 	_connect_rebind_button_once(btn_combo2, "combo_2")
 	_connect_rebind_button_once(btn_combo3, "combo_3")
@@ -272,6 +281,7 @@ func _input(event: InputEvent):
 			btn_pulo, btn_bolha, btn_super, btn_normal_form, btn_menu, btn_ataque,
 			btn_ataque_especial, btn_defesa, btn_ultimate, btn_esquerda, btn_direita,
 			btn_agachar, btn_dash, btn_pause,
+			btn_roda_cima, btn_roda_baixo, btn_roda_esquerda, btn_roda_direita,
 			btn_combo1, btn_combo2, btn_combo3, btn_combo4,
 			btn_voltar_botoes,
 		]:
@@ -383,6 +393,10 @@ func _setup_controls_scroll_focus() -> void:
 		btn_agachar,
 		btn_dash,
 		btn_pause,
+		btn_roda_cima,
+		btn_roda_baixo,
+		btn_roda_esquerda,
+		btn_roda_direita,
 		btn_voltar_botoes,
 	]
 
@@ -503,6 +517,11 @@ func _update_control_labels():
 	btn_agachar.text = "Agachar: " + _get_current_input_name("crouch")
 	btn_dash.text = "Dash: " + _get_current_input_name("dash")
 	btn_pause.text = "Pausa: " + _get_current_input_name("pause_menu")
+
+	btn_roda_cima.text = "Roda Cima: " + _get_current_input_name("hud_select_up")
+	btn_roda_baixo.text = "Roda Baixo: " + _get_current_input_name("hud_select_down")
+	btn_roda_esquerda.text = "Roda Esquerda: " + _get_current_input_name("hud_select_left")
+	btn_roda_direita.text = "Roda Direita: " + _get_current_input_name("hud_select_right")
 
 	btn_combo1.text = "Combo 1: " + _get_current_input_name("combo_1")
 	btn_combo2.text = "Combo 2: " + _get_current_input_name("combo_2")

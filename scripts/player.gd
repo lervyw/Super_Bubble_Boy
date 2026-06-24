@@ -91,6 +91,10 @@ var hud_menu_waiting_for_neutral := false
 @export var stomper_normal: Area2D
 @export var stomper_bubble: Area2D
 @export var stomper_super: Area2D
+@export var hurtbox_super: Area2D
+
+@export_group("Damage")
+@export var super_damage_reduction_divisor: float = 3.0
 
 @export_group("Normal Attack")
 @export var normal_attack_damage: int = 2
@@ -333,6 +337,10 @@ func _ready() -> void:
 		if hurtbox_area and not hurtbox_area.area_entered.is_connected(_on_hurtbox_body_entered):
 			hurtbox_area.area_entered.connect(_on_hurtbox_body_entered)
 
+	if hurtbox_super and not hurtbox_super.area_entered.is_connected(_on_hurtbox_body_entered):
+		hurtbox_super.area_entered.connect(_on_hurtbox_body_entered)
+		hurtbox_super.monitoring = false
+
 	connect_stomper_signals(stomper_normal)
 	connect_stomper_signals(stomper_bubble)
 	connect_stomper_signals(stomper_super)
@@ -343,6 +351,7 @@ func _ready() -> void:
 	setup_camera_framing()
 	refresh_stompers_for_current_form()
 	update_audio_by_form()
+	update_hurtbox_for_form()
 	passive_attack_timer = passive_attack_interval
 	setup_protective_bubble_shield()
 	setup_super_spike_area()
@@ -352,6 +361,21 @@ func ensure_optional_input_actions() -> void:
 	for action_name in ["hud_select_up", "hud_select_down", "hud_select_left", "hud_select_right", "swim_up"]:
 		if not InputMap.has_action(action_name):
 			InputMap.add_action(action_name)
+
+	_add_key_event_once("hud_select_up", KEY_W)
+	_add_key_event_once("hud_select_down", KEY_S)
+	_add_key_event_once("hud_select_left", KEY_A)
+	_add_key_event_once("hud_select_right", KEY_D)
+
+
+func _add_key_event_once(action_name: StringName, keycode: int) -> void:
+	for event in InputMap.action_get_events(action_name):
+		if event is InputEventKey and (event.physical_keycode == keycode or event.keycode == keycode):
+			return
+
+	var ev := InputEventKey.new()
+	ev.physical_keycode = keycode
+	InputMap.action_add_event(action_name, ev)
 
 
 func _input(event):
@@ -364,10 +388,6 @@ func _input(event):
 
 	if event.is_action_released("hud_menu"):
 		close_hud_menu()
-		return
-
-	if hud_menu_open:
-		get_viewport().set_input_as_handled()
 		return
 
 	if event.is_action_pressed("attack_special"):
@@ -388,7 +408,6 @@ func _process(_delta: float) -> void:
 
 	if hud_menu_open:
 		process_hud_menu_selection()
-		return
 
 	check_attack_combos()
 	check_quick_form_selection()
@@ -410,15 +429,6 @@ func _physics_process(delta: float) -> void:
 
 	if dash_cooldown_timer > 0.0:
 		dash_cooldown_timer -= delta
-
-	if hud_menu_open:
-		if in_water:
-			apply_water_physics(delta)
-		else:
-			apply_normal_gravity(delta)
-		velocity.x = 0.0
-		move_and_slide()
-		return
 
 	if in_water:
 		apply_water_physics(delta)
@@ -1289,7 +1299,7 @@ func is_forward_pressed(direction: int) -> bool:
 
 
 func handle_input() -> void:
-	if hud_menu_open or state in [State.HURT, State.DEAD, State.SPECIAL_ATTACK]:
+	if state in [State.HURT, State.DEAD, State.SPECIAL_ATTACK]:
 		return
 
 	if Input.is_action_just_pressed("jump"):
@@ -1852,6 +1862,7 @@ func force_form(new_form: Form) -> void:
 		change_state(State.IDLE)
 	refresh_stompers_for_current_form()
 	update_audio_by_form()
+	update_hurtbox_for_form()
 
 
 func can_dash() -> bool:
@@ -2069,7 +2080,10 @@ func take_damage(amount: int = 1, source: Node = null) -> void:
 	var is_fatal_hit := false
 
 	if stats and stats.has_method("take_damage"):
-		stats.take_damage(amount)
+		var final_amount := amount
+		if form == Form.SUPER:
+			final_amount = max(1, int(amount / super_damage_reduction_divisor))
+		stats.take_damage(final_amount)
 		if stats.current_health <= 0:
 			is_fatal_hit = true
 	else:
@@ -2265,29 +2279,18 @@ func get_hud_menu_direction() -> Vector2:
 
 
 func get_raw_hud_menu_direction() -> Vector2:
-	var keyboard_direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down", 0.35)
-	if keyboard_direction != Vector2.ZERO:
-		return keyboard_direction
+	var dir := Vector2.ZERO
 
 	if Input.is_action_pressed("hud_select_left"):
-		keyboard_direction.x -= 1.0
+		dir.x -= 1.0
 	if Input.is_action_pressed("hud_select_right"):
-		keyboard_direction.x += 1.0
+		dir.x += 1.0
 	if Input.is_action_pressed("hud_select_up"):
-		keyboard_direction.y -= 1.0
+		dir.y -= 1.0
 	if Input.is_action_pressed("hud_select_down"):
-		keyboard_direction.y += 1.0
+		dir.y += 1.0
 
-	if Input.is_action_pressed("left"):
-		keyboard_direction.x -= 1.0
-	if Input.is_action_pressed("right"):
-		keyboard_direction.x += 1.0
-	if Input.is_action_pressed("jump"):
-		keyboard_direction.y -= 1.0
-	if Input.is_action_pressed("crouch"):
-		keyboard_direction.y += 1.0
-
-	return keyboard_direction.normalized() if keyboard_direction != Vector2.ZERO else Vector2.ZERO
+	return dir.normalized() if dir != Vector2.ZERO else Vector2.ZERO
 
 
 func setup_camera_framing() -> void:
@@ -2936,6 +2939,14 @@ func refresh_stompers_for_current_form() -> void:
 	set_stomper_enabled(stomper_normal, form == Form.NORMAL)
 	set_stomper_enabled(stomper_bubble, form == Form.BUBBLE)
 	set_stomper_enabled(stomper_super, form == Form.SUPER)
+
+
+func update_hurtbox_for_form() -> void:
+	var hurtbox_area = $HurtboxArea if has_node("HurtboxArea") else null
+	if hurtbox_area:
+		hurtbox_area.monitoring = form != Form.SUPER
+	if hurtbox_super:
+		hurtbox_super.monitoring = form == Form.SUPER
 
 
 func set_stomper_enabled(stomper: Area2D, enabled: bool) -> void:

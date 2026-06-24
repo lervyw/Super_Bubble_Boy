@@ -1,5 +1,16 @@
 # Change Log
 
+## 2026-06-24
+
+### Separated power wheel inputs from movement inputs
+
+- `scripts/player.gd`: `get_raw_hud_menu_direction()` now uses only the dedicated `hud_select_up/down/left/right` actions
+- Removed `ui_left/right/up/down` and `left/right/jump/crouch` from wheel selection
+- Added default keyboard bindings WASD for `hud_select_*` in `ensure_optional_input_actions()`
+- `Cenas/Title.tscn` + `scripts/title.gd`: added 4 rebind buttons for the wheel controls
+- Player no longer moves while selecting powers on the HUD wheel
+- Xbox/PS4 users can rebind wheel controls independently from movement
+
 ## 2026-06-18
 
 ### Super form power wheel

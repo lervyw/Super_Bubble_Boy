@@ -68,6 +68,12 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 @export_range(-1, 99, 1) var attack_hitbox_start_frame: int = -1
 @export_range(-1, 99, 1) var attack_hitbox_end_frame: int = -1
 
+@export_group("Coin Drop")
+@export var coin_scene: PackedScene = preload("res://Cenas/coin.tscn")
+@export var coin_count: int = 5
+@export var coin_spread: float = 24.0
+@export_range(0.0, 1.0) var coin_drop_chance: float = 1.0
+
 @export_group("Health")
 @export var max_health: int = 3
 var health: int = max_health
@@ -665,11 +671,33 @@ func die():
 
 	attacking = false
 
+	call_deferred("spawn_coins")
+
 	if has_animation(death_animation):
 		play_animation(death_animation)
 		await wait_for_animation(death_animation)
 
 	queue_free()
+
+
+func spawn_coins() -> void:
+	if coin_scene == null or coin_count <= 0:
+		return
+	if randf() > coin_drop_chance:
+		return
+
+	var parent := get_tree().current_scene
+	if parent == null:
+		return
+
+	for i in range(coin_count):
+		var coin := coin_scene.instantiate()
+		var offset := Vector2(
+			randf_range(-coin_spread, coin_spread),
+			randf_range(-coin_spread * 0.3, 0.0)
+		)
+		coin.global_position = global_position + offset
+		parent.add_child(coin)
 
 
 func apply_damage_to(target):

@@ -15,6 +15,7 @@ const CUTSCENE_PATH = "res://Cenas/cutscene_test.tscn"
 var current_level_path: String = ""
 var player_lives: int = 3
 var player_score: int = 0
+var soap_count: int = 0
 
 # =======================
 # ====== NAVEGAÇÃO ======
@@ -64,6 +65,7 @@ func goto_cutscene() -> void:
 func reset_game() -> void:
 	player_lives = 3
 	player_score = 0
+	soap_count = 0
 	print("🔄 Estado do jogo resetado")
 
 func add_score(points: int) -> void:
@@ -93,6 +95,13 @@ func get_lives() -> int:
 
 func get_score() -> int:
 	return player_score
+
+func add_soap(amount: int) -> void:
+	soap_count += amount
+	print("🧼 Sabão: %d (+%d)" % [soap_count, amount])
+
+func get_soap() -> int:
+	return soap_count
 
 func get_current_level() -> String:
 	return current_level_path
