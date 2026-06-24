@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/projectile.gd" id="1_projectile"]
+[ext_resource type="Texture2D" uid="uid://cq6jvj7vbioyh" path="res://sprites/characters/projectiles/projectile_bubble1.png" id="2_frame1"]
+[ext_resource type="Texture2D" uid="uid://bt4yphfeogel5" path="res://sprites/characters/projectiles/projectile_bubble2.png" id="3_frame2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_player_bubble_projectile"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_frame1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_frame2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 8.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_player_bubble_projectile"]
+radius = 9.0
+
+[node name="PlayerBubbleProjectile" type="Area2D"]
+script = ExtResource("1_projectile")
+speed = 170.0
+max_distance = 230.0
+damage = 2
+vertical_wave_amplitude = 24.0
+vertical_wave_speed = 8.0
+is_player_projectile = true
+projectile_group = &"player_projectile"
+attack_id = &"bubble_projectile"
+hit_groups = Array[StringName]([&"enemy", &"slime", &"boss", &"stompable"])
+hurtbox_groups = Array[StringName]([&"stompable"])
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_player_bubble_projectile")
+animation = &"default"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_player_bubble_projectile")

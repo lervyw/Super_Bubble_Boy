@@ -1,5 +1,234 @@
 # Change Log
 
+## 2026-06-24
+
+### Separated power wheel inputs from movement inputs
+
+- `scripts/player.gd`: `get_raw_hud_menu_direction()` now uses only the dedicated `hud_select_up/down/left/right` actions
+- Removed `ui_left/right/up/down` and `left/right/jump/crouch` from wheel selection
+- Added default keyboard bindings WASD for `hud_select_*` in `ensure_optional_input_actions()`
+- `Cenas/Title.tscn` + `scripts/title.gd`: added 4 rebind buttons for the wheel controls
+- Player no longer moves while selecting powers on the HUD wheel
+- Xbox/PS4 users can rebind wheel controls independently from movement
+
+## 2026-06-18
+
+### Super form power wheel
+
+- Replaced the Super form wheel actions with four dedicated powers:
+  area spike attack, bubble launcher, Time Bubble, and parry.
+- Reused `Hitbox_example_spike` as the collision shape for the full-body
+  `super_espinho` area attack.
+- Reused the player bubble projectile foundation for the `super_lancador`
+  damaging projectile.
+- Added a 10-second Time Bubble effect using `super_warudo`; slimes, the boss,
+  newly spawned enemies, and boss projectiles remain frozen while the player
+  can continue attacking.
+- Added a HUD panel showing the remaining Time Bubble duration.
+- Added a timed `parry_super` window that negates incoming damage and
+  counter-damages the attacking enemy.
+- Added independent mana costs, cooldowns, and wheel cooldown indicators for
+  all four Super powers.
+- Positioned the bubble launcher on the left wheel slot and parry on the
+  bottom slot, with their HUD icons aligned to those directions.
+- Unlocking the Super form now also unlocks its four power-wheel slots.
+
+## 2026-05-20
+
+### Respawn enemy carry fix
+
+- Added a temporary player body-collision release during respawn so slimes standing on the player are not carried through the teleport.
+- Avoided repositioning nearby slimes/enemies during respawn so they are not pushed into level tiles.
+
+### Slime player-head sliding
+
+- Prevented slimes from inheriting player movement as a moving platform while standing on the player.
+- Added a stronger lateral slide force when a slime is above the player and the player starts walking, so the slime slips off instead of riding on the player's head.
+
+## 2026-05-16
+
+### Projectile collision and spawn tuning
+
+- Made boss projectiles despawn when colliding with player bubble projectiles.
+- Lowered the player bubble projectile spawn point slightly.
+
+### Player projectile animation
+
+- Made the player bubble projectile action play the `attack_projectile` animation instead of the generic special attack animation.
+
+### Boss chase pressure
+
+- Added a projectile chase distance so the boss keeps pursuing the player instead of stopping to shoot at every projectile-range opportunity.
+
+### More aggressive boss AI
+
+- Added a separate boss projectile attack range so the boss can use `attack2` before reaching melee range.
+- Reduced boss hit stun and prevented regular hits from interrupting attacks already in progress.
+- Increased the level boss movement speed, attack frequency, and projectile chance for a more aggressive fight.
+
+### Boss and player projectiles
+
+- Added reusable projectile scenes for boss fireballs and player bubble shots using the new `sprites/characters/projectiles/` sprites.
+- Added a periodic boss `attack2` projectile attack that fires from the mouth on the seventh visual frame and despawns after traveling a fixed distance.
+- Changed the left power-wheel action from defense to a forward-floating bubble projectile that damages the first enemy it touches.
+- Swapped the power-wheel left and bottom action sprites so the square/X positions use the intended icons.
+
+### Pause passive toggle behavior
+
+- Changed the pause menu passive toggle so it enables/disables the selected passive powers instead of the old passive attack foundation.
+- Renamed the toggle label to `Poderes ligados` to make its behavior clearer.
+
+### Pause menu art layout
+
+- Rebuilt the pause menu layout around the new 420x280 `sprites/assets/pause_menu/pause1.png` frame.
+- Repositioned pause actions and passive controls into the drawn panel slots and restyled the controls to sit over the pixel-art menu.
+
+### Controller scroll in title controls menu
+
+- Made the title controls ScrollContainer follow focused buttons so D-pad/left-stick navigation scrolls down to hidden remap options.
+
+### Respawn enemy separation
+
+- Added a player respawn cleanup step that pushes nearby slimes/enemies away from the checkpoint before and after the player is moved.
+- This prevents enemies that were overlapping the player at death from remaining stacked on top of the player after respawn.
+
+### Slime attack range, aquatic recovery, and gamepad menus
+
+- Reduced slime attack trigger ranges so normal, aquatic, and flying slimes move closer before biting.
+- Added optional out-of-water flop behavior for swimming slimes so aquatic enemies fall and can try to move back toward the last water area.
+- Added runtime controller UI mappings and initial focus for the title and pause menus so Xbox/PS4 D-pad/left stick and face buttons can navigate/confirm.
+
+### Aquatic slime swimming
+
+- Added a `SWIM` movement mode to `scripts/slime.gd` with pulsed swimming, drag, vertical follow, and zig-zag motion for aquatic enemies.
+- Configured `Cenas/slime_aquatico.tscn` to use the new swim movement instead of ground walking.
+- Updated `scripts/SpawnZone.gd` so swimming enemies are not snapped to floor spawn positions.
+- Set `Area_Terra`, `Area_Agua`, and `Area_Ceu` in level 1 to spawn 8 slimes each with 8 simultaneous alive slots.
+
+### Repeated slime bite attacks
+
+- Fixed slime hitbox attack flow so a completed bite does not wait through the full attack animation a second time before resuming AI.
+- Restarted the attack animation at the start of each bite, allowing normal slimes to keep approaching and biting repeatedly while the player remains in range.
+- Added attack sequence cancellation cleanup so interrupted bite hitboxes do not stay active.
+
+### Level 1 biome spawn areas
+
+- Wired `Area_Terra`, `Area_Agua`, and `Area_Ceu` in `Cenas/level1.tscn` as spawn zones for normal, aquatic, and flying slimes.
+- Updated `scripts/SpawnZone.gd` so spawn areas act only as region markers and no longer collide/detect the player unless `spawn_on_enter` is enabled.
+- Added world-collision validation for spawn positions so enemies are not placed inside tile collisions or cramped solid spaces.
+- Added floor snapping for non-flying enemies so ground/aquatic slimes spawn on valid tile surfaces inside their spawn region.
+
+### Slime hit reaction animation
+
+- Updated `scripts/slime.gd` so all slime enemies play `got_hit` when they take non-fatal player damage.
+- Added `got_hit` SpriteFrames to the aquatic and flying slime variants.
+
+### Slime enemy variants
+
+- Added `Cenas/slime_aquatico.tscn` as a slime variant that reuses `scripts/slime.gd` with aquatic sprite animations and water-oriented movement tuning.
+- Added `Cenas/slime_voador.tscn` as a slime variant that reuses `scripts/slime.gd` with flying sprite animations and zig-zag flight movement.
+- Both variants define their own `idle`, `walk`, `attack`, and `death` `SpriteFrames` using the new slime sheets under `sprites/characters/`.
+
+## 2026-05-15
+
+### Compact mobile controls
+
+- Reduced mobile button, transform button, pause button, joystick, and joystick knob sizes.
+- Tightened mobile button spacing and edge padding so the touch controls occupy less screen space.
+- Reduced mobile button label font size to fit the smaller controls.
+
+### Gamepad trigger rebinding
+
+- Changed the controls menu to capture LT/L2 and RT/R2 with trigger-specific logic instead of treating them like generic analog-stick drift.
+- Lowered trigger rebind activation to `0.20` and only accepts positive trigger press values for axes 4 and 5.
+- Applied a `0.20` InputMap deadzone when an action is mapped to a trigger so gameplay recognizes the trigger before a full press.
+- Kept generic analog-axis remapping on the stricter `0.55` threshold for sticks.
+
+### Power wheel gravity and mobile swim jump
+
+- Kept vertical velocity when opening the power wheel so the player can keep falling while the wheel is open.
+- Changed power-wheel selection to use only the dedicated `hud_select_*` actions, preventing movement/jump/crouch inputs from selecting powers.
+- Restored physical keyboard/gamepad direction selection for the power wheel, but waits for held directions to return to neutral after opening so movement already being held does not instantly select a power.
+- Reset the mobile joystick when switching into power-wheel mode so a held movement direction does not instantly select a power.
+- Added mobile `swim_up` joystick input and a stronger water jump when pressing up + jump in water.
+
+## 2026-05-14
+
+### Mobile pause overlay
+
+- Hid the mobile touch controls while the pause menu is open and restored them when leaving pause.
+- Released virtual joystick actions when entering pause so movement/power selection cannot remain stuck.
+
+### Mobile button swap
+
+- Swapped the mobile `A` and `Y` button actions so `Y` jumps and `A` opens the power wheel.
+
+### Stretched screen fill
+
+- Changed stretch aspect from `expand` to `ignore` so the game canvas stretches to fill the whole window instead of preserving its fixed aspect ratio.
+
+### Widescreen fill
+
+- Changed the desktop window override to `1600x900` for a larger 16:9 default window.
+- Set stretch aspect to `expand` so widescreen displays use the full available screen area instead of keeping fixed-aspect letterboxing.
+
+### Transform gravity fix
+
+- Froze player velocity during form transformation so gravity cannot move the character while transform hitboxes are disabled, preventing the player from falling through the ground.
+- Kept gravity behavior unchanged for aerial attacks and other combat states.
+
+### Gamepad and mobile controls
+
+- Reverted the centered `SubViewport` wrapper experiment and restored the title scene as the main scene
+- Changed display stretch aspect back to `keep`, restoring the centered fixed-aspect game frame with letterboxing
+- Changed display stretch aspect to `expand` so Android widescreen fills the available screen without distorting the pixel-art viewport
+- Added player camera framing for metroidvania play: vertical offset keeps the player lower on screen, drag margins stabilize movement, and a small smoothed horizontal look-ahead shows slightly more space ahead
+- Added a mobile `PAUSE` touch button
+- Added mobile HUD-wheel selection actions so holding the power-menu button can select up/down/left/right powers using touch controls
+- Replaced mobile direction buttons with a virtual touch wheel: dragging controls movement normally, and dragging while the power wheel is open selects the power direction without moving the player
+- Kept gravity active during the power wheel, normal attacks, special/ultimate attacks, defense, and transformations so the player can no longer float in midair by attacking
+- Updated input rebinding to capture and save joypad axes, including Xbox/PS4 LT/L2 and RT/R2 trigger events
+- Normalized saved gamepad binds to device `-1` so the mapping is not locked to a single connected controller slot
+- Updated the controls menu labels to show common Xbox/PlayStation names for face buttons, shoulders, D-pad, analog axes, and triggers
+- Added default controller movement support for left/right via D-pad and left analog stick
+- Added default trigger mappings: `LT/L2` for defense and `RT/R2` for special attack
+- Moved the default normal-form controller bind off `RT/R2` to avoid conflicting with special attack
+- Added a runtime mobile controls overlay for touch devices: left D-pad movement plus right-side jump, attack, dash, power menu, and form transform buttons
+
+## 2026-05-10
+
+### Selectable passive powers
+
+- Added an exclusive passive power selector to the pause menu: none, orbit bubble, ground stomp, and quick run
+- Added an orbit bubble passive that moves around the player in a zig-zag orbit and damages enemies through the existing player attack metadata
+- Added a ground stomp passive triggered in air with attack + down/crouch, creating a short damage burst around the landing point
+- Added a quick run passive triggered by double-tapping left or right, with a timed speed boost and runtime `run` / `run_super` animation aliases
+- Kept the previous passive pulse disabled when selecting the new passive-power system so only one passive is active at a time
+- Increased the orbit bubble's visual/collision size and added medium bubble particles when the ground stomp lands
+- Moved the ground stomp bubble particle origin down to the player's feet through a configurable offset
+- Changed ground stomp damage and particles to originate from the active form-specific stomp hitbox
+- Removed the particle offset when a form-specific stomp hitbox exists so stomp particles spawn exactly at the active stomper position
+- Refined ground stomp origin to use the active stomper collision shape position instead of the Area2D node origin
+- Wired the fixed ultimate HUD icon as a bottom-to-top progress bar that fills when the ultimate is available
+- Slowed mana regeneration, made ultimate availability require full mana, smoothed the ultimate HUD recharge fill, and added `icone-ult.png` as a repositionable ready icon above the power panel
+- Updated `UltBar` to fill from bottom to top based only on ultimate cooldown progress and added a reusable shaking "sem mana suficiente" HUD warning for mana failures
+- Reworked `UltBar` to use an explicit clipped bottom-fill texture so the vertical recharge is visibly similar to the active power panel fills
+- Moved ultimate cooldown tracking to a real one-shot `Timer` node and made `UltBar` read `time_left / wait_time`
+- Simplified `UltBar` back to native `TextureProgressBar` behavior, matching the mana bar update style while keeping bottom-to-top fill
+- Rebuilt `UltBar` as a custom vertical texture bar generated by `hud.gd`, using the scene bar only as a texture/position reference
+- Matched the `Y` power menu cooldown-fill pattern by adding a clipped `CooldownFill` child directly inside `UltBar`
+- Changed `UltBar` visual progress initialization from full to empty so it behaves like a conventional progress bar
+- Set ultimate cooldown to 20 seconds and made `UltBar` drain downward smoothly after use before refilling upward over the cooldown
+- Changed `UltBar` so using the ultimate resets the progress immediately, then the fill rises from bottom to top only as the cooldown ends
+- Removed the ultimate cooldown fill from the `Panel/Ultimate` button so only the fixed `TextureProgressBar` node `UltBar` shows ultimate recharge progress
+- Made `UltBar` follow the ultimate cooldown timer progress directly, so it fills gradually during recharge and reaches full exactly when the ultimate is available again
+- Changed `UltBar` to fill from the player's mana ratio required for the ultimate, while `UltimateReadyIcon` fades in from the 20-second ultimate cooldown progress
+- Replaced the deleted `UltBar` dependency with a script-created `UltimateCooldownBar` that fills bottom-to-top from ultimate cooldown progress and only shows `UltimateReadyIcon` when the ultimate is actually usable
+- Added `UltimateCooldownBar` and its `Fill` as editable nodes in `Cenas/hud.tscn`, while keeping the runtime fallback if the nodes are missing
+- Converted `UltimateCooldownBar` into a real `TextureProgressBar` in `Cenas/hud.tscn`, restoring the old ultimate textures as editable progress-bar textures
+- Set `UltimateCooldownBar.max_value` to `100` and mapped cooldown progress to the full 0-100 progress-bar range
+- Restyled the pause menu with a blue frosted-glass layout, added passive icons to the passive selector, and added a repositionable `SelectedPassiveIcon` HUD node for the selected passive
+
 ## 2026-05-03
 
 ### Title intro and menu background replacement

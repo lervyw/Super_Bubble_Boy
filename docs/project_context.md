@@ -1,6 +1,6 @@
 # Project Context
 
-Last reviewed: 2026-04-29
+Last reviewed: 2026-06-18
 
 ## Overview
 
@@ -74,6 +74,15 @@ Current mode/form rules:
 - The player starts and stays in metroidvania behavior
 - Locked forms still cannot be selected
 - Checkpoints no longer change gameplay mode
+
+Current Super form wheel:
+
+- Up: full-body spike area attack (`super_espinho`)
+- Down: timed attack parry (`parry_super`)
+- Right: 10-second enemy time stop (`super_warudo`)
+- Left: damaging bubble launcher (`super_lancador`)
+- The Time Bubble HUD counter is shown only while time is stopped
+- Collecting the Super form unlocks all four Super wheel slots
 
 Important groups and combat nodes:
 
@@ -153,13 +162,31 @@ Recent history before new work:
 - The config screen exposes Master, Music, and SFX volume sliders
 - The controls menu now includes a dedicated `Ultimate` rebind button for `ultimate_attack`
 - The controls menu also exposes left, right, crouch, dash, and pause rebinding entries
+- Control rebinding supports keyboard, joypad buttons, analog axes, and Xbox/PS4 trigger axes (`LT/L2`, `RT/R2`)
+- Saved joypad bindings are normalized to any controller device so Xbox/PS4 mappings survive controller reconnect/order changes
 - Title button signal wiring was aligned with the current script method names to avoid broken presses at runtime
+
+## Android / Mobile Controls
+
+- `scripts/level_1.gd` can create `scripts/mobile_controls.gd` at runtime through the `Mobile Controls` export group
+- The overlay appears automatically on Android/iOS/touchscreen devices when `mobile_controls_enabled` is true
+- `mobile_controls_show_on_desktop` can be enabled in the Inspector to test the touch overlay on desktop
+- The mobile layout uses a left virtual touch wheel for movement/crouch and right thumb buttons for jump, attack, dash, power menu, and Normal/Bubble/Super transforms
+- When the power menu is held open, the same touch wheel switches from movement to HUD-wheel direction selection and does not move the player until the power menu closes
+- The mobile overlay also exposes `PAUSE`
 
 ## Display Settings
 
 - Internal pixel-art viewport remains `420x280`
-- The game window opens at `1260x840`, an integer 3x scale
-- Stretch aspect is `keep` so the image preserves the 3:2 proportion instead of expanding into a distorted shape
+- The game window opens at `1600x900`, a larger 16:9 default desktop window
+- Stretch mode is `canvas_items` with aspect `ignore`, so the game canvas stretches to fill the whole window instead of preserving a fixed aspect ratio.
+
+## Camera Framing
+
+- The active player camera is `player/Camera` in `Cenas/player.tscn`
+- `scripts/player.gd` configures camera smoothing, drag margins, a modest horizontal look-ahead, and a vertical offset that keeps the player slightly below center for metroidvania-style framing
+- Level-specific camera limits are still the safest way to prevent widescreen from revealing unfinished/offstage map areas
+- Attack, special attack, defense, transform, and power-wheel states keep vertical gravity active; they only stop horizontal movement.
 
 ## Level Timer
 

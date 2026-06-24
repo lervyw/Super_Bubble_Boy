@@ -89,10 +89,33 @@ func _ready() -> void:
 	if not animation_finished.is_connected(_on_animation_finished):
 		animation_finished.connect(_on_animation_finished)
 
+	ensure_run_animations()
 	disable_all_hitboxes()
 	deactivate_all_attack_areas()
 	deactivate_all_special_attack_areas()
 	refresh_hitbox_for_current_state()
+
+
+func ensure_run_animations() -> void:
+	duplicate_animation_if_missing(&"walk", &"run", 13.0)
+	duplicate_animation_if_missing(&"walk_super", &"run_super", 13.0)
+	duplicate_animation_if_missing(&"idle_bubble", &"bubble_run", 13.0)
+
+
+func duplicate_animation_if_missing(source: StringName, target: StringName, target_speed: float) -> void:
+	if not sprite_frames:
+		return
+	if sprite_frames.has_animation(target):
+		return
+	if not sprite_frames.has_animation(source):
+		return
+
+	sprite_frames.add_animation(target)
+	sprite_frames.set_animation_loop(target, sprite_frames.get_animation_loop(source))
+	sprite_frames.set_animation_speed(target, target_speed)
+
+	for i in range(sprite_frames.get_frame_count(source)):
+		sprite_frames.add_frame(target, sprite_frames.get_frame_texture(source, i), sprite_frames.get_frame_duration(source, i))
 
 # ================================
 #            PROCESS
@@ -105,6 +128,8 @@ func _process(_delta: float) -> void:
 		Input.get_axis("ui_left", "ui_right"),
 		Input.get_axis("ui_up", "ui_down")
 	)
+	if direction.x == 0.0:
+		direction.x = Input.get_axis("left", "right")
 
 	if not is_player_using_hud_menu():
 		verify_position(direction)
@@ -131,6 +156,9 @@ func play_special_animation_if_exists(anim_name: StringName) -> void:
 #     SELETOR PRINCIPAL DE ANIMAÇÃO
 # ================================
 func update_animation(direction: Vector2) -> void:
+	if "ground_stomp_anim_override" in player and player.ground_stomp_anim_override != &"":
+		return
+
 	match player.state:
 		player.State.TRANSFORM:
 			handle_transform_animation()
@@ -231,6 +259,16 @@ func handle_attack_animation() -> void:
 func handle_special_attack_animation() -> void:
 	activate_hitbox_for_state("attack")
 
+	if "special_attack_animation_override" in player:
+		var override_anim: StringName = player.special_attack_animation_override
+		if override_anim != &"" and sprite_frames.has_animation(override_anim):
+			if override_anim in [&"bubble_throw", &"bubble_throw_arrive"]:
+				if animation != override_anim:
+					play(override_anim)
+			else:
+				play_if_different(override_anim)
+			return
+
 	var anim_name: StringName = &""
 
 	match player.form:
@@ -246,6 +284,10 @@ func handle_special_attack_animation() -> void:
 
 	if anim_name != &"" and sprite_frames.has_animation(anim_name):
 		play_if_different(anim_name)
+
+	if player.super_shield_active and animation == &"super_shield" and not is_playing() and frame >= 6:
+		play(&"super_shield")
+		frame = 6
 	else:
 		match player.form:
 			player.Form.NORMAL:
@@ -259,25 +301,40 @@ func handle_defend_animation() -> void:
 
 	var anim_name: StringName = &"parry_super"
 
-	match player.form:
-		player.Form.NORMAL:
-			if sprite_frames.has_animation(&"parry"):
-				anim_name = &"parry"
-		player.Form.BUBBLE:
-			if sprite_frames.has_animation(&"parry_bubble"):
-				anim_name = &"parry_bubble"
-		player.Form.SUPER:
-			if sprite_frames.has_animation(&"parry_super"):
-				anim_name = &"parry_super"
+	if player.super_shield_active and sprite_frames.has_animation(&"super_shield"):
+		anim_name = &"super_shield"
+	else:
+		match player.form:
+			player.Form.NORMAL:
+				if sprite_frames.has_animation(&"parry"):
+					anim_name = &"parry"
+			player.Form.BUBBLE:
+				if sprite_frames.has_animation(&"parry_bubble"):
+					anim_name = &"parry_bubble"
+			player.Form.SUPER:
+				if sprite_frames.has_animation(&"parry_super"):
+					anim_name = &"parry_super"
 
 	play_if_different(anim_name)
 
+	if player.super_shield_active and animation == &"super_shield" and not is_playing() and frame >= 6:
+		play(&"super_shield")
+		frame = 6
+
+
 func handle_movement_animation(direction: Vector2) -> void:
+	var use_run: bool = player.has_method("is_passive_run_boosting") and player.is_passive_run_boosting()
+
 	match player.form:
 		player.Form.NORMAL:
 			if direction.x != 0.0:
 				activate_hitbox_for_state("walk")
-				play_if_different(&"walk")
+				if use_run and sprite_frames.has_animation(&"bubble_run"):
+					play_if_different(&"bubble_run")
+				elif use_run and sprite_frames.has_animation(&"run"):
+					play_if_different(&"run")
+				else:
+					play_if_different(&"walk")
 			else:
 				activate_hitbox_for_state("idle")
 				play_if_different(&"idle")
@@ -292,7 +349,12 @@ func handle_movement_animation(direction: Vector2) -> void:
 		player.Form.SUPER:
 			if direction.x != 0.0:
 				activate_hitbox_for_state("walk")
-				play_if_different(&"walk_super")
+				if use_run and sprite_frames.has_animation(&"run_super"):
+					play_if_different(&"run_super")
+				elif use_run and sprite_frames.has_animation(&"run"):
+					play_if_different(&"run")
+				else:
+					play_if_different(&"walk_super")
 			else:
 				activate_hitbox_for_state("idle")
 				play_if_different(&"idle_super")
@@ -603,10 +665,16 @@ func _on_animation_finished() -> void:
 	]
 
 	match anim_name:
-		&"attack", &"attack_super", &"attack_bubble", &"parry_super", &"parry", &"parry_bubble":
+		&"attack", &"attack_super", &"attack_bubble", &"attack_projectile", &"parry_super", &"parry", &"parry_bubble", &"super_shield":
 			deactivate_all_attack_areas()
 			deactivate_all_special_attack_areas()
 			refresh_hitbox_for_current_state()
+			attack_finished.emit()
+
+		&"bubble_throw", &"bubble_throw_arrive":
+			refresh_hitbox_for_current_state()
+			deactivate_all_attack_areas()
+			deactivate_all_special_attack_areas()
 			attack_finished.emit()
 
 		_:
@@ -626,3 +694,6 @@ func _on_animation_finished() -> void:
 
 				if player.has_method("update_audio_by_form"):
 					player.update_audio_by_form()
+
+				if player.has_method("update_hurtbox_for_form"):
+					player.update_hurtbox_for_form()

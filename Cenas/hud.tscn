@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://4v1mv6nx587x"]
+[gd_scene load_steps=30 format=3 uid="uid://4v1mv6nx587x"]
 
 [ext_resource type="Script" uid="uid://c73t1ba5irapk" path="res://scripts/hud.gd" id="1_uow6a"]
 [ext_resource type="Texture2D" uid="uid://p2sjqryksujc" path="res://sprites/assets/hud/vida2.png" id="2_ftv5m"]
@@ -23,21 +23,32 @@
 [ext_resource type="Texture2D" uid="uid://x7uwvdtyo36u" path="res://sprites/assets/power_wheel/hud poderes4.png" id="22_panel_frame4"]
 [ext_resource type="Texture2D" uid="uid://chfnxeemn25rc" path="res://sprites/assets/tempo_bolhoso2.png" id="23_o7n0q"]
 [ext_resource type="Texture2D" uid="uid://dqgnm8xab67a7" path="res://sprites/assets/power_wheel/hud poderes5.png" id="23_panel_frame5"]
+[ext_resource type="Texture2D" uid="uid://ctoamifsknvhu" path="res://sprites/assets/icone-ult.png" id="24_ult_icon"]
+[ext_resource type="Texture2D" uid="uid://lcn6rpxarlr0" path="res://sprites/assets/pause_menu/pause1.png" id="25_pause_frame"]
+[ext_resource type="Texture2D" uid="uid://dymwby7mri44v" path="res://sprites/assets/bolha_ressonante.png" id="26_pk3l"]
+[ext_resource type="Texture2D" uid="uid://bflyvfpem4ffw" path="res://sprites/assets/Corrida.png" id="27_qwer4"]
+[ext_resource type="Texture2D" uid="uid://c028uipy5piq7" path="res://sprites/assets/hud/sabao.png" id="28_sabao"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_power_panel"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("heart_icons", "hp_bar", "mana_bar", "boss_hp_bar", "menu_panel", "pause_menu_panel", "passive_toggle", "resume_button", "main_menu_button", "quit_button")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("hp_bar", "mana_bar", "stamina_bar", "ultimate_ready_icon", "boss_hp_bar", "menu_panel", "pause_menu_panel", "warning_label", "passive_toggle", "resume_button", "main_menu_button", "quit_button", "ultimate_cooldown_bar", "time_bubble_panel", "time_bubble_label", "soap_label")]
 script = ExtResource("1_uow6a")
-heart_icons = [null, null, null]
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
 mana_bar = NodePath("HBoxContainer/Holder/ManaBar")
+stamina_bar = NodePath("HBoxContainer/Holder/StaminaBar")
+ultimate_ready_icon = NodePath("UltimateReadyIcon")
 boss_hp_bar = NodePath("BossBar")
 menu_panel = NodePath("Panel")
 pause_menu_panel = NodePath("PauseMenu")
+warning_label = NodePath("WarningLabel")
 passive_toggle = NodePath("PauseMenu/VBoxContainer/PassiveToggle")
 resume_button = NodePath("PauseMenu/VBoxContainer/ResumeButton")
 main_menu_button = NodePath("PauseMenu/VBoxContainer/MainMenuButton")
 quit_button = NodePath("PauseMenu/VBoxContainer/QuitButton")
+ultimate_cooldown_bar = NodePath("UltimateCooldownBar")
+time_bubble_panel = NodePath("TimeBubblePanel")
+time_bubble_label = NodePath("TimeBubblePanel/TimeLabel")
+soap_label = NodePath("SoapCounter/Label")
 metadata/_edit_vertical_guides_ = [152.0]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -85,16 +96,6 @@ scale = Vector2(0.27689847, 0.6582143)
 texture_under = ExtResource("2_ftv5m")
 texture_progress = ExtResource("3_sv046")
 
-[node name="TextureProgressBar2" type="TextureProgressBar" parent="HBoxContainer/Holder"]
-layout_mode = 0
-offset_left = 0.8110986
-offset_top = 1.8801594
-offset_right = 62.709538
-offset_bottom = 63.73143
-scale = Vector2(0.3417864, 0.8124592)
-texture_under = ExtResource("4_016od")
-texture_over = ExtResource("5_cqml6")
-
 [node name="ManaBar" type="TextureProgressBar" parent="HBoxContainer/Holder"]
 layout_mode = 0
 offset_left = 16.221981
@@ -105,27 +106,85 @@ scale = Vector2(0.27689844, 0.6100078)
 texture_under = ExtResource("4_b1pas")
 texture_progress = ExtResource("5_016od")
 
+[node name="StaminaBar" type="TextureProgressBar" parent="HBoxContainer/Holder"]
+layout_mode = 0
+offset_left = 19.060833
+offset_top = 39.50196
+offset_right = 172.06084
+offset_bottom = 58.50196
+scale = Vector2(0.27689844, 0.6100078)
+texture_under = ExtResource("6_cqml6")
+texture_progress = ExtResource("7_crc4m")
+
 [node name="BossBar" type="TextureProgressBar" parent="."]
-offset_left = 47.000004
-offset_top = 230.99997
-offset_right = 200.0
-offset_bottom = 258.0
+offset_left = 75.0
+offset_top = 233.0
+offset_right = 228.0
+offset_bottom = 260.00003
 scale = Vector2(1.6899998, 1.6899998)
 texture_under = ExtResource("6_cqml6")
 texture_progress = ExtResource("7_crc4m")
 
+[node name="UltimateCooldownBar" type="TextureProgressBar" parent="."]
+offset_left = -6.0
+offset_top = -3.0
+offset_right = 54.0
+offset_bottom = 57.0
+fill_mode = 3
+texture_under = ExtResource("4_016od")
+texture_progress = ExtResource("5_cqml6")
+
+[node name="UltimateReadyIcon" type="TextureRect" parent="."]
+offset_left = 9.0
+offset_top = 16.0
+offset_right = 73.0
+offset_bottom = 80.0
+scale = Vector2(0.41401416, 0.41964948)
+texture = ExtResource("24_ult_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PassiveIconOrbit" type="TextureRect" parent="."]
+offset_left = 64.0
+offset_top = 52.000004
+offset_right = 96.0
+offset_bottom = 84.0
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("18_1j8pg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PassiveIconStomp" type="TextureRect" parent="."]
+offset_left = 83.0
+offset_top = 52.000004
+offset_right = 115.0
+offset_bottom = 84.0
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("26_pk3l")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PassiveIconRun" type="TextureRect" parent="."]
+offset_left = 102.0
+offset_top = 52.000004
+offset_right = 134.0
+offset_bottom = 84.0
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("27_qwer4")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("state_texture", "up_button", "down_button", "left_button", "right_button")]
-offset_left = 337.0
-offset_top = 196.00002
-offset_right = 457.0
-offset_bottom = 316.0
+offset_left = 347.0
+offset_right = 467.0
+offset_bottom = 119.999985
 scale = Vector2(0.58228296, 0.58228296)
 theme_override_styles/panel = SubResource("StyleBoxEmpty_power_panel")
 script = ExtResource("5_is2x6")
 state_texture = NodePath("StateTexture")
 up_button = NodePath("Ultimate")
 down_button = NodePath("Placeholder")
-left_button = NodePath("Defend")
+left_button = NodePath("BubbleProjectile")
 right_button = NodePath("Special")
 active_panel_texture = ExtResource("23_panel_frame5")
 inactive_panel_texture = ExtResource("19_016od")
@@ -168,7 +227,7 @@ offset_bottom = 135.0
 texture = ExtResource("18_1j8pg")
 stretch_mode = 5
 
-[node name="Defend" type="TextureRect" parent="Panel"]
+[node name="BubbleProjectile" type="TextureRect" parent="Panel"]
 layout_mode = 0
 offset_left = -6.0
 offset_top = 34.0
@@ -186,6 +245,66 @@ offset_bottom = 96.0
 texture = ExtResource("22_invt5")
 stretch_mode = 5
 
+[node name="SoapCounter" type="HBoxContainer" parent="."]
+offset_left = 8.0
+offset_top = 244.0
+offset_right = 72.0
+offset_bottom = 272.0
+scale = Vector2(1.0, 1.0)
+
+[node name="Icon" type="TextureRect" parent="SoapCounter"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+texture = ExtResource("28_sabao")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SoapCounter"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "0"
+vertical_alignment = 1
+
+[node name="WarningLabel" type="Label" parent="."]
+visible = false
+offset_left = 110.0
+offset_top = 104.0
+offset_right = 310.0
+offset_bottom = 128.0
+theme_override_font_sizes/font_size = 14
+text = "sem mana suficiente"
+horizontal_alignment = 1
+
+[node name="TimeBubblePanel" type="Panel" parent="."]
+visible = false
+offset_left = 176.0
+offset_top = 22.0
+offset_right = 244.0
+offset_bottom = 58.0
+
+[node name="Title" type="Label" parent="TimeBubblePanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 14.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 8
+text = "TEMPO"
+horizontal_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="TimeBubblePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "10.0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="PauseMenu" type="Panel" parent="."]
 visible = false
 anchors_preset = 15
@@ -193,43 +312,128 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_power_panel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenu"]
+[node name="FrostOverlay" type="ColorRect" parent="PauseMenu"]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -86.0
-offset_top = -82.0
-offset_right = 86.0
-offset_bottom = 82.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+color = Color(0, 0.08, 0.12, 0.32)
+
+[node name="PauseFrame" type="TextureRect" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("25_pause_frame")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="Control" parent="PauseMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="Title" type="Label" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+visible = false
+layout_mode = 0
+offset_left = 149.0
+offset_top = 28.0
+offset_right = 271.0
+offset_bottom = 48.0
 text = "Menu"
 horizontal_alignment = 1
 
 [node name="PassiveToggle" type="CheckButton" parent="PauseMenu/VBoxContainer"]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 174.0
+offset_right = 187.0
+offset_bottom = 194.0
+theme_override_font_sizes/font_size = 8
+text = "Poderes ligados"
+
+[node name="PassiveIconsLabel" type="Label" parent="PauseMenu/VBoxContainer"]
+layout_mode = 0
+offset_left = 205.0
+offset_top = 130.0
+offset_right = 301.0
+offset_bottom = 145.0
+theme_override_font_sizes/font_size = 9
+text = "Passivas"
+horizontal_alignment = 1
+
+[node name="PassiveIcons" type="HBoxContainer" parent="PauseMenu/VBoxContainer"]
+layout_mode = 0
+offset_left = 198.0
+offset_top = 148.0
+offset_right = 308.0
+offset_bottom = 184.0
+alignment = 1
+
+[node name="Orbit" type="Button" parent="PauseMenu/VBoxContainer/PassiveIcons"]
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
-text = "Passiva"
+size_flags_horizontal = 3
+icon = ExtResource("18_1j8pg")
+flat = true
+
+[node name="Stomp" type="Button" parent="PauseMenu/VBoxContainer/PassiveIcons"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+icon = ExtResource("26_pk3l")
+flat = true
+
+[node name="Run" type="Button" parent="PauseMenu/VBoxContainer/PassiveIcons"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+icon = ExtResource("27_qwer4")
+flat = true
 
 [node name="ResumeButton" type="Button" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+layout_mode = 0
+offset_left = 90.0
+offset_top = 84.0
+offset_right = 188.0
+offset_bottom = 104.0
+theme_override_font_sizes/font_size = 8
 text = "Continuar"
 
 [node name="MainMenuButton" type="Button" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+layout_mode = 0
+offset_left = 90.0
+offset_top = 108.0
+offset_right = 188.0
+offset_bottom = 128.0
+theme_override_font_sizes/font_size = 8
 text = "Menu principal"
 
 [node name="QuitButton" type="Button" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
+layout_mode = 0
+offset_left = 90.0
+offset_top = 132.0
+offset_right = 188.0
+offset_bottom = 152.0
+theme_override_font_sizes/font_size = 8
 text = "Sair do jogo"
 
 [node name="Hint" type="Label" parent="PauseMenu/VBoxContainer"]
-layout_mode = 2
-text = "TAB para voltar"
+layout_mode = 0
+offset_left = 205.0
+offset_top = 198.0
+offset_right = 301.0
+offset_bottom = 214.0
+theme_override_font_sizes/font_size = 8
+text = "B/TAB volta"
 horizontal_alignment = 1

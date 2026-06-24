@@ -35,11 +35,26 @@ var menu_active: bool = false
 var current_action_selection: String = "none"
 var animation_version: int = 0
 var button_progress_bars: Dictionary = {}
+var _slot_unlocked := {
+	"ultimate_attack": true,
+	"attack_special": true,
+	"bubble_projectile": true,
+	"placeholder": true,
+}
+var _button_slot_map := {}
 
 
 func _ready() -> void:
 	visible = true
 	_prepare_button_layouts()
+
+	_button_slot_map = {
+		up_button: "ultimate_attack",
+		down_button: "placeholder",
+		left_button: "bubble_projectile",
+		right_button: "attack_special",
+	}
+
 	set_menu_active(false)
 	set_action_selection("none")
 
@@ -86,19 +101,40 @@ func set_action_selection(action_name: String) -> void:
 	if not special_attack_enabled:
 		_set_button_disabled(right_button)
 
-	match action_name:
-		"ultimate_attack":
+	match _normalize_action_name(action_name):
+		"ultimate_attack", "protective_bubble", "super_spike":
 			if ultimate_enabled:
 				_highlight_button(up_button, up_selected_texture)
-		"placeholder":
+		"placeholder", "ghost_mode", "super_parry":
 			_highlight_button(down_button, down_selected_texture)
-		"defend":
+		"bubble_projectile", "teleport_bubble", "super_launcher":
 			_highlight_button(left_button, left_selected_texture)
-		"attack_special":
+		"attack_special", "portal", "time_bubble":
 			if special_attack_enabled:
 				_highlight_button(right_button, right_selected_texture)
 
 	_refresh_cooldown_visuals()
+
+
+func _normalize_action_name(name: String) -> String:
+	match name:
+		"protective_bubble":
+			return "ultimate_attack"
+		"ghost_mode":
+			return "placeholder"
+		"teleport_bubble":
+			return "bubble_projectile"
+		"portal":
+			return "attack_special"
+		"super_spike":
+			return "ultimate_attack"
+		"super_launcher":
+			return "bubble_projectile"
+		"super_parry":
+			return "placeholder"
+		"time_bubble":
+			return "attack_special"
+	return name
 
 
 func set_special_attack_cooldown_progress(progress: float) -> void:
@@ -113,7 +149,7 @@ func set_ultimate_cooldown_progress(progress: float) -> void:
 	_set_button_cooldown_progress(up_button, clampf(progress, 0.0, 1.0))
 
 
-func set_defend_cooldown_progress(progress: float) -> void:
+func set_bubble_projectile_cooldown_progress(progress: float) -> void:
 	if progress < 1.0:
 		_reset_button_visual(left_button, left_normal_texture)
 	_set_button_cooldown_progress(left_button, clampf(progress, 0.0, 1.0))
@@ -123,6 +159,12 @@ func set_placeholder_cooldown_progress(progress: float) -> void:
 	if progress < 1.0:
 		_reset_button_visual(down_button, down_normal_texture)
 	_set_button_cooldown_progress(down_button, clampf(progress, 0.0, 1.0))
+
+func set_slot_unlocked(slot_name: String, unlocked: bool) -> void:
+	if _slot_unlocked.has(slot_name):
+		_slot_unlocked[slot_name] = unlocked
+		if menu_active:
+			_set_buttons_visible(true)
 
 
 func play_activation_animation(version: int) -> void:
@@ -157,7 +199,9 @@ func _set_state_texture(texture: Texture2D) -> void:
 func _set_buttons_visible(buttons_visible: bool) -> void:
 	for button in [up_button, down_button, left_button, right_button]:
 		if button:
-			button.visible = buttons_visible
+			var slot_name: String = _button_slot_map.get(button, "")
+			var is_unlocked: bool = _slot_unlocked.get(slot_name, true)
+			button.visible = buttons_visible and is_unlocked
 
 
 func _prepare_button_layouts() -> void:
@@ -276,10 +320,10 @@ func _restore_available_button_visual(node: TextureRect) -> void:
 		return
 
 	var selected := (
-		(node == up_button and current_action_selection == "ultimate_attack")
-		or (node == down_button and current_action_selection == "placeholder")
-		or (node == left_button and current_action_selection == "defend")
-		or (node == right_button and current_action_selection == "attack_special")
+		(node == up_button and (current_action_selection in ["ultimate_attack", "protective_bubble", "super_spike"]))
+		or (node == down_button and (current_action_selection in ["placeholder", "ghost_mode", "super_parry"]))
+		or (node == left_button and (current_action_selection in ["bubble_projectile", "teleport_bubble", "super_launcher"]))
+		or (node == right_button and (current_action_selection in ["attack_special", "portal", "time_bubble"]))
 	)
 
 	node.self_modulate = selected_modulate if selected else normal_modulate

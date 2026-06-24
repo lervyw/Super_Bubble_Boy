@@ -20,6 +20,13 @@ extends Area2D
 # Área de Spawn
 @export_group("Spawn Area")
 @export var min_distance_from_player: float = 50.0  # Distância mínima do player
+@export var validate_against_world: bool = true
+@export_flags_2d_physics var spawn_collision_mask: int = 1
+@export var max_spawn_attempts: int = 80
+@export var spawn_clearance_margin: float = 2.0
+@export var snap_ground_enemies_to_floor: bool = true
+@export var floor_snap_distance: float = 96.0
+@export var floor_clearance: float = 2.0
 
 # Ativação
 @export_group("Activation")
@@ -43,6 +50,8 @@ var spawned_enemies: Array[Node] = []
 var zone_rect: Rect2
 
 func _ready() -> void:
+	configure_area_collision()
+
 	# Encontra player se não definido
 	if not player:
 		player = get_tree().get_first_node_in_group("player")
@@ -73,6 +82,13 @@ func _ready() -> void:
 			await get_tree().create_timer(initial_spawn_delay).timeout
 		start_spawning()
 
+func configure_area_collision() -> void:
+	# Spawn zones are region markers. They should not physically affect the player.
+	collision_layer = 0
+	collision_mask = 1 if spawn_on_enter else 0
+	monitoring = spawn_on_enter
+	monitorable = false
+
 func _process(_delta: float) -> void:
 	if debug_mode:
 		queue_redraw()
@@ -101,17 +117,18 @@ func calculate_zone_bounds() -> void:
 	
 	var collision = $CollisionShape2D
 	var shape = collision.shape
+	var shape_position: Vector2 = collision.position
 	
 	if shape is RectangleShape2D:
 		var size = shape.size
-		zone_rect = Rect2(-size / 2, size)
+		zone_rect = Rect2(shape_position - size / 2, size)
 	elif shape is CircleShape2D:
 		var radius = shape.radius
-		zone_rect = Rect2(-radius, -radius, radius * 2, radius * 2)
+		zone_rect = Rect2(shape_position - Vector2(radius, radius), Vector2(radius * 2, radius * 2))
 	elif shape is CapsuleShape2D:
 		var radius = shape.radius
 		var height = shape.height
-		zone_rect = Rect2(-radius, -height/2, radius * 2, height)
+		zone_rect = Rect2(shape_position + Vector2(-radius, -height / 2), Vector2(radius * 2, height))
 	else:
 		push_warning("SpawnZone '%s': Shape não suportado, usando fallback" % name)
 		zone_rect = Rect2(-100, -100, 200, 200)
@@ -228,7 +245,7 @@ func spawn_enemy() -> void:
 	var enemy_instance = enemy_scene.instantiate()
 	
 	# Define posição de spawn (sempre dentro da CollisionShape2D)
-	var spawn_pos = get_valid_spawn_position()
+	var spawn_pos = get_valid_spawn_position(enemy_instance)
 	
 	# Usa call_deferred para evitar erro durante physics flush
 	get_parent().call_deferred("add_child", enemy_instance)
@@ -261,26 +278,113 @@ func _track_enemy_deferred(enemy: Node) -> void:
 		if not enemy.tree_exiting.is_connected(_on_enemy_died):
 			enemy.tree_exiting.connect(_on_enemy_died.bind(enemy))
 
-func get_valid_spawn_position() -> Vector2:
+func get_valid_spawn_position(enemy_instance: Node = null) -> Vector2:
 	"""Retorna uma posição válida para spawn (sempre dentro da CollisionShape2D)"""
 	var attempts = 0
-	var max_attempts = 20
+	var enemy_collision_shape := get_enemy_collision_shape(enemy_instance)
+	var wants_floor := should_snap_enemy_to_floor(enemy_instance)
 	
-	while attempts < max_attempts:
+	while attempts < max_spawn_attempts:
 		# ✅ Sempre spawna dentro dos bounds da CollisionShape2D
-		var spawn_pos = global_position + Vector2(
+		var local_spawn_pos := Vector2(
 			randf_range(zone_rect.position.x, zone_rect.position.x + zone_rect.size.x),
 			randf_range(zone_rect.position.y, zone_rect.position.y + zone_rect.size.y)
 		)
+		var spawn_pos := to_global(local_spawn_pos)
+
+		if wants_floor:
+			var floor_pos := get_floor_spawn_position(spawn_pos, enemy_collision_shape)
+			if floor_pos == Vector2.INF:
+				attempts += 1
+				continue
+			spawn_pos = floor_pos
 		
 		# Verifica distância do player
-		if not player or is_position_far_from_player(spawn_pos):
+		if (not player or is_position_far_from_player(spawn_pos)) and is_spawn_position_clear(spawn_pos, enemy_collision_shape):
 			return spawn_pos
 		
 		attempts += 1
 	
 	# Se não encontrou posição válida, usa o centro da zona
-	return global_position
+	var fallback_position := to_global(zone_rect.get_center())
+	if wants_floor:
+		var fallback_floor := get_floor_spawn_position(fallback_position, enemy_collision_shape)
+		if fallback_floor != Vector2.INF:
+			return fallback_floor
+	return fallback_position
+
+func should_snap_enemy_to_floor(enemy_instance: Node) -> bool:
+	if not snap_ground_enemies_to_floor or enemy_instance == null:
+		return false
+	if not has_property(enemy_instance, "move_mode"):
+		return false
+	var move_mode := int(enemy_instance.get("move_mode"))
+	return move_mode != 2 and move_mode != 3
+
+func has_property(target: Object, property_name: StringName) -> bool:
+	for property in target.get_property_list():
+		if property.get("name", "") == String(property_name):
+			return true
+	return false
+
+func get_enemy_collision_shape(enemy_instance: Node) -> Shape2D:
+	if enemy_instance == null:
+		return null
+
+	var collision_shape := enemy_instance.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision_shape == null or collision_shape.shape == null:
+		return null
+
+	return collision_shape.shape.duplicate()
+
+func get_floor_spawn_position(start_position: Vector2, enemy_shape: Shape2D) -> Vector2:
+	var space_state := get_world_2d().direct_space_state
+	var query := PhysicsRayQueryParameters2D.create(
+		start_position,
+		start_position + Vector2.DOWN * floor_snap_distance,
+		spawn_collision_mask
+	)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+
+	var result := space_state.intersect_ray(query)
+	if result.is_empty():
+		return Vector2.INF
+
+	var radius := get_shape_bottom_extent(enemy_shape)
+	var spawn_pos: Vector2 = result.position - Vector2(0, radius + floor_clearance)
+	if not is_position_inside_zone(spawn_pos):
+		return Vector2.INF
+
+	return spawn_pos
+
+func is_spawn_position_clear(spawn_pos: Vector2, enemy_shape: Shape2D) -> bool:
+	if not validate_against_world:
+		return true
+	if enemy_shape == null:
+		return true
+
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = enemy_shape
+	query.transform = Transform2D(0.0, spawn_pos)
+	query.collision_mask = spawn_collision_mask
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	query.margin = spawn_clearance_margin
+
+	return get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty()
+
+func is_position_inside_zone(pos: Vector2) -> bool:
+	return zone_rect.has_point(to_local(pos))
+
+func get_shape_bottom_extent(shape: Shape2D) -> float:
+	if shape is CircleShape2D:
+		return shape.radius
+	if shape is RectangleShape2D:
+		return shape.size.y / 2.0
+	if shape is CapsuleShape2D:
+		return shape.height / 2.0
+	return 8.0
 
 func is_player_far_enough() -> bool:
 	"""Verifica se player está longe o suficiente da zona"""
