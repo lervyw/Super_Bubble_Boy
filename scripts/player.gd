@@ -2844,11 +2844,12 @@ func play_hurt_reaction() -> void:
 		return
 
 	hurt_sequence_running = true
+	var hurt_anim := get_hurt_animation_name()
 	defending = false
 	deactivate_attack_area()
 	velocity = Vector2.ZERO
 	change_state(State.HURT)
-	await wait_for_current_sprite_animation(hurt_animation_name)
+	await wait_for_current_sprite_animation(hurt_anim)
 
 	if is_inside_tree() and state == State.HURT:
 		change_state(State.IDLE)
@@ -2860,11 +2861,12 @@ func play_fatal_hit_sequence() -> void:
 	fatal_hit_sequence_running = true
 	hurt_sequence_running = false
 	is_invincible = true
+	var hurt_anim := get_hurt_animation_name()
 	defending = false
 	deactivate_attack_area()
 	velocity = Vector2.ZERO
 	change_state(State.HURT)
-	await wait_for_current_sprite_animation(hurt_animation_name)
+	await wait_for_current_sprite_animation(hurt_anim)
 
 	if not is_inside_tree():
 		return
@@ -2925,6 +2927,12 @@ func get_death_animation_name() -> StringName:
 			return &"death"
 
 
+func get_hurt_animation_name() -> StringName:
+	if form == Form.SUPER:
+		return &"hurt_super"
+	return hurt_animation_name
+
+
 func restart_level_from_beginning() -> void:
 	await respawn_player()
 
@@ -2951,10 +2959,20 @@ func refresh_stompers_for_current_form() -> void:
 
 func update_hurtbox_for_form() -> void:
 	var hurtbox_area = $HurtboxArea if has_node("HurtboxArea") else null
-	if hurtbox_area:
-		hurtbox_area.monitoring = form != Form.SUPER
-	if hurtbox_super:
-		hurtbox_super.monitoring = form == Form.SUPER
+	set_hurtbox_enabled(hurtbox_area, form != Form.SUPER)
+	set_hurtbox_enabled(hurtbox_super, form == Form.SUPER)
+
+
+func set_hurtbox_enabled(hurtbox: Area2D, enabled: bool) -> void:
+	if not hurtbox:
+		return
+
+	hurtbox.monitoring = enabled
+	hurtbox.monitorable = enabled
+
+	for child in hurtbox.get_children():
+		if child is CollisionShape2D:
+			child.disabled = not enabled
 
 
 func set_stomper_enabled(stomper: Area2D, enabled: bool) -> void:

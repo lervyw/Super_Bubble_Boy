@@ -32,6 +32,16 @@ const JOYPAD_AXIS_REBIND_THRESHOLD: float = 0.55
 const JOYPAD_TRIGGER_REBIND_THRESHOLD: float = 0.20
 const JOYPAD_TRIGGER_AXES: Array[int] = [4, 5]
 const UI_JOYPAD_DEADZONE: float = 0.5
+const UI_NAV_ACTIONS: Array[StringName] = [
+	&"ui_accept",
+	&"ui_select",
+	&"ui_cancel",
+	&"ui_up",
+	&"ui_down",
+	&"ui_left",
+	&"ui_right",
+	&"ui_start",
+]
 
 
 # ================================
@@ -162,6 +172,8 @@ func _ready():
 
 	# Volta do menu de controles para o menu de config
 	_connect_pressed_once(btn_voltar_botoes, _back_to_config_menu)
+	_setup_menu_focus_order()
+	_setup_config_focus_order()
 	_setup_controls_scroll_focus()
 
 	# Atualiza o texto dos botões com o input atual (ex: "Pulo: Space")
@@ -273,6 +285,16 @@ func _input(event: InputEvent):
 
 		return
 
+	if event.is_action_pressed("ui_cancel"):
+		if botoes_menu.visible:
+			_back_to_config_menu()
+			get_viewport().set_input_as_handled()
+			return
+		if config_menu.visible:
+			_back_to_menu()
+			get_viewport().set_input_as_handled()
+			return
+
 	# --- Navegação por teclado em todos os menus ---
 	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_select"):
 		for btn in [
@@ -370,6 +392,20 @@ func _grab_focus_deferred(control: Control) -> void:
 	call_deferred("_scroll_focused_control_into_view", control)
 
 
+func _setup_menu_focus_order() -> void:
+	_setup_vertical_focus_order([btn_iniciar, btn_config, btn_sair])
+
+
+func _setup_config_focus_order() -> void:
+	_setup_vertical_focus_order([
+		slider_master,
+		slider_musica,
+		slider_sfx,
+		btn_cfg_botoes,
+		btn_voltar_config,
+	])
+
+
 func _setup_controls_scroll_focus() -> void:
 	if controls_scroll:
 		controls_scroll.set("follow_focus", true)
@@ -405,6 +441,25 @@ func _setup_controls_scroll_focus() -> void:
 		if button and not button.focus_entered.is_connected(focus_callable):
 			button.focus_entered.connect(focus_callable)
 
+	_setup_vertical_focus_order(control_buttons)
+
+
+func _setup_vertical_focus_order(nodes: Array) -> void:
+	var focus_nodes: Array[Control] = []
+	for node in nodes:
+		if node:
+			node.focus_mode = Control.FOCUS_ALL
+			focus_nodes.append(node)
+
+	for i in focus_nodes.size():
+		var current := focus_nodes[i]
+		var next := focus_nodes[(i + 1) % focus_nodes.size()]
+		var prev := focus_nodes[(i - 1 + focus_nodes.size()) % focus_nodes.size()]
+		current.focus_next = current.get_path_to(next)
+		current.focus_previous = current.get_path_to(prev)
+		current.focus_neighbor_bottom = current.get_path_to(next)
+		current.focus_neighbor_top = current.get_path_to(prev)
+
 
 func _on_control_button_focus_entered(control: Control) -> void:
 	_scroll_focused_control_into_view(control)
@@ -429,17 +484,13 @@ func _scroll_focused_control_into_view(control: Control) -> void:
 
 
 func _ensure_controller_ui_actions() -> void:
-	_ensure_action("ui_accept")
-	_ensure_action("ui_select")
-	_ensure_action("ui_cancel")
-	_ensure_action("ui_up")
-	_ensure_action("ui_down")
-	_ensure_action("ui_left")
-	_ensure_action("ui_right")
+	for action_name in UI_NAV_ACTIONS:
+		_ensure_action(action_name)
 
 	_add_joy_button_once("ui_accept", 0)
 	_add_joy_button_once("ui_select", 0)
 	_add_joy_button_once("ui_cancel", 1)
+	_add_joy_button_once("ui_start", 6)
 	_add_joy_button_once("ui_up", 11)
 	_add_joy_button_once("ui_down", 12)
 	_add_joy_button_once("ui_left", 13)
@@ -449,6 +500,7 @@ func _ensure_controller_ui_actions() -> void:
 	_add_joy_axis_once("ui_right", 0, 1.0)
 	_add_joy_axis_once("ui_up", 1, -1.0)
 	_add_joy_axis_once("ui_down", 1, 1.0)
+	_add_key_once("ui_cancel", KEY_ESCAPE)
 
 
 func _ensure_action(action_name: StringName) -> void:
@@ -458,7 +510,7 @@ func _ensure_action(action_name: StringName) -> void:
 
 func _add_joy_button_once(action_name: StringName, button_index: int) -> void:
 	for event in InputMap.action_get_events(action_name):
-		if event is InputEventJoypadButton and event.button_index == button_index:
+		if event is InputEventJoypadButton and event.device == -1 and event.button_index == button_index:
 			return
 
 	var joy_event := InputEventJoypadButton.new()
@@ -469,7 +521,7 @@ func _add_joy_button_once(action_name: StringName, button_index: int) -> void:
 
 func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -> void:
 	for event in InputMap.action_get_events(action_name):
-		if event is InputEventJoypadMotion and event.axis == axis and sign(event.axis_value) == sign(axis_value):
+		if event is InputEventJoypadMotion and event.device == -1 and event.axis == axis and sign(event.axis_value) == sign(axis_value):
 			return
 
 	var joy_event := InputEventJoypadMotion.new()
@@ -477,6 +529,17 @@ func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -
 	joy_event.axis = axis
 	joy_event.axis_value = axis_value
 	InputMap.action_add_event(action_name, joy_event)
+
+
+func _add_key_once(action_name: StringName, physical_keycode: int) -> void:
+	for event in InputMap.action_get_events(action_name):
+		if event is InputEventKey and event.physical_keycode == physical_keycode:
+			return
+
+	var key_event := InputEventKey.new()
+	key_event.device = -1
+	key_event.physical_keycode = physical_keycode
+	InputMap.action_add_event(action_name, key_event)
 
 
 # ================================

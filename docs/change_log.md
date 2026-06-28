@@ -1,5 +1,32 @@
 # Change Log
 
+## 2026-06-27
+
+### Pause menu input handling fix
+
+- `scripts/hud.gd`: pause menu controller activation now marks input as handled before button actions that can change scenes, preventing a null viewport error when returning to the title menu.
+
+### Aquatic slime water return origin
+
+- `scripts/water_tilemap.gd`: generated water areas now pass the actual water area to `enter_water_zone` / `exit_water_zone` instead of the tilemap root, avoiding fallback positions near world origin.
+- `scripts/SpawnZone.gd` and `scripts/slime.gd`: aquatic slimes now receive their spawn water position as a fallback return target when they leave water.
+
+### Super hurt animation
+
+- `scripts/player.gd` and `scripts/textura_2.gd`: Super form damage reactions now use `hurt_super` instead of the normal `hurt` animation.
+
+### Super hurtbox form gating
+
+- `scripts/player.gd`: form hurtbox switching now disables each inactive hurtbox collision shape, not only `monitoring`.
+- Prevented the Super form hurtbox from remaining damageable while the player is in Normal or Bubble form.
+
+### Controller menu navigation
+
+- Improved main menu, config menu, controls menu, and pause menu focus order for controller navigation.
+- Added runtime `device=-1` UI bindings for confirm, cancel, Start/Options, D-pad, and left analog navigation so Xbox/PlayStation controllers work after reconnect/order changes.
+- Added cancel/back behavior from controls to config and from config to the main menu.
+- Made the pause menu open/close with Start/Options and added directional focus neighbors for pause actions and passive-power icons.
+
 ## 2026-06-24
 
 ### Separated power wheel inputs from movement inputs

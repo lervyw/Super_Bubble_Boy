@@ -128,6 +128,8 @@ var in_water: bool = false
 var water_zone_overlap_count: int = 0
 var last_water_position: Vector2 = Vector2.ZERO
 var has_last_water_position: bool = false
+var spawn_water_position: Vector2 = Vector2.ZERO
+var has_spawn_water_position: bool = false
 var time_frozen: bool = false
 var time_frozen_velocity: Vector2 = Vector2.ZERO
 var time_frozen_sprite_was_playing: bool = false
@@ -330,20 +332,33 @@ func process_swim_out_of_water(delta: float) -> void:
 	swim_flop_t = swim_flop_interval
 
 
+func set_spawn_water_position(position: Vector2) -> void:
+	spawn_water_position = position
+	has_spawn_water_position = true
+	if not has_last_water_position:
+		last_water_position = position
+		has_last_water_position = true
+
+
 func enter_water_zone(water: Node = null) -> void:
 	water_zone_overlap_count += 1
 	in_water = true
-	if water is Node2D:
-		last_water_position = water.global_position
-		has_last_water_position = true
+	update_last_water_position(water)
 	swim_flop_t = 0.0
 
 
 func exit_water_zone(water: Node = null) -> void:
 	water_zone_overlap_count = max(water_zone_overlap_count - 1, 0)
 	in_water = water_zone_overlap_count > 0
+	update_last_water_position(water)
+
+
+func update_last_water_position(water: Node = null) -> void:
 	if water is Node2D:
 		last_water_position = water.global_position
+		has_last_water_position = true
+	elif has_spawn_water_position:
+		last_water_position = spawn_water_position
 		has_last_water_position = true
 
 
