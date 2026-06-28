@@ -29,6 +29,17 @@ extends CanvasLayer
 const PASSIVE_ICON_STOMP := preload("res://sprites/assets/bolha_ressonante.png")
 const PASSIVE_ICON_RUN := preload("res://sprites/assets/Corrida.png")
 const UI_JOYPAD_DEADZONE: float = 0.5
+const UI_NAV_ACTIONS: Array[StringName] = [
+	&"ui_accept",
+	&"ui_select",
+	&"ui_cancel",
+	&"ui_up",
+	&"ui_down",
+	&"ui_left",
+	&"ui_right",
+	&"ui_start",
+	&"pause_menu",
+]
 
 var boss_target: Node = null
 var pause_menu_open: bool = false
@@ -91,7 +102,7 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause_menu"):
+	if event.is_action_pressed("pause_menu") or event.is_action_pressed("ui_start"):
 		toggle_pause_menu()
 		get_viewport().set_input_as_handled()
 		return
@@ -472,28 +483,24 @@ func _grab_focus_deferred(control: Control) -> void:
 
 
 func _ensure_controller_ui_actions() -> void:
-	_ensure_action("ui_accept")
-	_ensure_action("ui_select")
-	_ensure_action("ui_cancel")
-	_ensure_action("ui_up")
-	_ensure_action("ui_down")
-	_ensure_action("ui_left")
-	_ensure_action("ui_right")
-	_ensure_action("pause_menu")
+	for action_name in UI_NAV_ACTIONS:
+		_ensure_action(action_name)
 
 	_add_joy_button_once("ui_accept", 0)
 	_add_joy_button_once("ui_select", 0)
 	_add_joy_button_once("ui_cancel", 1)
+	_add_joy_button_once("ui_start", 6)
+	_add_joy_button_once("pause_menu", 6)
 	_add_joy_button_once("ui_up", 11)
 	_add_joy_button_once("ui_down", 12)
 	_add_joy_button_once("ui_left", 13)
 	_add_joy_button_once("ui_right", 14)
-	_add_joy_button_once("pause_menu", 6)
 
 	_add_joy_axis_once("ui_left", 0, -1.0)
 	_add_joy_axis_once("ui_right", 0, 1.0)
 	_add_joy_axis_once("ui_up", 1, -1.0)
 	_add_joy_axis_once("ui_down", 1, 1.0)
+	_add_key_once("ui_cancel", KEY_ESCAPE)
 
 
 func _ensure_action(action_name: StringName) -> void:
@@ -503,7 +510,7 @@ func _ensure_action(action_name: StringName) -> void:
 
 func _add_joy_button_once(action_name: StringName, button_index: int) -> void:
 	for event in InputMap.action_get_events(action_name):
-		if event is InputEventJoypadButton and event.button_index == button_index:
+		if event is InputEventJoypadButton and event.device == -1 and event.button_index == button_index:
 			return
 
 	var joy_event := InputEventJoypadButton.new()
@@ -514,7 +521,7 @@ func _add_joy_button_once(action_name: StringName, button_index: int) -> void:
 
 func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -> void:
 	for event in InputMap.action_get_events(action_name):
-		if event is InputEventJoypadMotion and event.axis == axis and sign(event.axis_value) == sign(axis_value):
+		if event is InputEventJoypadMotion and event.device == -1 and event.axis == axis and sign(event.axis_value) == sign(axis_value):
 			return
 
 	var joy_event := InputEventJoypadMotion.new()
@@ -522,6 +529,17 @@ func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -
 	joy_event.axis = axis
 	joy_event.axis_value = axis_value
 	InputMap.action_add_event(action_name, joy_event)
+
+
+func _add_key_once(action_name: StringName, physical_keycode: int) -> void:
+	for event in InputMap.action_get_events(action_name):
+		if event is InputEventKey and event.physical_keycode == physical_keycode:
+			return
+
+	var key_event := InputEventKey.new()
+	key_event.device = -1
+	key_event.physical_keycode = physical_keycode
+	InputMap.action_add_event(action_name, key_event)
 
 
 func _on_passive_toggle_toggled(enabled: bool) -> void:
@@ -559,11 +577,15 @@ func _setup_pause_focus_order() -> void:
 	var focus_nodes: Array[Control] = []
 	for n in [resume_button, main_menu_button, quit_button, passive_toggle]:
 		if n:
+			n.focus_mode = Control.FOCUS_ALL
 			focus_nodes.append(n)
 
+	var passive_buttons: Array[Control] = []
 	for icon in pause_passive_icons:
 		if icon and icon is Button:
+			icon.focus_mode = Control.FOCUS_ALL
 			focus_nodes.append(icon)
+			passive_buttons.append(icon)
 
 	for i in focus_nodes.size():
 		var current := focus_nodes[i]
@@ -571,6 +593,15 @@ func _setup_pause_focus_order() -> void:
 		var prev := focus_nodes[(i - 1 + focus_nodes.size()) % focus_nodes.size()]
 		current.focus_next = current.get_path_to(next)
 		current.focus_previous = current.get_path_to(prev)
+		current.focus_neighbor_bottom = current.get_path_to(next)
+		current.focus_neighbor_top = current.get_path_to(prev)
+
+	for i in passive_buttons.size():
+		var current := passive_buttons[i]
+		var next := passive_buttons[(i + 1) % passive_buttons.size()]
+		var prev := passive_buttons[(i - 1 + passive_buttons.size()) % passive_buttons.size()]
+		current.focus_neighbor_right = current.get_path_to(next)
+		current.focus_neighbor_left = current.get_path_to(prev)
 
 
 func _on_pause_passive_icon_pressed(index: int) -> void:

@@ -1,5 +1,14 @@
 # Change Log
 
+## 2026-06-27
+
+### Controller menu navigation
+
+- Improved main menu, config menu, controls menu, and pause menu focus order for controller navigation.
+- Added runtime `device=-1` UI bindings for confirm, cancel, Start/Options, D-pad, and left analog navigation so Xbox/PlayStation controllers work after reconnect/order changes.
+- Added cancel/back behavior from controls to config and from config to the main menu.
+- Made the pause menu open/close with Start/Options and added directional focus neighbors for pause actions and passive-power icons.
+
 ## 2026-06-24
 
 ### Separated power wheel inputs from movement inputs
