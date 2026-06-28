@@ -104,23 +104,29 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause_menu") or event.is_action_pressed("ui_start"):
 		toggle_pause_menu()
-		get_viewport().set_input_as_handled()
+		_mark_input_handled()
 		return
 	if pause_menu_open and event.is_action_pressed("ui_cancel"):
 		close_pause_menu()
-		get_viewport().set_input_as_handled()
+		_mark_input_handled()
 		return
 	if pause_menu_open and (event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_select")):
 		for btn in [resume_button, main_menu_button, quit_button, passive_toggle]:
 			if btn and btn.has_focus():
+				_mark_input_handled()
 				btn.pressed.emit()
-				get_viewport().set_input_as_handled()
 				return
 		for icon in pause_passive_icons:
 			if icon and icon is Button and icon.has_focus():
+				_mark_input_handled()
 				icon.pressed.emit()
-				get_viewport().set_input_as_handled()
 				return
+
+
+func _mark_input_handled() -> void:
+	var viewport := get_viewport()
+	if viewport:
+		viewport.set_input_as_handled()
 
 
 func _process(delta: float) -> void:

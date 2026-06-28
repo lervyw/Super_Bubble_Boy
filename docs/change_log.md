@@ -2,6 +2,10 @@
 
 ## 2026-06-27
 
+### Pause menu input handling fix
+
+- `scripts/hud.gd`: pause menu controller activation now marks input as handled before button actions that can change scenes, preventing a null viewport error when returning to the title menu.
+
 ### Aquatic slime water return origin
 
 - `scripts/water_tilemap.gd`: generated water areas now pass the actual water area to `enter_water_zone` / `exit_water_zone` instead of the tilemap root, avoiding fallback positions near world origin.
