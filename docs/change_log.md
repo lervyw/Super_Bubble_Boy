@@ -2,6 +2,10 @@
 
 ## 2026-06-27
 
+### Super hurt animation
+
+- `scripts/player.gd` and `scripts/textura_2.gd`: Super form damage reactions now use `hurt_super` instead of the normal `hurt` animation.
+
 ### Super hurtbox form gating
 
 - `scripts/player.gd`: form hurtbox switching now disables each inactive hurtbox collision shape, not only `monitoring`.

@@ -2836,11 +2836,12 @@ func play_hurt_reaction() -> void:
 		return
 
 	hurt_sequence_running = true
+	var hurt_anim := get_hurt_animation_name()
 	defending = false
 	deactivate_attack_area()
 	velocity = Vector2.ZERO
 	change_state(State.HURT)
-	await wait_for_current_sprite_animation(hurt_animation_name)
+	await wait_for_current_sprite_animation(hurt_anim)
 
 	if is_inside_tree() and state == State.HURT:
 		change_state(State.IDLE)
@@ -2852,11 +2853,12 @@ func play_fatal_hit_sequence() -> void:
 	fatal_hit_sequence_running = true
 	hurt_sequence_running = false
 	is_invincible = true
+	var hurt_anim := get_hurt_animation_name()
 	defending = false
 	deactivate_attack_area()
 	velocity = Vector2.ZERO
 	change_state(State.HURT)
-	await wait_for_current_sprite_animation(hurt_animation_name)
+	await wait_for_current_sprite_animation(hurt_anim)
 
 	if not is_inside_tree():
 		return
@@ -2915,6 +2917,12 @@ func get_death_animation_name() -> StringName:
 			return &"death_super"
 		_:
 			return &"death"
+
+
+func get_hurt_animation_name() -> StringName:
+	if form == Form.SUPER:
+		return &"hurt_super"
+	return hurt_animation_name
 
 
 func restart_level_from_beginning() -> void:
