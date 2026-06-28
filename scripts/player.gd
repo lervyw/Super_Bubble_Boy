@@ -2943,10 +2943,20 @@ func refresh_stompers_for_current_form() -> void:
 
 func update_hurtbox_for_form() -> void:
 	var hurtbox_area = $HurtboxArea if has_node("HurtboxArea") else null
-	if hurtbox_area:
-		hurtbox_area.monitoring = form != Form.SUPER
-	if hurtbox_super:
-		hurtbox_super.monitoring = form == Form.SUPER
+	set_hurtbox_enabled(hurtbox_area, form != Form.SUPER)
+	set_hurtbox_enabled(hurtbox_super, form == Form.SUPER)
+
+
+func set_hurtbox_enabled(hurtbox: Area2D, enabled: bool) -> void:
+	if not hurtbox:
+		return
+
+	hurtbox.monitoring = enabled
+	hurtbox.monitorable = enabled
+
+	for child in hurtbox.get_children():
+		if child is CollisionShape2D:
+			child.disabled = not enabled
 
 
 func set_stomper_enabled(stomper: Area2D, enabled: bool) -> void:

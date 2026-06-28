@@ -2,6 +2,11 @@
 
 ## 2026-06-27
 
+### Super hurtbox form gating
+
+- `scripts/player.gd`: form hurtbox switching now disables each inactive hurtbox collision shape, not only `monitoring`.
+- Prevented the Super form hurtbox from remaining damageable while the player is in Normal or Bubble form.
+
 ### Controller menu navigation
 
 - Improved main menu, config menu, controls menu, and pause menu focus order for controller navigation.
