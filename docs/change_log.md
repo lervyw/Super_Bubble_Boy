@@ -2,6 +2,11 @@
 
 ## 2026-06-27
 
+### Aquatic slime water return origin
+
+- `scripts/water_tilemap.gd`: generated water areas now pass the actual water area to `enter_water_zone` / `exit_water_zone` instead of the tilemap root, avoiding fallback positions near world origin.
+- `scripts/SpawnZone.gd` and `scripts/slime.gd`: aquatic slimes now receive their spawn water position as a fallback return target when they leave water.
+
 ### Super hurt animation
 
 - `scripts/player.gd` and `scripts/textura_2.gd`: Super form damage reactions now use `hurt_super` instead of the normal `hurt` animation.

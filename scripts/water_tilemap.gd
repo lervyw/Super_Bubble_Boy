@@ -82,7 +82,7 @@ func _clear_generated_areas() -> void:
 	for target in overlap_counts.keys():
 		if is_instance_valid(target):
 			if target.has_method("exit_water_zone"):
-				target.exit_water_zone(self)
+				target.exit_water_zone()
 			elif "in_water" in target:
 				target.set("in_water", false)
 
@@ -157,34 +157,34 @@ func _create_water_area(cell_rect: Rect2i) -> void:
 	collision.shape = shape
 	area.add_child(collision)
 
-	area.body_entered.connect(_on_water_body_entered)
-	area.body_exited.connect(_on_water_body_exited)
-	area.area_entered.connect(_on_water_area_entered)
-	area.area_exited.connect(_on_water_area_exited)
+	area.body_entered.connect(_on_water_body_entered.bind(area))
+	area.body_exited.connect(_on_water_body_exited.bind(area))
+	area.area_entered.connect(_on_water_area_entered.bind(area))
+	area.area_exited.connect(_on_water_area_exited.bind(area))
 
 
-func _on_water_body_entered(body: Node) -> void:
+func _on_water_body_entered(body: Node, water_area: Area2D) -> void:
 	var target: Node = _resolve_water_target(body)
 	if target:
-		_enter_water(target)
+		_enter_water(target, water_area)
 
 
-func _on_water_body_exited(body: Node) -> void:
+func _on_water_body_exited(body: Node, water_area: Area2D) -> void:
 	var target: Node = _resolve_water_target(body)
 	if target:
-		_exit_water(target)
+		_exit_water(target, water_area)
 
 
-func _on_water_area_entered(area: Area2D) -> void:
+func _on_water_area_entered(area: Area2D, water_area: Area2D) -> void:
 	var target: Node = _resolve_water_target(area)
 	if target:
-		_enter_water(target)
+		_enter_water(target, water_area)
 
 
-func _on_water_area_exited(area: Area2D) -> void:
+func _on_water_area_exited(area: Area2D, water_area: Area2D) -> void:
 	var target: Node = _resolve_water_target(area)
 	if target:
-		_exit_water(target)
+		_exit_water(target, water_area)
 
 
 func _resolve_water_target(node: Node) -> Node:
@@ -197,19 +197,19 @@ func _resolve_water_target(node: Node) -> Node:
 	return null
 
 
-func _enter_water(target: Node) -> void:
+func _enter_water(target: Node, water_area: Node = null) -> void:
 	var count: int = int(overlap_counts.get(target, 0)) + 1
 	overlap_counts[target] = count
 	if count > 1:
 		return
 
 	if target.has_method("enter_water_zone"):
-		target.enter_water_zone(self)
+		target.enter_water_zone(water_area if water_area else self)
 	elif "in_water" in target:
 		target.set("in_water", true)
 
 
-func _exit_water(target: Node) -> void:
+func _exit_water(target: Node, water_area: Node = null) -> void:
 	var count: int = maxi(int(overlap_counts.get(target, 0)) - 1, 0)
 	if count > 0:
 		overlap_counts[target] = count
@@ -218,6 +218,6 @@ func _exit_water(target: Node) -> void:
 	overlap_counts.erase(target)
 
 	if target.has_method("exit_water_zone"):
-		target.exit_water_zone(self)
+		target.exit_water_zone(water_area if water_area else self)
 	elif "in_water" in target:
 		target.set("in_water", false)

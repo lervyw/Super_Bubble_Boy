@@ -252,6 +252,8 @@ func spawn_enemy() -> void:
 	
 	# Define posição depois de adicionar
 	enemy_instance.set_deferred("global_position", spawn_pos)
+	if enemy_instance.has_method("set_spawn_water_position"):
+		enemy_instance.call_deferred("set_spawn_water_position", spawn_pos)
 	
 	# Adiciona ao grupo
 	if not enemy_instance.is_in_group("enemy"):
