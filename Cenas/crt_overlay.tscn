@@ -8,13 +8,13 @@ render_priority = 128
 shader = ExtResource("2_shader")
 shader_parameter/screen_width = 320.0
 shader_parameter/screen_height = 180.0
-shader_parameter/barrel_power = 1.05
-shader_parameter/color_bleeding = 1.15
+shader_parameter/barrel_power = 1.0
+shader_parameter/color_bleeding = 0.0
 shader_parameter/bleeding_range_x = 2.5
 shader_parameter/bleeding_range_y = 2.5
 shader_parameter/lines_distance = 3.0
 shader_parameter/scan_size = 2.0
-shader_parameter/scanline_alpha = 0.65
+shader_parameter/scanline_alpha = 0.3
 shader_parameter/lines_velocity = 15.0
 
 [node name="CRTOverlay" type="CanvasLayer"]

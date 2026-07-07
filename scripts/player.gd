@@ -60,7 +60,7 @@ var hud_menu_waiting_for_neutral := false
 @export_range(0.1, 20.0, 0.1) var camera_position_smoothing_speed: float = 6.0
 @export_range(0.0, 1.0, 0.01) var camera_drag_left_margin: float = 0.35
 @export_range(0.0, 1.0, 0.01) var camera_drag_right_margin: float = 0.10
-@export_range(0.0, 1.0, 0.01) var camera_drag_top_margin: float = 0.25
+@export_range(0.0, 1.0, 0.01) var camera_drag_top_margin: float = 0.50
 @export_range(0.0, 1.0, 0.01) var camera_drag_bottom_margin: float = 0.38
 @export_range(0.0, 200.0, 1.0) var camera_crouch_offset: float = 30.0
 
@@ -211,7 +211,7 @@ var in_water: bool = false
 var water_zone_overlap_count: int = 0
 var target_form: Form = Form.NORMAL
 var is_bouncing_from_enemy := false
-var combo_lock := false
+
 var defending := false
 var super_shield_active := false
 var bubble_jump_count := 0
@@ -409,7 +409,6 @@ func _process(_delta: float) -> void:
 	if hud_menu_open:
 		process_hud_menu_selection()
 
-	check_attack_combos()
 	check_quick_form_selection()
 
 
@@ -1315,6 +1314,8 @@ func handle_input() -> void:
 
 
 func start_special_attack() -> void:
+	if form != Form.SUPER:
+		return
 	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
 	if not can_use_mana_attacks():
@@ -1344,6 +1345,8 @@ func start_special_attack() -> void:
 
 
 func start_ultimate_attack() -> void:
+	if form != Form.SUPER:
+		return
 	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
 	if not can_use_ultimate_attack():
@@ -1600,37 +1603,7 @@ func stop_defense() -> void:
 		change_state(State.IDLE)
 
 
-func check_attack_combos() -> void:
-	if hud_menu_open or combo_lock or state in [State.DEAD, State.HURT]:
-		return
 
-	if InputMap.has_action("combo_1") and Input.is_action_just_pressed("combo_1"):
-		execute_combo(1)
-	elif InputMap.has_action("combo_2") and Input.is_action_just_pressed("combo_2"):
-		execute_combo(2)
-	elif InputMap.has_action("combo_3") and Input.is_action_just_pressed("combo_3"):
-		execute_combo(3)
-	elif InputMap.has_action("combo_4") and Input.is_action_just_pressed("combo_4"):
-		execute_combo(4)
-	elif Input.is_action_pressed("attack") and Input.is_action_pressed("attack_special"):
-		execute_combo(1)
-	elif Input.is_action_pressed("attack") and Input.is_action_pressed("defend"):
-		execute_combo(2)
-	elif Input.is_action_pressed("attack_special") and Input.is_action_pressed("defend"):
-		execute_combo(3)
-	elif Input.is_action_pressed("attack") and Input.is_action_pressed("jump"):
-		execute_combo(4)
-
-
-func execute_combo(id: int) -> void:
-	combo_lock = true
-	prepare_attack_area(attack_area, normal_attack_damage, AttackKind.NORMAL, StringName("combo_%s" % id))
-	state = State.ATTACK
-	trigger_attack_window(normal_attack_active_time)
-	print("Combo executado:", id)
-
-	await get_tree().create_timer(0.25).timeout
-	combo_lock = false
 
 
 func check_quick_form_selection() -> void:

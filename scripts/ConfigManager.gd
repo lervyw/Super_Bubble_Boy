@@ -22,6 +22,10 @@ var settings := {
 	"volume_master": 0.0,
 	"volume_music": 0.0,
 	"volume_sfx": 0.0,
+	"crt_enabled": true,
+	"crt_scanline_alpha": 0.3,
+	"crt_barrel_power": 1.0,
+	"crt_color_bleeding": 0.0,
 
 	"inputs_keyboard": {
 	},
@@ -247,6 +251,42 @@ func _load():
 		_save()
 
 
+func set_crt_enabled(enabled: bool) -> void:
+	settings["crt_enabled"] = enabled
+	_save()
+
+
+func is_crt_enabled() -> bool:
+	return settings.get("crt_enabled", true)
+
+
+func set_crt_scanline_alpha(value: float) -> void:
+	settings["crt_scanline_alpha"] = value
+	_save()
+
+
+func get_crt_scanline_alpha() -> float:
+	return settings.get("crt_scanline_alpha", 0.3)
+
+
+func set_crt_barrel_power(value: float) -> void:
+	settings["crt_barrel_power"] = value
+	_save()
+
+
+func get_crt_barrel_power() -> float:
+	return settings.get("crt_barrel_power", 1.0)
+
+
+func set_crt_color_bleeding(value: float) -> void:
+	settings["crt_color_bleeding"] = value
+	_save()
+
+
+func get_crt_color_bleeding() -> float:
+	return settings.get("crt_color_bleeding", 0.0)
+
+
 func _apply_settings():
 	# Aplica volumes carregados no AudioServer
 	set_volume("master", settings["volume_master"])
@@ -261,6 +301,14 @@ func _ensure_settings_schema() -> void:
 		settings["volume_music"] = 0.0
 	if not settings.has("volume_sfx"):
 		settings["volume_sfx"] = 0.0
+	if not settings.has("crt_enabled"):
+		settings["crt_enabled"] = true
+	if not settings.has("crt_scanline_alpha"):
+		settings["crt_scanline_alpha"] = 0.3
+	if not settings.has("crt_barrel_power"):
+		settings["crt_barrel_power"] = 1.0
+	if not settings.has("crt_color_bleeding"):
+		settings["crt_color_bleeding"] = 0.0
 	if not settings.has("inputs_keyboard") or typeof(settings["inputs_keyboard"]) != TYPE_DICTIONARY:
 		settings["inputs_keyboard"] = {}
 	if not settings.has("inputs_controller") or typeof(settings["inputs_controller"]) != TYPE_DICTIONARY:

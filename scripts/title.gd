@@ -61,6 +61,10 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 @onready var slider_sfx = $ConfigMenu/VBoxContainer/SliderEfeitos
 @onready var slider_master = $ConfigMenu/VBoxContainer/SliderMaster
 @onready var btn_cfg_botoes = $ConfigMenu/VBoxContainer/ConfigurarBotoes
+@onready var btn_crt_toggle = $ConfigMenu/VBoxContainer/CRTToggle
+@onready var slider_crt_scanline = $ConfigMenu/VBoxContainer/SliderCRTScanline
+@onready var slider_crt_barrel = $ConfigMenu/VBoxContainer/SliderCRTBarrel
+@onready var slider_crt_bleed = $ConfigMenu/VBoxContainer/SliderCRTBleed
 @onready var btn_voltar_config = $ConfigMenu/VBoxContainer/Voltar
 
 
@@ -89,12 +93,6 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 @onready var btn_roda_esquerda = $ControlsMenu/ScrollContainer/VBoxContainer/Controle21
 @onready var btn_roda_direita = $ControlsMenu/ScrollContainer/VBoxContainer/Controle22
 
-@onready var btn_combo1 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle9
-@onready var btn_combo2 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle10
-@onready var btn_combo3 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle11
-@onready var btn_combo4 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle12
-
-# Botão de voltar do menu de controles para o menu config
 @onready var btn_voltar_botoes = $ControlsMenu/ScrollContainer/VBoxContainer/Voltar
 
 
@@ -142,6 +140,16 @@ func _ready():
 	slider_musica.value_changed.connect(func(val): ConfigManager.set_volume("music", val))
 	slider_sfx.value_changed.connect(func(val): ConfigManager.set_volume("sfx", val))
 
+	btn_crt_toggle.button_pressed = ConfigManager.is_crt_enabled()
+	btn_crt_toggle.toggled.connect(_on_crt_toggled)
+
+	slider_crt_scanline.value = ConfigManager.get_crt_scanline_alpha()
+	slider_crt_barrel.value = ConfigManager.get_crt_barrel_power()
+	slider_crt_bleed.value = ConfigManager.get_crt_color_bleeding()
+	slider_crt_scanline.value_changed.connect(func(val): ConfigManager.set_crt_scanline_alpha(val))
+	slider_crt_barrel.value_changed.connect(func(val): ConfigManager.set_crt_barrel_power(val))
+	slider_crt_bleed.value_changed.connect(func(val): ConfigManager.set_crt_color_bleeding(val))
+
 	# Abre menu de controles / volta pro menu principal
 	_connect_pressed_once(btn_cfg_botoes, _open_botoes_menu)
 	_connect_pressed_once(btn_voltar_config, _back_to_menu)
@@ -165,10 +173,6 @@ func _ready():
 	_connect_rebind_button_once(btn_roda_baixo, "hud_select_down")
 	_connect_rebind_button_once(btn_roda_esquerda, "hud_select_left")
 	_connect_rebind_button_once(btn_roda_direita, "hud_select_right")
-	_connect_rebind_button_once(btn_combo1, "combo_1")
-	_connect_rebind_button_once(btn_combo2, "combo_2")
-	_connect_rebind_button_once(btn_combo3, "combo_3")
-	_connect_rebind_button_once(btn_combo4, "combo_4")
 
 	# Volta do menu de controles para o menu de config
 	_connect_pressed_once(btn_voltar_botoes, _back_to_config_menu)
@@ -304,7 +308,6 @@ func _input(event: InputEvent):
 			btn_ataque_especial, btn_defesa, btn_ultimate, btn_esquerda, btn_direita,
 			btn_agachar, btn_dash, btn_pause,
 			btn_roda_cima, btn_roda_baixo, btn_roda_esquerda, btn_roda_direita,
-			btn_combo1, btn_combo2, btn_combo3, btn_combo4,
 			btn_voltar_botoes,
 		]:
 			if btn and btn.has_focus():
@@ -345,6 +348,10 @@ func _on_iniciar():
 func _on_sair():
 	# Sai do jogo
 	get_tree().quit()
+
+func _on_crt_toggled(enabled: bool) -> void:
+	ConfigManager.set_crt_enabled(enabled)
+
 
 func _open_config_menu():
 	if intro_running:
@@ -401,6 +408,10 @@ func _setup_config_focus_order() -> void:
 		slider_master,
 		slider_musica,
 		slider_sfx,
+		btn_crt_toggle,
+		slider_crt_scanline,
+		slider_crt_barrel,
+		slider_crt_bleed,
 		btn_cfg_botoes,
 		btn_voltar_config,
 	])
@@ -419,10 +430,6 @@ func _setup_controls_scroll_focus() -> void:
 		btn_ataque,
 		btn_ataque_especial,
 		btn_defesa,
-		btn_combo1,
-		btn_combo2,
-		btn_combo3,
-		btn_combo4,
 		btn_ultimate,
 		btn_esquerda,
 		btn_direita,
@@ -586,10 +593,6 @@ func _update_control_labels():
 	btn_roda_esquerda.text = "Roda Esquerda: " + _get_current_input_name("hud_select_left")
 	btn_roda_direita.text = "Roda Direita: " + _get_current_input_name("hud_select_right")
 
-	btn_combo1.text = "Combo 1: " + _get_current_input_name("combo_1")
-	btn_combo2.text = "Combo 2: " + _get_current_input_name("combo_2")
-	btn_combo3.text = "Combo 3: " + _get_current_input_name("combo_3")
-	btn_combo4.text = "Combo 4: " + _get_current_input_name("combo_4")
 	_set_rebind_prompt("Selecione uma ação para remapear")
 
 
