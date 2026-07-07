@@ -63,9 +63,6 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 @onready var slider_master = $ConfigMenu/ScrollContainer/VBoxContainer/SliderMaster
 @onready var btn_cfg_botoes = $ConfigMenu/ScrollContainer/VBoxContainer/ConfigurarBotoes
 @onready var btn_crt_toggle = $ConfigMenu/ScrollContainer/VBoxContainer/CRTToggle
-@onready var slider_crt_scanline = $ConfigMenu/ScrollContainer/VBoxContainer/SliderCRTScanline
-@onready var slider_crt_barrel = $ConfigMenu/ScrollContainer/VBoxContainer/SliderCRTBarrel
-@onready var slider_crt_bleed = $ConfigMenu/ScrollContainer/VBoxContainer/SliderCRTBleed
 @onready var btn_voltar_config = $ConfigMenu/ScrollContainer/VBoxContainer/Voltar
 
 
@@ -143,13 +140,6 @@ func _ready():
 
 	btn_crt_toggle.button_pressed = ConfigManager.is_crt_enabled()
 	btn_crt_toggle.toggled.connect(_on_crt_toggled)
-
-	slider_crt_scanline.value = ConfigManager.get_crt_scanline_alpha()
-	slider_crt_barrel.value = ConfigManager.get_crt_barrel_power()
-	slider_crt_bleed.value = ConfigManager.get_crt_color_bleeding()
-	slider_crt_scanline.value_changed.connect(func(val): ConfigManager.set_crt_scanline_alpha(val))
-	slider_crt_barrel.value_changed.connect(func(val): ConfigManager.set_crt_barrel_power(val))
-	slider_crt_bleed.value_changed.connect(func(val): ConfigManager.set_crt_color_bleeding(val))
 
 	# Abre menu de controles / volta pro menu principal
 	_connect_pressed_once(btn_cfg_botoes, _open_botoes_menu)
@@ -352,6 +342,10 @@ func _on_sair():
 
 func _on_crt_toggled(enabled: bool) -> void:
 	ConfigManager.set_crt_enabled(enabled)
+	if Engine.has_singleton("flowerwall_crt"):
+		var crt = Engine.get_singleton("flowerwall_crt")
+		if crt.has_method("set_active"):
+			crt.set_active(enabled)
 
 
 func _open_config_menu():
@@ -412,9 +406,6 @@ func _setup_config_focus_order() -> void:
 		slider_musica,
 		slider_sfx,
 		btn_crt_toggle,
-		slider_crt_scanline,
-		slider_crt_barrel,
-		slider_crt_bleed,
 		btn_cfg_botoes,
 		btn_voltar_config,
 	])

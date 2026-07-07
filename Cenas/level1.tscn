@@ -1,4 +1,4 @@
-[gd_scene load_steps=63 format=4 uid="uid://bmeqa3g35tp1i"]
+[gd_scene load_steps=62 format=4 uid="uid://bmeqa3g35tp1i"]
 
 [ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://sprites/img/tiles/pedra.png" id="1_djts0"]
 [ext_resource type="Script" uid="uid://b32be5wkrk8lo" path="res://scripts/level_1.gd" id="1_o25p7"]
@@ -36,7 +36,7 @@
 [ext_resource type="Script" uid="uid://7qq470pnqhtv" path="res://Cenas/level_light_points.gd" id="31_lightpoints"]
 [ext_resource type="PackedScene" uid="uid://bqu5y30tbneql" path="res://Cenas/npc_fabian.tscn" id="32_fabian"]
 [ext_resource type="PackedScene" uid="uid://cn4hds3wv5q5m" path="res://Cenas/inimigo_lopes.tscn" id="36_2av5b"]
-[ext_resource type="PackedScene" uid="uid://dh5yscqf3y2ld" path="res://Cenas/crt_overlay.tscn" id="37_crt"]
+
 
 [sub_resource type="Gradient" id="Gradient_level1_light"]
 offsets = PackedFloat32Array(0, 0.62, 1)
@@ -1923,7 +1923,7 @@ position = Vector2(1249, -769)
 [node name="inimigo_lopes7" parent="." instance=ExtResource("36_2av5b")]
 position = Vector2(1475, -770)
 
-[node name="CRTOverlay" parent="." instance=ExtResource("37_crt")]
+
 
 [editable path="WaterTilemap"]
 [editable path="player"]

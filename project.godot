@@ -26,6 +26,7 @@ config/icon="res://icon_bubble.svg"
 GameManager="*res://scripts/GameManager.gd"
 ConfigManager="*res://scripts/ConfigManager.gd"
 ControllerMapper="*res://scripts/ControllerMapper.gd"
+flowerwall_crt="*res://addons/flowerwall_crt/scenes/flowerwall_crt.tscn"
 
 [display]
 
@@ -197,6 +198,10 @@ pause_menu={
 2d_physics/layer_4="items"
 2d_physics/layer_5="hitbox"
 2d_physics/layer_6="hurtbox"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/flowerwall_crt/plugin.cfg")
 
 [rendering]
 
