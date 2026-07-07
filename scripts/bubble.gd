@@ -5,12 +5,21 @@ extends CharacterBody2D
 @export var jump_speed: int
 @export var player_gravity: int
 @export var respawn_position: Vector2
-#@onready var Super_Bubble = "res://Cenas/Super_bubble.tscn"
-@onready var Super_Bubble_scene: PackedScene = preload("res://Cenas/Super_bubble.tscn")
+const SUPER_BUBBLE_SCENE_PATH := "res://Cenas/Super_bubble.tscn"
+
+# Legacy transform scene. Keep runtime-loaded so a missing legacy scene does not
+# break script parsing when the editor opens the project.
+@onready var Super_Bubble_scene: PackedScene = load_optional_scene(SUPER_BUBBLE_SCENE_PATH)
 @export var super_scene: Resource  # Aqui você associa "super.tscn" pelo editor
 var estado: int =0
 var transformando: bool = false
 var jump_count: int
+
+
+func load_optional_scene(scene_path: String) -> PackedScene:
+	if not ResourceLoader.exists(scene_path):
+		return null
+	return load(scene_path) as PackedScene
 
 
 func _physics_process(delta: float) -> void:

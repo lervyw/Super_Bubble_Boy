@@ -100,12 +100,9 @@ func collect() -> void:
 	if stats and stats.has_method("update_max_health_by_form"):
 		stats.update_max_health_by_form()
 
-	# --- Desbloqueio de forma ---
-	player.unlocked_forms[player.Form.SUPER] = true
-	if "unlocked_wheel_slots" in player:
-		var super_slots = player.unlocked_wheel_slots.get(player.Form.SUPER, {})
-		for slot in super_slots.keys():
-			super_slots[slot] = true
+		# --- Desbloqueio de forma ---
+		player.unlocked_forms[player.Form.SUPER] = true
+		_notify_transformation_unlocked()
 
 	# --- Atualização de respawn (opcional) ---
 	if update_respawn and respawn_node:
@@ -115,6 +112,17 @@ func collect() -> void:
 	if stats and stats.has_method("reset_health_full"):
 		stats.reset_health_full()
 
-	print("⭐ Forma Super desbloqueada! Vida restaurada!")
+		print("⭐ Forma Super desbloqueada! Vida restaurada!")
 
-	queue_free()
+		queue_free()
+
+
+func _notify_transformation_unlocked() -> void:
+	if not player:
+		return
+	if not ("hud" in player):
+		return
+	if not player.hud:
+		return
+	if player.hud.has_method("show_transformation_unlocked_message"):
+		player.hud.show_transformation_unlocked_message("forma super desbloqueada")

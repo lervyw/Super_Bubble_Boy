@@ -156,6 +156,8 @@ func activate_checkpoint() -> void:
 			s_mana.reset_mana_full()
 			print("🔷 Mana restaurada no checkpoint")
 
+	_notify_checkpoint_activated()
+
 	# ----- 5) Som de ativação -----
 	if activate_sound:
 		activate_sound.play()
@@ -179,3 +181,14 @@ func activate_checkpoint() -> void:
 	# ----- 7) One-shot: destrói o checkpoint após uso -----
 	if destroy_after_activation:
 		queue_free()
+
+
+func _notify_checkpoint_activated() -> void:
+	if not player:
+		return
+	if not ("hud" in player):
+		return
+	if not player.hud:
+		return
+	if player.hud.has_method("show_checkpoint_message"):
+		player.hud.show_checkpoint_message("checkpoint ativado")

@@ -6,7 +6,8 @@ extends Sprite2D
 var transformacaoOn: bool
 var estado: int =0
 #var form: String = "normal"  # Formas: "normal", "bubble"
-var super_bubble = preload("res://Cenas/Super_bubble.tscn").instantiate()
+const SUPER_BUBBLE_SCENE_PATH := "res://Cenas/Super_bubble.tscn"
+var super_bubble: Node = null
 #@export var super_scene: PackedScene
 
 func animate(direction: Vector2) -> void:

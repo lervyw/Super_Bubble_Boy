@@ -1,5 +1,23 @@
 # Change Log
 
+## 2026-07-07
+
+### Level 1 checkpoint and powerup identification
+
+- Renamed level 1 powerups and checkpoints with explicit `Level1...` node names.
+- Tinted form powerups gold/orange, regular checkpoints cyan, and power checkpoints purple.
+- Added/updated particle colors so activation/identification effects match each item category.
+- Removed unused oversized `bubble_boy_complete` texture that could crash the editor during preview/import.
+- Super form collection no longer unlocks every Super wheel power automatically.
+- Converted the named level power markers into real power pickups for Super spike, Super projectile, and Normal teleport.
+- Power pickups now show `powerup coletado` and make the power wheel glow until the player opens it.
+- Updated `cutscene_test` with the new animated Fernanda and Bubbleboy intro sprites, simpler kingdom rescue dialogue, focused continue button, and a dark-to-purple background modulation.
+- Changed `poder_bolha_protetora` into the Normal-form protective bubble power pickup and changed `Checkpoint_caverna` into the Bubble transformation pickup.
+- Added colored HUD notices for checkpoints, transformations, and power unlocks, with outlined text for readability.
+- Fixed passive power icon wiring fallback and added usage hints when selecting passives from the pause menu.
+- Enabled the day/night cycle in `level1`, made it run without requiring an `AnimationPlayer`, and added local lights around checkpoints, transformations, and power pickups.
+- Added softer day/night compensation for the parallax background and automatic soft lights for all `ponto_luz*` guide markers in `level1`.
+
 ## 2026-06-27
 
 ### Pause menu input handling fix

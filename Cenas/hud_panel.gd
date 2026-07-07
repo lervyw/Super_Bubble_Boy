@@ -35,6 +35,8 @@ var menu_active: bool = false
 var current_action_selection: String = "none"
 var animation_version: int = 0
 var button_progress_bars: Dictionary = {}
+var power_unlock_glow_active: bool = false
+var power_unlock_glow_tween: Tween
 var _slot_unlocked := {
 	"ultimate_attack": true,
 	"attack_special": true,
@@ -70,6 +72,8 @@ func set_menu_active(active: bool) -> void:
 		play_activation_animation(animation_version)
 	else:
 		_set_state_texture(inactive_panel_texture)
+		if power_unlock_glow_active:
+			_apply_power_unlock_glow_base()
 
 
 func set_special_attack_enabled(enabled: bool) -> void:
@@ -165,6 +169,40 @@ func set_slot_unlocked(slot_name: String, unlocked: bool) -> void:
 		_slot_unlocked[slot_name] = unlocked
 		if menu_active:
 			_set_buttons_visible(true)
+
+
+func start_power_unlock_glow() -> void:
+	power_unlock_glow_active = true
+	visible = true
+	if power_unlock_glow_tween:
+		power_unlock_glow_tween.kill()
+	power_unlock_glow_tween = create_tween()
+	power_unlock_glow_tween.set_loops()
+	power_unlock_glow_tween.tween_method(_set_power_unlock_glow_amount, 0.0, 1.0, 0.45)
+	power_unlock_glow_tween.tween_method(_set_power_unlock_glow_amount, 1.0, 0.0, 0.45)
+
+
+func stop_power_unlock_glow() -> void:
+	power_unlock_glow_active = false
+	if power_unlock_glow_tween:
+		power_unlock_glow_tween.kill()
+		power_unlock_glow_tween = null
+	if state_texture:
+		state_texture.self_modulate = Color(1, 1, 1, 1)
+	self_modulate = Color(1, 1, 1, 1)
+
+
+func _set_power_unlock_glow_amount(amount: float) -> void:
+	if not power_unlock_glow_active:
+		return
+	var glow := Color(1.0 + amount * 0.55, 1.0 + amount * 0.45, 1.0 + amount * 0.15, 1.0)
+	if state_texture:
+		state_texture.self_modulate = glow
+	self_modulate = Color(1.0 + amount * 0.18, 1.0 + amount * 0.12, 1.0, 1.0)
+
+
+func _apply_power_unlock_glow_base() -> void:
+	_set_power_unlock_glow_amount(0.35)
 
 
 func play_activation_animation(version: int) -> void:

@@ -515,7 +515,7 @@ func _add_joy_button_once(action_name: StringName, button_index: int) -> void:
 
 	var joy_event := InputEventJoypadButton.new()
 	joy_event.device = -1
-	joy_event.button_index = button_index
+	joy_event.button_index = button_index as JoyButton
 	InputMap.action_add_event(action_name, joy_event)
 
 
@@ -526,7 +526,7 @@ func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -
 
 	var joy_event := InputEventJoypadMotion.new()
 	joy_event.device = -1
-	joy_event.axis = axis
+	joy_event.axis = axis as JoyAxis
 	joy_event.axis_value = axis_value
 	InputMap.action_add_event(action_name, joy_event)
 
@@ -538,7 +538,7 @@ func _add_key_once(action_name: StringName, physical_keycode: int) -> void:
 
 	var key_event := InputEventKey.new()
 	key_event.device = -1
-	key_event.physical_keycode = physical_keycode
+	key_event.physical_keycode = physical_keycode as Key
 	InputMap.action_add_event(action_name, key_event)
 
 

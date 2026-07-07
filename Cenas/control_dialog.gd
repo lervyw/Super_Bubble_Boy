@@ -4,16 +4,10 @@ extends Control
 
 @export_group("Diálogos")
 @export var dialogs: Array[String] = [
-	"você é um garoto com cabeça de bolha",
-	"precisa destruir um sapo maligno",
-	"e assim salvar o universo",
-	"slimes serão invocados para lhe impedir",
-	"colete os Power Ups e ache o sapo",
-	"você tem 5 minutos para isso",
-	"use as setas para se mover",
-	"L1 e R1 para se transformar",
-	"Triângulo para DASH, QUADRADO para atacar, X para pular",
-	"BOA SORTE!"
+	"Bubbleboy, nosso reino está em perigo.",
+	"Um Sapo Maligno se esconde no castelo e ameaça tomar tudo para si.",
+	"O Rei Slime guarda o portão, e suas tropas bloquearam o caminho até lá.",
+	"Salve-nos, atravesse o reino e liberte todos dessa ameaça!"
 ]
 
 @export_group("Botão de Avançar")
@@ -41,7 +35,9 @@ func _ready() -> void:
 	
 	# Conecta o botão se existir
 	if advance_button:
+		advance_button.focus_mode = Control.FOCUS_ALL
 		advance_button.pressed.connect(_on_advance_button_pressed)
+		advance_button.call_deferred("grab_focus")
 		print("✅ Botão de avançar conectado")
 
 func _input(event: InputEvent) -> void:

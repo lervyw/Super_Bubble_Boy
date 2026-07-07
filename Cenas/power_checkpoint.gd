@@ -90,6 +90,7 @@ func activate_checkpoint() -> void:
 		var form_slots = player.unlocked_wheel_slots.get(unlock_form, {})
 		form_slots[unlock_slot] = true
 		print("   Slot ", unlock_slot, " desbloqueado para forma ", unlock_form)
+		_notify_powerup_collected()
 
 	if update_respawn and player:
 		var pos := player.global_position
@@ -129,3 +130,14 @@ func activate_checkpoint() -> void:
 
 	if destroy_after_activation:
 		queue_free()
+
+
+func _notify_powerup_collected() -> void:
+	if not player:
+		return
+	if not ("hud" in player):
+		return
+	if not player.hud:
+		return
+	if player.hud.has_method("show_powerup_collected_message"):
+		player.hud.show_powerup_collected_message()

@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 signal boss_defeated
 signal health_changed(current_health: int, max_health: int)
-signal hud_visibility_changed(visible: bool)
+signal hud_visibility_changed(should_show: bool)
 
 const ATTACK_META_DAMAGE := &"attack_damage"
 
@@ -432,11 +432,11 @@ func deal_damage_to_player(target: Node) -> void:
 		target.take_damage(damage)
 
 
-func update_hud_visibility(visible: bool) -> void:
-	if hud_visible == visible:
+func update_hud_visibility(should_show: bool) -> void:
+	if hud_visible == should_show:
 		return
-	hud_visible = visible
-	emit_signal("hud_visibility_changed", visible)
+	hud_visible = should_show
+	emit_signal("hud_visibility_changed", should_show)
 
 
 func is_hud_visible() -> bool:

@@ -45,10 +45,18 @@ var boss_target: Node = null
 var pause_menu_open: bool = false
 var warning_tween: Tween
 
+const NOTICE_POWER_START := Color(1.0, 0.86, 0.22, 1.0)
+const NOTICE_POWER_END := Color(1.0, 0.55, 0.08, 1.0)
+const NOTICE_TRANSFORM_START := Color(0.22, 0.72, 1.0, 1.0)
+const NOTICE_TRANSFORM_END := Color(0.66, 0.25, 1.0, 1.0)
+const NOTICE_CHECKPOINT_START := Color(0.20, 1.0, 0.52, 1.0)
+const NOTICE_CHECKPOINT_END := Color(0.56, 1.0, 0.30, 1.0)
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_ensure_controller_ui_actions()
+	_resolve_passive_icon_references()
 
 	if menu_panel:
 		menu_panel.visible = true
@@ -199,12 +207,12 @@ func _update_ultimate_ready_icon(cooldown_progress: float) -> void:
 	if not ultimate_ready_icon:
 		return
 
-	var ready := cooldown_progress >= 1.0
+	var ultimate_ready := cooldown_progress >= 1.0
 	if player and player.has_method("can_use_ultimate_attack"):
-		ready = player.can_use_ultimate_attack()
+		ultimate_ready = player.can_use_ultimate_attack()
 
-	ultimate_ready_icon.visible = ready
-	ultimate_ready_icon.modulate.a = 1.0 if ready else 0.0
+	ultimate_ready_icon.visible = ultimate_ready
+	ultimate_ready_icon.modulate.a = 1.0 if ultimate_ready else 0.0
 
 
 func setup_ultimate_cooldown_bar() -> void:
@@ -242,7 +250,25 @@ func show_mana_warning(message: String = "sem mana suficiente") -> void:
 	show_warning_message(message)
 
 
+func show_powerup_collected_message() -> void:
+	show_notice_message("poder desbloqueado", NOTICE_POWER_START, NOTICE_POWER_END)
+	if menu_panel and menu_panel.has_method("start_power_unlock_glow"):
+		menu_panel.start_power_unlock_glow()
+
+
+func show_transformation_unlocked_message(message: String = "transformacao desbloqueada") -> void:
+	show_notice_message(message, NOTICE_TRANSFORM_START, NOTICE_TRANSFORM_END)
+
+
+func show_checkpoint_message(message: String = "checkpoint ativado") -> void:
+	show_notice_message(message, NOTICE_CHECKPOINT_START, NOTICE_CHECKPOINT_END)
+
+
 func show_warning_message(message: String) -> void:
+	show_notice_message(message, Color(1, 1, 1, 1), Color(1, 0.82, 0.42, 1))
+
+
+func show_notice_message(message: String, start_color: Color, end_color: Color) -> void:
 	if not warning_label:
 		return
 
@@ -251,8 +277,13 @@ func show_warning_message(message: String) -> void:
 
 	warning_label.text = message
 	warning_label.visible = true
-	warning_label.modulate = Color(1, 1, 1, 1)
+	warning_label.modulate = start_color
 	warning_label.position = Vector2(110.0, 104.0)
+	warning_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.72))
+	warning_label.add_theme_constant_override("outline_size", 4)
+	warning_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.45))
+	warning_label.add_theme_constant_override("shadow_offset_x", 1)
+	warning_label.add_theme_constant_override("shadow_offset_y", 1)
 
 	warning_tween = create_tween()
 	warning_tween.set_parallel(true)
@@ -261,7 +292,8 @@ func show_warning_message(message: String) -> void:
 	warning_tween.tween_property(warning_label, "position:x", 108.0, 0.05).set_delay(0.10)
 	warning_tween.tween_property(warning_label, "position:x", 112.0, 0.05).set_delay(0.15)
 	warning_tween.tween_property(warning_label, "position:x", 110.0, 0.05).set_delay(0.20)
-	warning_tween.tween_property(warning_label, "modulate:a", 0.0, 0.35).set_delay(0.65)
+	warning_tween.tween_property(warning_label, "modulate", end_color, 0.45)
+	warning_tween.tween_property(warning_label, "modulate:a", 0.0, 0.45).set_delay(1.05)
 
 	await warning_tween.finished
 	if warning_label:
@@ -411,9 +443,9 @@ func _on_boss_health_changed(current_health: int, max_health: int) -> void:
 	boss_hp_bar.value = float(current_health)
 
 
-func _on_boss_hud_visibility_changed(visible: bool) -> void:
-	_set_boss_hp_visible(visible)
-	if visible:
+func _on_boss_hud_visibility_changed(should_show: bool) -> void:
+	_set_boss_hp_visible(should_show)
+	if should_show:
 		_refresh_boss_bar()
 
 
@@ -428,6 +460,8 @@ func _set_boss_hp_visible(v: bool) -> void:
 
 func show_menu() -> void:
 	if menu_panel:
+		if menu_panel.has_method("stop_power_unlock_glow"):
+			menu_panel.stop_power_unlock_glow()
 		menu_panel.visible = true
 		if menu_panel.has_method("set_menu_active"):
 			menu_panel.set_menu_active(true)
@@ -521,7 +555,7 @@ func _add_joy_button_once(action_name: StringName, button_index: int) -> void:
 
 	var joy_event := InputEventJoypadButton.new()
 	joy_event.device = -1
-	joy_event.button_index = button_index
+	joy_event.button_index = button_index as JoyButton
 	InputMap.action_add_event(action_name, joy_event)
 
 
@@ -532,7 +566,7 @@ func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -
 
 	var joy_event := InputEventJoypadMotion.new()
 	joy_event.device = -1
-	joy_event.axis = axis
+	joy_event.axis = axis as JoyAxis
 	joy_event.axis_value = axis_value
 	InputMap.action_add_event(action_name, joy_event)
 
@@ -544,13 +578,14 @@ func _add_key_once(action_name: StringName, physical_keycode: int) -> void:
 
 	var key_event := InputEventKey.new()
 	key_event.device = -1
-	key_event.physical_keycode = physical_keycode
+	key_event.physical_keycode = physical_keycode as Key
 	InputMap.action_add_event(action_name, key_event)
 
 
 func _on_passive_toggle_toggled(enabled: bool) -> void:
 	if player and player.has_method("set_passive_powers_enabled"):
 		player.set_passive_powers_enabled(enabled)
+	show_notice_message("passivas ligadas" if enabled else "passivas desligadas", NOTICE_POWER_START, NOTICE_POWER_END)
 
 
 func _are_player_passives_enabled() -> bool:
@@ -577,6 +612,24 @@ func _update_icon_list(icons: Array, selected_index: int) -> void:
 		var is_selected := power_index == selected_index
 		icon.modulate = Color(1, 1, 1, 1.0) if is_selected else Color(0.35, 0.35, 0.35, 0.7)
 		icon.visible = true
+
+
+func _resolve_passive_icon_references() -> void:
+	if passive_icons.is_empty():
+		var stomp_icon := get_node_or_null("PassiveIconStomp") as TextureRect
+		var run_icon := get_node_or_null("PassiveIconRun") as TextureRect
+		var kill_stomp_icon := get_node_or_null("PassiveIconOrbit") as TextureRect
+		for icon in [stomp_icon, run_icon, kill_stomp_icon]:
+			if icon:
+				passive_icons.append(icon)
+
+	if pause_passive_icons.is_empty():
+		var stomp_button := get_node_or_null("PauseMenu/VBoxContainer/PassiveIcons/Stomp") as Control
+		var run_button := get_node_or_null("PauseMenu/VBoxContainer/PassiveIcons/Run") as Control
+		var kill_stomp_button := get_node_or_null("PauseMenu/VBoxContainer/PassiveIcons/Orbit") as Control
+		for icon in [stomp_button, run_button, kill_stomp_button]:
+			if icon:
+				pause_passive_icons.append(icon)
 
 
 func _setup_pause_focus_order() -> void:
@@ -624,7 +677,20 @@ func _on_pause_passive_icon_pressed(index: int) -> void:
 
 	if player and player.has_method("set_selected_passive_power"):
 		player.set_selected_passive_power(power_index)
+		_show_passive_usage_hint(power_index)
 	_update_passive_icons()
+
+
+func _show_passive_usage_hint(power_index: int) -> void:
+	match power_index:
+		1:
+			show_notice_message("stomp: baixo + ataque no ar", NOTICE_POWER_START, NOTICE_POWER_END)
+		2:
+			show_notice_message("corrida: toque duas vezes para o lado", NOTICE_POWER_START, NOTICE_POWER_END)
+		3:
+			show_notice_message("kill stomp: pule em cima do inimigo", NOTICE_POWER_START, NOTICE_POWER_END)
+		_:
+			show_notice_message("passiva desativada", NOTICE_POWER_START, NOTICE_POWER_END)
 
 
 func apply_pause_menu_aero_style() -> void:
