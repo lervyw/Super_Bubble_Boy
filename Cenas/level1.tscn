@@ -1,4 +1,4 @@
-[gd_scene load_steps=60 format=4 uid="uid://bmeqa3g35tp1i"]
+[gd_scene load_steps=63 format=4 uid="uid://bmeqa3g35tp1i"]
 
 [ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://sprites/img/tiles/pedra.png" id="1_djts0"]
 [ext_resource type="Script" uid="uid://b32be5wkrk8lo" path="res://scripts/level_1.gd" id="1_o25p7"]
@@ -34,6 +34,9 @@
 [ext_resource type="PackedScene" uid="uid://bo2w3vc1bhchp" path="res://Cenas/power_checkpoint.tscn" id="29_power"]
 [ext_resource type="Script" uid="uid://dqbyjy6knuq1c" path="res://Cenas/dia_noite_ciclo.gd" id="30_daynight"]
 [ext_resource type="Script" uid="uid://7qq470pnqhtv" path="res://Cenas/level_light_points.gd" id="31_lightpoints"]
+[ext_resource type="PackedScene" uid="uid://bqu5y30tbneql" path="res://Cenas/npc_fabian.tscn" id="32_fabian"]
+[ext_resource type="PackedScene" uid="uid://cn4hds3wv5q5m" path="res://Cenas/inimigo_lopes.tscn" id="36_2av5b"]
+[ext_resource type="PackedScene" uid="uid://dh5yscqf3y2ld" path="res://Cenas/crt_overlay.tscn" id="37_crt"]
 
 [sub_resource type="Gradient" id="Gradient_level1_light"]
 offsets = PackedFloat32Array(0, 0.62, 1)
@@ -1564,7 +1567,7 @@ position = Vector2(812, 1133.0001)
 level = NodePath("..")
 player = NodePath("../player")
 
-[node name="player" parent="." groups=["player"] instance=ExtResource("2_csolo")]
+[node name="player" parent="." instance=ExtResource("2_csolo")]
 position = Vector2(-11, 182)
 respawn_position = Vector2(182, 214)
 
@@ -1788,8 +1791,11 @@ snap_ground_enemies_to_floor = false
 position = Vector2(-638.375, 589)
 shape = SubResource("RectangleShape2D_25re5")
 
-[node name="NPC_chat" type="Node2D" parent="."]
-position = Vector2(199, -325)
+[node name="NPC_chat" parent="." instance=ExtResource("32_fabian")]
+position = Vector2(323, -271)
+
+[node name="CollisionShape2D" parent="NPC_chat/InteractionArea" index="0"]
+position = Vector2(-2, -24)
 
 [node name="ponto_luz" type="Node2D" parent="."]
 position = Vector2(695, 519)
@@ -1860,8 +1866,23 @@ position = Vector2(1336, -965)
 [node name="ponto_luz23" type="Node2D" parent="."]
 position = Vector2(1163, -968)
 
+[node name="ponto_luz34" type="Node2D" parent="."]
+position = Vector2(989, -519)
+
+[node name="ponto_luz35" type="Node2D" parent="."]
+position = Vector2(752, -460)
+
 [node name="ponto_luz24" type="Node2D" parent="."]
 position = Vector2(941, -968)
+
+[node name="ponto_luz31" type="Node2D" parent="."]
+position = Vector2(523, -304)
+
+[node name="ponto_luz32" type="Node2D" parent="."]
+position = Vector2(350, -307)
+
+[node name="ponto_luz33" type="Node2D" parent="."]
+position = Vector2(128, -307)
 
 [node name="ponto_luz25" type="Node2D" parent="."]
 position = Vector2(425, -963)
@@ -1881,6 +1902,30 @@ position = Vector2(-1754, 124)
 [node name="ponto_luz30" type="Node2D" parent="."]
 position = Vector2(-1976, 121)
 
+[node name="inimigo_lopes" parent="." instance=ExtResource("36_2av5b")]
+position = Vector2(887, -657)
+
+[node name="inimigo_lopes2" parent="." instance=ExtResource("36_2av5b")]
+position = Vector2(1234, -658)
+
+[node name="inimigo_lopes3" parent="." instance=ExtResource("36_2av5b")]
+position = Vector2(1554, -660)
+
+[node name="inimigo_lopes4" parent="." instance=ExtResource("36_2av5b")]
+position = Vector2(704, -786)
+
+[node name="inimigo_lopes5" parent="." instance=ExtResource("36_2av5b")]
+position = Vector2(940, -785)
+
+[node name="inimigo_lopes6" parent="." instance=ExtResource("36_2av5b")]
+position = Vector2(1249, -769)
+
+[node name="inimigo_lopes7" parent="." instance=ExtResource("36_2av5b")]
+position = Vector2(1475, -770)
+
+[node name="CRTOverlay" parent="." instance=ExtResource("37_crt")]
+
 [editable path="WaterTilemap"]
 [editable path="player"]
 [editable path="ParallaxBackground"]
+[editable path="NPC_chat"]
