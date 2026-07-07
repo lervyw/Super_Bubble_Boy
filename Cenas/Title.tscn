@@ -164,69 +164,69 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="ConfigTitle" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="ConfigTitle" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "CONFIGURACOES"
 horizontal_alignment = 1
 
-[node name="Master" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="Master" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Master"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SliderMaster" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+[node name="SliderMaster" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 14)
 layout_mode = 2
 min_value = -60.0
 max_value = 1.0
 value = 1.0
 
-[node name="Musica" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="Musica" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Musica"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SliderMusica" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+[node name="SliderMusica" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 14)
 layout_mode = 2
 min_value = -60.0
 max_value = 1.0
 value = 1.0
 
-[node name="Volume" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="Volume" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Efeitos"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SliderEfeitos" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+[node name="SliderEfeitos" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 14)
 layout_mode = 2
 min_value = -60.0
 max_value = 1.0
 value = 1.0
 
-[node name="CRTToggle" type="CheckButton" parent="ConfigMenu/VBoxContainer"]
+[node name="CRTToggle" type="CheckButton" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 22)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "CRT"
 button_pressed = true
 
-[node name="CRTScanlineLabel" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="CRTScanlineLabel" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 10)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Scanlines"
 horizontal_alignment = 1
 
-[node name="SliderCRTScanline" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+[node name="SliderCRTScanline" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 14)
 layout_mode = 2
 min_value = 0.0
@@ -234,14 +234,14 @@ max_value = 1.0
 step = 0.01
 value = 0.3
 
-[node name="CRTBarrelLabel" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="CRTBarrelLabel" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 10)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Distorcao"
 horizontal_alignment = 1
 
-[node name="SliderCRTBarrel" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+[node name="SliderCRTBarrel" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 14)
 layout_mode = 2
 min_value = 0.5
@@ -249,14 +249,14 @@ max_value = 2.0
 step = 0.01
 value = 1.0
 
-[node name="CRTBleedLabel" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="CRTBleedLabel" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 10)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Aberracao"
 horizontal_alignment = 1
 
-[node name="SliderCRTBleed" type="HSlider" parent="ConfigMenu/VBoxContainer"]
+[node name="SliderCRTBleed" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 14)
 layout_mode = 2
 min_value = 0.0
@@ -264,13 +264,13 @@ max_value = 2.0
 step = 0.01
 value = 0.0
 
-[node name="ConfigurarBotoes" type="Button" parent="ConfigMenu/VBoxContainer"]
+[node name="ConfigurarBotoes" type="Button" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 22)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "CONTROLES"
 
-[node name="Voltar" type="Button" parent="ConfigMenu/VBoxContainer"]
+[node name="Voltar" type="Button" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(190, 22)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
