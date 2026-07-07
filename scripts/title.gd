@@ -16,6 +16,7 @@ extends Control
 @onready var config_menu = $ConfigMenu
 @onready var botoes_menu = $ControlsMenu
 @onready var controls_scroll: ScrollContainer = $ControlsMenu/ScrollContainer
+@onready var config_scroll: ScrollContainer = $ConfigMenu/ScrollContainer
 @onready var logo_intro: TextureRect = $LogoIntro
 @onready var menu_intro_background: TextureRect = $MenuIntroBackground
 
@@ -57,15 +58,15 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 #       CONFIG (VOLUME)
 # ================================
 # Sliders e botões da tela de configurações (volume + ir pro rebind)
-@onready var slider_musica = $ConfigMenu/VBoxContainer/SliderMusica
-@onready var slider_sfx = $ConfigMenu/VBoxContainer/SliderEfeitos
-@onready var slider_master = $ConfigMenu/VBoxContainer/SliderMaster
-@onready var btn_cfg_botoes = $ConfigMenu/VBoxContainer/ConfigurarBotoes
-@onready var btn_crt_toggle = $ConfigMenu/VBoxContainer/CRTToggle
-@onready var slider_crt_scanline = $ConfigMenu/VBoxContainer/SliderCRTScanline
-@onready var slider_crt_barrel = $ConfigMenu/VBoxContainer/SliderCRTBarrel
-@onready var slider_crt_bleed = $ConfigMenu/VBoxContainer/SliderCRTBleed
-@onready var btn_voltar_config = $ConfigMenu/VBoxContainer/Voltar
+@onready var slider_musica = $ConfigMenu/ScrollContainer/VBoxContainer/SliderMusica
+@onready var slider_sfx = $ConfigMenu/ScrollContainer/VBoxContainer/SliderEfeitos
+@onready var slider_master = $ConfigMenu/ScrollContainer/VBoxContainer/SliderMaster
+@onready var btn_cfg_botoes = $ConfigMenu/ScrollContainer/VBoxContainer/ConfigurarBotoes
+@onready var btn_crt_toggle = $ConfigMenu/ScrollContainer/VBoxContainer/CRTToggle
+@onready var slider_crt_scanline = $ConfigMenu/ScrollContainer/VBoxContainer/SliderCRTScanline
+@onready var slider_crt_barrel = $ConfigMenu/ScrollContainer/VBoxContainer/SliderCRTBarrel
+@onready var slider_crt_bleed = $ConfigMenu/ScrollContainer/VBoxContainer/SliderCRTBleed
+@onready var btn_voltar_config = $ConfigMenu/ScrollContainer/VBoxContainer/Voltar
 
 
 # ================================
@@ -404,6 +405,8 @@ func _setup_menu_focus_order() -> void:
 
 
 func _setup_config_focus_order() -> void:
+	if config_scroll:
+		config_scroll.set("follow_focus", true)
 	_setup_vertical_focus_order([
 		slider_master,
 		slider_musica,
@@ -473,21 +476,23 @@ func _on_control_button_focus_entered(control: Control) -> void:
 
 
 func _scroll_focused_control_into_view(control: Control) -> void:
-	if not controls_scroll or not control:
+	if not control:
 		return
-	if not botoes_menu.visible:
+
+	var scroll: ScrollContainer = controls_scroll if botoes_menu.visible else (config_scroll if config_menu.visible else null)
+	if not scroll:
 		return
 
 	var top := control.position.y
 	var bottom := top + control.size.y
-	var view_top := float(controls_scroll.scroll_vertical)
-	var view_bottom := view_top + controls_scroll.size.y
+	var view_top := float(scroll.scroll_vertical)
+	var view_bottom := view_top + scroll.size.y
 	var padding := 12.0
 
 	if top < view_top + padding:
-		controls_scroll.scroll_vertical = max(int(top - padding), 0)
+		scroll.scroll_vertical = max(int(top - padding), 0)
 	elif bottom > view_bottom - padding:
-		controls_scroll.scroll_vertical = max(int(bottom - controls_scroll.size.y + padding), 0)
+		scroll.scroll_vertical = max(int(bottom - scroll.size.y + padding), 0)
 
 
 func _ensure_controller_ui_actions() -> void:
