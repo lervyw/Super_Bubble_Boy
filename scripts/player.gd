@@ -76,7 +76,7 @@ var hud_menu_waiting_for_neutral := false
 @export_group("Dash Settings")
 @export var dash_stops_fall: bool = false
 @export_range(0.0, 1.0) var dash_fall_factor: float = 0.3
-@export_range(0.0, 2.0) var dash_cooldown: float = 0.3
+@export_range(0.0, 2.0) var dash_cooldown: float = 1.5
 
 @export_group("Damage Settings")
 @export_range(0.0, 5.0) var invincibility_time: float = 1.0

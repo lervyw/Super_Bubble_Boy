@@ -562,10 +562,10 @@ size = Vector2(22, 8)
 collision_layer = 4
 collision_mask = 5
 script = ExtResource("1_script")
-sprite_faces_left_by_default = false
 attack_hitbox_start_frame = 0
 sprite_frames_normal = SubResource("SpriteFrames_normal")
 sprite_frames_second = SubResource("SpriteFrames_second")
+sprite_faces_left_by_default = false
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -15)

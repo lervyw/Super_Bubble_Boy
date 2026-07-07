@@ -37,6 +37,10 @@ window/size/window_height_override=900
 window/stretch/mode="canvas_items"
 window/stretch/aspect="ignore"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/flowerwall_crt/plugin.cfg")
+
 [input]
 
 ui_accept={
@@ -198,10 +202,6 @@ pause_menu={
 2d_physics/layer_4="items"
 2d_physics/layer_5="hitbox"
 2d_physics/layer_6="hurtbox"
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/flowerwall_crt/plugin.cfg")
 
 [rendering]
 
