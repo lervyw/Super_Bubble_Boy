@@ -45,6 +45,7 @@ var health: int = max_health
 @export var projectile_min_range: float = 42.0
 @export var projectile_chase_distance: float = 150.0
 @export var projectile_attack_animation: StringName = &"attack2"
+@export var projectile_super_attack_animation: StringName = &"attack_super2"
 @export_range(0, 99, 1) var projectile_attack_fire_frame: int = 6
 @export var projectile_mouth_offset: Vector2 = Vector2(38.0, -27.0)
 @export var projectile_damage: int = 2
@@ -88,6 +89,7 @@ var current_attack_animation: StringName = &""
 var time_frozen: bool = false
 var time_frozen_velocity: Vector2 = Vector2.ZERO
 var time_frozen_sprite_was_playing: bool = false
+var transform_started: bool = false
 
 # =========================================================
 
@@ -126,6 +128,11 @@ func _physics_process(delta):
 		return
 	if time_frozen:
 		velocity = Vector2.ZERO
+		return
+	if state == State.TRANSFORM:
+		velocity.x = 0.0
+		apply_gravity(delta)
+		move_and_slide()
 		return
 
 	if cooldown_t > 0:
@@ -219,6 +226,9 @@ func start_attack(dist: float = 0.0):
 
 	await wait_for_animation(get_attack_anim())
 
+	if state == State.DEAD or state == State.TRANSFORM:
+		return
+
 	state = State.CHASE
 	current_attack_animation = &""
 
@@ -238,22 +248,26 @@ func should_use_projectile_attack(dist: float) -> bool:
 
 func can_use_projectile_attack(dist: float) -> bool:
 	return projectile_attack_scene != null \
-		and has_animation(projectile_attack_animation) \
+		and has_animation(get_projectile_attack_anim()) \
 		and dist <= projectile_attack_range \
 		and dist >= projectile_chase_distance \
 		and dist >= projectile_min_range
 
 
 func start_projectile_attack() -> void:
-	current_attack_animation = projectile_attack_animation
+	var anim := get_projectile_attack_anim()
+	current_attack_animation = anim
 	if hitbox_shape:
 		hitbox_shape.disabled = true
 
 	if sprite:
-		sprite.play(projectile_attack_animation)
+		sprite.play(anim)
 
-	await fire_projectile_on_animation_frame(projectile_attack_animation, projectile_attack_fire_frame)
-	await wait_for_animation(projectile_attack_animation)
+	await fire_projectile_on_animation_frame(anim, projectile_attack_fire_frame)
+	await wait_for_animation(anim)
+
+	if state == State.DEAD or state == State.TRANSFORM:
+		return
 
 	state = State.CHASE
 	current_attack_animation = &""
@@ -296,19 +310,23 @@ func get_projectile_spawn_position() -> Vector2:
 # =========================================================
 
 func take_damage(amount, _source: Node = null):
-	if state == State.DEAD:
+	if state == State.DEAD or state == State.TRANSFORM:
 		return
 
 	health -= max(amount, 1)
 	emit_signal("health_changed", max(health, 0), max_health)
 
+	if form == Form.NORMAL and not transform_started and health <= max_health / 2:
+		health = max(health, 1)
+		emit_signal("health_changed", health, max_health)
+		if time_frozen:
+			return
+		await start_transform()
+		return
 	if health <= 0:
 		die()
 		return
 	if time_frozen:
-		return
-	if form == Form.NORMAL and health <= max_health / 2:
-		start_transform()
 		return
 
 	if state == State.ATTACK and not interrupt_attack_on_damage:
@@ -345,8 +363,15 @@ func set_time_frozen(frozen: bool) -> void:
 # =========================================================
 
 func start_transform():
+	if transform_started or form == Form.SUPER or state == State.DEAD:
+		return
+
+	transform_started = true
 	state = State.TRANSFORM
 	velocity = Vector2.ZERO
+	current_attack_animation = &""
+	if hitbox_shape:
+		hitbox_shape.disabled = true
 
 	if has_animation(transform_animation):
 		play_animation(transform_animation)
@@ -357,6 +382,9 @@ func start_transform():
 	state = State.CHASE
 
 func change_form(new_form: Form):
+	if form == new_form:
+		return
+
 	form = new_form
 
 	# 🔥 melhora comportamento na fase 2
@@ -523,6 +551,8 @@ func update_attack_hitbox_frame_state(frame: int) -> void:
 func update_animation():
 	if not sprite:
 		return
+	if state == State.TRANSFORM:
+		return
 
 	if state == State.ATTACK:
 		play_attack_animation()
@@ -543,6 +573,9 @@ func get_walk_anim():
 
 func get_attack_anim():
 	return attack_super_animation if form == Form.SUPER else attack_animation
+
+func get_projectile_attack_anim() -> StringName:
+	return projectile_super_attack_animation if form == Form.SUPER else projectile_attack_animation
 
 # =========================================================
 

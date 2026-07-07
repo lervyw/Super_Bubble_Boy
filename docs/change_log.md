@@ -4,6 +4,10 @@
 
 ### Level 1 checkpoint and powerup identification
 
+- Added a post-Rei Slime dialogue scene that reuses the intro dialogue layout, ends with a `Continua...` prompt, and returns to the title menu.
+- Updated `level1` boss victory flow to open the new post-boss dialogue scene instead of the final credits scene.
+- Fixed the Rei Slime transformation so the `transform` animation is not immediately overwritten by idle/walk updates, and made the phase change trigger only once.
+- Rei Slime projectile attacks now use `attack_super2` while transformed instead of reusing the normal `attack2` animation.
 - Renamed level 1 powerups and checkpoints with explicit `Level1...` node names.
 - Tinted form powerups gold/orange, regular checkpoints cyan, and power checkpoints purple.
 - Added/updated particle colors so activation/identification effects match each item category.

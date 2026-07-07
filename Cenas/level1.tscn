@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://c06lcsshf5ft0" path="res://sprites/img/tiles/pedra.png" id="1_djts0"]
 [ext_resource type="Script" uid="uid://b32be5wkrk8lo" path="res://scripts/level_1.gd" id="1_o25p7"]
-[ext_resource type="PackedScene" uid="uid://cxlaxy2tpvxf6" path="res://Cenas/Final_Credits.tscn" id="2_6fn3k"]
+[ext_resource type="PackedScene" path="res://Cenas/boss_slime_defeated.tscn" id="2_6fn3k"]
 [ext_resource type="PackedScene" uid="uid://d3xrf0yvjc4od" path="res://Cenas/player.tscn" id="2_csolo"]
 [ext_resource type="Texture2D" uid="uid://blov3p54q6huf" path="res://sprites/img/tiles/pino.png" id="2_rrx48"]
 [ext_resource type="PackedScene" uid="uid://barbuh5nxkp2a" path="res://Cenas/background.tscn" id="3_itj36"]
