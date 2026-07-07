@@ -208,11 +208,12 @@ func start_attack(dist: float = 0.0):
 		await start_projectile_attack()
 		return
 
-	current_attack_animation = get_attack_anim()
+	var attack_anim: StringName = get_attack_anim()
+	current_attack_animation = attack_anim
 	restart_attack_animation()
 
 	if uses_frame_based_hitbox():
-		await run_attack_hitbox_by_frames(get_attack_anim())
+		await run_attack_hitbox_by_frames(attack_anim)
 	else:
 		await wait_for_attack_hitbox_start()
 
@@ -224,7 +225,7 @@ func start_attack(dist: float = 0.0):
 		if hitbox_shape:
 			hitbox_shape.disabled = true
 
-	await wait_for_animation(get_attack_anim())
+		await wait_for_animation(attack_anim)
 
 	if state == State.DEAD or state == State.TRANSFORM:
 		return
@@ -235,22 +236,27 @@ func start_attack(dist: float = 0.0):
 # =========================================================
 
 func should_start_attack(dist: float) -> bool:
-	return dist <= attack_range or can_use_projectile_attack(dist)
+	return dist <= attack_range or can_start_long_range_projectile_attack(dist)
 
 
 func should_use_projectile_attack(dist: float) -> bool:
 	if not can_use_projectile_attack(dist):
 		return false
-	if dist > attack_range:
+	if can_start_long_range_projectile_attack(dist):
 		return true
-	return rng.randf() <= projectile_attack_chance
+	if form == Form.SUPER and dist <= attack_range:
+		return rng.randf() <= projectile_attack_chance
+	return false
+
+
+func can_start_long_range_projectile_attack(dist: float) -> bool:
+	return can_use_projectile_attack(dist) and dist >= projectile_chase_distance
 
 
 func can_use_projectile_attack(dist: float) -> bool:
 	return projectile_attack_scene != null \
 		and has_animation(get_projectile_attack_anim()) \
 		and dist <= projectile_attack_range \
-		and dist >= projectile_chase_distance \
 		and dist >= projectile_min_range
 
 
@@ -527,13 +533,16 @@ func run_attack_hitbox_by_frames(anim: StringName) -> void:
 	if hitbox_shape:
 		hitbox_shape.disabled = true
 
+	var attack_time: float = get_animation_duration(anim)
+	var elapsed := 0.0
 	var last_frame := -1
-	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing():
+	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing() and elapsed < attack_time:
 		var frame := sprite.frame
 		if frame != last_frame:
 			update_attack_hitbox_frame_state(frame)
 			last_frame = frame
 		await get_tree().process_frame
+		elapsed += get_process_delta_time()
 
 	if hitbox_shape:
 		hitbox_shape.disabled = true
@@ -565,13 +574,13 @@ func update_animation():
 
 # =========================================================
 
-func get_idle_anim():
+func get_idle_anim() -> StringName:
 	return idle_super_animation if form == Form.SUPER else idle_animation
 
-func get_walk_anim():
+func get_walk_anim() -> StringName:
 	return walk_super_animation if form == Form.SUPER else walk_animation
 
-func get_attack_anim():
+func get_attack_anim() -> StringName:
 	return attack_super_animation if form == Form.SUPER else attack_animation
 
 func get_projectile_attack_anim() -> StringName:
@@ -608,9 +617,9 @@ func wait_for_attack_hitbox_start():
 	if delay > 0:
 		await get_tree().create_timer(delay).timeout
 
-func get_animation_duration(anim):
+func get_animation_duration(anim) -> float:
 	if not has_animation(anim):
-		return 0
+		return 0.0
 	var frames = sprite.sprite_frames.get_frame_count(anim)
 	var speed = maxf(sprite.sprite_frames.get_animation_speed(anim), 1.0)
 	return float(frames) / speed

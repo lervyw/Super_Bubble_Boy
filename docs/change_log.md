@@ -8,6 +8,9 @@
 - Updated `level1` boss victory flow to open the new post-boss dialogue scene instead of the final credits scene.
 - Fixed the Rei Slime transformation so the `transform` animation is not immediately overwritten by idle/walk updates, and made the phase change trigger only once.
 - Rei Slime projectile attacks now use `attack_super2` while transformed instead of reusing the normal `attack2` animation.
+- Fixed looped Rei Slime attack animations so `attack_super` cannot keep the boss stuck in attack state.
+- Rei Slime can now choose the Super projectile attack at close range, using `attack_super2` instead of only repeating `attack_super`.
+- Fixed `NPC_Fabian` player detection so it finds the level player through the `jogador` group while keeping a fallback for `player`.
 - Reduced player stamina regeneration from `15` to `5` stamina per second.
 - Increased the player dash cooldown from `0.3` seconds to `1.5` seconds.
 - Renamed level 1 powerups and checkpoints with explicit `Level1...` node names.

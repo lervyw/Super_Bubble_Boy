@@ -1,0 +1,129 @@
+[gd_scene load_steps=13 format=3 uid="uid://bqu5y30tbneql"]
+
+[ext_resource type="Script" uid="uid://b8cpkh231trs3" path="res://Cenas/npc_fabian.gd" id="1_fabian"]
+[ext_resource type="Texture2D" uid="uid://d3n1co2abg4qy" path="res://sprites/characters/Fabian Noir-Sheet.png" id="2_sheet"]
+[ext_resource type="Theme" uid="uid://f3qbr13lf6l6" path="res://demo/assets/button.tres" id="3_theme"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(24, 40)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fabian0"]
+atlas = ExtResource("2_sheet")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fabian1"]
+atlas = ExtResource("2_sheet")
+region = Rect2(200, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fabian2"]
+atlas = ExtResource("2_sheet")
+region = Rect2(400, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fabian3"]
+atlas = ExtResource("2_sheet")
+region = Rect2(600, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fabian4"]
+atlas = ExtResource("2_sheet")
+region = Rect2(800, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fabian5"]
+atlas = ExtResource("2_sheet")
+region = Rect2(1000, 0, 200, 200)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fabian_idle"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fabian0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fabian1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fabian2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fabian3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fabian4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fabian5")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
+size = Vector2(56, 52)
+
+[node name="NPC_Fabian" type="Node2D"]
+
+[node name="Body" type="StaticBody2D" parent="."]
+position = Vector2(-1, -20)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body"]
+position = Vector2(1, 0)
+shape = SubResource("RectangleShape2D_body")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-1, -59)
+scale = Vector2(0.6, 0.6)
+sprite_frames = SubResource("SpriteFrames_fabian_idle")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="InteractionArea" type="Area2D" parent="."]
+script = ExtResource("1_fabian")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+position = Vector2(0, -26)
+shape = SubResource("RectangleShape2D_interact")
+
+[node name="PromptLabel" type="Label" parent="."]
+offset_left = -60.0
+offset_right = 60.0
+offset_bottom = 24.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+text = "[C] Falar"
+horizontal_alignment = 1
+
+[node name="DialogPanel" type="Panel" parent="."]
+offset_left = -158.0
+offset_top = -140.0
+offset_right = 158.0
+offset_bottom = -10.0
+
+[node name="NameLabel" type="Label" parent="DialogPanel"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 308.0
+offset_bottom = 29.0
+theme_override_colors/font_color = Color(0.7, 0.8, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 14
+text = "Fabian"
+
+[node name="DialogLabel" type="RichTextLabel" parent="DialogPanel"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 30.0
+offset_right = 308.0
+offset_bottom = 102.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+
+[node name="ContinuePrompt" type="Button" parent="DialogPanel"]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 100.0
+offset_right = 306.0
+offset_bottom = 126.0
+theme = ExtResource("3_theme")
+text = "Continuar"
