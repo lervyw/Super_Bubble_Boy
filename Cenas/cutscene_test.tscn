@@ -63,6 +63,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("2_13wbg")
 DialogBox = NodePath("Node/CharacterNode/MarginContainer/VBoxContainer/DialogBox")
+dialogs = Array[String](["Bubbleboy, nosso reino está em perigo.", "O Sapo Maligno Sapolio se esconde no castelo e ameaça tomar tudo para si.", "O Rei Slime guarda o portão, e suas tropas bloquearam o caminho até lá.", "Precisamos de você novamente! Salve-nos, atravesse o reino e liberte todos dessa ameaça!"])
 advance_button = NodePath("Button2")
 
 [node name="Background" type="TextureRect" parent="."]

@@ -44,7 +44,7 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 
 @export_group("AI")
 @export var aggro_range: float = 260.0
-@export var stop_distance: float = 40.0
+@export var stop_distance: float = 22.0
 @export var turn_horizontal_threshold: float = 24.0
 @export var avoid_other_slimes: bool = true
 @export var separation_distance: float = 20.0
@@ -58,8 +58,8 @@ enum FlyMode { X_ONLY, DIRECT, ZIGZAG }
 @export_group("Attack")
 @export var attack_mode: AttackMode = AttackMode.HITBOX
 @export var damage: int = 1
-@export var attack_range: float = 24.0
-@export var attack_vertical_range: float = 42.0
+@export var attack_range: float = 28.0
+@export var attack_vertical_range: float = 48.0
 @export var hitbox_active_time: float = 0.10
 @export var attack_cooldown: float = 0.85
 @export_range(0.0, 5.0, 0.05) var hit_reaction_time: float = 1.0

@@ -26,6 +26,11 @@ extends CanvasLayer
 
 @export var soap_label: Label
 
+@export_group("Powerup Prompt Icons")
+@export var powerup_icons_offset: Vector2 = Vector2(0.0, -28.0)
+@export var powerup_icon_size: Vector2 = Vector2(20.0, 20.0)
+@export var powerup_icon_spacing: int = 4
+
 const PASSIVE_ICON_STOMP := preload("res://sprites/assets/bolha_ressonante.png")
 const PASSIVE_ICON_RUN := preload("res://sprites/assets/Corrida.png")
 const UI_JOYPAD_DEADZONE: float = 0.5
@@ -44,6 +49,9 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 var boss_target: Node = null
 var pause_menu_open: bool = false
 var warning_tween: Tween
+var powerup_icon_row: HBoxContainer
+var powerup_icon_rects: Array[TextureRect] = []
+var powerup_freeze_active: bool = false
 
 const NOTICE_POWER_START := Color(1.0, 0.86, 0.22, 1.0)
 const NOTICE_POWER_END := Color(1.0, 0.55, 0.08, 1.0)
@@ -91,6 +99,7 @@ func _ready() -> void:
 	if warning_label:
 		warning_label.visible = false
 		warning_label.modulate.a = 0.0
+	_setup_powerup_icon()
 	if resume_button:
 		resume_button.process_mode = Node.PROCESS_MODE_ALWAYS
 		if not resume_button.pressed.is_connected(close_pause_menu):
@@ -250,14 +259,128 @@ func show_mana_warning(message: String = "sem mana suficiente") -> void:
 	show_warning_message(message)
 
 
-func show_powerup_collected_message() -> void:
-	show_notice_message("poder desbloqueado", NOTICE_POWER_START, NOTICE_POWER_END)
+func show_powerup_collected_message(hint_actions: Array = []) -> void:
+	var msg := "poder desbloqueado"
+	var hint := _build_input_hint(hint_actions)
+	if hint != "":
+		msg += "\n" + hint
+	_show_powerup_icons(hint_actions)
+	show_notice_message(msg, NOTICE_POWER_START, NOTICE_POWER_END, true)
 	if menu_panel and menu_panel.has_method("start_power_unlock_glow"):
 		menu_panel.start_power_unlock_glow()
+	_freeze_for_powerup(2.8)
 
 
-func show_transformation_unlocked_message(message: String = "transformacao desbloqueada") -> void:
-	show_notice_message(message, NOTICE_TRANSFORM_START, NOTICE_TRANSFORM_END)
+func _build_input_hint(actions: Array) -> String:
+	if actions.is_empty():
+		return ""
+	var parts: PackedStringArray = []
+	for action in actions:
+		parts.append(_get_action_display_name(action))
+	return "use " + " + ".join(parts)
+
+
+func _get_action_display_name(action: StringName) -> String:
+	if not InputMap.has_action(action):
+		return str(action)
+
+	var is_controller := ControllerMapper.get_last_input_source() == ControllerMapper.InputSource.CONTROLLER
+	var ctype := ControllerMapper.get_primary_type()
+
+	for event in InputMap.action_get_events(action):
+		if is_controller and (event is InputEventJoypadButton or event is InputEventJoypadMotion):
+			if event is InputEventJoypadButton:
+				return ControllerMapper.get_button_name(event.button_index)
+			elif event is InputEventJoypadMotion:
+				return ControllerMapper.get_axis_name(event.axis, event.axis_value)
+		if not is_controller and event is InputEventKey:
+			var keycode: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+			return OS.get_keycode_string(keycode)
+
+	var fallback = InputMap.action_get_events(action)[0] if InputMap.action_get_events(action).size() > 0 else null
+	if fallback:
+		if fallback is InputEventKey:
+			var keycode: int = fallback.physical_keycode if fallback.physical_keycode != 0 else fallback.keycode
+			return OS.get_keycode_string(keycode)
+		elif fallback is InputEventJoypadButton:
+			return ControllerMapper.get_button_name(fallback.button_index)
+		elif fallback is InputEventJoypadMotion:
+			return ControllerMapper.get_axis_name(fallback.axis, fallback.axis_value)
+	return str(action)
+
+
+func _setup_powerup_icon() -> void:
+	powerup_icon_row = HBoxContainer.new()
+	powerup_icon_row.name = "PowerupPromptIcons"
+	powerup_icon_row.z_index = 100
+	powerup_icon_row.visible = false
+	powerup_icon_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	powerup_icon_row.add_theme_constant_override("separation", powerup_icon_spacing)
+	add_child(powerup_icon_row)
+
+
+func _show_powerup_icons(actions: Array) -> void:
+	for child in powerup_icon_row.get_children():
+		child.queue_free()
+	powerup_icon_rects.clear()
+
+	if actions.is_empty() or not PromptIcons:
+		powerup_icon_row.visible = false
+		return
+
+	var any_shown := false
+	for action in actions:
+		if action == &"":
+			continue
+		var tex: Texture2D = PromptIcons.for_action(action)
+		if not tex:
+			continue
+		var rect := TextureRect.new()
+		rect.texture = tex
+		rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		rect.custom_minimum_size = powerup_icon_size
+		rect.size = powerup_icon_size
+		powerup_icon_row.add_child(rect)
+		powerup_icon_rects.append(rect)
+		any_shown = true
+
+	if any_shown:
+		powerup_icon_row.visible = true
+		await get_tree().process_frame
+		var label_center_x := warning_label.position.x + warning_label.size.x * 0.5
+		var row_w := powerup_icon_row.size.x
+		powerup_icon_row.position = Vector2(
+			label_center_x - row_w * 0.5 + powerup_icons_offset.x,
+			warning_label.position.y + powerup_icons_offset.y
+		)
+	else:
+		powerup_icon_row.visible = false
+
+
+func _hide_powerup_icon() -> void:
+	if powerup_icon_row:
+		powerup_icon_row.visible = false
+
+
+func _freeze_for_powerup(duration: float) -> void:
+	if powerup_freeze_active:
+		return
+	powerup_freeze_active = true
+	get_tree().paused = true
+	await get_tree().create_timer(duration, true, false, true).timeout
+	get_tree().paused = false
+	powerup_freeze_active = false
+	_hide_powerup_icon()
+
+
+func show_transformation_unlocked_message(message: String = "transformacao desbloqueada", hint_actions: Array = []) -> void:
+	var hint := _build_input_hint(hint_actions)
+	var msg := message
+	if hint != "":
+		msg += "\n" + hint
+	_show_powerup_icons(hint_actions)
+	show_notice_message(msg, NOTICE_TRANSFORM_START, NOTICE_TRANSFORM_END, true)
+	_freeze_for_powerup(2.8)
 
 
 func show_checkpoint_message(message: String = "checkpoint ativado") -> void:
@@ -268,7 +391,7 @@ func show_warning_message(message: String) -> void:
 	show_notice_message(message, Color(1, 1, 1, 1), Color(1, 0.82, 0.42, 1))
 
 
-func show_notice_message(message: String, start_color: Color, end_color: Color) -> void:
+func show_notice_message(message: String, start_color: Color, end_color: Color, extended: bool = false) -> void:
 	if not warning_label:
 		return
 
@@ -278,12 +401,16 @@ func show_notice_message(message: String, start_color: Color, end_color: Color) 
 	warning_label.text = message
 	warning_label.visible = true
 	warning_label.modulate = start_color
-	warning_label.position = Vector2(110.0, 104.0)
+	warning_label.position = Vector2(110.0, 40.0)
 	warning_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.72))
 	warning_label.add_theme_constant_override("outline_size", 4)
 	warning_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.45))
 	warning_label.add_theme_constant_override("shadow_offset_x", 1)
 	warning_label.add_theme_constant_override("shadow_offset_y", 1)
+
+	var fade_delay := 1.05
+	if extended:
+		fade_delay = 2.3
 
 	warning_tween = create_tween()
 	warning_tween.set_parallel(true)
@@ -293,7 +420,7 @@ func show_notice_message(message: String, start_color: Color, end_color: Color) 
 	warning_tween.tween_property(warning_label, "position:x", 112.0, 0.05).set_delay(0.15)
 	warning_tween.tween_property(warning_label, "position:x", 110.0, 0.05).set_delay(0.20)
 	warning_tween.tween_property(warning_label, "modulate", end_color, 0.45)
-	warning_tween.tween_property(warning_label, "modulate:a", 0.0, 0.45).set_delay(1.05)
+	warning_tween.tween_property(warning_label, "modulate:a", 0.0, 0.45).set_delay(fade_delay)
 
 	await warning_tween.finished
 	if warning_label:

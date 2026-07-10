@@ -181,14 +181,13 @@ func get_button_name(button_index: int, device_id: int = -1) -> String:
 
 
 func get_axis_name(axis: int, axis_value: float, device_id: int = -1) -> String:
-	var direction := "+" if axis_value >= 0.0 else "-"
 	var ctype := _get_type_for_device(device_id)
 
 	match axis:
-		0: return "Analogico Esquerdo %sX" % direction
-		1: return "Analogico Esquerdo %sY" % direction
-		2: return "Analogico Direito %sX" % direction
-		3: return "Analogico Direito %sY" % direction
+		0: return "Analogico Esquerdo " + ("Direita" if axis_value >= 0.0 else "Esquerda")
+		1: return "Analogico Esquerdo " + ("Baixo" if axis_value >= 0.0 else "Cima")
+		2: return "Analogico Direito " + ("Direita" if axis_value >= 0.0 else "Esquerda")
+		3: return "Analogico Direito " + ("Baixo" if axis_value >= 0.0 else "Cima")
 		4:
 			match ctype:
 				ControllerType.PLAYSTATION: return "L2"
@@ -199,7 +198,7 @@ func get_axis_name(axis: int, axis_value: float, device_id: int = -1) -> String:
 				ControllerType.PLAYSTATION: return "R2"
 				ControllerType.NINTENDO_SWITCH: return "ZR"
 				_: return "RT"
-		_: return "Eixo %d%s" % [axis, direction]
+		_: return "Eixo %d" % axis
 
 
 func _get_type_for_device(device_id: int) -> ControllerType:

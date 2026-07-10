@@ -22,7 +22,7 @@ var health: int = max_health
 @export_group("Movement")
 @export var speed: float = 90.0
 @export var gravity: float = 900.0
-@export var stop_distance: float = 60.0
+@export var stop_distance: float = 42.0
 @export var aggro_range: float = 450.0
 @export var turn_horizontal_threshold: float = 32.0
 
@@ -32,7 +32,7 @@ var health: int = max_health
 
 @export_group("Attack")
 @export var damage: int = 2
-@export var attack_range: float = 70.0
+@export var attack_range: float = 55.0
 @export var attack_cooldown: float = 1.0
 @export var hitbox_active_time: float = 0.12
 @export_range(-1, 99, 1) var attack_hitbox_start_frame: int = -1

@@ -16,6 +16,7 @@ enum WheelSlot { ULTIMATE, SPECIAL_ATTACK, BUBBLE_PROJECTILE, PLACEHOLDER }
 @export var activate_particles: Node2D
 @export var activate_sound: AudioStreamPlayer
 @export var destroy_after_activation: bool = false
+@export var power_hint_actions: Array[StringName] = []
 
 @export_group("HP")
 @export var restore_health_on_activate: bool = true
@@ -142,4 +143,4 @@ func _notify_powerup_collected() -> void:
 	if not player.hud:
 		return
 	if player.hud.has_method("show_powerup_collected_message"):
-		player.hud.show_powerup_collected_message()
+		player.hud.show_powerup_collected_message(power_hint_actions)

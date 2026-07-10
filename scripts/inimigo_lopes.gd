@@ -23,13 +23,13 @@ signal form_changed(new_form: Form)
 
 @export_group("AI")
 @export var aggro_range: float = 260.0
-@export var stop_distance: float = 40.0
+@export var stop_distance: float = 28.0
 @export var turn_horizontal_threshold: float = 24.0
 
 @export_group("Attack")
 @export var damage: int = 1
-@export var attack_range: float = 30.0
-@export var attack_vertical_range: float = 42.0
+@export var attack_range: float = 36.0
+@export var attack_vertical_range: float = 48.0
 @export var hitbox_active_time: float = 0.12
 @export var attack_cooldown: float = 0.85
 @export_range(0.0, 5.0, 0.05) var hit_reaction_time: float = 1.0

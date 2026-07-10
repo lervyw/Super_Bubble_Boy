@@ -1981,6 +1981,10 @@ func swim_state() -> void:
 	if not is_zero_approx(dir_y):
 		velocity.y = dir_y * swim_speed * 0.85
 
+	if Input.is_action_just_pressed("attack"):
+		start_normal_attack()
+		return
+
 	if not in_water:
 		change_state(State.IDLE)
 

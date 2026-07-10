@@ -125,4 +125,4 @@ func _notify_transformation_unlocked() -> void:
 	if not player.hud:
 		return
 	if player.hud.has_method("show_transformation_unlocked_message"):
-		player.hud.show_transformation_unlocked_message("forma super desbloqueada")
+		player.hud.show_transformation_unlocked_message("forma super desbloqueada", [&"forma2"])

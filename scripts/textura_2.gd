@@ -299,7 +299,7 @@ func handle_special_attack_animation() -> void:
 func handle_defend_animation() -> void:
 	activate_hitbox_for_state("defend")
 
-	var anim_name: StringName = &"parry_super"
+	var anim_name: StringName = &"parry"
 
 	if player.super_shield_active and sprite_frames.has_animation(&"super_shield"):
 		anim_name = &"super_shield"
@@ -311,9 +311,13 @@ func handle_defend_animation() -> void:
 			player.Form.BUBBLE:
 				if sprite_frames.has_animation(&"parry_bubble"):
 					anim_name = &"parry_bubble"
+				elif sprite_frames.has_animation(&"parry"):
+					anim_name = &"parry"
 			player.Form.SUPER:
 				if sprite_frames.has_animation(&"parry_super"):
 					anim_name = &"parry_super"
+				elif sprite_frames.has_animation(&"parry"):
+					anim_name = &"parry"
 
 	play_if_different(anim_name)
 
