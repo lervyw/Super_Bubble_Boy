@@ -2,6 +2,13 @@
 
 ## 2026-07-10
 
+### Mr. Breakfast prompt pack migration
+
+- Replaced the active keyboard, Xbox, and PlayStation prompt artwork with Mr. Breakfast's CC0 individual PNG assets.
+- Removed runtime atlas-coordinate mapping from `PromptIcons.gd`; prompts now load explicitly named image files.
+- Direction prompts now use dedicated `stick_up/right/down/left` files, eliminating directional tile-order ambiguity.
+- Enabled button icon scaling so the new 48x48 artwork fits the controls menu rows.
+
 ### PlayStation analog direction prompt fix
 
 - Corrected the PlayStation atlas regions for left- and right-stick directional prompts.

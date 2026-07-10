@@ -600,7 +600,7 @@ func _set_control_button(button: Button, action_label: String, action_name: Stri
 	button.custom_minimum_size.y = 36.0
 	button.text = action_label
 	button.icon = PromptIcons.for_action(action_name)
-	button.expand_icon = false
+	button.expand_icon = true
 	button.tooltip_text = _get_current_input_name(action_name)
 
 
