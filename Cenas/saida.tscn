@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://djv20rs0wgcty" path="res://scripts/saida.gd" id="1_mjiy0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_twqaj"]
-size = Vector2(162152, 231.519)
+size = Vector2(17762.639, 400.7749)
 
 [node name="saida" type="Area2D"]
 position = Vector2(458, -39)
@@ -12,6 +12,7 @@ collision_layer = 2
 script = ExtResource("1_mjiy0")
 
 [node name="Collision" type="CollisionShape2D" parent="."]
+position = Vector2(5388.0596, 0)
 shape = SubResource("RectangleShape2D_twqaj")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
