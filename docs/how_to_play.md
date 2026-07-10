@@ -139,49 +139,72 @@ Respawn can also restore:
 - health
 - mana
 
-## Current Keyboard Controls Found In The Project
-
-These are the controls I could confirm from `project.godot`.
+## Current Keyboard Controls
 
 ### Movement
 
-- Move left: `H`
-- Move right: `L`
-- Jump: `J`
-- Crouch: `K`
-- Dash: `D`
+- Move/swim up: `W`
+- Move left: `A`
+- Move/swim down: `S`
+- Move right: `D`
+- Jump: `Space`
+- Dash: `Shift`
 
 ### Combat
 
 - Normal attack: `C`
-- Ultimate attack: `T`
+- Parry/defense: `V`
 
 ### Form Change
 
-- Bubble form: `X`
-- Super form: `Z`
-- Back to normal form: `N`
+- Normal form: `1`
+- Bubble form: `2`
+- Super form: `3`
 
 Important:
 
 - form change only works if the form is unlocked
 
-### Radial / Quick Form Input
+### Power Wheel
 
-- Hold form select: `1`
+- Hold power wheel: `R`
+- Point up: `I`
+- Point left: `J`
+- Point down: `K`
+- Point right: `L`
+- Pause: `Tab`
 
-This is used by the quick form selection logic.
+### PlayStation
 
-## What Is The Ultimate Attack Command?
+- Move: left analog stick
+- Jump: Cross
+- Attack: Square
+- Parry: Triangle
+- Dash: Circle
+- Bubble: R1
+- Super: L1
+- Normal: L2
+- Hold power wheel: R2
+- Select wheel power: right analog stick
+- Pause: Options
 
-Short answer:
+### Xbox
 
-- right now the default command is `T`
+- Move: left analog stick
+- Jump: A
+- Attack: X
+- Parry: Y
+- Dash: B
+- Bubble: RB
+- Super: LB
+- Normal: LT
+- Hold power wheel: RT
+- Select wheel power: right analog stick
+- Pause: Menu/Start
 
-Also:
+## Ultimate And Special Powers
 
-- you can change this in the Title screen controls menu
-- the button name there is `Ultimate`
+Ultimate and special powers are selected through the power wheel instead of dedicated default shortcuts.
 
 ## What To Remember In Potato Mode
 

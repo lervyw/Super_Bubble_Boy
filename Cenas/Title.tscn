@@ -371,6 +371,12 @@ layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "roda direita"
 
+[node name="Controle23" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(198, 20)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "cima / nadar"
+
 [node name="Voltar" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(198, 22)
 layout_mode = 2

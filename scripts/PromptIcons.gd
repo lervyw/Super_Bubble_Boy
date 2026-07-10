@@ -96,8 +96,12 @@ static func _gamepad_button_icon(button_index: int, controller_type: int) -> Tex
 static func _gamepad_axis_icon(axis: int, axis_value: float, controller_type: int) -> Texture2D:
 	if axis == 4 or axis == 5:
 		if controller_type == ControllerMapper.ControllerType.PLAYSTATION:
-			return _atlas(PLAYSTATION, Rect2(120, 56 if axis == 4 else 72, 32, 16))
+			return _atlas(PLAYSTATION, Rect2(120, 80 if axis == 4 else 96, 32, 16))
 		return _atlas(XBOX, Rect2(112, 496 if axis == 4 else 512, 32, 16))
+	if axis == 2 or axis == 3:
+		if controller_type == ControllerMapper.ControllerType.PLAYSTATION:
+			return _atlas(PLAYSTATION, Rect2(192, 304, 16, 16))
+		return _atlas(XBOX, Rect2(280, 32, 16, 16))
 
 	if axis == 0:
 		return _gamepad_button_icon(13 if axis_value < 0.0 else 14, controller_type)

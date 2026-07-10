@@ -90,6 +90,7 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 @onready var btn_roda_baixo = $ControlsMenu/ScrollContainer/VBoxContainer/Controle20
 @onready var btn_roda_esquerda = $ControlsMenu/ScrollContainer/VBoxContainer/Controle21
 @onready var btn_roda_direita = $ControlsMenu/ScrollContainer/VBoxContainer/Controle22
+@onready var btn_cima = $ControlsMenu/ScrollContainer/VBoxContainer/Controle23
 
 @onready var btn_voltar_botoes = $ControlsMenu/ScrollContainer/VBoxContainer/Voltar
 
@@ -116,6 +117,7 @@ func _ready():
 	_ensure_controller_ui_actions()
 	if not ControllerMapper.input_source_changed.is_connected(_on_input_source_changed):
 		ControllerMapper.input_source_changed.connect(_on_input_source_changed)
+	_organize_control_buttons()
 
 	# Estado inicial: mostra o menu principal e esconde as outras telas
 	menu.visible = false
@@ -166,6 +168,7 @@ func _ready():
 	_connect_rebind_button_once(btn_roda_baixo, "hud_select_down")
 	_connect_rebind_button_once(btn_roda_esquerda, "hud_select_left")
 	_connect_rebind_button_once(btn_roda_direita, "hud_select_right")
+	_connect_rebind_button_once(btn_cima, "swim_up")
 
 	# Volta do menu de controles para o menu de config
 	_connect_pressed_once(btn_voltar_botoes, _back_to_config_menu)
@@ -301,6 +304,7 @@ func _input(event: InputEvent):
 			btn_ataque_especial, btn_defesa, btn_ultimate, btn_esquerda, btn_direita,
 			btn_agachar, btn_dash, btn_pause,
 			btn_roda_cima, btn_roda_baixo, btn_roda_esquerda, btn_roda_direita,
+			btn_cima,
 			btn_voltar_botoes,
 		]:
 			if btn and btn.has_focus():
@@ -418,24 +422,23 @@ func _setup_controls_scroll_focus() -> void:
 		controls_scroll.set("follow_focus", true)
 
 	var control_buttons: Array[Control] = [
-		btn_pulo,
-		btn_bolha,
-		btn_super,
-		btn_normal_form,
-		btn_menu,
-		btn_ataque,
-		btn_ataque_especial,
-		btn_defesa,
-		btn_ultimate,
+		btn_cima,
 		btn_esquerda,
 		btn_direita,
 		btn_agachar,
+		btn_pulo,
 		btn_dash,
-		btn_pause,
+		btn_ataque,
+		btn_defesa,
+		btn_normal_form,
+		btn_bolha,
+		btn_super,
+		btn_menu,
 		btn_roda_cima,
-		btn_roda_baixo,
 		btn_roda_esquerda,
+		btn_roda_baixo,
 		btn_roda_direita,
+		btn_pause,
 		btn_voltar_botoes,
 	]
 
@@ -576,12 +579,13 @@ func _update_control_labels():
 	_set_control_button(btn_normal_form, "Normal", &"normal")
 	_set_control_button(btn_menu, "Menu", &"hud_menu")
 	_set_control_button(btn_ataque, "Ataque", &"attack")
-	_set_control_button(btn_ataque_especial, "Ataque Especial", &"attack_special")
-	_set_control_button(btn_defesa, "Defesa", &"defend")
+	_set_control_button(btn_ataque_especial, "Ataque Especial Direto", &"attack_special")
+	_set_control_button(btn_defesa, "Parry", &"defend")
 	_set_control_button(btn_ultimate, "Ultimate", &"ultimate_attack")
 	_set_control_button(btn_esquerda, "Esquerda", &"left")
 	_set_control_button(btn_direita, "Direita", &"right")
-	_set_control_button(btn_agachar, "Agachar", &"crouch")
+	_set_control_button(btn_cima, "Cima / Nadar", &"swim_up")
+	_set_control_button(btn_agachar, "Baixo / Agachar", &"crouch")
 	_set_control_button(btn_dash, "Dash", &"dash")
 	_set_control_button(btn_pause, "Pausa", &"pause_menu")
 	_set_control_button(btn_roda_cima, "Roda Cima", &"hud_select_up")
@@ -593,10 +597,31 @@ func _update_control_labels():
 
 
 func _set_control_button(button: Button, action_label: String, action_name: StringName) -> void:
+	button.custom_minimum_size.y = 36.0
 	button.text = action_label
 	button.icon = PromptIcons.for_action(action_name)
-	button.expand_icon = true
+	button.expand_icon = false
 	button.tooltip_text = _get_current_input_name(action_name)
+
+
+func _organize_control_buttons() -> void:
+	# Ataque especial e ultimate sao escolhidos pela roda; nao precisam de
+	# atalhos diretos no esquema padrao.
+	btn_ataque_especial.visible = false
+	btn_ultimate.visible = false
+
+	var ordered_buttons: Array[Control] = [
+		btn_cima, btn_esquerda, btn_agachar, btn_direita, btn_pulo, btn_dash,
+		btn_ataque, btn_defesa,
+		btn_normal_form, btn_bolha, btn_super,
+		btn_menu, btn_roda_cima, btn_roda_esquerda, btn_roda_baixo, btn_roda_direita,
+		btn_pause,
+	]
+	var first_button_index := 2
+	for button in ordered_buttons:
+		button.get_parent().move_child(button, first_button_index)
+		first_button_index += 1
+	btn_voltar_botoes.get_parent().move_child(btn_voltar_botoes, first_button_index)
 
 
 func _on_input_source_changed(_source: int, _controller_type: int) -> void:
@@ -608,11 +633,11 @@ func _get_current_input_name(action: String) -> String:
 	if events.is_empty():
 		return "<nenhum>"
 
-	var has_controller := ControllerMapper.has_controller()
+	var use_controller := ControllerMapper.get_last_input_source() == ControllerMapper.InputSource.CONTROLLER
 	var ev: InputEvent = events[0]
 
 	for event in events:
-		if has_controller:
+		if use_controller:
 			if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 				ev = event
 				break

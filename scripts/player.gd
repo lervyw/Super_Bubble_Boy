@@ -362,10 +362,10 @@ func ensure_optional_input_actions() -> void:
 		if not InputMap.has_action(action_name):
 			InputMap.add_action(action_name)
 
-	_add_key_event_once("hud_select_up", KEY_W)
-	_add_key_event_once("hud_select_down", KEY_S)
-	_add_key_event_once("hud_select_left", KEY_A)
-	_add_key_event_once("hud_select_right", KEY_D)
+	_add_key_event_once("hud_select_up", KEY_I)
+	_add_key_event_once("hud_select_down", KEY_K)
+	_add_key_event_once("hud_select_left", KEY_J)
+	_add_key_event_once("hud_select_right", KEY_L)
 
 
 func _add_key_event_once(action_name: StringName, keycode: int) -> void:
@@ -395,6 +395,8 @@ func _input(event):
 
 	if event.is_action_pressed("defend"):
 		start_defense()
+	elif event.is_action_released("defend"):
+		stop_defense()
 
 	if allow_ultimate_input and InputMap.has_action("ultimate_attack") and event.is_action_pressed("ultimate_attack"):
 		start_ultimate_attack()

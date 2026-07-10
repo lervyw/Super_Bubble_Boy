@@ -2,6 +2,17 @@
 
 ## 2026-07-09
 
+### Unified keyboard, Xbox, and PlayStation control profiles
+
+- Increased control-menu button height so wide trigger and stick icons are no longer clipped.
+- Reordered the controls menu into movement, combat, forms, power wheel, and pause controls.
+- Added JSON schema version 2 with separate keyboard, Xbox, and PlayStation input profiles and automatic legacy migration.
+- Keyboard defaults now use WASD, Space, Shift, C/V, 1/2/3, R, IJKL, and Tab.
+- PlayStation defaults now use Cross/Square/Triangle/Circle, R1/L1/L2/R2, left-stick movement, and right-stick wheel selection.
+- Xbox uses the equivalent A/X/Y/B, RB/LB/LT/RT, left-stick movement, and right-stick wheel selection.
+- Controller detection now activates the matching saved profile and refreshes the displayed prompt artwork.
+- Defense/parry now ends when its input is released.
+
 ### Dynamic keyboard and controller prompt icons
 
 - Added the Dream Mix keyboard-key sprites and GreatDocBrown CC0 Xbox/PlayStation prompt sprites.
