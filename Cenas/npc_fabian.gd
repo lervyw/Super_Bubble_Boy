@@ -25,9 +25,22 @@ var _is_typing: bool = false
 @onready var dialog_label: RichTextLabel = $"../DialogPanel/DialogLabel"
 @onready var continue_prompt: Button = $"../DialogPanel/ContinuePrompt"
 @onready var prompt_label: Label = $"../PromptLabel"
+var prompt_icon: TextureRect
 
 
 func _ready():
+	prompt_icon = TextureRect.new()
+	prompt_icon.name = "InputPromptIcon"
+	prompt_icon.custom_minimum_size = Vector2(16, 16)
+	prompt_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	prompt_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	prompt_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	prompt_icon.position = Vector2(24, 2)
+	prompt_label.add_child(prompt_icon)
+	prompt_label.text = "Falar"
+	if not ControllerMapper.input_source_changed.is_connected(_on_input_source_changed):
+		ControllerMapper.input_source_changed.connect(_on_input_source_changed)
+	_update_prompt_icon()
 	dialog_panel.visible = false
 	continue_prompt.visible = false
 	prompt_label.visible = false
@@ -39,6 +52,15 @@ func _ready():
 	add_child(_display_timer)
 
 	continue_prompt.pressed.connect(_on_continue_pressed)
+
+
+func _on_input_source_changed(_source: ControllerMapper.InputSource, _controller_type: ControllerMapper.ControllerType) -> void:
+	_update_prompt_icon()
+
+
+func _update_prompt_icon() -> void:
+	if prompt_icon:
+		prompt_icon.texture = PromptIcons.for_action(&"attack")
 
 
 func _process(_delta: float):

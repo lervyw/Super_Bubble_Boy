@@ -1,9 +1,11 @@
 extends Node
 
 enum ControllerType { UNKNOWN, XBOX, PLAYSTATION, NINTENDO_SWITCH, GENERIC }
+enum InputSource { KEYBOARD, CONTROLLER }
 
 signal controller_connected(device_id: int, type: ControllerType)
 signal controller_disconnected(device_id: int)
+signal input_source_changed(source: InputSource, controller_type: ControllerType)
 
 const JOYPAD_TRIGGER_AXES: Array[int] = [4, 5]
 const JOYPAD_TRIGGER_DEADZONE: float = 0.20
@@ -12,11 +14,36 @@ const JOYPAD_DEADZONE: float = 0.5
 var connected_controllers: Dictionary = {}
 
 var _primary_device: int = -1
+var _last_input_source: InputSource = InputSource.KEYBOARD
 
 
 func _ready() -> void:
 	Input.joy_connection_changed.connect(_on_joy_connection_changed)
 	_detect_connected_controllers()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey or event is InputEventMouseButton or event is InputEventMouseMotion:
+		_set_last_input_source(InputSource.KEYBOARD)
+	elif event is InputEventJoypadButton and event.pressed:
+		if event.device >= 0:
+			_primary_device = event.device
+		_set_last_input_source(InputSource.CONTROLLER)
+	elif event is InputEventJoypadMotion and absf(event.axis_value) >= 0.55:
+		if event.device >= 0:
+			_primary_device = event.device
+		_set_last_input_source(InputSource.CONTROLLER)
+
+
+func _set_last_input_source(source: InputSource) -> void:
+	if _last_input_source == source:
+		return
+	_last_input_source = source
+	input_source_changed.emit(source, get_primary_type())
+
+
+func get_last_input_source() -> InputSource:
+	return _last_input_source
 
 
 func _detect_connected_controllers() -> void:

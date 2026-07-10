@@ -114,6 +114,8 @@ var forbidden_keys: Array[int] = [
 # ================================
 func _ready():
 	_ensure_controller_ui_actions()
+	if not ControllerMapper.input_source_changed.is_connected(_on_input_source_changed):
+		ControllerMapper.input_source_changed.connect(_on_input_source_changed)
 
 	# Estado inicial: mostra o menu principal e esconde as outras telas
 	menu.visible = false
@@ -568,28 +570,38 @@ func _finish_rebind(event: InputEvent):
 #   VISUAL / LABELS
 # ================================
 func _update_control_labels():
-	# Atualiza o texto de cada botão para mostrar qual tecla/botão está configurado agora
-	btn_pulo.text = "Pulo: " + _get_current_input_name("jump")
-	btn_bolha.text = "Bolha: " + _get_current_input_name("forma1")
-	btn_super.text = "Super: " + _get_current_input_name("forma2")
-	btn_normal_form.text = "Normal: " + _get_current_input_name("normal")
-	btn_menu.text = "Menu: " + _get_current_input_name("hud_menu")
-	btn_ataque.text = "Ataque: " + _get_current_input_name("attack")
-	btn_ataque_especial.text = "Ataque Especial: " + _get_current_input_name("attack_special")
-	btn_defesa.text = "Defesa: " + _get_current_input_name("defend")
-	btn_ultimate.text = "Ultimate: " + _get_current_input_name("ultimate_attack")
-	btn_esquerda.text = "Esquerda: " + _get_current_input_name("left")
-	btn_direita.text = "Direita: " + _get_current_input_name("right")
-	btn_agachar.text = "Agachar: " + _get_current_input_name("crouch")
-	btn_dash.text = "Dash: " + _get_current_input_name("dash")
-	btn_pause.text = "Pausa: " + _get_current_input_name("pause_menu")
-
-	btn_roda_cima.text = "Roda Cima: " + _get_current_input_name("hud_select_up")
-	btn_roda_baixo.text = "Roda Baixo: " + _get_current_input_name("hud_select_down")
-	btn_roda_esquerda.text = "Roda Esquerda: " + _get_current_input_name("hud_select_left")
-	btn_roda_direita.text = "Roda Direita: " + _get_current_input_name("hud_select_right")
+	_set_control_button(btn_pulo, "Pulo", &"jump")
+	_set_control_button(btn_bolha, "Bolha", &"forma1")
+	_set_control_button(btn_super, "Super", &"forma2")
+	_set_control_button(btn_normal_form, "Normal", &"normal")
+	_set_control_button(btn_menu, "Menu", &"hud_menu")
+	_set_control_button(btn_ataque, "Ataque", &"attack")
+	_set_control_button(btn_ataque_especial, "Ataque Especial", &"attack_special")
+	_set_control_button(btn_defesa, "Defesa", &"defend")
+	_set_control_button(btn_ultimate, "Ultimate", &"ultimate_attack")
+	_set_control_button(btn_esquerda, "Esquerda", &"left")
+	_set_control_button(btn_direita, "Direita", &"right")
+	_set_control_button(btn_agachar, "Agachar", &"crouch")
+	_set_control_button(btn_dash, "Dash", &"dash")
+	_set_control_button(btn_pause, "Pausa", &"pause_menu")
+	_set_control_button(btn_roda_cima, "Roda Cima", &"hud_select_up")
+	_set_control_button(btn_roda_baixo, "Roda Baixo", &"hud_select_down")
+	_set_control_button(btn_roda_esquerda, "Roda Esquerda", &"hud_select_left")
+	_set_control_button(btn_roda_direita, "Roda Direita", &"hud_select_right")
 
 	_set_rebind_prompt("Selecione uma ação para remapear")
+
+
+func _set_control_button(button: Button, action_label: String, action_name: StringName) -> void:
+	button.text = action_label
+	button.icon = PromptIcons.for_action(action_name)
+	button.expand_icon = false
+	button.icon_max_width = 16
+	button.tooltip_text = _get_current_input_name(action_name)
+
+
+func _on_input_source_changed(_source: ControllerMapper.InputSource, _controller_type: ControllerMapper.ControllerType) -> void:
+	_update_control_labels()
 
 
 func _get_current_input_name(action: String) -> String:

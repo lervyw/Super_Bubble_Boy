@@ -2,6 +2,13 @@
 
 ## 2026-07-09
 
+### Dynamic keyboard and controller prompt icons
+
+- Added the Dream Mix keyboard-key sprites and GreatDocBrown CC0 Xbox/PlayStation prompt sprites.
+- Replaced textual key/button names in the controls menu with prompt icons while keeping action names and remapping behavior.
+- Prompts now switch automatically between keyboard, Xbox, and PlayStation artwork according to the latest input device.
+- Replaced Fabian's `[C] Falar` prompt with the dynamic icon for the currently bound attack/interact action.
+
 ### Player downward swimming
 
 - The player now returns to the swim state when a regular movement state ends while still inside water.
