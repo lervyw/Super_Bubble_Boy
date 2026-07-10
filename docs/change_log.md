@@ -2,6 +2,16 @@
 
 ## 2026-07-10
 
+### Android touch controls replacement
+
+- Added Marco Fazio's MIT-licensed Virtual Joystick as a local lightweight addon.
+- Replaced the generated movement stick with an editable `Cenas/mobile_controls.tscn` scene.
+- Kept the existing multitouch action buttons and power-wheel direction behavior.
+- Touch controls now load automatically on Android and stay disabled on desktop by default.
+- Desktop touch emulation remains available for explicit Inspector testing through `mobile_controls_show_on_desktop`.
+
+## 2026-07-10
+
 ### Mr. Breakfast prompt pack migration
 
 - Replaced the active keyboard, Xbox, and PlayStation prompt artwork with Mr. Breakfast's CC0 individual PNG assets.

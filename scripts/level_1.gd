@@ -55,6 +55,7 @@ extends Node2D
 
 @export var mobile_controls_enabled: bool = true
 @export var mobile_controls_show_on_desktop: bool = false
+@export var mobile_controls_scene: PackedScene = preload("res://Cenas/mobile_controls.tscn")
 
 
 # ================================
@@ -177,18 +178,16 @@ func setup_mobile_controls() -> void:
 		return
 
 	var os_name := OS.get_name()
-	var should_show := mobile_controls_show_on_desktop or os_name == "Android" or os_name == "iOS" or DisplayServer.is_touchscreen_available()
+	var should_show := mobile_controls_show_on_desktop or os_name == "Android"
 	if not should_show:
 		return
 
-	var script := load("res://scripts/mobile_controls.gd") as Script
-	if not script:
-		push_warning("Mobile controls script não encontrado.")
+	if not mobile_controls_scene:
+		push_warning("Cena dos controles mobile não configurada.")
 		return
 
-	var controls := CanvasLayer.new()
+	var controls := mobile_controls_scene.instantiate()
 	controls.name = "MobileControls"
-	controls.set_script(script)
 	add_child(controls)
 
 
