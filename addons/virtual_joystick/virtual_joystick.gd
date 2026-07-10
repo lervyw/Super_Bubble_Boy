@@ -111,9 +111,9 @@ func _update_joystick(touch_position: Vector2) -> void:
 
 func _apply_input_actions() -> void:
 	_release_input_actions()
-	var actions := [action_left, action_right, action_up, action_down]
-	var strengths := [-output.x, output.x, -output.y, output.y]
-	for index in actions.size():
+	var actions: Array[String] = [action_left, action_right, action_up, action_down]
+	var strengths: Array[float] = [-output.x, output.x, -output.y, output.y]
+	for index in range(actions.size()):
 		if strengths[index] > 0.0:
 			Input.action_press(actions[index], strengths[index])
 			_pressed_actions.append(actions[index])

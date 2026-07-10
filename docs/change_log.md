@@ -5,6 +5,7 @@
 ### Android touch controls replacement
 
 - Added Marco Fazio's MIT-licensed Virtual Joystick as a local lightweight addon.
+- Adjusted joystick and overlay typing to avoid GDScript parse failures across Godot 4.x versions.
 - Replaced the generated movement stick with an editable `Cenas/mobile_controls.tscn` scene.
 - Kept the existing multitouch action buttons and power-wheel direction behavior.
 - Touch controls now load automatically on Android and stay disabled on desktop by default.

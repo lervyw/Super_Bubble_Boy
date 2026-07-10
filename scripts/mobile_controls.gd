@@ -22,7 +22,7 @@ var controls: Array[Dictionary] = [
 var joystick_actions := ["left", "right", "crouch", "swim_up", "hud_select_up", "hud_select_down", "hud_select_left", "hud_select_right"]
 var button_nodes: Dictionary = {}
 var label_nodes: Dictionary = {}
-@onready var joystick: VirtualJoystick = $VirtualJoystick
+@onready var joystick = $VirtualJoystick
 var joystick_was_power_mode := false
 var controls_hidden_for_pause := false
 var virtual_pressed: Dictionary = {}
@@ -62,14 +62,15 @@ func _setup_scene_buttons() -> void:
 	for item in controls:
 		var button_name: String = item["name"]
 		var action_name: String = item["action"]
+		var button_size: Vector2 = item["size"]
 		var button := find_child(button_name, true, false) as TouchScreenButton
 		var label := find_child("%sLabel" % button_name, true, false) as Label
 		if not button or not label:
 			push_warning("Controle mobile ausente na cena: %s" % button_name)
 			continue
 		button.action = action_name
-		button.texture_normal = _make_button_texture(item["size"], Color(0.04, 0.10, 0.16, 0.48), Color(0.62, 0.86, 1.0, 0.9))
-		button.texture_pressed = _make_button_texture(item["size"], Color(0.15, 0.42, 0.66, 0.72), Color(0.94, 1.0, 1.0, 1.0))
+		button.texture_normal = _make_button_texture(button_size, Color(0.04, 0.10, 0.16, 0.48), Color(0.62, 0.86, 1.0, 0.9))
+		button.texture_pressed = _make_button_texture(button_size, Color(0.15, 0.42, 0.66, 0.72), Color(0.94, 1.0, 1.0, 1.0))
 		button_nodes[button_name] = button
 		label_nodes[button_name] = label
 
