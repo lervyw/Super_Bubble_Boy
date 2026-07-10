@@ -1,5 +1,12 @@
 # Change Log
 
+## 2026-07-10
+
+### PlayStation analog direction prompt fix
+
+- Corrected the PlayStation atlas regions for left- and right-stick directional prompts.
+- Analog directions now use the pack's full 24x24 `L`/`R` artwork instead of cropped 16x16 or D-pad icons.
+
 ## 2026-07-09
 
 ### Unified keyboard, Xbox, and PlayStation control profiles

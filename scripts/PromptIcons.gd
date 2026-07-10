@@ -98,14 +98,30 @@ static func _gamepad_axis_icon(axis: int, axis_value: float, controller_type: in
 		if controller_type == ControllerMapper.ControllerType.PLAYSTATION:
 			return _atlas(PLAYSTATION, Rect2(120, 80 if axis == 4 else 96, 32, 16))
 		return _atlas(XBOX, Rect2(112, 496 if axis == 4 else 512, 32, 16))
+	if controller_type == ControllerMapper.ControllerType.PLAYSTATION and axis >= 0 and axis <= 3:
+		return _playstation_stick_direction_icon(axis, axis_value)
 	if axis == 2 or axis == 3:
-		if controller_type == ControllerMapper.ControllerType.PLAYSTATION:
-			return _atlas(PLAYSTATION, Rect2(192, 304, 16, 16))
 		return _atlas(XBOX, Rect2(280, 32, 16, 16))
 
 	if axis == 0:
 		return _gamepad_button_icon(13 if axis_value < 0.0 else 14, controller_type)
 	return _gamepad_button_icon(11 if axis_value < 0.0 else 12, controller_type)
+
+
+static func _playstation_stick_direction_icon(axis: int, axis_value: float) -> Texture2D:
+	var region := Rect2()
+	match axis:
+		0: # Analogico esquerdo: esquerda / direita
+			region = Rect2(16 if axis_value < 0.0 else 56, 308, 24, 24)
+		1: # Analogico esquerdo: cima / baixo
+			region = Rect2(36, 288 if axis_value < 0.0 else 328, 24, 24)
+		2: # Analogico direito: esquerda / direita
+			region = Rect2(128 if axis_value < 0.0 else 168, 308, 24, 24)
+		3: # Analogico direito: cima / baixo
+			region = Rect2(148, 288 if axis_value < 0.0 else 328, 24, 24)
+		_:
+			return null
+	return _atlas(PLAYSTATION, region)
 
 
 static func _atlas(texture: Texture2D, region: Rect2) -> AtlasTexture:
