@@ -424,8 +424,8 @@ func _setup_controls_scroll_focus() -> void:
 	var control_buttons: Array[Control] = [
 		btn_cima,
 		btn_esquerda,
-		btn_direita,
 		btn_agachar,
+		btn_direita,
 		btn_pulo,
 		btn_dash,
 		btn_ataque,

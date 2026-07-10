@@ -76,8 +76,8 @@ static func _gamepad_button_icon(button_index: int, controller_type: int) -> Tex
 			4: Rect2(16, 240, 16, 16), 5: Rect2(16, 256, 16, 16),
 			6: Rect2(16, 240, 16, 16), 9: Rect2(120, 104, 32, 16),
 			10: Rect2(120, 120, 32, 16), 11: Rect2(16, 64, 16, 16),
-			12: Rect2(16, 96, 16, 16), 13: Rect2(16, 80, 16, 16),
-			14: Rect2(16, 112, 16, 16),
+			12: Rect2(16, 96, 16, 16), 13: Rect2(16, 112, 16, 16),
+			14: Rect2(16, 80, 16, 16),
 		}
 		return _atlas(PLAYSTATION, ps_regions.get(button_index, Rect2(16, 192, 16, 16)))
 

@@ -6,6 +6,8 @@
 
 - Corrected the PlayStation atlas regions for left- and right-stick directional prompts.
 - Analog directions now use the pack's full 24x24 `L`/`R` artwork instead of cropped 16x16 or D-pad icons.
+- Matched controller focus navigation to the visual control-menu order, preventing `Baixo / Agachar` from being skipped.
+- Corrected PlayStation D-pad left/right atlas regions to follow the source order: up, right, down, left.
 
 ## 2026-07-09
 
