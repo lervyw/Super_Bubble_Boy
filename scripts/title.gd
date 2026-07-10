@@ -348,10 +348,9 @@ func _on_sair():
 
 func _on_crt_toggled(enabled: bool) -> void:
 	ConfigManager.set_crt_enabled(enabled)
-	if Engine.has_singleton("flowerwall_crt"):
-		var crt = Engine.get_singleton("flowerwall_crt")
-		if crt.has_method("set_active"):
-			crt.set_active(enabled)
+	var crt_node = get_node_or_null("/root/flowerwall_crt")
+	if crt_node and crt_node.has_method("set_active"):
+		crt_node.set_active(enabled)
 
 
 func _open_config_menu():
@@ -597,7 +596,7 @@ func _update_control_labels():
 
 
 func _set_control_button(button: Button, action_label: String, action_name: StringName) -> void:
-	button.custom_minimum_size.y = 36.0
+	button.custom_minimum_size.y = 16.0
 	button.text = action_label
 	button.icon = PromptIcons.for_action(action_name)
 	button.expand_icon = true

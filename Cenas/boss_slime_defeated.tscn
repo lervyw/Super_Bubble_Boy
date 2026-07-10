@@ -65,8 +65,9 @@ script = ExtResource("2_13wbg")
 DialogBox = NodePath("Node/CharacterNode/MarginContainer/VBoxContainer/DialogBox")
 dialogs = Array[String](["Bubbleboy, você conseguiu!", "O Rei Slime caiu, e as criaturas que guardavam o caminho perderam sua força.", "O portão do castelo finalmente está livre, mas a ameaça do Sapo Maligno espera lá dentro.", "Descanse por enquanto.   A próxima batalha vai começar em breve."])
 advance_button = NodePath("Button2")
-on_finish_action = 3
+on_finish_action = 4
 final_button_text = "Continua..."
+finish_scene_path = "res://Cenas/creditos.tscn"
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 0

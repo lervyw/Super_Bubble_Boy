@@ -1816,6 +1816,9 @@ position = Vector2(323, -271)
 [node name="CollisionShape2D" parent="NPC_chat/InteractionArea" index="0"]
 position = Vector2(-2, -24)
 
+[node name="NameLabel" parent="NPC_chat/DialogPanel" index="0"]
+text = "Fabian Noir"
+
 [node name="ponto_luz" type="Node2D" parent="."]
 position = Vector2(695, 519)
 

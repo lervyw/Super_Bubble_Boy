@@ -25,11 +25,10 @@ extends CanvasLayer
 @export var ultimate_cooldown_bar_size: Vector2 = Vector2(24.0, 52.0)
 
 @export var soap_label: Label
+@export var powerup_icon_row: HBoxContainer
 
 @export_group("Powerup Prompt Icons")
-@export var powerup_icons_offset: Vector2 = Vector2(0.0, -28.0)
 @export var powerup_icon_size: Vector2 = Vector2(20.0, 20.0)
-@export var powerup_icon_spacing: int = 4
 
 const PASSIVE_ICON_STOMP := preload("res://sprites/assets/bolha_ressonante.png")
 const PASSIVE_ICON_RUN := preload("res://sprites/assets/Corrida.png")
@@ -49,7 +48,6 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 var boss_target: Node = null
 var pause_menu_open: bool = false
 var warning_tween: Tween
-var powerup_icon_row: HBoxContainer
 var powerup_icon_rects: Array[TextureRect] = []
 var powerup_freeze_active: bool = false
 
@@ -99,7 +97,8 @@ func _ready() -> void:
 	if warning_label:
 		warning_label.visible = false
 		warning_label.modulate.a = 0.0
-	_setup_powerup_icon()
+	if powerup_icon_row:
+		powerup_icon_row.visible = false
 	if resume_button:
 		resume_button.process_mode = Node.PROCESS_MODE_ALWAYS
 		if not resume_button.pressed.is_connected(close_pause_menu):
@@ -309,17 +308,9 @@ func _get_action_display_name(action: StringName) -> String:
 	return str(action)
 
 
-func _setup_powerup_icon() -> void:
-	powerup_icon_row = HBoxContainer.new()
-	powerup_icon_row.name = "PowerupPromptIcons"
-	powerup_icon_row.z_index = 100
-	powerup_icon_row.visible = false
-	powerup_icon_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	powerup_icon_row.add_theme_constant_override("separation", powerup_icon_spacing)
-	add_child(powerup_icon_row)
-
-
 func _show_powerup_icons(actions: Array) -> void:
+	if not powerup_icon_row:
+		return
 	for child in powerup_icon_row.get_children():
 		child.queue_free()
 	powerup_icon_rects.clear()
@@ -344,17 +335,7 @@ func _show_powerup_icons(actions: Array) -> void:
 		powerup_icon_rects.append(rect)
 		any_shown = true
 
-	if any_shown:
-		powerup_icon_row.visible = true
-		await get_tree().process_frame
-		var label_center_x := warning_label.position.x + warning_label.size.x * 0.5
-		var row_w := powerup_icon_row.size.x
-		powerup_icon_row.position = Vector2(
-			label_center_x - row_w * 0.5 + powerup_icons_offset.x,
-			warning_label.position.y + powerup_icons_offset.y
-		)
-	else:
-		powerup_icon_row.visible = false
+	powerup_icon_row.visible = any_shown
 
 
 func _hide_powerup_icon() -> void:

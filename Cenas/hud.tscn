@@ -31,7 +31,7 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_power_panel"]
 
-[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("hp_bar", "mana_bar", "stamina_bar", "ultimate_ready_icon", "boss_hp_bar", "menu_panel", "pause_menu_panel", "warning_label", "passive_toggle", "resume_button", "main_menu_button", "quit_button", "ultimate_cooldown_bar", "time_bubble_panel", "time_bubble_label", "soap_label")]
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("hp_bar", "mana_bar", "stamina_bar", "ultimate_ready_icon", "boss_hp_bar", "menu_panel", "pause_menu_panel", "warning_label", "passive_toggle", "resume_button", "main_menu_button", "quit_button", "ultimate_cooldown_bar", "time_bubble_panel", "time_bubble_label", "soap_label", "powerup_icon_row")]
 script = ExtResource("1_uow6a")
 hp_bar = NodePath("HBoxContainer/Holder/TextureProgressBar")
 mana_bar = NodePath("HBoxContainer/Holder/ManaBar")
@@ -49,7 +49,17 @@ ultimate_cooldown_bar = NodePath("UltimateCooldownBar")
 time_bubble_panel = NodePath("TimeBubblePanel")
 time_bubble_label = NodePath("TimeBubblePanel/TimeLabel")
 soap_label = NodePath("SoapCounter/Label")
+powerup_icon_row = NodePath("PowerupPromptIcons")
 metadata/_edit_vertical_guides_ = [152.0]
+
+[node name="PowerupPromptIcons" type="HBoxContainer" parent="."]
+z_index = 100
+offset_left = 100.0
+offset_top = 131.0
+offset_right = 320.0
+offset_bottom = 156.0
+theme_override_constants/separation = 4
+alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 anchors_preset = 15
@@ -250,7 +260,6 @@ offset_left = 8.0
 offset_top = 244.0
 offset_right = 72.0
 offset_bottom = 272.0
-scale = Vector2(1.0, 1.0)
 
 [node name="Icon" type="TextureRect" parent="SoapCounter"]
 custom_minimum_size = Vector2(12, 12)
@@ -266,7 +275,6 @@ text = "0"
 vertical_alignment = 1
 
 [node name="WarningLabel" type="Label" parent="."]
-visible = false
 offset_left = 110.0
 offset_top = 104.0
 offset_right = 310.0

@@ -218,12 +218,12 @@ func start_attack(dist: float = 0.0):
 		await wait_for_attack_hitbox_start()
 
 		if hitbox_shape and not time_frozen:
-			hitbox_shape.disabled = false
+			hitbox_shape.set_deferred("disabled", false)
 
 		await get_tree().create_timer(hitbox_active_time).timeout
 
-		if hitbox_shape:
-			hitbox_shape.disabled = true
+	if hitbox_shape:
+		hitbox_shape.set_deferred("disabled", true)
 
 		await wait_for_animation(attack_anim)
 
@@ -264,7 +264,7 @@ func start_projectile_attack() -> void:
 	var anim := get_projectile_attack_anim()
 	current_attack_animation = anim
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 
 	if sprite:
 		sprite.play(anim)
@@ -284,12 +284,20 @@ func fire_projectile_on_animation_frame(anim: StringName, target_frame: int) -> 
 		spawn_projectile()
 		return
 
+	var actual_frame_count := sprite.sprite_frames.get_frame_count(anim)
+	var effective_target := mini(target_frame, actual_frame_count - 1)
+
 	var fired := false
+	var last_frame := -1
 	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing() and not time_frozen:
-		if not fired and sprite.frame >= target_frame:
+		var frame := sprite.frame
+		if not fired and frame >= effective_target:
 			spawn_projectile()
 			fired = true
 			return
+		if frame < last_frame:
+			break
+		last_frame = frame
 		await get_tree().process_frame
 
 	if not fired and not time_frozen:
@@ -377,7 +385,7 @@ func start_transform():
 	velocity = Vector2.ZERO
 	current_attack_animation = &""
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 
 	if has_animation(transform_animation):
 		play_animation(transform_animation)
@@ -531,7 +539,7 @@ func run_attack_hitbox_by_frames(anim: StringName) -> void:
 		return
 
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 
 	var attack_time: float = get_animation_duration(anim)
 	var elapsed := 0.0
@@ -545,7 +553,7 @@ func run_attack_hitbox_by_frames(anim: StringName) -> void:
 		elapsed += get_process_delta_time()
 
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 
 
 func update_attack_hitbox_frame_state(frame: int) -> void:
@@ -553,7 +561,7 @@ func update_attack_hitbox_frame_state(frame: int) -> void:
 		return
 
 	var inside_window := frame >= attack_hitbox_start_frame and frame <= attack_hitbox_end_frame
-	hitbox_shape.disabled = not inside_window
+	hitbox_shape.set_deferred("disabled", not inside_window)
 
 # =========================================================
 

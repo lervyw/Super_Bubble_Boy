@@ -12,7 +12,7 @@ var current_dialog_index: int = 0
 var dialogs: Array[String] = [
 	"Você está próximo da entrada do castelo.",
 	"Lembre-se que o Slime Rei está protegendo a entrada e ele é muito forte!",
-	"Eu poderia te acompanhar, mas meu joelho está doendo e vou ter que ficar para trás mais uma vez."
+	"Eu poderia te acompanhar, mas recusaram minha ajuda, você está por si só."
 ]
 
 var _display_timer: Timer
