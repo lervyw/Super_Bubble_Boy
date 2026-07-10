@@ -1847,6 +1847,12 @@ func can_dash() -> bool:
 
 
 func handle_state(_delta: float) -> void:
+	# Acoes como ataque e transformacao podem terminar em IDLE mesmo com o
+	# personagem ainda dentro da agua. Retoma a natacao antes de processar os
+	# estados terrestres para manter os controles verticais disponiveis.
+	if in_water and state in [State.IDLE, State.WALK, State.JUMP, State.CROUCH]:
+		change_state(State.SWIM)
+
 	match state:
 		State.IDLE: idle_state()
 		State.WALK: walk_state()
@@ -1970,7 +1976,10 @@ func swim_state() -> void:
 			swim_speed *= 0.5
 
 	velocity.x = dir_x * swim_speed
-	velocity.y += dir_y * swim_speed * 0.6
+	if not is_zero_approx(dir_y):
+		# Controle vertical direto: para baixo usa crouch/ui_down e para cima
+		# usa swim_up/ui_up. Isso evita que a flutuacao anule a descida.
+		velocity.y = dir_y * swim_speed * 0.6
 
 	if not in_water:
 		change_state(State.IDLE)

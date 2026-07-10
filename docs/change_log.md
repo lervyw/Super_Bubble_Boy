@@ -1,5 +1,12 @@
 # Change Log
 
+## 2026-07-09
+
+### Player downward swimming
+
+- The player now returns to the swim state when a regular movement state ends while still inside water.
+- Holding the down/crouch input underwater now produces direct, continuous downward movement instead of competing with water buoyancy.
+
 ## 2026-07-07
 
 ### Level 1 checkpoint and powerup identification
