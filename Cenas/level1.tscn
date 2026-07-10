@@ -1428,7 +1428,7 @@ sources/15 = SubResource("TileSetAtlasSource_dyuph")
 size = Vector2(17762.639, 400.7749)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0041a"]
-size = Vector2(350.19824, 5100.248)
+size = Vector2(350.19824, 5808.836)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pgpjx"]
 size = Vector2(256, 240)
@@ -1561,14 +1561,14 @@ level = NodePath("..")
 player = NodePath("../player")
 
 [node name="Collision" parent="saida" index="0"]
-position = Vector2(5285.1777, -1340.0032)
+position = Vector2(1591.7659, -376.51025)
 
 [node name="Collision2" type="CollisionShape2D" parent="saida"]
 position = Vector2(2532.676, -6405.3545)
 shape = SubResource("RectangleShape2D_2av5b")
 
 [node name="Collision3" type="CollisionShape2D" parent="saida"]
-position = Vector2(6480.1895, -3693.687)
+position = Vector2(6480.1895, -3339.393)
 shape = SubResource("RectangleShape2D_0041a")
 
 [node name="player" parent="." instance=ExtResource("2_csolo")]
