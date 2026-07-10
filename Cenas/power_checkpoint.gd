@@ -28,6 +28,8 @@ var activated: bool = false
 
 func _ready() -> void:
 	if not player:
+		player = get_tree().get_first_node_in_group("jogador") as CharacterBody2D
+	if not player:
 		player = get_tree().get_first_node_in_group("player") as CharacterBody2D
 
 	if not body_entered.is_connected(_on_body_entered):

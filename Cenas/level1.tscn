@@ -1667,6 +1667,10 @@ position = Vector2(757, 525)
 [node name="Timer" parent="." instance=ExtResource("13_tb1qe")]
 visible = false
 
+[node name="checkpoint_spawnpoint_3" parent="." node_paths=PackedStringArray("player") instance=ExtResource("17_etkem")]
+position = Vector2(1159, -947)
+player = NodePath("../player")
+
 [node name="checkpoint_spawnpoint_2" parent="." node_paths=PackedStringArray("player") instance=ExtResource("17_etkem")]
 position = Vector2(2499, 90)
 player = NodePath("../player")
@@ -1674,16 +1678,18 @@ player = NodePath("../player")
 [node name="SpawnPoint2" type="Node2D" parent="."]
 position = Vector2(2499, 90)
 
-[node name="poder_super_espinho" parent="." instance=ExtResource("29_power")]
+[node name="poder_super_espinho" parent="." node_paths=PackedStringArray("player") instance=ExtResource("29_power")]
 position = Vector2(699, -696)
+player = NodePath("../player")
 unlock_form = 2
 update_respawn = false
 destroy_after_activation = true
 restore_health_on_activate = false
 restore_mana_on_activate = false
 
-[node name="poder_super_projetil" parent="." instance=ExtResource("29_power")]
+[node name="poder_super_projetil" parent="." node_paths=PackedStringArray("player") instance=ExtResource("29_power")]
 position = Vector2(477, -884)
+player = NodePath("../player")
 unlock_form = 2
 unlock_slot = 2
 update_respawn = false
@@ -1703,8 +1709,9 @@ stats = NodePath("../player/Stats")
 position = Vector2(861, 208)
 player = NodePath("../player")
 
-[node name="poder_normal_teleporte" parent="." instance=ExtResource("29_power")]
+[node name="poder_normal_teleporte" parent="." node_paths=PackedStringArray("player") instance=ExtResource("29_power")]
 position = Vector2(1376, 178)
+player = NodePath("../player")
 unlock_slot = 1
 update_respawn = false
 destroy_after_activation = true

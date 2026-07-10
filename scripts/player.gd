@@ -1746,8 +1746,8 @@ func apply_water_physics(delta: float) -> void:
 
 	velocity.y += water_grav * delta
 	velocity.y -= 80.0 * delta
-	velocity.y *= 0.92
-	velocity.x *= 0.92
+	velocity.y *= 0.88
+	velocity.x *= 0.88
 
 
 func enter_water_zone(_water: Node = null) -> void:
@@ -1968,20 +1968,18 @@ func swim_state() -> void:
 	var dir_x := get_horizontal_axis()
 	var dir_y := get_vertical_swim_axis()
 
-	var swim_speed := speed * 0.5
+	var swim_speed := speed * 0.8
 	match form:
 		Form.NORMAL:
-			swim_speed *= 0.6
+			swim_speed *= 0.75
 		Form.BUBBLE:
-			swim_speed *= 0.9
+			swim_speed *= 1.0
 		Form.SUPER:
-			swim_speed *= 0.5
+			swim_speed *= 0.65
 
 	velocity.x = dir_x * swim_speed
 	if not is_zero_approx(dir_y):
-		# Controle vertical direto: para baixo usa crouch/ui_down e para cima
-		# usa swim_up/ui_up. Isso evita que a flutuacao anule a descida.
-		velocity.y = dir_y * swim_speed * 0.6
+		velocity.y = dir_y * swim_speed * 0.85
 
 	if not in_water:
 		change_state(State.IDLE)
@@ -1997,11 +1995,11 @@ func handle_horizontal_input() -> void:
 	if in_water:
 		match form:
 			Form.NORMAL:
-				current_speed *= 0.6
+				current_speed *= 0.75
 			Form.BUBBLE:
-				current_speed *= 0.9
+				current_speed *= 1.0
 			Form.SUPER:
-				current_speed *= 0.5
+				current_speed *= 0.65
 
 	if is_passive_run_boosting():
 		current_speed *= quick_run_speed_multiplier
