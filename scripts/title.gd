@@ -595,8 +595,7 @@ func _update_control_labels():
 func _set_control_button(button: Button, action_label: String, action_name: StringName) -> void:
 	button.text = action_label
 	button.icon = PromptIcons.for_action(action_name)
-	button.expand_icon = false
-	button.icon_max_width = 16
+	button.expand_icon = true
 	button.tooltip_text = _get_current_input_name(action_name)
 
 

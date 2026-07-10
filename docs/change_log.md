@@ -8,6 +8,7 @@
 - Replaced textual key/button names in the controls menu with prompt icons while keeping action names and remapping behavior.
 - Prompts now switch automatically between keyboard, Xbox, and PlayStation artwork according to the latest input device.
 - Replaced Fabian's `[C] Falar` prompt with the dynamic icon for the currently bound attack/interact action.
+- Fixed prompt icon sizing to use Godot's supported `Button.expand_icon` property.
 
 ### Player downward swimming
 
