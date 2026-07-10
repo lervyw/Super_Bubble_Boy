@@ -115,7 +115,7 @@ func _apply_joystick_actions() -> void:
 
 
 func _press_direction_actions(left_action: String, right_action: String, up_action: String, down_action: String) -> void:
-	var direction := joystick.output
+	var direction: Vector2 = joystick.output
 	if absf(direction.x) >= JOYSTICK_DEADZONE:
 		_set_action_strength(left_action, -direction.x if direction.x < 0.0 else 0.0)
 		_set_action_strength(right_action, direction.x if direction.x > 0.0 else 0.0)
