@@ -73,14 +73,14 @@ func _on_joy_connection_changed(device_id: int, connected: bool) -> void:
 
 
 func _identify_controller(device_id: int) -> ControllerType:
-	var name := Input.get_joy_name(device_id).to_lower()
+	var controller_name := Input.get_joy_name(device_id).to_lower()
 	var guid := Input.get_joy_guid(device_id).to_lower()
 
-	if "xbox" in name or "x-box" in name or "xinput" in name:
+	if "xbox" in controller_name or "x-box" in controller_name or "xinput" in controller_name:
 		return ControllerType.XBOX
-	if "playstation" in name or "ps4" in name or "ps5" in name or "dualsense" in name or "dualshock" in name or "ps" in name:
+	if "playstation" in controller_name or "ps4" in controller_name or "ps5" in controller_name or "dualsense" in controller_name or "dualshock" in controller_name or "ps" in controller_name:
 		return ControllerType.PLAYSTATION
-	if "nintendo" in name or "switch" in name or "pro controller" in name or "joy-con" in name:
+	if "nintendo" in controller_name or "switch" in controller_name or "pro controller" in controller_name or "joy-con" in controller_name:
 		return ControllerType.NINTENDO_SWITCH
 	if "xbox" in guid:
 		return ControllerType.XBOX

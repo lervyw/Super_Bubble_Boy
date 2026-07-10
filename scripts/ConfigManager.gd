@@ -157,24 +157,24 @@ func _event_to_string(event: InputEvent) -> String:
 #          STRING → EVENTO (CARREGAR)
 # ============================================================
 
-func _string_to_event(str: String) -> InputEvent:
+func _string_to_event(serialized_event: String) -> InputEvent:
 	# Reconstrói um InputEvent a partir do texto salvo
 
-	if str.begins_with("Key:"):
-		var code = str.split(":")[1].to_int()
+	if serialized_event.begins_with("Key:"):
+		var code = serialized_event.split(":")[1].to_int()
 		var ev = InputEventKey.new()
 		ev.physical_keycode = code
 		return ev
 
-	if str.begins_with("JoyButton:"):
-		var btn = str.split(":")[1].to_int()
+	if serialized_event.begins_with("JoyButton:"):
+		var btn = serialized_event.split(":")[1].to_int()
 		var ev = InputEventJoypadButton.new()
 		ev.device = -1
 		ev.button_index = btn
 		return ev
 
-	if str.begins_with("JoyAxis:"):
-		var parts := str.split(":")
+	if serialized_event.begins_with("JoyAxis:"):
+		var parts := serialized_event.split(":")
 		if parts.size() < 3:
 			return null
 		var ev = InputEventJoypadMotion.new()

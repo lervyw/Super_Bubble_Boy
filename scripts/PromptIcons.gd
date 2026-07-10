@@ -14,7 +14,7 @@ static func for_action(action_name: StringName) -> Texture2D:
 		return null
 
 	var wants_controller := ControllerMapper.get_last_input_source() == ControllerMapper.InputSource.CONTROLLER
-	var fallback: InputEvent
+	var fallback: InputEvent = null
 	for event in InputMap.action_get_events(action_name):
 		if fallback == null:
 			fallback = event
