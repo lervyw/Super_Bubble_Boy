@@ -600,7 +600,7 @@ func _set_control_button(button: Button, action_label: String, action_name: Stri
 	button.tooltip_text = _get_current_input_name(action_name)
 
 
-func _on_input_source_changed(_source: ControllerMapper.InputSource, _controller_type: ControllerMapper.ControllerType) -> void:
+func _on_input_source_changed(_source: int, _controller_type: int) -> void:
 	_update_control_labels()
 
 
