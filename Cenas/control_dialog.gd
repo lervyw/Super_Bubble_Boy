@@ -54,7 +54,6 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	# Detecta clique do mouse, tecla de ação ou botão do controle
 	if event.is_action_pressed("jump") or \
-	   event.is_action_pressed("attack") or \
 	   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 		advance_dialog()
 

@@ -83,7 +83,7 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	# Durante diálogo
 	if not dialogs_finished and dialogs.size() > 0:
-		if event.is_action_pressed("ui_accept") or event.is_action_pressed("attack") \
+		if event.is_action_pressed("ui_accept") \
 		or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 			advance_dialog()
 		return

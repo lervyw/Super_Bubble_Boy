@@ -60,7 +60,7 @@ func _on_input_source_changed(_source: int, _controller_type: int) -> void:
 
 func _update_prompt_icon() -> void:
 	if prompt_icon:
-		prompt_icon.texture = PromptIcons.for_action(&"attack")
+		prompt_icon.texture = PromptIcons.for_action(&"ui_up")
 
 
 func _process(_delta: float):
@@ -69,12 +69,14 @@ func _process(_delta: float):
 	if player:
 		player_node = player
 		if state == State.IDLE:
-			start_dialog()
+			prompt_label.visible = true
+			if Input.is_action_just_pressed("ui_up"):
+				start_dialog()
 			return
 		elif state == State.DIALOG_FINISHED:
 			prompt_label.visible = true
-			if Input.is_action_just_pressed("attack"):
-				print("[Fabian] C manual — restartando diálogo")
+			if Input.is_action_just_pressed("ui_up"):
+				print("[Fabian] Seta p/ cima — restartando diálogo")
 				start_dialog()
 			return
 	else:
@@ -83,7 +85,7 @@ func _process(_delta: float):
 			player_node = null
 
 	if state == State.DIALOG_ACTIVE:
-		if Input.is_action_just_pressed("attack"):
+		if Input.is_action_just_pressed("jump"):
 			advance_dialog()
 
 
