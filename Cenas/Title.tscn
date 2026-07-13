@@ -377,6 +377,30 @@ layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "cima / nadar"
 
+[node name="Controle24" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face cima"
+
+[node name="Controle25" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face esquerda"
+
+[node name="Controle26" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face baixo"
+
+[node name="Controle27" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face direita"
+
 [node name="Voltar" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(170, 16)
 layout_mode = 2

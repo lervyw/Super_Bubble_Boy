@@ -1,5 +1,36 @@
 # Change Log
 
+## 2026-07-13
+
+### Bug fixes: dual action and camera follow
+
+- Fixed dual-action bug where pressing R2 + face button simultaneously fired both the normal action (attack/defend/dash/special) and the power wheel selection. Added `Input.is_action_pressed("hud_menu")` guard alongside `hud_menu_open` in `_input()` to catch events that arrive before the hud_menu event in the same frame.
+- Added missing `hud_menu_open` guard to `dash` in `idle_state()` — previously unguarded, allowing dash while wheel was open.
+- Fixed camera not returning to player after portal bubble flight. Disabled `position_smoothing_enabled` during camera follow to prevent smoothing from fighting the direct `global_position` assignment, and re-enabled it when follow stops.
+- Removed dead code `_remove_conflicting_joypad_events()` and `_is_same_physical_input()` from ConfigManager.
+- Removed `sync_wheel_face_actions()` and related functions from player.gd — wheel face actions are now independent and rebindable.
+- Added `wheel_face_*` actions to ConfigManager's `MANAGED_INPUT_ACTIONS` and `_default_controller_inputs()` for save/load persistence.
+- Added wheel face rebind buttons (Controle24–27) to the controls menu UI.
+- Updated change_log.md, project_context.md, how_to_play.md.
+
+### Power wheel face button selection
+
+- Added `wheel_face_up`, `wheel_face_down`, `wheel_face_left`, `wheel_face_right` input actions for gamepad face buttons (Triangle/Y, Circle/B, Square/X, Cross/A).
+- The power wheel now accepts face button input for direction selection alongside the right analog stick.
+- Face buttons are **independent rebindable actions** — the same gamepad button can serve dual purposes (e.g., Cross/A = attack when wheel is closed, Cross/A = wheel right when R2 is held).
+- Removed `_remove_conflicting_joypad_events()` from `ConfigManager.rebind_action()` to allow the same button on multiple actions. The input context (wheel open/closed) determines which action fires.
+- Added wheel face buttons to the controls menu UI (Controle24–27) so users can rebind them independently.
+- Added `wheel_face_*` to `MANAGED_INPUT_ACTIONS` and `_default_controller_inputs()` for save/load persistence.
+- Face buttons bypass the wait-for-neutral gate since they are digital and precise.
+- Player movement no longer stops when the power wheel opens (`velocity.x = 0.0` removed).
+- Combat actions (attack, defend, special attack, dash, ultimate, form change) are now blocked while the power wheel is open to prevent unintended triggers from shared face buttons.
+- Ground stomp input is also blocked during wheel to prevent attack collision.
+
+### Power wheel rebind input fix
+
+- Fixed rebind system in the controls menu so the button/key used to activate a rebind button is no longer captured as the new binding.
+- Added `set_input_as_handled()` to the rebind capture block to prevent the event from propagating to the button's `_gui_input` and re-triggering `_start_rebind`.
+
 ## 2026-07-10
 
 ### Android touch controls replacement

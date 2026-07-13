@@ -8,6 +8,8 @@ extends Node
 #  Os dados são salvos em um arquivo JSON no user://
 # =========================================================
 
+signal rebind_completed(action_name: String)
+
 # Caminho do arquivo de configuração salvo no sistema do jogador
 const CONFIG_PATH := "user://config.json"
 const INPUT_SCHEMA_VERSION := 2
@@ -18,6 +20,7 @@ const MANAGED_INPUT_ACTIONS: Array[StringName] = [
 	&"attack", &"defend", &"dash", &"hud_menu", &"hud_select_up", &"hud_select_down",
 	&"hud_select_left", &"hud_select_right", &"pause_menu", &"attack_special", &"ultimate_attack",
 	&"form_select",
+	&"wheel_face_up", &"wheel_face_down", &"wheel_face_left", &"wheel_face_right",
 ]
 
 
@@ -95,10 +98,9 @@ func rebind_action(action: String, event: InputEvent):
 	_apply_action_deadzone_for_event(action, ev)
 
 	var storage_key := _get_active_controller_storage_key() if is_joypad else "inputs_keyboard"
-	if is_joypad:
-		_remove_conflicting_joypad_events(action, ev, storage_key)
 	settings[storage_key][action] = _event_to_string(ev)
 	_save()
+	rebind_completed.emit(action)
 
 
 func apply_loaded_inputs():
@@ -227,28 +229,6 @@ func _string_to_event(serialized_event: String) -> InputEvent:
 func _apply_action_deadzone_for_event(action: String, event: InputEvent) -> void:
 	if event is InputEventJoypadMotion and event.axis in JOYPAD_TRIGGER_AXES:
 		InputMap.action_set_deadzone(action, JOYPAD_TRIGGER_ACTION_DEADZONE)
-
-
-func _remove_conflicting_joypad_events(source_action: String, event: InputEvent, storage_key: String) -> void:
-	for other_action in MANAGED_INPUT_ACTIONS:
-		if other_action == source_action:
-			continue
-		var to_remove: Array[InputEvent] = []
-		for existing in InputMap.action_get_events(other_action):
-			if _is_same_physical_input(existing, event):
-				to_remove.append(existing)
-		for e in to_remove:
-			InputMap.action_erase_event(other_action, e)
-		if not to_remove.is_empty() and settings.has(storage_key):
-			settings[storage_key].erase(other_action)
-
-
-func _is_same_physical_input(a: InputEvent, b: InputEvent) -> bool:
-	if a is InputEventJoypadButton and b is InputEventJoypadButton:
-		return a.button_index == b.button_index
-	if a is InputEventJoypadMotion and b is InputEventJoypadMotion:
-		return a.axis == b.axis and sign(a.axis_value) == sign(b.axis_value)
-	return false
 
 
 # ============================================================
@@ -382,6 +362,10 @@ func _default_controller_inputs() -> Dictionary:
 		"hud_select_up": "JoyAxis:3:-1.000",
 		"hud_select_down": "JoyAxis:3:1.000",
 		"pause_menu": "JoyButton:6",
+		"wheel_face_up": "JoyButton:3",
+		"wheel_face_down": "JoyButton:1",
+		"wheel_face_left": "JoyButton:2",
+		"wheel_face_right": "JoyButton:0",
 	}
 
 

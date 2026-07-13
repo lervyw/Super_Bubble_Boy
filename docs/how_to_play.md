@@ -1,6 +1,6 @@
 # How To Play
 
-Last updated: 2026-04-29
+Last updated: 2026-07-13
 
 This file is the simple version.
 Think of it as "potato knowledge".
@@ -186,6 +186,7 @@ Important:
 - Normal: L2
 - Hold power wheel: R2
 - Select wheel power: right analog stick
+- Select wheel power: face buttons (Triângulo=up, Quadrado=left, Bola=down, Cross=right)
 - Pause: Options
 
 ### Xbox
@@ -200,6 +201,7 @@ Important:
 - Normal: LT
 - Hold power wheel: RT
 - Select wheel power: right analog stick
+- Select wheel power: face buttons (Y=up, X=left, B=down, A=right)
 - Pause: Menu/Start
 
 ## Ultimate And Special Powers

@@ -91,6 +91,10 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 @onready var btn_roda_esquerda = $ControlsMenu/ScrollContainer/VBoxContainer/Controle21
 @onready var btn_roda_direita = $ControlsMenu/ScrollContainer/VBoxContainer/Controle22
 @onready var btn_cima = $ControlsMenu/ScrollContainer/VBoxContainer/Controle23
+@onready var btn_wheel_face_cima = $ControlsMenu/ScrollContainer/VBoxContainer/Controle24
+@onready var btn_wheel_face_esquerda = $ControlsMenu/ScrollContainer/VBoxContainer/Controle25
+@onready var btn_wheel_face_baixo = $ControlsMenu/ScrollContainer/VBoxContainer/Controle26
+@onready var btn_wheel_face_direita = $ControlsMenu/ScrollContainer/VBoxContainer/Controle27
 
 @onready var btn_voltar_botoes = $ControlsMenu/ScrollContainer/VBoxContainer/Voltar
 
@@ -169,6 +173,10 @@ func _ready():
 	_connect_rebind_button_once(btn_roda_esquerda, "hud_select_left")
 	_connect_rebind_button_once(btn_roda_direita, "hud_select_right")
 	_connect_rebind_button_once(btn_cima, "swim_up")
+	_connect_rebind_button_once(btn_wheel_face_cima, "wheel_face_up")
+	_connect_rebind_button_once(btn_wheel_face_esquerda, "wheel_face_left")
+	_connect_rebind_button_once(btn_wheel_face_baixo, "wheel_face_down")
+	_connect_rebind_button_once(btn_wheel_face_direita, "wheel_face_right")
 
 	# Volta do menu de controles para o menu de config
 	_connect_pressed_once(btn_voltar_botoes, _back_to_config_menu)
@@ -264,25 +272,28 @@ func _input(event: InputEvent):
 		return
 
 	if awaiting_rebind_action != "":
+		var handled := false
 		# --- Rebind por teclado ---
 		if event is InputEventKey and event.pressed:
 			if event.keycode in forbidden_keys:
 				return
 			_finish_rebind(event)
-			return
+			handled = true
 
 		# --- Rebind por controle (joypad) ---
-		if event is InputEventJoypadButton and event.pressed:
+		elif event is InputEventJoypadButton and event.pressed:
 			_finish_rebind(event)
-			return
+			handled = true
 
 		# --- Rebind por eixo/gatilho do controle ---
-		if event is InputEventJoypadMotion:
+		elif event is InputEventJoypadMotion:
 			var joy_event := _normalize_joy_motion_for_rebind(event)
 			if joy_event:
 				_finish_rebind(joy_event)
-				return
+				handled = true
 
+		if handled:
+			get_viewport().set_input_as_handled()
 		return
 
 	if event.is_action_pressed("ui_cancel"):
@@ -304,6 +315,7 @@ func _input(event: InputEvent):
 			btn_ataque_especial, btn_defesa, btn_ultimate, btn_esquerda, btn_direita,
 			btn_agachar, btn_dash, btn_pause,
 			btn_roda_cima, btn_roda_baixo, btn_roda_esquerda, btn_roda_direita,
+			btn_wheel_face_cima, btn_wheel_face_baixo, btn_wheel_face_esquerda, btn_wheel_face_direita,
 			btn_cima,
 			btn_voltar_botoes,
 		]:
@@ -437,6 +449,10 @@ func _setup_controls_scroll_focus() -> void:
 		btn_roda_esquerda,
 		btn_roda_baixo,
 		btn_roda_direita,
+		btn_wheel_face_cima,
+		btn_wheel_face_esquerda,
+		btn_wheel_face_baixo,
+		btn_wheel_face_direita,
 		btn_pause,
 		btn_voltar_botoes,
 	]
@@ -553,7 +569,6 @@ func _add_key_once(action_name: StringName, physical_keycode: int) -> void:
 #        SISTEMA DE REBIND
 # ================================
 func _start_rebind(action_name: String):
-	# Entra no modo "aguardando input" e define qual ação será alterada
 	awaiting_rebind_action = action_name
 	_set_rebind_prompt("Pressione tecla, botão, analógico ou gatilho")
 	print("Pressione tecla, botão, analógico ou gatilho para redefinir:", action_name)
@@ -592,6 +607,11 @@ func _update_control_labels():
 	_set_control_button(btn_roda_esquerda, "Roda Esquerda", &"hud_select_left")
 	_set_control_button(btn_roda_direita, "Roda Direita", &"hud_select_right")
 
+	_set_control_button(btn_wheel_face_cima, "Roda Face Cima", &"wheel_face_up")
+	_set_control_button(btn_wheel_face_esquerda, "Roda Face Esquerda", &"wheel_face_left")
+	_set_control_button(btn_wheel_face_baixo, "Roda Face Baixo", &"wheel_face_down")
+	_set_control_button(btn_wheel_face_direita, "Roda Face Direita", &"wheel_face_right")
+
 	_set_rebind_prompt("Selecione uma ação para remapear")
 
 
@@ -614,6 +634,7 @@ func _organize_control_buttons() -> void:
 		btn_ataque, btn_defesa,
 		btn_normal_form, btn_bolha, btn_super,
 		btn_menu, btn_roda_cima, btn_roda_esquerda, btn_roda_baixo, btn_roda_direita,
+		btn_wheel_face_cima, btn_wheel_face_esquerda, btn_wheel_face_baixo, btn_wheel_face_direita,
 		btn_pause,
 	]
 	var first_button_index := 2

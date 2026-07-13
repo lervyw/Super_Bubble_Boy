@@ -48,7 +48,7 @@ func _on_area_entered(area: Area2D) -> void:
 
 
 func _arrived() -> void:
-	var player := get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("jogador")
 	if player and is_instance_valid(player):
 		if player.has_method("_on_teleport_bubble_arrived"):
 			player._on_teleport_bubble_arrived(global_position)

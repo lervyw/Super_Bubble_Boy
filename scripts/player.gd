@@ -131,7 +131,7 @@ var hud_menu_waiting_for_neutral := false
 
 @export_group("Active Super Attacks")
 @export var active_attack_names: Array[StringName] = [&"super_attack_1"]
-@export var active_attack_cooldowns: Array[float] = [1.5]
+@export var active_attack_cooldowns: Array[float] = [1.0]
 @export var active_attack_mana_costs: Array[float] = [20.0]
 @export var active_attack_damages: Array[int] = [4]
 @export var active_attack_area_paths: Array[NodePath] = [NodePath("AttackHitbox")]
@@ -367,6 +367,13 @@ func ensure_optional_input_actions() -> void:
 	_add_key_event_once("hud_select_left", KEY_J)
 	_add_key_event_once("hud_select_right", KEY_L)
 
+	# Ações para botões face na roda de poderes
+	# Podem compartilhar botões com attack/defend/dash/attack_special
+	# pois o contexto (roda aberta/fechada) controla qual dispara
+	for action_name in ["wheel_face_up", "wheel_face_down", "wheel_face_left", "wheel_face_right"]:
+		if not InputMap.has_action(action_name):
+			InputMap.add_action(action_name)
+
 
 func _add_key_event_once(action_name: StringName, keycode: int) -> void:
 	for event in InputMap.action_get_events(action_name):
@@ -388,6 +395,11 @@ func _input(event):
 
 	if event.is_action_released("hud_menu"):
 		close_hud_menu()
+		return
+
+	# Bloquear ações de combate dos botões face enquanto a roda está aberta
+	# Ou enquanto R2 está pressionado (caso o evento chegue antes do hud_menu no mesmo frame)
+	if hud_menu_open or Input.is_action_pressed("hud_menu"):
 		return
 
 	if event.is_action_pressed("attack_special"):
@@ -446,7 +458,7 @@ func normalize_attack_configuration() -> void:
 	if active_attack_names.is_empty():
 		active_attack_names = [&"super_attack_1"]
 	if active_attack_cooldowns.is_empty():
-		active_attack_cooldowns = [1.5]
+		active_attack_cooldowns = [1.0]
 	if active_attack_mana_costs.is_empty():
 		active_attack_mana_costs = [20.0]
 	if active_attack_damages.is_empty():
@@ -1082,6 +1094,8 @@ func check_ground_stomp_input() -> void:
 		return
 	if not is_down_pressed():
 		return
+	if hud_menu_open:
+		return
 	if not Input.is_action_just_pressed("attack"):
 		return
 
@@ -1306,6 +1320,9 @@ func handle_input() -> void:
 	if Input.is_action_just_pressed("jump"):
 		handle_jump()
 
+	if hud_menu_open:
+		return
+
 	if mode == GameMode.METROIDVANIA:
 		if Input.is_action_just_pressed("forma1"):
 			toggle_transform(Form.BUBBLE)
@@ -1324,9 +1341,6 @@ func start_special_attack() -> void:
 		return
 	if not can_trigger_active_attack(selected_active_attack_index):
 		return
-	if not has_stamina(STAMINA_COST_SPECIAL):
-		show_stamina_warning()
-		return
 
 	var attack_name := get_active_attack_name(selected_active_attack_index)
 	var mana_cost := get_active_attack_mana_cost(selected_active_attack_index)
@@ -1334,7 +1348,6 @@ func start_special_attack() -> void:
 		return
 
 	defending = false
-	consume_stamina(STAMINA_COST_SPECIAL * (SUPER_STAMINA_MULTIPLIER if form == Form.SUPER else 1.0))
 	prepare_attack_area(
 		get_active_attack_area(selected_active_attack_index),
 		get_active_attack_damage(selected_active_attack_index),
@@ -1877,11 +1890,11 @@ func idle_state() -> void:
 		change_state(State.JUMP)
 	elif abs(get_horizontal_axis()) > 0:
 		change_state(State.WALK)
-	elif Input.is_action_just_pressed("attack"):
+	elif Input.is_action_just_pressed("attack") and not hud_menu_open:
 		start_normal_attack()
 	elif Input.is_action_pressed("crouch"):
 		change_state(State.CROUCH)
-	elif Input.is_action_just_pressed("dash") and can_dash():
+	elif Input.is_action_just_pressed("dash") and can_dash() and not hud_menu_open:
 		if form == Form.SUPER:
 			start_super_shield()
 		else:
@@ -1893,11 +1906,11 @@ func walk_state() -> void:
 
 	if Input.is_action_just_pressed("jump") and on_ground:
 		change_state(State.JUMP)
-	elif Input.is_action_just_pressed("attack"):
+	elif Input.is_action_just_pressed("attack") and not hud_menu_open:
 		start_normal_attack()
 	elif Input.is_action_pressed("crouch"):
 		change_state(State.CROUCH)
-	elif Input.is_action_just_pressed("dash") and can_dash():
+	elif Input.is_action_just_pressed("dash") and can_dash() and not hud_menu_open:
 		if form == Form.SUPER:
 			start_super_shield()
 		else:
@@ -1909,7 +1922,7 @@ func walk_state() -> void:
 func jump_state() -> void:
 	handle_horizontal_input()
 
-	if Input.is_action_just_pressed("dash") and can_dash():
+	if Input.is_action_just_pressed("dash") and can_dash() and not hud_menu_open:
 		if form == Form.SUPER:
 			start_super_shield()
 		else:
@@ -1981,7 +1994,7 @@ func swim_state() -> void:
 	if not is_zero_approx(dir_y):
 		velocity.y = dir_y * swim_speed * 0.85
 
-	if Input.is_action_just_pressed("attack"):
+	if Input.is_action_just_pressed("attack") and not hud_menu_open:
 		start_normal_attack()
 		return
 
@@ -2040,12 +2053,8 @@ func change_state(new_state: State) -> void:
 func start_normal_attack() -> void:
 	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
 		return
-	if not has_stamina(STAMINA_COST_ATTACK):
-		show_stamina_warning()
-		return
 
 	defending = false
-	consume_stamina(STAMINA_COST_ATTACK * (SUPER_STAMINA_MULTIPLIER if form == Form.SUPER else 1.0))
 	prepare_attack_area(attack_area, normal_attack_damage, AttackKind.NORMAL, normal_attack_id)
 	change_state(State.ATTACK)
 	trigger_attack_window(normal_attack_active_time)
@@ -2197,7 +2206,6 @@ func open_hud_menu() -> void:
 	hud_menu_axis_locked = false
 	hud_menu_selection_locked = false
 	hud_menu_waiting_for_neutral = get_raw_hud_menu_direction() != Vector2.ZERO
-	velocity.x = 0.0
 
 	if hud and hud.has_method("show_menu"):
 		hud.show_menu()
@@ -2257,9 +2265,14 @@ func process_hud_menu_selection() -> void:
 func get_hud_menu_direction() -> Vector2:
 	var direction := get_raw_hud_menu_direction()
 	if hud_menu_waiting_for_neutral:
-		if direction == Vector2.ZERO:
+		# Botões face são digitais e precisos — pula a espera de neutro
+		var face_active := Input.is_action_pressed("wheel_face_up") or Input.is_action_pressed("wheel_face_down") or Input.is_action_pressed("wheel_face_left") or Input.is_action_pressed("wheel_face_right")
+		if face_active:
 			hud_menu_waiting_for_neutral = false
-		return Vector2.ZERO
+		elif direction == Vector2.ZERO:
+			hud_menu_waiting_for_neutral = false
+		if hud_menu_waiting_for_neutral:
+			return Vector2.ZERO
 
 	return direction
 
@@ -2267,6 +2280,7 @@ func get_hud_menu_direction() -> Vector2:
 func get_raw_hud_menu_direction() -> Vector2:
 	var dir := Vector2.ZERO
 
+	# Analógico direito (hud_select_*)
 	if Input.is_action_pressed("hud_select_left"):
 		dir.x -= 1.0
 	if Input.is_action_pressed("hud_select_right"):
@@ -2274,6 +2288,16 @@ func get_raw_hud_menu_direction() -> Vector2:
 	if Input.is_action_pressed("hud_select_up"):
 		dir.y -= 1.0
 	if Input.is_action_pressed("hud_select_down"):
+		dir.y += 1.0
+
+	# Botões face do controle (Triângulo/Y=up, Quadrado/X=left, Bola/B=down, Cross/A=right)
+	if Input.is_action_pressed("wheel_face_left"):
+		dir.x -= 1.0
+	if Input.is_action_pressed("wheel_face_right"):
+		dir.x += 1.0
+	if Input.is_action_pressed("wheel_face_up"):
+		dir.y -= 1.0
+	if Input.is_action_pressed("wheel_face_down"):
 		dir.y += 1.0
 
 	return dir.normalized() if dir != Vector2.ZERO else Vector2.ZERO
@@ -2326,6 +2350,8 @@ func get_camera_lookahead_direction() -> float:
 func _start_camera_follow(target: Node2D, duration: float) -> void:
 	camera_follow_target = target
 	camera_follow_timer = duration
+	if player_camera:
+		player_camera.position_smoothing_enabled = false
 
 
 func _stop_camera_follow() -> void:
@@ -2333,6 +2359,7 @@ func _stop_camera_follow() -> void:
 	camera_follow_timer = 0.0
 	if is_instance_valid(player_camera):
 		player_camera.position = Vector2.ZERO
+		player_camera.position_smoothing_enabled = true
 
 
 func action_to_wheel_slot(action: HudMenuAction) -> WheelSlot:
@@ -2594,12 +2621,12 @@ func set_area_collision_enabled(area: Area2D, enabled: bool) -> void:
 	if area == null:
 		return
 
-	area.monitoring = enabled
-	area.monitorable = enabled
+	area.set_deferred("monitoring", enabled)
+	area.set_deferred("monitorable", enabled)
 
 	for child in area.get_children():
 		if child is CollisionShape2D:
-			child.disabled = not enabled
+			child.set_deferred("disabled", not enabled)
 
 
 func attack_area_has_targets(area: Area2D) -> bool:

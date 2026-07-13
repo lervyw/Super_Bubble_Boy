@@ -569,16 +569,16 @@ func start_attack():
 				return
 
 		if hitbox_shape:
-			hitbox_shape.disabled = false
+			hitbox_shape.set_deferred("disabled", false)
 
 		await get_tree().create_timer(hitbox_active_time).timeout
 		if not is_current_attack(current_attack_serial):
 			if hitbox_shape:
-				hitbox_shape.disabled = true
+				hitbox_shape.set_deferred("disabled", true)
 			return
 
 		if hitbox_shape:
-			hitbox_shape.disabled = true
+			hitbox_shape.set_deferred("disabled", true)
 
 		var remaining_animation_time: float = maxf(animation_duration - hitbox_start_delay - hitbox_active_time, 0.0)
 		if remaining_animation_time > 0:
@@ -607,7 +607,7 @@ func take_damage(amount, _source: Node = null):
 	var current_hit_reaction := hit_reaction_serial
 
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 
 	if health <= 0:
 		die()
@@ -812,7 +812,7 @@ func update_attack_hitbox_frame_state(frame: int) -> void:
 		return
 
 	var inside_window := frame >= attack_hitbox_start_frame and frame <= attack_hitbox_end_frame
-	hitbox_shape.disabled = not inside_window
+	hitbox_shape.set_deferred("disabled", not inside_window)
 
 
 func update_animation():

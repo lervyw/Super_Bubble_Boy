@@ -63,7 +63,7 @@ var activated: bool = false
 func _ready() -> void:
 	# Se não foi setado no Inspector, tenta achar o player pelo grupo
 	if not player:
-		player = get_tree().get_first_node_in_group("player") as CharacterBody2D
+		player = get_tree().get_first_node_in_group("jogador") as CharacterBody2D
 
 	# Conecta sinais apenas uma vez
 	if not body_entered.is_connected(_on_body_entered):
