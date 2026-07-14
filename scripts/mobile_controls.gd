@@ -137,7 +137,7 @@ func _update_menu_mode(delta: float) -> void:
 		_release_menu_actions()
 		return
 
-	var direction: Vector2 = joystick.output
+	var direction := joystick.output
 	var snapped := Vector2.ZERO
 	if absf(direction.x) >= MENU_JOYSTICK_DEADZONE:
 		snapped.x = 1.0 if direction.x > 0.0 else -1.0
