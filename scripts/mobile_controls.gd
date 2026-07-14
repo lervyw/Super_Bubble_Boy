@@ -43,6 +43,7 @@ var _menu_confirm_btn: TouchScreenButton
 var _menu_confirm_label: Label
 var _menu_back_btn: TouchScreenButton
 var _menu_back_label: Label
+var _menu_controls: Control
 
 
 func _ready() -> void:
@@ -72,6 +73,8 @@ func _exit_tree() -> void:
 func set_menu_mode(enabled: bool) -> void:
 	menu_mode = enabled
 	_release_joystick_actions()
+	for action_name in MENU_ACTIONS:
+		Input.action_release(action_name)
 	if joystick:
 		joystick.reset_joystick()
 	_menu_last_direction = Vector2.ZERO
@@ -87,6 +90,9 @@ func _apply_menu_button_visibility() -> void:
 	if joystick:
 		joystick.visible = menu_mode
 
+	if _menu_controls:
+		_menu_controls.visible = menu_mode
+
 	if _menu_confirm_btn:
 		_menu_confirm_btn.visible = menu_mode
 		_menu_confirm_label.visible = menu_mode
@@ -96,8 +102,8 @@ func _apply_menu_button_visibility() -> void:
 
 
 func _setup_menu_buttons() -> void:
-	var menu_controls := find_child("MenuControls", true, false) as Control
-	if not menu_controls:
+	_menu_controls = find_child("MenuControls", true, false) as Control
+	if not _menu_controls:
 		return
 
 	_menu_confirm_btn = find_child("MenuOK", true, false) as TouchScreenButton
