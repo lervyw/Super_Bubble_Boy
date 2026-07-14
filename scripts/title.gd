@@ -186,6 +186,15 @@ func _ready():
 
 	# Atualiza o texto dos botões com o input atual (ex: "Pulo: Space")
 	_update_control_labels()
+
+	if OS.get_name() == "Android":
+		var mobile_scene := preload("res://Cenas/mobile_controls.tscn")
+		var controls := mobile_scene.instantiate()
+		controls.name = "MobileControls"
+		add_child(controls)
+		if controls.has_method("set_menu_mode"):
+			controls.set_menu_mode(true)
+
 	_play_startup_intro()
 
 

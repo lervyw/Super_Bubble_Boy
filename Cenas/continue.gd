@@ -76,6 +76,19 @@ func _ready() -> void:
 	if not start_timer_after_dialogs or dialogs.is_empty():
 		start_countdown()
 
+	if OS.get_name() == "Android":
+		var mobile_scene := preload("res://Cenas/mobile_controls.tscn")
+		var controls := mobile_scene.instantiate()
+		controls.name = "MobileControls"
+		add_child(controls)
+		if controls.has_method("set_menu_mode"):
+			controls.set_menu_mode(true)
+		if continue_button:
+			continue_button.focus_mode = Control.FOCUS_ALL
+			continue_button.grab_focus()
+		if quit_button:
+			quit_button.focus_mode = Control.FOCUS_ALL
+
 
 # =======================
 # ====== INPUT ==========
