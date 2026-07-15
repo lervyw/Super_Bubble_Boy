@@ -32,7 +32,7 @@ var settings := {
 	"volume_master": 0.0,
 	"volume_music": 0.0,
 	"volume_sfx": 0.0,
-	"crt_enabled": true,
+	"crt_enabled": false,
 	"input_schema_version": INPUT_SCHEMA_VERSION,
 	"active_input_profile": "keyboard",
 	"inputs_keyboard": {},
@@ -292,7 +292,7 @@ func _ensure_settings_schema() -> void:
 	if not settings.has("volume_sfx"):
 		settings["volume_sfx"] = 0.0
 	if not settings.has("crt_enabled"):
-		settings["crt_enabled"] = true
+		settings["crt_enabled"] = false
 	var schema_version := int(settings.get("input_schema_version", 0))
 	if schema_version < INPUT_SCHEMA_VERSION:
 		settings["inputs_keyboard"] = _default_keyboard_inputs()

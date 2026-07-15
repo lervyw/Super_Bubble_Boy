@@ -12,7 +12,7 @@ extends Control
 @export var colored_grain_toggle: CheckButton
 @export var scanlines_size_slider: HSlider
 @export var scanlines_interval_slider: HSlider
-var is_enabled: float = true
+var is_enabled: float = false
 
 var current_scale: float = 1.0
 
@@ -24,6 +24,8 @@ const CRT_SHADER = preload("res://addons/flowerwall_crt/shaders/crt_shader.mater
 func _ready() -> void:
 	_apply_subtle_preset()
 	flowerwall_crt_config_ui.visible = false
+	if ConfigManager.has_method("is_crt_enabled"):
+		is_enabled = ConfigManager.is_crt_enabled()
 	set_active(is_enabled)
 
 #Menu
