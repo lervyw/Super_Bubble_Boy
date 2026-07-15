@@ -26,7 +26,7 @@ var mana_regen_block_timer: float = 0.0
 
 @export_group("Stamina")
 @export var max_stamina: float = 100.0
-@export_range(0.0, 100.0, 0.1) var stamina_regen_per_second: float = 15.0
+@export_range(0.0, 100.0, 0.1) var stamina_regen_per_second: float = 5.0
 @export_range(0.0, 10.0, 0.05) var stamina_regen_delay: float = 0.5
 var current_stamina: float = 100.0
 var stamina_regen_block_timer: float = 0.0

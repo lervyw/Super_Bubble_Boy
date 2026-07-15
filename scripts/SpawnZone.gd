@@ -54,7 +54,7 @@ func _ready() -> void:
 
 	# Encontra player se não definido
 	if not player:
-		player = get_tree().get_first_node_in_group("player")
+		player = get_tree().get_first_node_in_group("jogador")
 	
 	# Calcula bounds da zona
 	calculate_zone_bounds()

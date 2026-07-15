@@ -96,8 +96,9 @@ func collect() -> void:
 	if stats and stats.has_method("update_health"):
 		stats.update_health("Increase", 1)
 
-	# --- Desbloqueio de forma ---
-	player.unlocked_forms[player.Form.BUBBLE] = true
+		# --- Desbloqueio de forma ---
+		player.unlocked_forms[player.Form.BUBBLE] = true
+		_notify_transformation_unlocked()
 
 	# --- Atualização de respawn (opcional) ---
 	if update_respawn and respawn_node:
@@ -107,6 +108,17 @@ func collect() -> void:
 	if stats and stats.has_method("reset_health_full"):
 		stats.reset_health_full()
 
-	print("🫧 Forma Bubble desbloqueada! HP restaurado!")
+		print("🫧 Forma Bubble desbloqueada! HP restaurado!")
 
-	queue_free()
+		queue_free()
+
+
+func _notify_transformation_unlocked() -> void:
+	if not player:
+		return
+	if not ("hud" in player):
+		return
+	if not player.hud:
+		return
+	if player.hud.has_method("show_transformation_unlocked_message"):
+		player.hud.show_transformation_unlocked_message("forma bolha desbloqueada", [&"forma1"])

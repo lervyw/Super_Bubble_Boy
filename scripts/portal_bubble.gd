@@ -36,7 +36,7 @@ func _on_area_entered(area: Area2D) -> void:
 
 
 func _hit_position(pos: Vector2) -> void:
-	var player := get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("jogador")
 	if player and player.has_method("_on_portal_bubble_hit"):
 		player._on_portal_bubble_hit(pos)
 	queue_free()

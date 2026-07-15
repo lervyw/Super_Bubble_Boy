@@ -16,6 +16,7 @@ enum WheelSlot { ULTIMATE, SPECIAL_ATTACK, BUBBLE_PROJECTILE, PLACEHOLDER }
 @export var activate_particles: Node2D
 @export var activate_sound: AudioStreamPlayer
 @export var destroy_after_activation: bool = false
+@export var power_hint_actions: Array[StringName] = []
 
 @export_group("HP")
 @export var restore_health_on_activate: bool = true
@@ -28,7 +29,9 @@ var activated: bool = false
 
 func _ready() -> void:
 	if not player:
-		player = get_tree().get_first_node_in_group("player") as CharacterBody2D
+		player = get_tree().get_first_node_in_group("jogador") as CharacterBody2D
+	if not player:
+		player = get_tree().get_first_node_in_group("jogador") as CharacterBody2D
 
 	if not body_entered.is_connected(_on_body_entered):
 		body_entered.connect(_on_body_entered)
@@ -90,6 +93,7 @@ func activate_checkpoint() -> void:
 		var form_slots = player.unlocked_wheel_slots.get(unlock_form, {})
 		form_slots[unlock_slot] = true
 		print("   Slot ", unlock_slot, " desbloqueado para forma ", unlock_form)
+		_notify_powerup_collected()
 
 	if update_respawn and player:
 		var pos := player.global_position
@@ -129,3 +133,14 @@ func activate_checkpoint() -> void:
 
 	if destroy_after_activation:
 		queue_free()
+
+
+func _notify_powerup_collected() -> void:
+	if not player:
+		return
+	if not ("hud" in player):
+		return
+	if not player.hud:
+		return
+	if player.hud.has_method("show_powerup_collected_message"):
+		player.hud.show_powerup_collected_message(power_hint_actions)

@@ -31,7 +31,7 @@ func _ready() -> void:
 			print("✅ Kill Zone: Level encontrado automaticamente: ", level.name)
 
 	if not player:
-		player = get_tree().get_first_node_in_group("player") as CharacterBody2D
+		player = get_tree().get_first_node_in_group("jogador") as CharacterBody2D
 
 	if not level:
 		push_error("Kill Zone: Level não encontrado! Configure no Inspector.")

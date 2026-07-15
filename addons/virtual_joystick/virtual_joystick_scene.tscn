@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=3 uid="uid://cjywq4yidt8ww"]
+
+[ext_resource type="Script" uid="uid://crhkh4tk213qg" path="res://addons/virtual_joystick/virtual_joystick.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cqkw58ft3yjs4" path="res://addons/virtual_joystick/textures/joystick_base.svg" id="2"]
+[ext_resource type="Texture2D" uid="uid://gf3ushnyasx2" path="res://addons/virtual_joystick/textures/joystick_tip.svg" id="3"]
+
+[node name="VirtualJoystick" type="Control"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 120.0
+offset_bottom = 120.0
+mouse_filter = 2
+script = ExtResource("1")
+clampzone_size = 34.0
+
+[node name="Base" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 104.0
+offset_bottom = 104.0
+pivot_offset = Vector2(44, 44)
+mouse_filter = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tip" type="TextureRect" parent="Base"]
+layout_mode = 0
+offset_left = 29.0
+offset_top = 29.0
+offset_right = 59.0
+offset_bottom = 59.0
+pivot_offset = Vector2(15, 15)
+mouse_filter = 2
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5

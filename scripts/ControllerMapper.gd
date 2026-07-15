@@ -1,22 +1,58 @@
 extends Node
 
 enum ControllerType { UNKNOWN, XBOX, PLAYSTATION, NINTENDO_SWITCH, GENERIC }
+enum InputSource { KEYBOARD, CONTROLLER }
 
 signal controller_connected(device_id: int, type: ControllerType)
 signal controller_disconnected(device_id: int)
-
-const JOYPAD_TRIGGER_AXES: Array[int] = [4, 5]
-const JOYPAD_TRIGGER_DEADZONE: float = 0.20
-const JOYPAD_DEADZONE: float = 0.5
+signal input_source_changed(source: InputSource, controller_type: ControllerType)
 
 var connected_controllers: Dictionary = {}
 
 var _primary_device: int = -1
+var _last_input_source: InputSource = InputSource.KEYBOARD
 
 
 func _ready() -> void:
 	Input.joy_connection_changed.connect(_on_joy_connection_changed)
 	_detect_connected_controllers()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey or event is InputEventMouseButton or event is InputEventMouseMotion:
+		_set_last_input_source(InputSource.KEYBOARD)
+	elif event is InputEventJoypadButton and event.pressed:
+		_activate_controller_input(event.device)
+	elif event is InputEventJoypadMotion and absf(event.axis_value) >= 0.55:
+		_activate_controller_input(event.device)
+
+
+func _activate_controller_input(device_id: int) -> void:
+	var previous_type := get_primary_type()
+	if device_id >= 0:
+		_primary_device = device_id
+	var current_type := get_primary_type()
+	ConfigManager.apply_controller_profile(current_type)
+	if _last_input_source == InputSource.CONTROLLER:
+		if previous_type != current_type:
+			input_source_changed.emit(InputSource.CONTROLLER, current_type)
+		return
+	_set_last_input_source(InputSource.CONTROLLER)
+
+
+func _set_last_input_source(source: InputSource) -> void:
+	if _last_input_source == source:
+		return
+	_last_input_source = source
+	if source == InputSource.KEYBOARD:
+		ConfigManager.set_keyboard_profile_active()
+	else:
+		ConfigManager.apply_controller_profile(get_primary_type())
+	input_source_changed.emit(source, get_primary_type())
+
+
+func get_last_input_source() -> InputSource:
+	return _last_input_source
 
 
 func _detect_connected_controllers() -> void:
@@ -28,9 +64,9 @@ func _register_controller(device_id: int) -> void:
 	var ctype := _identify_controller(device_id)
 	connected_controllers[device_id] = ctype
 	print("Controle detectado [%d]: %s (%s)" % [device_id, Input.get_joy_name(device_id), _type_name(ctype)])
-	_ensure_all_input_actions(device_id)
 	if _primary_device < 0:
 		_primary_device = device_id
+	ConfigManager.apply_controller_profile(ctype)
 	controller_connected.emit(device_id, ctype)
 
 
@@ -41,19 +77,22 @@ func _on_joy_connection_changed(device_id: int, connected: bool) -> void:
 		connected_controllers.erase(device_id)
 		if _primary_device == device_id:
 			_primary_device = connected_controllers.keys()[0] if not connected_controllers.is_empty() else -1
+			if _primary_device >= 0:
+				ConfigManager.apply_controller_profile(get_primary_type())
+				input_source_changed.emit(_last_input_source, get_primary_type())
 		print("Controle desconectado [%d]" % device_id)
 		controller_disconnected.emit(device_id)
 
 
 func _identify_controller(device_id: int) -> ControllerType:
-	var name := Input.get_joy_name(device_id).to_lower()
+	var controller_name := Input.get_joy_name(device_id).to_lower()
 	var guid := Input.get_joy_guid(device_id).to_lower()
 
-	if "xbox" in name or "x-box" in name or "xinput" in name:
+	if "xbox" in controller_name or "x-box" in controller_name or "xinput" in controller_name:
 		return ControllerType.XBOX
-	if "playstation" in name or "ps4" in name or "ps5" in name or "dualsense" in name or "dualshock" in name or "ps" in name:
+	if "playstation" in controller_name or "ps4" in controller_name or "ps5" in controller_name or "dualsense" in controller_name or "dualshock" in controller_name or "ps" in controller_name:
 		return ControllerType.PLAYSTATION
-	if "nintendo" in name or "switch" in name or "pro controller" in name or "joy-con" in name:
+	if "nintendo" in controller_name or "switch" in controller_name or "pro controller" in controller_name or "joy-con" in controller_name:
 		return ControllerType.NINTENDO_SWITCH
 	if "xbox" in guid:
 		return ControllerType.XBOX
@@ -65,111 +104,6 @@ func _identify_controller(device_id: int) -> ControllerType:
 		return ControllerType.XBOX
 
 	return ControllerType.GENERIC
-
-
-func _ensure_all_input_actions(_device_id: int) -> void:
-	_ensure_action("ui_accept")
-	_ensure_action("ui_select")
-	_ensure_action("ui_cancel")
-	_ensure_action("ui_up")
-	_ensure_action("ui_down")
-	_ensure_action("ui_left")
-	_ensure_action("ui_right")
-	_ensure_action("pause_menu")
-	_ensure_action("hud_select_up")
-	_ensure_action("hud_select_down")
-	_ensure_action("hud_select_left")
-	_ensure_action("hud_select_right")
-	_ensure_action("swim_up")
-
-	_add_joy_button("jump", 0)
-	_add_joy_button("ui_accept", 0)
-	_add_joy_button("ui_select", 0)
-	_add_joy_button("normal", 1)
-	_add_joy_button("ui_cancel", 1)
-	_add_joy_button("attack", 2)
-	_add_joy_button("dash", 3)
-	_add_joy_button("ui_start", 6)
-	_add_joy_button("pause_menu", 6)
-	_add_joy_button("forma1", 10)
-	_add_joy_button("forma2", 9)
-	_add_joy_button("ui_up", 11)
-	_add_joy_button("ui_down", 12)
-	_add_joy_button("crouch", 12)
-	_add_joy_button("ui_left", 13)
-	_add_joy_button("left", 13)
-	_add_joy_button("ui_right", 14)
-	_add_joy_button("right", 14)
-
-	_add_joy_axis("attack_special", 5, 1.0)
-	_add_joy_axis("defend", 4, 1.0)
-	_add_joy_axis("ui_left", 0, -1.0)
-	_add_joy_axis("ui_right", 0, 1.0)
-	_add_joy_axis("ui_up", 1, -1.0)
-	_add_joy_axis("ui_down", 1, 1.0)
-	_add_joy_axis("left", 0, -1.0)
-	_add_joy_axis("right", 0, 1.0)
-	_add_joy_axis("crouch", 1, 1.0)
-
-
-func _ensure_action(action_name: StringName) -> void:
-	if not InputMap.has_action(action_name):
-		InputMap.add_action(action_name, JOYPAD_DEADZONE)
-
-
-func _add_joy_button(action_name: StringName, button_index: int) -> void:
-	if not InputMap.has_action(action_name):
-		return
-
-	if _is_button_in_any_action(button_index):
-		return
-
-	for event in InputMap.action_get_events(action_name):
-		if event is InputEventJoypadButton and event.button_index == button_index:
-			return
-	var joy_event := InputEventJoypadButton.new()
-	joy_event.device = -1
-	joy_event.button_index = button_index
-	InputMap.action_add_event(action_name, joy_event)
-
-
-func _add_joy_axis(action_name: StringName, axis: int, axis_value: float) -> void:
-	if not InputMap.has_action(action_name):
-		return
-
-	if _is_axis_in_any_action(axis, axis_value):
-		return
-
-	for event in InputMap.action_get_events(action_name):
-		if event is InputEventJoypadMotion and event.axis == axis and sign(event.axis_value) == sign(axis_value):
-			return
-	var joy_event := InputEventJoypadMotion.new()
-	joy_event.device = -1
-	joy_event.axis = axis
-	joy_event.axis_value = axis_value
-	InputMap.action_add_event(action_name, joy_event)
-	if axis in JOYPAD_TRIGGER_AXES:
-		InputMap.action_set_deadzone(action_name, JOYPAD_TRIGGER_DEADZONE)
-
-
-func _is_button_in_any_action(button_index: int) -> bool:
-	for action in InputMap.get_actions():
-		if action in ["ui_accept", "ui_select", "ui_cancel", "ui_up", "ui_down", "ui_left", "ui_right", "ui_start", "ui_text_newline"]:
-			continue
-		for event in InputMap.action_get_events(action):
-			if event is InputEventJoypadButton and event.button_index == button_index:
-				return true
-	return false
-
-
-func _is_axis_in_any_action(axis: int, axis_value: float) -> bool:
-	for action in InputMap.get_actions():
-		if action in ["ui_accept", "ui_select", "ui_cancel", "ui_up", "ui_down", "ui_left", "ui_right", "ui_start", "ui_text_newline"]:
-			continue
-		for event in InputMap.action_get_events(action):
-			if event is InputEventJoypadMotion and event.axis == axis and sign(event.axis_value) == sign(axis_value):
-				return true
-	return false
 
 
 func get_primary_type() -> ControllerType:
@@ -247,14 +181,13 @@ func get_button_name(button_index: int, device_id: int = -1) -> String:
 
 
 func get_axis_name(axis: int, axis_value: float, device_id: int = -1) -> String:
-	var direction := "+" if axis_value >= 0.0 else "-"
 	var ctype := _get_type_for_device(device_id)
 
 	match axis:
-		0: return "Analogico Esquerdo %sX" % direction
-		1: return "Analogico Esquerdo %sY" % direction
-		2: return "Analogico Direito %sX" % direction
-		3: return "Analogico Direito %sY" % direction
+		0: return "Analogico Esquerdo " + ("Direita" if axis_value >= 0.0 else "Esquerda")
+		1: return "Analogico Esquerdo " + ("Baixo" if axis_value >= 0.0 else "Cima")
+		2: return "Analogico Direito " + ("Direita" if axis_value >= 0.0 else "Esquerda")
+		3: return "Analogico Direito " + ("Baixo" if axis_value >= 0.0 else "Cima")
 		4:
 			match ctype:
 				ControllerType.PLAYSTATION: return "L2"
@@ -265,7 +198,7 @@ func get_axis_name(axis: int, axis_value: float, device_id: int = -1) -> String:
 				ControllerType.PLAYSTATION: return "R2"
 				ControllerType.NINTENDO_SWITCH: return "ZR"
 				_: return "RT"
-		_: return "Eixo %d%s" % [axis, direction]
+		_: return "Eixo %d" % axis
 
 
 func _get_type_for_device(device_id: int) -> ControllerType:

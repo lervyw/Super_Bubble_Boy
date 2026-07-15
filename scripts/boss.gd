@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 signal boss_defeated
 signal health_changed(current_health: int, max_health: int)
-signal hud_visibility_changed(visible: bool)
+signal hud_visibility_changed(should_show: bool)
 
 const ATTACK_META_DAMAGE := &"attack_damage"
 
@@ -22,7 +22,7 @@ var health: int = max_health
 @export_group("Movement")
 @export var speed: float = 90.0
 @export var gravity: float = 900.0
-@export var stop_distance: float = 60.0
+@export var stop_distance: float = 42.0
 @export var aggro_range: float = 450.0
 @export var turn_horizontal_threshold: float = 32.0
 
@@ -32,7 +32,7 @@ var health: int = max_health
 
 @export_group("Attack")
 @export var damage: int = 2
-@export var attack_range: float = 70.0
+@export var attack_range: float = 55.0
 @export var attack_cooldown: float = 1.0
 @export var hitbox_active_time: float = 0.12
 @export_range(-1, 99, 1) var attack_hitbox_start_frame: int = -1
@@ -45,6 +45,7 @@ var health: int = max_health
 @export var projectile_min_range: float = 42.0
 @export var projectile_chase_distance: float = 150.0
 @export var projectile_attack_animation: StringName = &"attack2"
+@export var projectile_super_attack_animation: StringName = &"attack_super2"
 @export_range(0, 99, 1) var projectile_attack_fire_frame: int = 6
 @export var projectile_mouth_offset: Vector2 = Vector2(38.0, -27.0)
 @export var projectile_damage: int = 2
@@ -88,6 +89,7 @@ var current_attack_animation: StringName = &""
 var time_frozen: bool = false
 var time_frozen_velocity: Vector2 = Vector2.ZERO
 var time_frozen_sprite_was_playing: bool = false
+var transform_started: bool = false
 
 # =========================================================
 
@@ -126,6 +128,11 @@ func _physics_process(delta):
 		return
 	if time_frozen:
 		velocity = Vector2.ZERO
+		return
+	if state == State.TRANSFORM:
+		velocity.x = 0.0
+		apply_gravity(delta)
+		move_and_slide()
 		return
 
 	if cooldown_t > 0:
@@ -201,23 +208,27 @@ func start_attack(dist: float = 0.0):
 		await start_projectile_attack()
 		return
 
-	current_attack_animation = get_attack_anim()
+	var attack_anim: StringName = get_attack_anim()
+	current_attack_animation = attack_anim
 	restart_attack_animation()
 
 	if uses_frame_based_hitbox():
-		await run_attack_hitbox_by_frames(get_attack_anim())
+		await run_attack_hitbox_by_frames(attack_anim)
 	else:
 		await wait_for_attack_hitbox_start()
 
 		if hitbox_shape and not time_frozen:
-			hitbox_shape.disabled = false
+			hitbox_shape.set_deferred("disabled", false)
 
 		await get_tree().create_timer(hitbox_active_time).timeout
 
-		if hitbox_shape:
-			hitbox_shape.disabled = true
+	if hitbox_shape:
+		hitbox_shape.set_deferred("disabled", true)
 
-	await wait_for_animation(get_attack_anim())
+		await wait_for_animation(attack_anim)
+
+	if state == State.DEAD or state == State.TRANSFORM:
+		return
 
 	state = State.CHASE
 	current_attack_animation = &""
@@ -225,35 +236,44 @@ func start_attack(dist: float = 0.0):
 # =========================================================
 
 func should_start_attack(dist: float) -> bool:
-	return dist <= attack_range or can_use_projectile_attack(dist)
+	return dist <= attack_range or can_start_long_range_projectile_attack(dist)
 
 
 func should_use_projectile_attack(dist: float) -> bool:
 	if not can_use_projectile_attack(dist):
 		return false
-	if dist > attack_range:
+	if can_start_long_range_projectile_attack(dist):
 		return true
-	return rng.randf() <= projectile_attack_chance
+	if form == Form.SUPER and dist <= attack_range:
+		return rng.randf() <= projectile_attack_chance
+	return false
+
+
+func can_start_long_range_projectile_attack(dist: float) -> bool:
+	return can_use_projectile_attack(dist) and dist >= projectile_chase_distance
 
 
 func can_use_projectile_attack(dist: float) -> bool:
 	return projectile_attack_scene != null \
-		and has_animation(projectile_attack_animation) \
+		and has_animation(get_projectile_attack_anim()) \
 		and dist <= projectile_attack_range \
-		and dist >= projectile_chase_distance \
 		and dist >= projectile_min_range
 
 
 func start_projectile_attack() -> void:
-	current_attack_animation = projectile_attack_animation
+	var anim := get_projectile_attack_anim()
+	current_attack_animation = anim
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 
 	if sprite:
-		sprite.play(projectile_attack_animation)
+		sprite.play(anim)
 
-	await fire_projectile_on_animation_frame(projectile_attack_animation, projectile_attack_fire_frame)
-	await wait_for_animation(projectile_attack_animation)
+	await fire_projectile_on_animation_frame(anim, projectile_attack_fire_frame)
+	await wait_for_animation(anim)
+
+	if state == State.DEAD or state == State.TRANSFORM:
+		return
 
 	state = State.CHASE
 	current_attack_animation = &""
@@ -264,12 +284,20 @@ func fire_projectile_on_animation_frame(anim: StringName, target_frame: int) -> 
 		spawn_projectile()
 		return
 
+	var actual_frame_count := sprite.sprite_frames.get_frame_count(anim)
+	var effective_target := mini(target_frame, actual_frame_count - 1)
+
 	var fired := false
+	var last_frame := -1
 	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing() and not time_frozen:
-		if not fired and sprite.frame >= target_frame:
+		var frame := sprite.frame
+		if not fired and frame >= effective_target:
 			spawn_projectile()
 			fired = true
 			return
+		if frame < last_frame:
+			break
+		last_frame = frame
 		await get_tree().process_frame
 
 	if not fired and not time_frozen:
@@ -296,19 +324,23 @@ func get_projectile_spawn_position() -> Vector2:
 # =========================================================
 
 func take_damage(amount, _source: Node = null):
-	if state == State.DEAD:
+	if state == State.DEAD or state == State.TRANSFORM:
 		return
 
 	health -= max(amount, 1)
 	emit_signal("health_changed", max(health, 0), max_health)
 
+	if form == Form.NORMAL and not transform_started and health <= max_health / 2:
+		health = max(health, 1)
+		emit_signal("health_changed", health, max_health)
+		if time_frozen:
+			return
+		await start_transform()
+		return
 	if health <= 0:
 		die()
 		return
 	if time_frozen:
-		return
-	if form == Form.NORMAL and health <= max_health / 2:
-		start_transform()
 		return
 
 	if state == State.ATTACK and not interrupt_attack_on_damage:
@@ -345,8 +377,15 @@ func set_time_frozen(frozen: bool) -> void:
 # =========================================================
 
 func start_transform():
+	if transform_started or form == Form.SUPER or state == State.DEAD:
+		return
+
+	transform_started = true
 	state = State.TRANSFORM
 	velocity = Vector2.ZERO
+	current_attack_animation = &""
+	if hitbox_shape:
+		hitbox_shape.set_deferred("disabled", true)
 
 	if has_animation(transform_animation):
 		play_animation(transform_animation)
@@ -357,6 +396,9 @@ func start_transform():
 	state = State.CHASE
 
 func change_form(new_form: Form):
+	if form == new_form:
+		return
+
 	form = new_form
 
 	# 🔥 melhora comportamento na fase 2
@@ -432,11 +474,11 @@ func deal_damage_to_player(target: Node) -> void:
 		target.take_damage(damage)
 
 
-func update_hud_visibility(visible: bool) -> void:
-	if hud_visible == visible:
+func update_hud_visibility(should_show: bool) -> void:
+	if hud_visible == should_show:
 		return
-	hud_visible = visible
-	emit_signal("hud_visibility_changed", visible)
+	hud_visible = should_show
+	emit_signal("hud_visibility_changed", should_show)
 
 
 func is_hud_visible() -> bool:
@@ -497,18 +539,21 @@ func run_attack_hitbox_by_frames(anim: StringName) -> void:
 		return
 
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 
+	var attack_time: float = get_animation_duration(anim)
+	var elapsed := 0.0
 	var last_frame := -1
-	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing():
+	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing() and elapsed < attack_time:
 		var frame := sprite.frame
 		if frame != last_frame:
 			update_attack_hitbox_frame_state(frame)
 			last_frame = frame
 		await get_tree().process_frame
+		elapsed += get_process_delta_time()
 
 	if hitbox_shape:
-		hitbox_shape.disabled = true
+		hitbox_shape.set_deferred("disabled", true)
 
 
 func update_attack_hitbox_frame_state(frame: int) -> void:
@@ -516,12 +561,14 @@ func update_attack_hitbox_frame_state(frame: int) -> void:
 		return
 
 	var inside_window := frame >= attack_hitbox_start_frame and frame <= attack_hitbox_end_frame
-	hitbox_shape.disabled = not inside_window
+	hitbox_shape.set_deferred("disabled", not inside_window)
 
 # =========================================================
 
 func update_animation():
 	if not sprite:
+		return
+	if state == State.TRANSFORM:
 		return
 
 	if state == State.ATTACK:
@@ -535,14 +582,17 @@ func update_animation():
 
 # =========================================================
 
-func get_idle_anim():
+func get_idle_anim() -> StringName:
 	return idle_super_animation if form == Form.SUPER else idle_animation
 
-func get_walk_anim():
+func get_walk_anim() -> StringName:
 	return walk_super_animation if form == Form.SUPER else walk_animation
 
-func get_attack_anim():
+func get_attack_anim() -> StringName:
 	return attack_super_animation if form == Form.SUPER else attack_animation
+
+func get_projectile_attack_anim() -> StringName:
+	return projectile_super_attack_animation if form == Form.SUPER else projectile_attack_animation
 
 # =========================================================
 
@@ -575,9 +625,9 @@ func wait_for_attack_hitbox_start():
 	if delay > 0:
 		await get_tree().create_timer(delay).timeout
 
-func get_animation_duration(anim):
+func get_animation_duration(anim) -> float:
 	if not has_animation(anim):
-		return 0
+		return 0.0
 	var frames = sprite.sprite_frames.get_frame_count(anim)
 	var speed = maxf(sprite.sprite_frames.get_animation_speed(anim), 1.0)
 	return float(frames) / speed

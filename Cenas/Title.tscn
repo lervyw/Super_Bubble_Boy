@@ -17,10 +17,10 @@ corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2vbo6"]
-content_margin_left = 10.0
-content_margin_top = 4.0
-content_margin_right = 10.0
-content_margin_bottom = 4.0
+content_margin_left = 6.0
+content_margin_top = 2.0
+content_margin_right = 6.0
+content_margin_bottom = 2.0
 bg_color = Color(0.0196078, 0.0215686, 0.0392157, 0.88)
 border_width_left = 1
 border_width_top = 1
@@ -112,6 +112,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="MainMenu" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -129,19 +130,19 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Start" type="Button" parent="MainMenu/VBoxContainer"]
-custom_minimum_size = Vector2(190, 22)
+custom_minimum_size = Vector2(170, 18)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "INICIAR"
 
 [node name="Config" type="Button" parent="MainMenu/VBoxContainer"]
-custom_minimum_size = Vector2(190, 22)
+custom_minimum_size = Vector2(170, 18)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "CONFIGURACOES"
 
 [node name="Quit" type="Button" parent="MainMenu/VBoxContainer"]
-custom_minimum_size = Vector2(190, 22)
+custom_minimum_size = Vector2(170, 18)
 layout_mode = 2
 theme = SubResource("Theme_8he0a")
 text = "SAIR"
@@ -150,241 +151,258 @@ text = "SAIR"
 visible = false
 layout_mode = 0
 offset_left = 178.0
-offset_top = 66.0
-offset_right = 390.0
-offset_bottom = 246.0
+offset_top = 34.0
+offset_right = 411.0
+offset_bottom = 274.0
 alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ConfigMenu"]
+[node name="ScrollContainer" type="ScrollContainer" parent="ConfigMenu"]
+custom_minimum_size = Vector2(178, 240)
 layout_mode = 2
-theme_override_constants/separation = 5
+horizontal_scroll_mode = 0
 
-[node name="ConfigTitle" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigMenu/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="ConfigTitle" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "CONFIGURACOES"
 horizontal_alignment = 1
 
-[node name="Master" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="Master" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Master"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SliderMaster" type="HSlider" parent="ConfigMenu/VBoxContainer"]
-custom_minimum_size = Vector2(190, 14)
+[node name="SliderMaster" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 12)
 layout_mode = 2
 min_value = -60.0
 max_value = 1.0
 value = 1.0
 
-[node name="Musica" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="Musica" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Musica"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SliderMusica" type="HSlider" parent="ConfigMenu/VBoxContainer"]
-custom_minimum_size = Vector2(190, 14)
+[node name="SliderMusica" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 12)
 layout_mode = 2
 min_value = -60.0
 max_value = 1.0
 value = 1.0
 
-[node name="Volume" type="Label" parent="ConfigMenu/VBoxContainer"]
+[node name="Volume" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Efeitos"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SliderEfeitos" type="HSlider" parent="ConfigMenu/VBoxContainer"]
-custom_minimum_size = Vector2(190, 14)
+[node name="SliderEfeitos" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 12)
 layout_mode = 2
 min_value = -60.0
 max_value = 1.0
 value = 1.0
 
-[node name="ConfigurarBotoes" type="Button" parent="ConfigMenu/VBoxContainer"]
-custom_minimum_size = Vector2(190, 22)
+[node name="CRTToggle" type="CheckButton" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 18)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+button_pressed = true
+text = "CRT"
+
+[node name="ConfigurarBotoes" type="Button" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 18)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "CONTROLES"
 
-[node name="Voltar" type="Button" parent="ConfigMenu/VBoxContainer"]
-custom_minimum_size = Vector2(190, 22)
+[node name="Voltar" type="Button" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 18)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "VOLTAR"
 
 [node name="ControlsMenu" type="HBoxContainer" parent="."]
-visible = false
 layout_mode = 0
-offset_left = 172.0
-offset_top = 58.0
-offset_right = 397.0
-offset_bottom = 258.0
+offset_left = 182.0
+offset_top = 32.0
+offset_right = 407.0
+offset_bottom = 242.0
 alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="ControlsMenu"]
-custom_minimum_size = Vector2(212, 198)
+custom_minimum_size = Vector2(178, 210)
 layout_mode = 2
 horizontal_scroll_mode = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ControlsMenu/ScrollContainer"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 3
 
 [node name="ControlsTitle" type="Label" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 18)
+custom_minimum_size = Vector2(170, 14)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "CONTROLES"
 horizontal_alignment = 1
 
 [node name="RebindPrompt" type="Label" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 18)
+custom_minimum_size = Vector2(170, 14)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "Selecione uma acao para remapear"
 horizontal_alignment = 1
 
 [node name="Controle1" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "botao pulo"
 
 [node name="Controle2" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "transformacao 1"
 
 [node name="Controle3" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "transformacao 2"
 
 [node name="Controle4" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "forma normal"
 
 [node name="Controle5" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "botao menu"
 
 [node name="Controle6" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "botao ataque"
 
 [node name="Controle7" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "ataque especial"
 
 [node name="Controle8" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "escudo"
 
-[node name="Controle9" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
-layout_mode = 2
-theme = SubResource("Theme_50u4b")
-text = "poder 1"
-
-[node name="Controle10" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
-layout_mode = 2
-theme = SubResource("Theme_50u4b")
-text = "poder 2"
-
-[node name="Controle11" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
-layout_mode = 2
-theme = SubResource("Theme_50u4b")
-text = "poder 3"
-
-[node name="Controle12" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
-layout_mode = 2
-theme = SubResource("Theme_50u4b")
-text = "poder 4"
-
 [node name="Controle13" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "ultimate"
 
 [node name="Controle14" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "esquerda"
 
 [node name="Controle15" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "direita"
 
 [node name="Controle16" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "agachar"
 
 [node name="Controle17" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "dash"
 
 [node name="Controle18" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "pausa"
 
 [node name="Controle19" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "roda cima"
 
 [node name="Controle20" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "roda baixo"
 
 [node name="Controle21" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "roda esquerda"
 
 [node name="Controle22" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 20)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "roda direita"
 
+[node name="Controle23" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "cima / nadar"
+
+[node name="Controle24" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face cima"
+
+[node name="Controle25" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face esquerda"
+
+[node name="Controle26" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face baixo"
+
+[node name="Controle27" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face direita"
+
 [node name="Voltar" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(198, 22)
+custom_minimum_size = Vector2(170, 16)
 layout_mode = 2
 theme = SubResource("Theme_50u4b")
 text = "VOLTAR"
@@ -397,6 +415,4 @@ bus = &"music"
 [connection signal="pressed" from="MainMenu/VBoxContainer/Start" to="." method="_on_iniciar"]
 [connection signal="pressed" from="MainMenu/VBoxContainer/Config" to="." method="_open_config_menu"]
 [connection signal="pressed" from="MainMenu/VBoxContainer/Quit" to="." method="_on_sair"]
-[connection signal="pressed" from="ConfigMenu/VBoxContainer/ConfigurarBotoes" to="." method="_open_botoes_menu"]
-[connection signal="pressed" from="ConfigMenu/VBoxContainer/Voltar" to="." method="_back_to_menu"]
 [connection signal="pressed" from="ControlsMenu/ScrollContainer/VBoxContainer/Voltar" to="." method="_back_to_config_menu"]

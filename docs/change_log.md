@@ -1,5 +1,118 @@
 # Change Log
 
+## 2026-07-13
+
+### Bug fixes: dual action and camera follow
+
+- Fixed dual-action bug where pressing R2 + face button simultaneously fired both the normal action (attack/defend/dash/special) and the power wheel selection. Added `Input.is_action_pressed("hud_menu")` guard alongside `hud_menu_open` in `_input()` to catch events that arrive before the hud_menu event in the same frame.
+- Added missing `hud_menu_open` guard to `dash` in `idle_state()` — previously unguarded, allowing dash while wheel was open.
+- Fixed camera not returning to player after portal bubble flight. Disabled `position_smoothing_enabled` during camera follow to prevent smoothing from fighting the direct `global_position` assignment, and re-enabled it when follow stops.
+- Removed dead code `_remove_conflicting_joypad_events()` and `_is_same_physical_input()` from ConfigManager.
+- Removed `sync_wheel_face_actions()` and related functions from player.gd — wheel face actions are now independent and rebindable.
+- Added `wheel_face_*` actions to ConfigManager's `MANAGED_INPUT_ACTIONS` and `_default_controller_inputs()` for save/load persistence.
+- Added wheel face rebind buttons (Controle24–27) to the controls menu UI.
+- Updated change_log.md, project_context.md, how_to_play.md.
+
+### Power wheel face button selection
+
+- Added `wheel_face_up`, `wheel_face_down`, `wheel_face_left`, `wheel_face_right` input actions for gamepad face buttons (Triangle/Y, Circle/B, Square/X, Cross/A).
+- The power wheel now accepts face button input for direction selection alongside the right analog stick.
+- Face buttons are **independent rebindable actions** — the same gamepad button can serve dual purposes (e.g., Cross/A = attack when wheel is closed, Cross/A = wheel right when R2 is held).
+- Removed `_remove_conflicting_joypad_events()` from `ConfigManager.rebind_action()` to allow the same button on multiple actions. The input context (wheel open/closed) determines which action fires.
+- Added wheel face buttons to the controls menu UI (Controle24–27) so users can rebind them independently.
+- Added `wheel_face_*` to `MANAGED_INPUT_ACTIONS` and `_default_controller_inputs()` for save/load persistence.
+- Face buttons bypass the wait-for-neutral gate since they are digital and precise.
+- Player movement no longer stops when the power wheel opens (`velocity.x = 0.0` removed).
+- Combat actions (attack, defend, special attack, dash, ultimate, form change) are now blocked while the power wheel is open to prevent unintended triggers from shared face buttons.
+- Ground stomp input is also blocked during wheel to prevent attack collision.
+
+### Power wheel rebind input fix
+
+- Fixed rebind system in the controls menu so the button/key used to activate a rebind button is no longer captured as the new binding.
+- Added `set_input_as_handled()` to the rebind capture block to prevent the event from propagating to the button's `_gui_input` and re-triggering `_start_rebind`.
+
+## 2026-07-10
+
+### Android touch controls replacement
+
+- Added Marco Fazio's MIT-licensed Virtual Joystick as a local lightweight addon.
+- Adjusted joystick and overlay typing to avoid GDScript parse failures across Godot 4.x versions.
+- Replaced the generated movement stick with an editable `Cenas/mobile_controls.tscn` scene.
+- Kept the existing multitouch action buttons and power-wheel direction behavior.
+- Touch controls now load automatically on Android and stay disabled on desktop by default.
+- Desktop touch emulation remains available for explicit Inspector testing through `mobile_controls_show_on_desktop`.
+
+## 2026-07-10
+
+### Mr. Breakfast prompt pack migration
+
+- Replaced the active keyboard, Xbox, and PlayStation prompt artwork with Mr. Breakfast's CC0 individual PNG assets.
+- Removed runtime atlas-coordinate mapping from `PromptIcons.gd`; prompts now load explicitly named image files.
+- Direction prompts now use dedicated `stick_up/right/down/left` files, eliminating directional tile-order ambiguity.
+- Enabled button icon scaling so the new 48x48 artwork fits the controls menu rows.
+
+### PlayStation analog direction prompt fix
+
+- Corrected the PlayStation atlas regions for left- and right-stick directional prompts.
+- Analog directions now use the pack's full 24x24 `L`/`R` artwork instead of cropped 16x16 or D-pad icons.
+- Matched controller focus navigation to the visual control-menu order, preventing `Baixo / Agachar` from being skipped.
+- Corrected PlayStation D-pad left/right atlas regions to follow the source order: up, right, down, left.
+
+## 2026-07-09
+
+### Unified keyboard, Xbox, and PlayStation control profiles
+
+- Increased control-menu button height so wide trigger and stick icons are no longer clipped.
+- Reordered the controls menu into movement, combat, forms, power wheel, and pause controls.
+- Added JSON schema version 2 with separate keyboard, Xbox, and PlayStation input profiles and automatic legacy migration.
+- Keyboard defaults now use WASD, Space, Shift, C/V, 1/2/3, R, IJKL, and Tab.
+- PlayStation defaults now use Cross/Square/Triangle/Circle, R1/L1/L2/R2, left-stick movement, and right-stick wheel selection.
+- Xbox uses the equivalent A/X/Y/B, RB/LB/LT/RT, left-stick movement, and right-stick wheel selection.
+- Controller detection now activates the matching saved profile and refreshes the displayed prompt artwork.
+- Defense/parry now ends when its input is released.
+
+### Dynamic keyboard and controller prompt icons
+
+- Added the Dream Mix keyboard-key sprites and GreatDocBrown CC0 Xbox/PlayStation prompt sprites.
+- Replaced textual key/button names in the controls menu with prompt icons while keeping action names and remapping behavior.
+- Prompts now switch automatically between keyboard, Xbox, and PlayStation artwork according to the latest input device.
+- Replaced Fabian's `[C] Falar` prompt with the dynamic icon for the currently bound attack/interact action.
+- Fixed prompt icon sizing to use Godot's supported `Button.expand_icon` property.
+- Cleared GDScript warnings in the prompt fallback, input deserialization, and controller-name detection code.
+- Removed a stale Flowerwall CRT material UID so Godot loads the valid material path without warning.
+
+### Player downward swimming
+
+- The player now returns to the swim state when a regular movement state ends while still inside water.
+- Holding the down/crouch input underwater now produces direct, continuous downward movement instead of competing with water buoyancy.
+
+## 2026-07-07
+
+### Level 1 checkpoint and powerup identification
+
+- Added a post-Rei Slime dialogue scene that reuses the intro dialogue layout, ends with a `Continua...` prompt, and returns to the title menu.
+- Updated `level1` boss victory flow to open the new post-boss dialogue scene instead of the final credits scene.
+- Fixed the Rei Slime transformation so the `transform` animation is not immediately overwritten by idle/walk updates, and made the phase change trigger only once.
+- Rei Slime projectile attacks now use `attack_super2` while transformed instead of reusing the normal `attack2` animation.
+- Fixed looped Rei Slime attack animations so `attack_super` cannot keep the boss stuck in attack state.
+- Rei Slime can now choose the Super projectile attack at close range, using `attack_super2` instead of only repeating `attack_super`.
+- Fixed `NPC_Fabian` player detection so it finds the level player through the `jogador` group while keeping a fallback for `player`.
+- Reduced player stamina regeneration from `15` to `5` stamina per second.
+- Increased the player dash cooldown from `0.3` seconds to `1.5` seconds.
+- Renamed level 1 powerups and checkpoints with explicit `Level1...` node names.
+- Tinted form powerups gold/orange, regular checkpoints cyan, and power checkpoints purple.
+- Added/updated particle colors so activation/identification effects match each item category.
+- Removed unused oversized `bubble_boy_complete` texture that could crash the editor during preview/import.
+- Super form collection no longer unlocks every Super wheel power automatically.
+- Converted the named level power markers into real power pickups for Super spike, Super projectile, and Normal teleport.
+- Power pickups now show `powerup coletado` and make the power wheel glow until the player opens it.
+- Updated `cutscene_test` with the new animated Fernanda and Bubbleboy intro sprites, simpler kingdom rescue dialogue, focused continue button, and a dark-to-purple background modulation.
+- Changed `poder_bolha_protetora` into the Normal-form protective bubble power pickup and changed `Checkpoint_caverna` into the Bubble transformation pickup.
+- Added colored HUD notices for checkpoints, transformations, and power unlocks, with outlined text for readability.
+- Fixed passive power icon wiring fallback and added usage hints when selecting passives from the pause menu.
+- Enabled the day/night cycle in `level1`, made it run without requiring an `AnimationPlayer`, and added local lights around checkpoints, transformations, and power pickups.
+- Added softer day/night compensation for the parallax background and automatic soft lights for all `ponto_luz*` guide markers in `level1`.
+
 ## 2026-06-27
 
 ### Pause menu input handling fix

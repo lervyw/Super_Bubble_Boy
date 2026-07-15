@@ -26,8 +26,6 @@ func _ready() -> void:
 	if not tile_layer:
 		tile_layer = get_node_or_null("WaterTiles") as TileMapLayer
 	if not player:
-		player = get_tree().get_first_node_in_group("player") as CharacterBody2D
-	if not player:
 		player = get_tree().get_first_node_in_group("jogador") as CharacterBody2D
 
 	if generate_on_ready:

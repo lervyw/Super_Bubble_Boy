@@ -84,6 +84,20 @@ Current Super form wheel:
 - The Time Bubble HUD counter is shown only while time is stopped
 - Collecting the Super form unlocks all four Super wheel slots
 
+### Power wheel input
+
+- The power wheel opens with `hud_menu` (R2/RT on gamepad, R on keyboard)
+- Selection is done via right analog stick (`hud_select_*` actions) OR face buttons (`wheel_face_*` actions):
+  - Triângulo/Y = Up (Ultimate)
+  - Quadrado/X = Left (Bubble Projectile / Launcher / Portal)
+  - Bola/B = Down (Placeholder / Parry / Ghost)
+  - Cross/A = Right (Special Attack / Time Bubble / Portal)
+- Face button bindings are **derived** from attack/defend/dash/attack_special — no separate rebind
+- Player movement continues while the wheel is open (left stick / WASD still work)
+- Combat actions (attack, defend, dash, form change) are blocked while the wheel is open
+- Face buttons bypass the wait-for-neutral gate for immediate response
+- `ConfigManager` emits `rebind_completed` signal to re-sync wheel face bindings after any rebind
+
 Important groups and combat nodes:
 
 - Root scene instance in `level1` is in group `player`

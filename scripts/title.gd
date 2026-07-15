@@ -16,6 +16,7 @@ extends Control
 @onready var config_menu = $ConfigMenu
 @onready var botoes_menu = $ControlsMenu
 @onready var controls_scroll: ScrollContainer = $ControlsMenu/ScrollContainer
+@onready var config_scroll: ScrollContainer = $ConfigMenu/ScrollContainer
 @onready var logo_intro: TextureRect = $LogoIntro
 @onready var menu_intro_background: TextureRect = $MenuIntroBackground
 
@@ -57,11 +58,12 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 #       CONFIG (VOLUME)
 # ================================
 # Sliders e botões da tela de configurações (volume + ir pro rebind)
-@onready var slider_musica = $ConfigMenu/VBoxContainer/SliderMusica
-@onready var slider_sfx = $ConfigMenu/VBoxContainer/SliderEfeitos
-@onready var slider_master = $ConfigMenu/VBoxContainer/SliderMaster
-@onready var btn_cfg_botoes = $ConfigMenu/VBoxContainer/ConfigurarBotoes
-@onready var btn_voltar_config = $ConfigMenu/VBoxContainer/Voltar
+@onready var slider_musica = $ConfigMenu/ScrollContainer/VBoxContainer/SliderMusica
+@onready var slider_sfx = $ConfigMenu/ScrollContainer/VBoxContainer/SliderEfeitos
+@onready var slider_master = $ConfigMenu/ScrollContainer/VBoxContainer/SliderMaster
+@onready var btn_cfg_botoes = $ConfigMenu/ScrollContainer/VBoxContainer/ConfigurarBotoes
+@onready var btn_crt_toggle = $ConfigMenu/ScrollContainer/VBoxContainer/CRTToggle
+@onready var btn_voltar_config = $ConfigMenu/ScrollContainer/VBoxContainer/Voltar
 
 
 # ================================
@@ -88,13 +90,12 @@ const UI_NAV_ACTIONS: Array[StringName] = [
 @onready var btn_roda_baixo = $ControlsMenu/ScrollContainer/VBoxContainer/Controle20
 @onready var btn_roda_esquerda = $ControlsMenu/ScrollContainer/VBoxContainer/Controle21
 @onready var btn_roda_direita = $ControlsMenu/ScrollContainer/VBoxContainer/Controle22
+@onready var btn_cima = $ControlsMenu/ScrollContainer/VBoxContainer/Controle23
+@onready var btn_wheel_face_cima = $ControlsMenu/ScrollContainer/VBoxContainer/Controle24
+@onready var btn_wheel_face_esquerda = $ControlsMenu/ScrollContainer/VBoxContainer/Controle25
+@onready var btn_wheel_face_baixo = $ControlsMenu/ScrollContainer/VBoxContainer/Controle26
+@onready var btn_wheel_face_direita = $ControlsMenu/ScrollContainer/VBoxContainer/Controle27
 
-@onready var btn_combo1 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle9
-@onready var btn_combo2 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle10
-@onready var btn_combo3 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle11
-@onready var btn_combo4 = $ControlsMenu/ScrollContainer/VBoxContainer/Controle12
-
-# Botão de voltar do menu de controles para o menu config
 @onready var btn_voltar_botoes = $ControlsMenu/ScrollContainer/VBoxContainer/Voltar
 
 
@@ -118,6 +119,9 @@ var forbidden_keys: Array[int] = [
 # ================================
 func _ready():
 	_ensure_controller_ui_actions()
+	if not ControllerMapper.input_source_changed.is_connected(_on_input_source_changed):
+		ControllerMapper.input_source_changed.connect(_on_input_source_changed)
+	_organize_control_buttons()
 
 	# Estado inicial: mostra o menu principal e esconde as outras telas
 	menu.visible = false
@@ -142,6 +146,9 @@ func _ready():
 	slider_musica.value_changed.connect(func(val): ConfigManager.set_volume("music", val))
 	slider_sfx.value_changed.connect(func(val): ConfigManager.set_volume("sfx", val))
 
+	btn_crt_toggle.button_pressed = ConfigManager.is_crt_enabled()
+	btn_crt_toggle.toggled.connect(_on_crt_toggled)
+
 	# Abre menu de controles / volta pro menu principal
 	_connect_pressed_once(btn_cfg_botoes, _open_botoes_menu)
 	_connect_pressed_once(btn_voltar_config, _back_to_menu)
@@ -165,10 +172,11 @@ func _ready():
 	_connect_rebind_button_once(btn_roda_baixo, "hud_select_down")
 	_connect_rebind_button_once(btn_roda_esquerda, "hud_select_left")
 	_connect_rebind_button_once(btn_roda_direita, "hud_select_right")
-	_connect_rebind_button_once(btn_combo1, "combo_1")
-	_connect_rebind_button_once(btn_combo2, "combo_2")
-	_connect_rebind_button_once(btn_combo3, "combo_3")
-	_connect_rebind_button_once(btn_combo4, "combo_4")
+	_connect_rebind_button_once(btn_cima, "swim_up")
+	_connect_rebind_button_once(btn_wheel_face_cima, "wheel_face_up")
+	_connect_rebind_button_once(btn_wheel_face_esquerda, "wheel_face_left")
+	_connect_rebind_button_once(btn_wheel_face_baixo, "wheel_face_down")
+	_connect_rebind_button_once(btn_wheel_face_direita, "wheel_face_right")
 
 	# Volta do menu de controles para o menu de config
 	_connect_pressed_once(btn_voltar_botoes, _back_to_config_menu)
@@ -264,25 +272,28 @@ func _input(event: InputEvent):
 		return
 
 	if awaiting_rebind_action != "":
+		var handled := false
 		# --- Rebind por teclado ---
 		if event is InputEventKey and event.pressed:
 			if event.keycode in forbidden_keys:
 				return
 			_finish_rebind(event)
-			return
+			handled = true
 
 		# --- Rebind por controle (joypad) ---
-		if event is InputEventJoypadButton and event.pressed:
+		elif event is InputEventJoypadButton and event.pressed:
 			_finish_rebind(event)
-			return
+			handled = true
 
 		# --- Rebind por eixo/gatilho do controle ---
-		if event is InputEventJoypadMotion:
+		elif event is InputEventJoypadMotion:
 			var joy_event := _normalize_joy_motion_for_rebind(event)
 			if joy_event:
 				_finish_rebind(joy_event)
-				return
+				handled = true
 
+		if handled:
+			get_viewport().set_input_as_handled()
 		return
 
 	if event.is_action_pressed("ui_cancel"):
@@ -304,7 +315,8 @@ func _input(event: InputEvent):
 			btn_ataque_especial, btn_defesa, btn_ultimate, btn_esquerda, btn_direita,
 			btn_agachar, btn_dash, btn_pause,
 			btn_roda_cima, btn_roda_baixo, btn_roda_esquerda, btn_roda_direita,
-			btn_combo1, btn_combo2, btn_combo3, btn_combo4,
+			btn_wheel_face_cima, btn_wheel_face_baixo, btn_wheel_face_esquerda, btn_wheel_face_direita,
+			btn_cima,
 			btn_voltar_botoes,
 		]:
 			if btn and btn.has_focus():
@@ -345,6 +357,13 @@ func _on_iniciar():
 func _on_sair():
 	# Sai do jogo
 	get_tree().quit()
+
+func _on_crt_toggled(enabled: bool) -> void:
+	ConfigManager.set_crt_enabled(enabled)
+	var crt_node = get_node_or_null("/root/flowerwall_crt")
+	if crt_node and crt_node.has_method("set_active"):
+		crt_node.set_active(enabled)
+
 
 func _open_config_menu():
 	if intro_running:
@@ -397,10 +416,13 @@ func _setup_menu_focus_order() -> void:
 
 
 func _setup_config_focus_order() -> void:
+	if config_scroll:
+		config_scroll.set("follow_focus", true)
 	_setup_vertical_focus_order([
 		slider_master,
 		slider_musica,
 		slider_sfx,
+		btn_crt_toggle,
 		btn_cfg_botoes,
 		btn_voltar_config,
 	])
@@ -411,28 +433,27 @@ func _setup_controls_scroll_focus() -> void:
 		controls_scroll.set("follow_focus", true)
 
 	var control_buttons: Array[Control] = [
+		btn_cima,
+		btn_esquerda,
+		btn_agachar,
+		btn_direita,
 		btn_pulo,
+		btn_dash,
+		btn_ataque,
+		btn_defesa,
+		btn_normal_form,
 		btn_bolha,
 		btn_super,
-		btn_normal_form,
 		btn_menu,
-		btn_ataque,
-		btn_ataque_especial,
-		btn_defesa,
-		btn_combo1,
-		btn_combo2,
-		btn_combo3,
-		btn_combo4,
-		btn_ultimate,
-		btn_esquerda,
-		btn_direita,
-		btn_agachar,
-		btn_dash,
-		btn_pause,
 		btn_roda_cima,
-		btn_roda_baixo,
 		btn_roda_esquerda,
+		btn_roda_baixo,
 		btn_roda_direita,
+		btn_wheel_face_cima,
+		btn_wheel_face_esquerda,
+		btn_wheel_face_baixo,
+		btn_wheel_face_direita,
+		btn_pause,
 		btn_voltar_botoes,
 	]
 
@@ -466,21 +487,23 @@ func _on_control_button_focus_entered(control: Control) -> void:
 
 
 func _scroll_focused_control_into_view(control: Control) -> void:
-	if not controls_scroll or not control:
+	if not control:
 		return
-	if not botoes_menu.visible:
+
+	var scroll: ScrollContainer = controls_scroll if botoes_menu.visible else (config_scroll if config_menu.visible else null)
+	if not scroll:
 		return
 
 	var top := control.position.y
 	var bottom := top + control.size.y
-	var view_top := float(controls_scroll.scroll_vertical)
-	var view_bottom := view_top + controls_scroll.size.y
+	var view_top := float(scroll.scroll_vertical)
+	var view_bottom := view_top + scroll.size.y
 	var padding := 12.0
 
 	if top < view_top + padding:
-		controls_scroll.scroll_vertical = max(int(top - padding), 0)
+		scroll.scroll_vertical = max(int(top - padding), 0)
 	elif bottom > view_bottom - padding:
-		controls_scroll.scroll_vertical = max(int(bottom - controls_scroll.size.y + padding), 0)
+		scroll.scroll_vertical = max(int(bottom - scroll.size.y + padding), 0)
 
 
 func _ensure_controller_ui_actions() -> void:
@@ -515,7 +538,7 @@ func _add_joy_button_once(action_name: StringName, button_index: int) -> void:
 
 	var joy_event := InputEventJoypadButton.new()
 	joy_event.device = -1
-	joy_event.button_index = button_index
+	joy_event.button_index = button_index as JoyButton
 	InputMap.action_add_event(action_name, joy_event)
 
 
@@ -526,7 +549,7 @@ func _add_joy_axis_once(action_name: StringName, axis: int, axis_value: float) -
 
 	var joy_event := InputEventJoypadMotion.new()
 	joy_event.device = -1
-	joy_event.axis = axis
+	joy_event.axis = axis as JoyAxis
 	joy_event.axis_value = axis_value
 	InputMap.action_add_event(action_name, joy_event)
 
@@ -538,7 +561,7 @@ func _add_key_once(action_name: StringName, physical_keycode: int) -> void:
 
 	var key_event := InputEventKey.new()
 	key_event.device = -1
-	key_event.physical_keycode = physical_keycode
+	key_event.physical_keycode = physical_keycode as Key
 	InputMap.action_add_event(action_name, key_event)
 
 
@@ -546,7 +569,6 @@ func _add_key_once(action_name: StringName, physical_keycode: int) -> void:
 #        SISTEMA DE REBIND
 # ================================
 func _start_rebind(action_name: String):
-	# Entra no modo "aguardando input" e define qual ação será alterada
 	awaiting_rebind_action = action_name
 	_set_rebind_prompt("Pressione tecla, botão, analógico ou gatilho")
 	print("Pressione tecla, botão, analógico ou gatilho para redefinir:", action_name)
@@ -565,32 +587,65 @@ func _finish_rebind(event: InputEvent):
 #   VISUAL / LABELS
 # ================================
 func _update_control_labels():
-	# Atualiza o texto de cada botão para mostrar qual tecla/botão está configurado agora
-	btn_pulo.text = "Pulo: " + _get_current_input_name("jump")
-	btn_bolha.text = "Bolha: " + _get_current_input_name("forma1")
-	btn_super.text = "Super: " + _get_current_input_name("forma2")
-	btn_normal_form.text = "Normal: " + _get_current_input_name("normal")
-	btn_menu.text = "Menu: " + _get_current_input_name("hud_menu")
-	btn_ataque.text = "Ataque: " + _get_current_input_name("attack")
-	btn_ataque_especial.text = "Ataque Especial: " + _get_current_input_name("attack_special")
-	btn_defesa.text = "Defesa: " + _get_current_input_name("defend")
-	btn_ultimate.text = "Ultimate: " + _get_current_input_name("ultimate_attack")
-	btn_esquerda.text = "Esquerda: " + _get_current_input_name("left")
-	btn_direita.text = "Direita: " + _get_current_input_name("right")
-	btn_agachar.text = "Agachar: " + _get_current_input_name("crouch")
-	btn_dash.text = "Dash: " + _get_current_input_name("dash")
-	btn_pause.text = "Pausa: " + _get_current_input_name("pause_menu")
+	_set_control_button(btn_pulo, "Pulo", &"jump")
+	_set_control_button(btn_bolha, "Bolha", &"forma1")
+	_set_control_button(btn_super, "Super", &"forma2")
+	_set_control_button(btn_normal_form, "Normal", &"normal")
+	_set_control_button(btn_menu, "Menu", &"hud_menu")
+	_set_control_button(btn_ataque, "Ataque", &"attack")
+	_set_control_button(btn_ataque_especial, "Ataque Especial Direto", &"attack_special")
+	_set_control_button(btn_defesa, "Parry", &"defend")
+	_set_control_button(btn_ultimate, "Ultimate", &"ultimate_attack")
+	_set_control_button(btn_esquerda, "Esquerda", &"left")
+	_set_control_button(btn_direita, "Direita", &"right")
+	_set_control_button(btn_cima, "Cima / Nadar", &"swim_up")
+	_set_control_button(btn_agachar, "Baixo / Agachar", &"crouch")
+	_set_control_button(btn_dash, "Dash", &"dash")
+	_set_control_button(btn_pause, "Pausa", &"pause_menu")
+	_set_control_button(btn_roda_cima, "Roda Cima", &"hud_select_up")
+	_set_control_button(btn_roda_baixo, "Roda Baixo", &"hud_select_down")
+	_set_control_button(btn_roda_esquerda, "Roda Esquerda", &"hud_select_left")
+	_set_control_button(btn_roda_direita, "Roda Direita", &"hud_select_right")
 
-	btn_roda_cima.text = "Roda Cima: " + _get_current_input_name("hud_select_up")
-	btn_roda_baixo.text = "Roda Baixo: " + _get_current_input_name("hud_select_down")
-	btn_roda_esquerda.text = "Roda Esquerda: " + _get_current_input_name("hud_select_left")
-	btn_roda_direita.text = "Roda Direita: " + _get_current_input_name("hud_select_right")
+	_set_control_button(btn_wheel_face_cima, "Roda Face Cima", &"wheel_face_up")
+	_set_control_button(btn_wheel_face_esquerda, "Roda Face Esquerda", &"wheel_face_left")
+	_set_control_button(btn_wheel_face_baixo, "Roda Face Baixo", &"wheel_face_down")
+	_set_control_button(btn_wheel_face_direita, "Roda Face Direita", &"wheel_face_right")
 
-	btn_combo1.text = "Combo 1: " + _get_current_input_name("combo_1")
-	btn_combo2.text = "Combo 2: " + _get_current_input_name("combo_2")
-	btn_combo3.text = "Combo 3: " + _get_current_input_name("combo_3")
-	btn_combo4.text = "Combo 4: " + _get_current_input_name("combo_4")
 	_set_rebind_prompt("Selecione uma ação para remapear")
+
+
+func _set_control_button(button: Button, action_label: String, action_name: StringName) -> void:
+	button.custom_minimum_size.y = 16.0
+	button.text = action_label
+	button.icon = PromptIcons.for_action(action_name)
+	button.expand_icon = true
+	button.tooltip_text = _get_current_input_name(action_name)
+
+
+func _organize_control_buttons() -> void:
+	# Ataque especial e ultimate sao escolhidos pela roda; nao precisam de
+	# atalhos diretos no esquema padrao.
+	btn_ataque_especial.visible = false
+	btn_ultimate.visible = false
+
+	var ordered_buttons: Array[Control] = [
+		btn_cima, btn_esquerda, btn_agachar, btn_direita, btn_pulo, btn_dash,
+		btn_ataque, btn_defesa,
+		btn_normal_form, btn_bolha, btn_super,
+		btn_menu, btn_roda_cima, btn_roda_esquerda, btn_roda_baixo, btn_roda_direita,
+		btn_wheel_face_cima, btn_wheel_face_esquerda, btn_wheel_face_baixo, btn_wheel_face_direita,
+		btn_pause,
+	]
+	var first_button_index := 2
+	for button in ordered_buttons:
+		button.get_parent().move_child(button, first_button_index)
+		first_button_index += 1
+	btn_voltar_botoes.get_parent().move_child(btn_voltar_botoes, first_button_index)
+
+
+func _on_input_source_changed(_source: int, _controller_type: int) -> void:
+	_update_control_labels()
 
 
 func _get_current_input_name(action: String) -> String:
@@ -598,11 +653,11 @@ func _get_current_input_name(action: String) -> String:
 	if events.is_empty():
 		return "<nenhum>"
 
-	var has_controller := ControllerMapper.has_controller()
+	var use_controller := ControllerMapper.get_last_input_source() == ControllerMapper.InputSource.CONTROLLER
 	var ev: InputEvent = events[0]
 
 	for event in events:
-		if has_controller:
+		if use_controller:
 			if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 				ev = event
 				break
