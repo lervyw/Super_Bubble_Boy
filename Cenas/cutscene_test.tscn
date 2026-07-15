@@ -69,7 +69,7 @@ advance_button = NodePath("Button2")
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 0
 offset_left = -1.0000001
-offset_right = 841.80725
+offset_right = 853.93396
 offset_bottom = 676.0
 scale = Vector2(0.494775, 0.41477522)
 texture = ExtResource("3_gfy6n")
