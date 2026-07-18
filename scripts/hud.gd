@@ -28,7 +28,7 @@ extends CanvasLayer
 @export var powerup_icon_row: HBoxContainer
 
 @export_group("Powerup Prompt Icons")
-@export var powerup_icon_size: Vector2 = Vector2(20.0, 20.0)
+@export var powerup_icon_size: Vector2 = Vector2(14.0, 14.0)
 
 const PASSIVE_ICON_STOMP := preload("res://sprites/assets/bolha_ressonante.png")
 const PASSIVE_ICON_RUN := preload("res://sprites/assets/Corrida.png")
@@ -50,6 +50,7 @@ var pause_menu_open: bool = false
 var warning_tween: Tween
 var powerup_icon_rects: Array[TextureRect] = []
 var powerup_freeze_active: bool = false
+var _notice_was_active_before_pause: bool = false
 
 const NOTICE_POWER_START := Color(1.0, 0.86, 0.22, 1.0)
 const NOTICE_POWER_END := Color(1.0, 0.55, 0.08, 1.0)
@@ -258,8 +259,12 @@ func show_mana_warning(message: String = "sem mana suficiente") -> void:
 	show_warning_message(message)
 
 
-func show_powerup_collected_message(hint_actions: Array = []) -> void:
-	var msg := "poder desbloqueado"
+func show_powerup_collected_message(hint_actions: Array = [], form_name: String = "") -> void:
+	var msg := ""
+	if form_name != "":
+		msg = "Na forma %s use" % form_name
+	else:
+		msg = "poder desbloqueado"
 	var hint := _build_input_hint(hint_actions)
 	if hint != "":
 		msg += "\n" + hint
@@ -370,6 +375,34 @@ func show_checkpoint_message(message: String = "checkpoint ativado") -> void:
 
 func show_warning_message(message: String) -> void:
 	show_notice_message(message, Color(1, 1, 1, 1), Color(1, 0.82, 0.42, 1))
+
+
+func show_tutorial_notice(message: String) -> void:
+	show_notice_message(message, Color(1, 1, 1, 1), Color(1, 0.82, 0.42, 1), true)
+
+
+func show_tutorial_notice_with_icons(message: String, actions: Array) -> void:
+	_show_powerup_icons(actions)
+	show_tutorial_notice(message)
+	_fade_powerup_icons_with_notice(2.3, 0.45)
+
+
+func _fade_powerup_icons_with_notice(delay: float, fade_duration: float) -> void:
+	if not powerup_icon_row or not powerup_icon_row.visible:
+		return
+	await get_tree().create_timer(delay).timeout
+	if not powerup_icon_row:
+		return
+	var tween := create_tween()
+	tween.tween_property(powerup_icon_row, "modulate:a", 0.0, fade_duration)
+	await tween.finished
+	if powerup_icon_row:
+		powerup_icon_row.visible = false
+		powerup_icon_row.modulate.a = 1.0
+
+
+func get_action_display_name(action: StringName) -> String:
+	return _get_action_display_name(action)
 
 
 func show_notice_message(message: String, start_color: Color, end_color: Color, extended: bool = false) -> void:
@@ -606,6 +639,8 @@ func open_pause_menu() -> void:
 		player.close_hud_menu()
 	get_tree().paused = true
 
+	_freeze_notice_on_pause()
+
 	if pause_menu_panel:
 		pause_menu_panel.visible = true
 		_grab_focus_deferred(resume_button)
@@ -622,6 +657,30 @@ func close_pause_menu() -> void:
 		pause_menu_panel.visible = false
 
 	get_tree().paused = false
+	_resume_notice_on_unpause()
+
+
+func _freeze_notice_on_pause() -> void:
+	_notice_was_active_before_pause = false
+	if warning_tween:
+		_notice_was_active_before_pause = true
+		warning_tween.kill()
+		warning_tween = null
+	if powerup_icon_row and powerup_icon_row.visible:
+		_notice_was_active_before_pause = true
+		powerup_icon_row.visible = false
+
+
+func _resume_notice_on_unpause() -> void:
+	if not _notice_was_active_before_pause:
+		return
+	_notice_was_active_before_pause = false
+	if warning_label and warning_label.visible and warning_label.modulate.a > 0.01:
+		warning_tween = create_tween()
+		warning_tween.tween_property(warning_label, "modulate:a", 0.0, 0.45)
+		await warning_tween.finished
+		if warning_label:
+			warning_label.visible = false
 
 
 func _grab_focus_deferred(control: Control) -> void:

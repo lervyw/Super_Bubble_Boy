@@ -71,9 +71,9 @@ shape = SubResource("RectangleShape2D_body")
 disabled = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+z_index = -1
 position = Vector2(0, -83.00001)
 scale = Vector2(0.8450001, 0.8450001)
-z_index = -1
 sprite_frames = SubResource("SpriteFrames_fabian_idle")
 animation = &"idle"
 autoplay = "idle"

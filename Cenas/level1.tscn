@@ -1679,7 +1679,7 @@ player = NodePath("../player")
 unlock_form = 2
 update_respawn = false
 destroy_after_activation = true
-power_hint_actions = Array[StringName]([&"forma2", &"hud_menu", &"hud_select_up"])
+power_hint_actions = Array[StringName]([&"hud_menu", &"hud_select_up"])
 restore_health_on_activate = false
 restore_mana_on_activate = false
 
@@ -1690,7 +1690,7 @@ unlock_form = 2
 unlock_slot = 2
 update_respawn = false
 destroy_after_activation = true
-power_hint_actions = Array[StringName]([&"forma2", &"hud_menu", &"hud_select_left"])
+power_hint_actions = Array[StringName]([&"hud_menu", &"hud_select_left"])
 restore_health_on_activate = false
 restore_mana_on_activate = false
 

@@ -143,4 +143,12 @@ func _notify_powerup_collected() -> void:
 	if not player.hud:
 		return
 	if player.hud.has_method("show_powerup_collected_message"):
-		player.hud.show_powerup_collected_message(power_hint_actions)
+		var form_name := _form_display_name(unlock_form)
+		player.hud.show_powerup_collected_message(power_hint_actions, form_name)
+
+
+func _form_display_name(form_index: int) -> String:
+	match form_index:
+		1: return "Bolha"
+		2: return "Super"
+		_: return ""

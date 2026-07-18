@@ -55,9 +55,9 @@ metadata/_edit_vertical_guides_ = [152.0]
 [node name="PowerupPromptIcons" type="HBoxContainer" parent="."]
 z_index = 100
 offset_left = 100.0
-offset_top = 131.0
+offset_top = 90.0
 offset_right = 320.0
-offset_bottom = 156.0
+offset_bottom = 115.0
 theme_override_constants/separation = 4
 alignment = 1
 

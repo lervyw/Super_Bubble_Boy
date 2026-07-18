@@ -76,8 +76,8 @@ extends Node2D
 func _ready() -> void:
 	print("🎮 Nível iniciado!")
 
-	show_tutorial_message("Pressione a tecla J para atacar")
-	show_dash_tutorial_after_delay()
+	_show_tutorial(&"attack", "ataque")
+	_show_dash_tutorial_after_delay()
 
 	# Restaura vida cheia ao entrar no nível (se existir stats)
 	if stats and stats.has_method("restore_all"):
@@ -121,38 +121,18 @@ func _ready() -> void:
 # ================================
 #        TUTORIAL
 # ================================
-func show_dash_tutorial_after_delay() -> void:
+func _show_dash_tutorial_after_delay() -> void:
 	await get_tree().create_timer(10.0).timeout
 	if is_instance_valid(self):
-		show_tutorial_message("Pressione a tecla K para dar dash")
+		_show_tutorial(&"dash", "dash")
 
 
-func show_tutorial_message(text: String) -> void:
-	var layer := CanvasLayer.new()
-	layer.name = "TutorialLayer"
-	add_child(layer)
-
-	var label := Label.new()
-	label.text = text
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_color_override("font_color", Color(1, 1, 1, 1))
-	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
-	label.add_theme_constant_override("outline_size", 2)
-	label.anchor_left = 0.5
-	label.anchor_right = 0.5
-	label.offset_left = -160.0
-	label.offset_right = 160.0
-	label.offset_top = 20.0
-	label.offset_bottom = 44.0
-	layer.add_child(label)
-
-	var tween := create_tween()
-	tween.tween_interval(4.0)
-	tween.tween_property(label, "modulate:a", 0.0, 1.0)
-	await tween.finished
-	if is_instance_valid(layer):
-		layer.queue_free()
+func _show_tutorial(action: StringName, label: String) -> void:
+	var hud = player.get_node_or_null("HUD") if player else null
+	if not hud:
+		return
+	var key_name = hud.get_action_display_name(action)
+	hud.show_tutorial_notice_with_icons("Pressione %s para %s" % [key_name, label], [action])
 
 
 # ================================

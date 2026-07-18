@@ -12,14 +12,14 @@ signal rebind_completed(action_name: String)
 
 # Caminho do arquivo de configuração salvo no sistema do jogador
 const CONFIG_PATH := "user://config.json"
-const INPUT_SCHEMA_VERSION := 2
+const INPUT_SCHEMA_VERSION := 3
 const JOYPAD_TRIGGER_ACTION_DEADZONE: float = 0.20
 const JOYPAD_TRIGGER_AXES: Array[int] = [4, 5]
 const MANAGED_INPUT_ACTIONS: Array[StringName] = [
 	&"left", &"right", &"swim_up", &"crouch", &"jump", &"normal", &"forma1", &"forma2",
 	&"attack", &"defend", &"dash", &"hud_menu", &"hud_select_up", &"hud_select_down",
 	&"hud_select_left", &"hud_select_right", &"pause_menu", &"attack_special", &"ultimate_attack",
-	&"form_select",
+	&"form_select", &"interact",
 	&"wheel_face_up", &"wheel_face_down", &"wheel_face_left", &"wheel_face_right",
 ]
 
@@ -331,15 +331,16 @@ func _default_keyboard_inputs() -> Dictionary:
 		"normal": _key_binding(KEY_1),
 		"forma1": _key_binding(KEY_2),
 		"forma2": _key_binding(KEY_3),
-		"attack": _key_binding(KEY_C),
+		"attack": _key_binding(KEY_J),
 		"defend": _key_binding(KEY_V),
 		"hud_menu": _key_binding(KEY_R),
 		"hud_select_up": _key_binding(KEY_I),
 		"hud_select_left": _key_binding(KEY_J),
 		"hud_select_down": _key_binding(KEY_K),
 		"hud_select_right": _key_binding(KEY_L),
-		"pause_menu": _key_binding(KEY_TAB),
-		"dash": _key_binding(KEY_SHIFT),
+		"pause_menu": _key_binding(KEY_ESCAPE),
+		"dash": _key_binding(KEY_K),
+		"interact": _key_binding(KEY_W),
 	}
 
 
@@ -362,6 +363,7 @@ func _default_controller_inputs() -> Dictionary:
 		"hud_select_up": "JoyAxis:3:-1.000",
 		"hud_select_down": "JoyAxis:3:1.000",
 		"pause_menu": "JoyButton:6",
+		"interact": "JoyButton:11",
 		"wheel_face_up": "JoyButton:3",
 		"wheel_face_down": "JoyButton:1",
 		"wheel_face_left": "JoyButton:2",

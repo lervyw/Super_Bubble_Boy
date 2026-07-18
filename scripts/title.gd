@@ -108,7 +108,6 @@ var intro_running: bool = true
 
 # Teclas que você não deixa usar no rebind (pra evitar travar navegação/confirmar/sair)
 var forbidden_keys: Array[int] = [
-	KEY_ESCAPE,
 	KEY_ENTER,
 	KEY_KP_ENTER
 ]
