@@ -5,6 +5,9 @@ signal health_changed(current_health: int, max_health: int)
 signal hud_visibility_changed(should_show: bool)
 
 const ATTACK_META_DAMAGE := &"attack_damage"
+const PHYSICS_LAYER_PLAYER: int = 1
+const PHYSICS_LAYER_WORLD: int = 2
+const PHYSICS_LAYER_ENEMIES: int = 4
 
 enum State { IDLE, CHASE, ATTACK, STUN, TRANSFORM, DEAD }
 enum Form { NORMAL, SUPER }
@@ -123,9 +126,22 @@ func _ready():
 
 # =========================================================
 
+func update_player_collision_mask() -> void:
+	var base_mask := PHYSICS_LAYER_WORLD | PHYSICS_LAYER_ENEMIES
+	var is_super: bool = is_instance_valid(player) and "form" in player and player.form == player.Form.SUPER
+
+	if is_super:
+		collision_mask = base_mask | PHYSICS_LAYER_PLAYER
+	else:
+		collision_mask = base_mask
+
+
 func _physics_process(delta):
 	if state == State.DEAD:
 		return
+
+	update_player_collision_mask()
+
 	if time_frozen:
 		velocity = Vector2.ZERO
 		return

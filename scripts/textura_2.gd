@@ -443,6 +443,12 @@ func handle_hurt_animation() -> void:
 	deactivate_all_attack_areas()
 	deactivate_all_special_attack_areas()
 
+	# Forma Bubble nao tem animacao de dano propria: mantem a animacao
+	# bubble atual (idle/walk/etc) e deixa o piscar da invencibilidade
+	# ser o feedback visual, em vez de trocar pra aparencia da forma Normal.
+	if player.form == player.Form.BUBBLE:
+		return
+
 	var hurt_anim := &"hurt_super" if player.form == player.Form.SUPER else &"hurt"
 	if sprite_frames.has_animation(hurt_anim):
 		play_if_different(hurt_anim)

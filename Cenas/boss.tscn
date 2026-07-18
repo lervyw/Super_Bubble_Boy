@@ -600,7 +600,8 @@ size = Vector2(52, 44)
 size = Vector2(30, 7)
 
 [node name="boss" type="CharacterBody2D"]
-collision_layer = 2
+collision_layer = 4
+collision_mask = 6
 script = ExtResource("1_faq14")
 max_health = 40
 take_stomp_damage = false

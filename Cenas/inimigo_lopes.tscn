@@ -560,7 +560,7 @@ size = Vector2(22, 8)
 
 [node name="inimigo_lopes" type="CharacterBody2D"]
 collision_layer = 4
-collision_mask = 5
+collision_mask = 6
 script = ExtResource("1_script")
 attack_hitbox_start_frame = 0
 sprite_frames_normal = SubResource("SpriteFrames_normal")

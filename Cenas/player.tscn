@@ -1,4 +1,4 @@
-[gd_scene load_steps=378 format=3 uid="uid://d3xrf0yvjc4od"]
+[gd_scene format=3 uid="uid://d3xrf0yvjc4od"]
 
 [ext_resource type="Script" uid="uid://dkwo33107g2du" path="res://scripts/player.gd" id="1_8vhvd"]
 [ext_resource type="Texture2D" uid="uid://vsjddjgvg22v" path="res://sprites/characters/super bubble all.png" id="3_e2nbm"]
@@ -1451,7 +1451,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_2umio")
 }],
-"loop": false,
+"loop": 0,
 "name": &"attack",
 "speed": 8.0
 }, {
@@ -1471,7 +1471,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_y3gt4")
 }],
-"loop": true,
+"loop": 1,
 "name": &"attack_bubble",
 "speed": 8.0
 }, {
@@ -1488,7 +1488,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_0mfve")
 }],
-"loop": false,
+"loop": 0,
 "name": &"attack_crouch_super",
 "speed": 8.0
 }, {
@@ -1499,7 +1499,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_2umio")
 }],
-"loop": false,
+"loop": 0,
 "name": &"attack_projectile",
 "speed": 8.0
 }, {
@@ -1513,7 +1513,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ilsj8")
 }],
-"loop": false,
+"loop": 0,
 "name": &"attack_super",
 "speed": 8.0
 }, {
@@ -1554,7 +1554,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_yyamt")
 }],
-"loop": false,
+"loop": 0,
 "name": &"attack_super_combo",
 "speed": 8.0
 }, {
@@ -1580,7 +1580,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_60xba")
 }],
-"loop": false,
+"loop": 0,
 "name": &"born",
 "speed": 8.0
 }, {
@@ -1597,7 +1597,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_5wg6i")
 }],
-"loop": false,
+"loop": 0,
 "name": &"bubble_ground_stomp",
 "speed": 8.0
 }, {
@@ -1611,7 +1611,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_fvja2")
 }],
-"loop": true,
+"loop": 1,
 "name": &"bubble_run",
 "speed": 8.0
 }, {
@@ -1631,7 +1631,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_myutq")
 }],
-"loop": false,
+"loop": 0,
 "name": &"bubble_throw",
 "speed": 15.0
 }, {
@@ -1657,7 +1657,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_60xba")
 }],
-"loop": false,
+"loop": 0,
 "name": &"bubble_throw_arrive",
 "speed": 8.0
 }, {
@@ -1677,7 +1677,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_4elbv")
 }],
-"loop": false,
+"loop": 0,
 "name": &"bubble_to_normal",
 "speed": 8.0
 }, {
@@ -1724,7 +1724,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_erfbu")
 }],
-"loop": false,
+"loop": 0,
 "name": &"bubble_to_super",
 "speed": 8.0
 }, {
@@ -1744,7 +1744,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_8tubf")
 }],
-"loop": false,
+"loop": 0,
 "name": &"crouch",
 "speed": 8.0
 }, {
@@ -1758,7 +1758,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_uemdr")
 }],
-"loop": false,
+"loop": 0,
 "name": &"crouch_super",
 "speed": 8.0
 }, {
@@ -1772,7 +1772,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_alogn")
 }],
-"loop": false,
+"loop": 0,
 "name": &"dash",
 "speed": 8.0
 }, {
@@ -1783,7 +1783,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_tc88p")
 }],
-"loop": false,
+"loop": 0,
 "name": &"dash_super",
 "speed": 8.0
 }, {
@@ -1833,7 +1833,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_qhl2e")
 }],
-"loop": false,
+"loop": 0,
 "name": &"death",
 "speed": 8.0
 }, {
@@ -1859,7 +1859,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_p2obi")
 }],
-"loop": false,
+"loop": 0,
 "name": &"death_bubble",
 "speed": 8.0
 }, {
@@ -1909,7 +1909,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_21t01")
 }],
-"loop": false,
+"loop": 0,
 "name": &"death_super",
 "speed": 8.0
 }, {
@@ -2265,7 +2265,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_21t01")
 }],
-"loop": false,
+"loop": 0,
 "name": &"default",
 "speed": 8.0
 }, {
@@ -2870,7 +2870,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_tjabs")
 }],
-"loop": false,
+"loop": 0,
 "name": &"default_1",
 "speed": 8.0
 }, {
@@ -2914,7 +2914,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ry01a")
 }],
-"loop": false,
+"loop": 0,
 "name": &"default_2",
 "speed": 8.0
 }, {
@@ -2925,7 +2925,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_wh05g")
 }],
-"loop": true,
+"loop": 1,
 "name": &"fall",
 "speed": 8.0
 }, {
@@ -2936,7 +2936,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_tibrr")
 }],
-"loop": true,
+"loop": 1,
 "name": &"fall_super",
 "speed": 8.0
 }, {
@@ -2950,7 +2950,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_2ex7r")
 }],
-"loop": false,
+"loop": 0,
 "name": &"hurt",
 "speed": 8.0
 }, {
@@ -2961,7 +2961,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_lx1vu")
 }],
-"loop": false,
+"loop": 0,
 "name": &"hurt_super",
 "speed": 8.0
 }, {
@@ -2975,7 +2975,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_t7cd8")
 }],
-"loop": true,
+"loop": 1,
 "name": &"idle",
 "speed": 8.0
 }, {
@@ -2995,7 +2995,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_y3gt4")
 }],
-"loop": true,
+"loop": 1,
 "name": &"idle_bubble",
 "speed": 8.0
 }, {
@@ -3006,7 +3006,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_erfbu")
 }],
-"loop": true,
+"loop": 1,
 "name": &"idle_super",
 "speed": 8.0
 }, {
@@ -3020,7 +3020,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_wh05g")
 }],
-"loop": false,
+"loop": 0,
 "name": &"jump",
 "speed": 8.0
 }, {
@@ -3031,7 +3031,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_tibrr")
 }],
-"loop": true,
+"loop": 1,
 "name": &"jump_super",
 "speed": 8.0
 }, {
@@ -3057,7 +3057,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_woj60")
 }],
-"loop": false,
+"loop": 0,
 "name": &"normal_to_bubble",
 "speed": 8.0
 }, {
@@ -3092,7 +3092,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_r0ok5")
 }],
-"loop": false,
+"loop": 0,
 "name": &"normal_to_super",
 "speed": 8.0
 }, {
@@ -3106,7 +3106,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_2umio")
 }],
-"loop": false,
+"loop": 0,
 "name": &"parry",
 "speed": 8.0
 }, {
@@ -3126,7 +3126,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_y3gt4")
 }],
-"loop": true,
+"loop": 1,
 "name": &"parry_bubble",
 "speed": 8.0
 }, {
@@ -3143,7 +3143,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_yyamt")
 }],
-"loop": false,
+"loop": 0,
 "name": &"parry_super",
 "speed": 8.0
 }, {
@@ -3166,7 +3166,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_hwm1c")
 }],
-"loop": false,
+"loop": 0,
 "name": &"super_espinho",
 "speed": 5.0
 }, {
@@ -3186,7 +3186,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_nqod0")
 }],
-"loop": true,
+"loop": 1,
 "name": &"super_extensao",
 "speed": 5.0
 }, {
@@ -3200,7 +3200,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_xuxui")
 }],
-"loop": false,
+"loop": 0,
 "name": &"super_lancador",
 "speed": 5.0
 }, {
@@ -3229,7 +3229,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_3kf68")
 }],
-"loop": false,
+"loop": 0,
 "name": &"super_shield",
 "speed": 8.0
 }, {
@@ -3282,7 +3282,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_y3gt4")
 }],
-"loop": false,
+"loop": 0,
 "name": &"super_to_bubble",
 "speed": 8.0
 }, {
@@ -3317,7 +3317,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_4elbv")
 }],
-"loop": false,
+"loop": 0,
 "name": &"super_to_normal",
 "speed": 8.0
 }, {
@@ -3343,7 +3343,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_x0vnr")
 }],
-"loop": false,
+"loop": 0,
 "name": &"super_warudo",
 "speed": 8.0
 }, {
@@ -3363,7 +3363,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_4j5ex")
 }],
-"loop": true,
+"loop": 1,
 "name": &"swim",
 "speed": 8.0
 }, {
@@ -3386,7 +3386,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_tc88p")
 }],
-"loop": true,
+"loop": 1,
 "name": &"swim_super",
 "speed": 8.0
 }, {
@@ -3403,7 +3403,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jnm6q")
 }],
-"loop": true,
+"loop": 1,
 "name": &"walk",
 "speed": 8.0
 }, {
@@ -3426,7 +3426,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_5ns7m")
 }],
-"loop": true,
+"loop": 1,
 "name": &"walk_super",
 "speed": 8.0
 }]
@@ -3458,7 +3458,8 @@ size = Vector2(19, 3.5)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2enhl"]
 size = Vector2(63, 63)
 
-[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("audio_normal", "audio_super", "hud", "stomper_normal", "stomper_bubble", "stomper_super", "hurtbox_super", "stats") groups=["jogador"]]
+[node name="player" type="CharacterBody2D" unique_id=82006631 node_paths=PackedStringArray("audio_normal", "audio_super", "hud", "stomper_normal", "stomper_bubble", "stomper_super", "hurtbox_super", "stats") groups=["jogador"]]
+collision_mask = 6
 script = ExtResource("1_8vhvd")
 audio_normal = NodePath("audio_normal")
 audio_super = NodePath("audio_super")
@@ -3469,7 +3470,7 @@ stomper_super = NodePath("StompHitboxSuper")
 hurtbox_super = NodePath("HurtboxSuper")
 stats = NodePath("Stats")
 
-[node name="Sprite2D" type="AnimatedSprite2D" parent="." node_paths=PackedStringArray("player", "stats", "special_attack_area_normal", "special_attack_area_bubble", "special_attack_area_super", "body_idle_normal", "body_walk_normal", "body_jump_normal", "body_fall_normal", "body_crouch_normal", "body_dash_normal", "body_swim_normal", "body_attack_normal", "body_defend_normal", "body_dead_normal", "body_idle_bubble", "body_walk_bubble", "body_jump_bubble", "body_fall_bubble", "body_crouch_bubble", "body_dash_bubble", "body_swim_bubble", "body_attack_bubble", "body_defend_bubble", "body_dead_bubble", "body_idle_super", "body_walk_super", "body_jump_super", "body_fall_super", "body_crouch_super", "body_dash_super", "body_swim_super", "body_attack_super", "body_defend_super", "body_dead_super", "attack_area_normal", "attack_area_bubble", "attack_area_super")]
+[node name="Sprite2D" type="AnimatedSprite2D" parent="." unique_id=943877636 node_paths=PackedStringArray("player", "stats", "special_attack_area_normal", "special_attack_area_bubble", "special_attack_area_super", "body_idle_normal", "body_walk_normal", "body_jump_normal", "body_fall_normal", "body_crouch_normal", "body_dash_normal", "body_swim_normal", "body_attack_normal", "body_defend_normal", "body_dead_normal", "body_idle_bubble", "body_walk_bubble", "body_jump_bubble", "body_fall_bubble", "body_crouch_bubble", "body_dash_bubble", "body_swim_bubble", "body_attack_bubble", "body_defend_bubble", "body_dead_bubble", "body_idle_super", "body_walk_super", "body_jump_super", "body_fall_super", "body_crouch_super", "body_dash_super", "body_swim_super", "body_attack_super", "body_defend_super", "body_dead_super", "attack_area_normal", "attack_area_bubble", "attack_area_super")]
 sprite_frames = SubResource("SpriteFrames_nwtu0")
 animation = &"parry_bubble"
 script = ExtResource("3_ybr15")
@@ -3512,19 +3513,19 @@ attack_area_normal = NodePath("../AttackHitbox")
 attack_area_bubble = NodePath("../AttackHitbox")
 attack_area_super = NodePath("../AttackHitbox")
 
-[node name="Corpo" type="CollisionShape2D" parent="." groups=["player"]]
+[node name="Corpo" type="CollisionShape2D" parent="." unique_id=789783394 groups=["player"]]
 position = Vector2(-0.5, 19)
 shape = SubResource("RectangleShape2D_kadp1")
 
-[node name="CorpoBubble" type="CollisionShape2D" parent="." groups=["player"]]
+[node name="CorpoBubble" type="CollisionShape2D" parent="." unique_id=1326825148 groups=["player"]]
 position = Vector2(-0.25, 9)
 shape = SubResource("RectangleShape2D_8vhvd")
 
-[node name="CorpoSuper" type="CollisionShape2D" parent="." groups=["player"]]
+[node name="CorpoSuper" type="CollisionShape2D" parent="." unique_id=691493367 groups=["player"]]
 position = Vector2(-2, 0.5)
 shape = SubResource("RectangleShape2D_e2nbm")
 
-[node name="Camera" type="Camera2D" parent="."]
+[node name="Camera" type="Camera2D" parent="." unique_id=1347386766]
 offset = Vector2(18, -18)
 limit_bottom = 300
 position_smoothing_enabled = true
@@ -3536,76 +3537,76 @@ drag_top_margin = 0.25
 drag_right_margin = 0.35
 drag_bottom_margin = 0.38
 
-[node name="audio_normal" type="AudioStreamPlayer" parent="."]
+[node name="audio_normal" type="AudioStreamPlayer" parent="." unique_id=1391239728]
 stream = ExtResource("4_4q8k4")
 autoplay = true
 bus = &"music"
 
-[node name="audio_super" type="AudioStreamPlayer" parent="."]
+[node name="audio_super" type="AudioStreamPlayer" parent="." unique_id=1219359400]
 stream = ExtResource("5_2enhl")
 bus = &"music"
 
-[node name="Stats" type="Node" parent="." node_paths=PackedStringArray("player")]
+[node name="Stats" type="Node" parent="." unique_id=1459209450 node_paths=PackedStringArray("player")]
 script = ExtResource("6_ruciq")
 player = NodePath("..")
 
-[node name="Invencibilidade" type="Timer" parent="Stats"]
+[node name="Invencibilidade" type="Timer" parent="Stats" unique_id=350638444]
 one_shot = true
 
-[node name="piscar_timer" type="Timer" parent="Stats"]
+[node name="piscar_timer" type="Timer" parent="Stats" unique_id=1815713043]
 wait_time = 0.1
 
-[node name="HurtboxArea" type="Area2D" parent="." groups=["player", "player_hurtbox"]]
+[node name="HurtboxArea" type="Area2D" parent="." unique_id=194185049 groups=["player", "player_hurtbox"]]
 position = Vector2(-1, 6)
 
-[node name="HurtboxCollisionShape" type="CollisionShape2D" parent="HurtboxArea"]
+[node name="HurtboxCollisionShape" type="CollisionShape2D" parent="HurtboxArea" unique_id=1249965872]
 position = Vector2(1, 3)
 shape = SubResource("RectangleShape2D_bll10")
 
-[node name="HurtboxSuper" type="Area2D" parent="." groups=["player", "player_hurtbox"]]
+[node name="HurtboxSuper" type="Area2D" parent="." unique_id=603401341 groups=["player", "player_hurtbox"]]
 position = Vector2(-2, 0.5)
 
-[node name="CollisionShapeSuper" type="CollisionShape2D" parent="HurtboxSuper"]
+[node name="CollisionShapeSuper" type="CollisionShape2D" parent="HurtboxSuper" unique_id=443773557]
 shape = SubResource("RectangleShape2D_e2nbm")
 
-[node name="AttackHitbox" type="Area2D" parent="." groups=["killer", "player_attack"]]
+[node name="AttackHitbox" type="Area2D" parent="." unique_id=1868986973 groups=["killer", "player_attack"]]
 
-[node name="AttackCollisionShape" type="CollisionShape2D" parent="AttackHitbox"]
+[node name="AttackCollisionShape" type="CollisionShape2D" parent="AttackHitbox" unique_id=837617690]
 position = Vector2(23.5, 9)
 shape = SubResource("RectangleShape2D_x33ej")
 
-[node name="ShieldHitbox" type="Area2D" parent="."]
+[node name="ShieldHitbox" type="Area2D" parent="." unique_id=863856865]
 
-[node name="ShieldCollisionShape" type="CollisionShape2D" parent="ShieldHitbox"]
+[node name="ShieldCollisionShape" type="CollisionShape2D" parent="ShieldHitbox" unique_id=346615702]
 position = Vector2(23.5, 9)
 shape = SubResource("RectangleShape2D_x33ej")
 
-[node name="StompHitboxNormal" type="Area2D" parent="." groups=["killer", "player_stomper"]]
+[node name="StompHitboxNormal" type="Area2D" parent="." unique_id=1202893158 groups=["killer", "player_stomper"]]
 
-[node name="StompCollisionShapeNormal" type="CollisionShape2D" parent="StompHitboxNormal"]
+[node name="StompCollisionShapeNormal" type="CollisionShape2D" parent="StompHitboxNormal" unique_id=1437329512]
 position = Vector2(-0.5, 34)
 shape = SubResource("RectangleShape2D_3udnp")
 
-[node name="StompHitboxBubble" type="Area2D" parent="." groups=["killer", "player_stomper"]]
+[node name="StompHitboxBubble" type="Area2D" parent="." unique_id=503782490 groups=["killer", "player_stomper"]]
 
-[node name="StompCollisionShapeBubble" type="CollisionShape2D" parent="StompHitboxBubble"]
+[node name="StompCollisionShapeBubble" type="CollisionShape2D" parent="StompHitboxBubble" unique_id=2400943]
 position = Vector2(0, 21)
 shape = SubResource("RectangleShape2D_ybr15")
 
-[node name="StompHitboxSuper" type="Area2D" parent="." groups=["killer", "player_stomper"]]
+[node name="StompHitboxSuper" type="Area2D" parent="." unique_id=1761804877 groups=["killer", "player_stomper"]]
 
-[node name="StompCollisionShapeSuper" type="CollisionShape2D" parent="StompHitboxSuper"]
+[node name="StompCollisionShapeSuper" type="CollisionShape2D" parent="StompHitboxSuper" unique_id=1244940815]
 position = Vector2(-0.5, 34)
 shape = SubResource("RectangleShape2D_4q8k4")
 
-[node name="HUD" parent="." node_paths=PackedStringArray("player", "stats") instance=ExtResource("7_yk6xx")]
+[node name="HUD" parent="." unique_id=1449012575 node_paths=PackedStringArray("player", "stats") instance=ExtResource("7_yk6xx")]
 player = NodePath("..")
 stats = NodePath("../Stats")
 
-[node name="origem_throw_teleporte" type="Node2D" parent="."]
+[node name="origem_throw_teleporte" type="Node2D" parent="." unique_id=59602365]
 position = Vector2(52, 20)
 
-[node name="Hitbox_example_spike" type="CollisionShape2D" parent="."]
+[node name="Hitbox_example_spike" type="CollisionShape2D" parent="." unique_id=292123227]
 position = Vector2(-0.5, 0.5)
 shape = SubResource("RectangleShape2D_2enhl")
 debug_color = Color(1.3957917e-06, 0.6436006, 0.30272216, 0.41960785)

@@ -1,6 +1,9 @@
 extends CharacterBody2D
 
 const ATTACK_META_DAMAGE := &"attack_damage"
+const PHYSICS_LAYER_PLAYER: int = 1
+const PHYSICS_LAYER_WORLD: int = 2
+const PHYSICS_LAYER_ENEMIES: int = 4
 
 enum MoveMode { WALK, JUMP, FLY, SWIM }
 enum AttackMode { CONTACT, HITBOX }
@@ -171,6 +174,8 @@ func _physics_process(delta):
 	if time_frozen:
 		velocity = Vector2.ZERO
 		return
+
+	update_player_collision_mask()
 
 	if cooldown_t > 0:
 		cooldown_t -= delta
@@ -523,6 +528,16 @@ func process_contact_attack():
 			return
 
 
+func update_player_collision_mask() -> void:
+	var base_mask := PHYSICS_LAYER_WORLD | PHYSICS_LAYER_ENEMIES
+	var is_super: bool = is_instance_valid(player) and "form" in player and player.form == player.Form.SUPER
+
+	if is_super:
+		collision_mask = base_mask | PHYSICS_LAYER_PLAYER
+	else:
+		collision_mask = base_mask
+
+
 func avoid_nearby_slimes() -> void:
 	if not avoid_other_slimes:
 		return
@@ -565,6 +580,12 @@ func separate_from_player():
 		if absf(offset.x) < 1.0:
 			side = -1.0 if facing_dir >= 0 else 1.0
 		velocity.x = side * head_slide_force * speed_scale
+		return
+
+	# Empurrao por proximidade/colisao lateral so acontece com o jogador
+	# na forma Super; nas outras formas o inimigo so e afastado se estiver
+	# em cima da cabeca (bloco acima), nao so por encostar do lado.
+	if not ("form" in player and player.form == player.Form.SUPER):
 		return
 
 	var dist := offset.length()

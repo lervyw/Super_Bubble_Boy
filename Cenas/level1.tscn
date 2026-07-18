@@ -1400,7 +1400,7 @@ texture = ExtResource("12_x7kwe")
 5:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
 [sub_resource type="TileSet" id="TileSet_spx7c"]
-physics_layer_0/collision_layer = 1
+physics_layer_0/collision_layer = 2
 terrain_set_0/mode = 0
 terrain_set_0/terrain_0/name = "Terrain 1"
 terrain_set_0/terrain_0/color = Color(1, 1, 1, 1)
@@ -1576,40 +1576,40 @@ shape = SubResource("RectangleShape2D_0041a")
 position = Vector2(-639, 189)
 respawn_position = Vector2(182, 214)
 
-[node name="Sprite2D" parent="player" index="0" node_paths=PackedStringArray("nivel")]
+[node name="Sprite2D" parent="player" index="0" unique_id=943877636 node_paths=PackedStringArray("nivel")]
 nivel = NodePath("../..")
 
-[node name="Camera" parent="player" index="4"]
+[node name="Camera" parent="player" index="4" unique_id=1347386766]
 limit_enabled = false
 
-[node name="audio_normal" parent="player" index="5"]
+[node name="audio_normal" parent="player" index="5" unique_id=1391239728]
 stream = ExtResource("18_6ynql")
 
-[node name="HurtboxArea" parent="player" index="8"]
+[node name="HurtboxArea" parent="player" index="8" unique_id=194185049]
 visible = false
 
-[node name="HurtboxSuper" parent="player" index="9"]
+[node name="HurtboxSuper" parent="player" index="9" unique_id=603401341]
 visible = false
 
-[node name="AttackHitbox" parent="player" index="10"]
+[node name="AttackHitbox" parent="player" index="10" unique_id=1868986973]
 visible = false
 
-[node name="ShieldHitbox" parent="player" index="11"]
+[node name="ShieldHitbox" parent="player" index="11" unique_id=863856865]
 visible = false
 
-[node name="StompHitboxNormal" parent="player" index="12"]
+[node name="StompHitboxNormal" parent="player" index="12" unique_id=1202893158]
 visible = false
 
-[node name="StompHitboxBubble" parent="player" index="13"]
+[node name="StompHitboxBubble" parent="player" index="13" unique_id=503782490]
 visible = false
 
-[node name="StompHitboxSuper" parent="player" index="14"]
+[node name="StompHitboxSuper" parent="player" index="14" unique_id=1761804877]
 visible = false
 
-[node name="origem_throw_teleporte" parent="player" index="16"]
+[node name="origem_throw_teleporte" parent="player" index="16" unique_id=59602365]
 visible = false
 
-[node name="Hitbox_example_spike" parent="player" index="17"]
+[node name="Hitbox_example_spike" parent="player" index="17" unique_id=292123227]
 visible = false
 
 [node name="checkpoint_forma_super" parent="." unique_id=313496775 node_paths=PackedStringArray("player", "stats") instance=ExtResource("10_h5nj6")]

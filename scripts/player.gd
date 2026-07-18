@@ -36,6 +36,8 @@ const LEDGE_COYOTE_TIME: float = 0.12
 const HIT_FLASH_BLINK_INTERVAL: float = 0.08
 const CAMERA_WORLD_LAYER_MASK: int = 2
 const CAMERA_LIMIT_UNSET: int = 10000000
+const PHYSICS_LAYER_WORLD: int = 2
+const PHYSICS_LAYER_ENEMIES: int = 4
 
 var hud_menu_open := false
 var hud_menu_selection: HudMenuAction = HudMenuAction.NONE
@@ -67,7 +69,8 @@ var hud_menu_waiting_for_neutral := false
 @export_range(0.0, 1.0, 0.01) var camera_drag_right_margin: float = 0.25
 @export_range(0.0, 1.0, 0.01) var camera_drag_top_margin: float = 0.50
 @export_range(0.0, 1.0, 0.01) var camera_drag_bottom_margin: float = 0.38
-@export_range(0.0, 200.0, 1.0) var camera_crouch_offset: float = 30.0
+@export_range(0.0, 200.0, 1.0) var camera_crouch_offset: float = 55.0
+@export_range(0.1, 10.0, 0.1) var camera_crouch_transition_time: float = 2.0
 @export_range(8.0, 200.0, 1.0) var camera_wall_check_distance: float = 48.0
 @export_range(16.0, 300.0, 1.0) var camera_wall_min_span: float = 56.0
 @export_range(0.0, 64.0, 1.0) var camera_wall_margin: float = 4.0
@@ -288,6 +291,7 @@ var super_parry_serial := 0
 
 var camera_follow_target: Node2D
 var camera_follow_timer: float = 0.0
+var crouch_camera_progress: float = 0.0
 
 var unlocked_forms = {
 	Form.NORMAL: true,
@@ -438,6 +442,7 @@ func _process(_delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	update_enemy_collision_mask()
 	refresh_stompers_for_current_form()
 	update_attack_cooldowns(delta)
 	process_passive_attack(delta)
@@ -1163,6 +1168,19 @@ func get_current_stomper() -> Area2D:
 			return stomper_super
 		_:
 			return stomper_normal
+
+
+func update_enemy_collision_mask() -> void:
+	# Fora da forma Super, o corpo do jogador colide com inimigos (fica
+	# bloqueado por eles) mas sem os empurrar - o bloqueio e' resolvido
+	# so do lado do jogador, o inimigo nao reage a esse contato (ver
+	# update_player_collision_mask() nos scripts dos inimigos). Na forma
+	# Super o jogador passa livre e sao os inimigos que reagem, dando a
+	# sensacao de empurrar/atropelar.
+	if form == Form.SUPER:
+		collision_mask = PHYSICS_LAYER_WORLD
+	else:
+		collision_mask = PHYSICS_LAYER_WORLD | PHYSICS_LAYER_ENEMIES
 
 
 func is_grounded_on_enemy() -> bool:
@@ -1899,6 +1917,8 @@ func force_form(new_form: Form) -> void:
 
 
 func can_dash() -> bool:
+	if form == Form.BUBBLE:
+		return false
 	if not can_dash_global():
 		return false
 	if dash_cooldown_timer > 0:
@@ -2095,6 +2115,8 @@ func change_state(new_state: State) -> void:
 
 func start_normal_attack() -> void:
 	if state in [State.ATTACK, State.SPECIAL_ATTACK, State.DEFEND, State.DEAD, State.TRANSFORM, State.HURT]:
+		return
+	if form == Form.BUBBLE:
 		return
 
 	if form == Form.NORMAL and stats:
@@ -2386,9 +2408,14 @@ func update_camera_framing(delta: float) -> void:
 			_stop_camera_follow()
 		return
 
-	var vertical_offset := camera_vertical_offset
-	if is_on_floor() and (state == State.CROUCH or is_down_pressed()):
-		vertical_offset += camera_crouch_offset
+	var is_crouch_camera_active := is_on_floor() and (state == State.CROUCH or is_down_pressed())
+	var crouch_progress_step := delta / camera_crouch_transition_time
+	if is_crouch_camera_active:
+		crouch_camera_progress = minf(crouch_camera_progress + crouch_progress_step, 1.0)
+	else:
+		crouch_camera_progress = maxf(crouch_camera_progress - crouch_progress_step, 0.0)
+
+	var vertical_offset := camera_vertical_offset + camera_crouch_offset * smoothstep(0.0, 1.0, crouch_camera_progress)
 
 	var target_offset := Vector2(get_camera_lookahead_direction() * camera_lookahead_distance, vertical_offset)
 	var weight := clampf(delta * camera_offset_smoothing, 0.0, 1.0)
