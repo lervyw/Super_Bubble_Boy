@@ -1,0 +1,418 @@
+[gd_scene load_steps=10 format=3 uid="uid://bxwaorviofm3w"]
+
+[ext_resource type="Script" uid="uid://cx7ula7bxnjv4" path="res://scripts/title.gd" id="1_y12so"]
+[ext_resource type="FontFile" uid="uid://tb0dgy82p4df" path="res://sprites/img/background/fundo/Rev Mini Pixel.ttf" id="8_mcqsg"]
+[ext_resource type="AudioStream" uid="uid://bweoc5o508ai7" path="res://music/A Alegria Pixelada.wav" id="9_7wsge"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qui40"]
+bg_color = Color(0.34, 0.0595, 0.0714, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.98, 0.74, 0.32, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2vbo6"]
+content_margin_left = 6.0
+content_margin_top = 2.0
+content_margin_right = 6.0
+content_margin_bottom = 2.0
+bg_color = Color(0.0196078, 0.0215686, 0.0392157, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.65, 0.54, 0.36, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+expand_margin_top = 1.0
+
+[sub_resource type="Theme" id="Theme_50u4b"]
+Button/colors/font_color = Color(1, 1, 1, 1)
+Button/colors/font_focus_color = Color(1, 0.92, 0.64, 1)
+Button/colors/font_hover_color = Color(1, 0.92, 0.64, 1)
+Button/font_sizes/font_size = 8
+Button/fonts/font = ExtResource("8_mcqsg")
+Button/styles/focus = SubResource("StyleBoxFlat_qui40")
+Button/styles/hover = SubResource("StyleBoxFlat_qui40")
+Button/styles/normal = SubResource("StyleBoxFlat_2vbo6")
+HSlider/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 8
+Label/fonts/font = ExtResource("8_mcqsg")
+Label/styles/normal = SubResource("StyleBoxFlat_2vbo6")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_01s65"]
+bg_color = Color(0.42, 0.055, 0.055, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.55, 0.35, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_di2en"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+bg_color = Color(0.03, 0.015, 0.018, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.62, 0.28, 0.2, 1)
+
+[sub_resource type="Theme" id="Theme_8he0a"]
+Button/colors/font_color = Color(1, 1, 1, 1)
+Button/colors/font_hover_color = Color(1, 0.86, 0.62, 1)
+Button/font_sizes/font_size = 8
+Button/fonts/font = ExtResource("8_mcqsg")
+Button/styles/focus = SubResource("StyleBoxFlat_01s65")
+Button/styles/hover = SubResource("StyleBoxFlat_01s65")
+Button/styles/normal = SubResource("StyleBoxFlat_di2en")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_y12so")
+metadata/_edit_vertical_guides_ = [199.0]
+metadata/_edit_horizontal_guides_ = [77.0]
+
+[node name="IntroBlackBackground" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 420.0
+offset_bottom = 280.0
+color = Color(0, 0, 0, 1)
+
+[node name="MenuIntroBackground" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 420.0
+offset_bottom = 280.0
+expand_mode = 1
+
+[node name="LogoIntro" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 420.0
+offset_bottom = 280.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MainMenu" type="HBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 178.0
+offset_top = 156.0
+offset_right = -30.0
+offset_bottom = 36.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Start" type="Button" parent="MainMenu/VBoxContainer"]
+custom_minimum_size = Vector2(170, 18)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "INICIAR"
+
+[node name="Config" type="Button" parent="MainMenu/VBoxContainer"]
+custom_minimum_size = Vector2(170, 18)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "CONFIGURACOES"
+
+[node name="Quit" type="Button" parent="MainMenu/VBoxContainer"]
+custom_minimum_size = Vector2(170, 18)
+layout_mode = 2
+theme = SubResource("Theme_8he0a")
+text = "SAIR"
+
+[node name="ConfigMenu" type="HBoxContainer" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 178.0
+offset_top = 34.0
+offset_right = 411.0
+offset_bottom = 274.0
+alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ConfigMenu"]
+custom_minimum_size = Vector2(178, 240)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigMenu/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="ConfigTitle" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "CONFIGURACOES"
+horizontal_alignment = 1
+
+[node name="Master" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Master"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SliderMaster" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 12)
+layout_mode = 2
+min_value = -60.0
+max_value = 1.0
+value = 1.0
+
+[node name="Musica" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Musica"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SliderMusica" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 12)
+layout_mode = 2
+min_value = -60.0
+max_value = 1.0
+value = 1.0
+
+[node name="Volume" type="Label" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Efeitos"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SliderEfeitos" type="HSlider" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 12)
+layout_mode = 2
+min_value = -60.0
+max_value = 1.0
+value = 1.0
+
+[node name="CRTToggle" type="CheckButton" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 18)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+button_pressed = true
+text = "CRT"
+
+[node name="ConfigurarBotoes" type="Button" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 18)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "CONTROLES"
+
+[node name="Voltar" type="Button" parent="ConfigMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 18)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "VOLTAR"
+
+[node name="ControlsMenu" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 182.0
+offset_top = 32.0
+offset_right = 407.0
+offset_bottom = 242.0
+alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ControlsMenu"]
+custom_minimum_size = Vector2(178, 210)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlsMenu/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="ControlsTitle" type="Label" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 14)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "CONTROLES"
+horizontal_alignment = 1
+
+[node name="RebindPrompt" type="Label" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 14)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "Selecione uma acao para remapear"
+horizontal_alignment = 1
+
+[node name="Controle1" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "botao pulo"
+
+[node name="Controle2" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "transformacao 1"
+
+[node name="Controle3" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "transformacao 2"
+
+[node name="Controle4" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "forma normal"
+
+[node name="Controle5" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "botao menu"
+
+[node name="Controle6" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "botao ataque"
+
+[node name="Controle7" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "ataque especial"
+
+[node name="Controle8" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "escudo"
+
+[node name="Controle13" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "ultimate"
+
+[node name="Controle14" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "esquerda"
+
+[node name="Controle15" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "direita"
+
+[node name="Controle16" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "agachar"
+
+[node name="Controle17" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "dash"
+
+[node name="Controle18" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "pausa"
+
+[node name="Controle19" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda cima"
+
+[node name="Controle20" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda baixo"
+
+[node name="Controle21" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda esquerda"
+
+[node name="Controle22" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda direita"
+
+[node name="Controle23" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "cima / nadar"
+
+[node name="Controle24" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face cima"
+
+[node name="Controle25" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face esquerda"
+
+[node name="Controle26" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face baixo"
+
+[node name="Controle27" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "roda face direita"
+
+[node name="Voltar" type="Button" parent="ControlsMenu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(170, 16)
+layout_mode = 2
+theme = SubResource("Theme_50u4b")
+text = "VOLTAR"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_7wsge")
+autoplay = true
+bus = &"music"
+
+[connection signal="pressed" from="MainMenu/VBoxContainer/Start" to="." method="_on_iniciar"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Config" to="." method="_open_config_menu"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/Quit" to="." method="_on_sair"]
+[connection signal="pressed" from="ControlsMenu/ScrollContainer/VBoxContainer/Voltar" to="." method="_back_to_config_menu"]

@@ -1,0 +1,633 @@
+extends CharacterBody2D
+
+signal boss_defeated
+signal health_changed(current_health: int, max_health: int)
+signal hud_visibility_changed(should_show: bool)
+
+const ATTACK_META_DAMAGE := &"attack_damage"
+
+enum State { IDLE, CHASE, ATTACK, STUN, TRANSFORM, DEAD }
+enum Form { NORMAL, SUPER }
+
+@export var player_group: StringName = "jogador"
+@export var player_hurtbox_group: StringName = "player_hurtbox"
+
+@export_group("Stats")
+@export var max_health: int = 6
+@export var take_stomp_damage: bool = true
+@export_range(0.0, 2.0, 0.05) var hit_stun_time: float = 0.2
+@export var interrupt_attack_on_damage: bool = false
+var health: int = max_health
+
+@export_group("Movement")
+@export var speed: float = 90.0
+@export var gravity: float = 900.0
+@export var stop_distance: float = 42.0
+@export var aggro_range: float = 450.0
+@export var turn_horizontal_threshold: float = 32.0
+
+@export_group("Water")
+@export_range(0.05, 1.0, 0.05) var water_speed_multiplier: float = 0.55
+@export_range(0.05, 1.0, 0.05) var water_gravity_multiplier: float = 0.35
+
+@export_group("Attack")
+@export var damage: int = 2
+@export var attack_range: float = 55.0
+@export var attack_cooldown: float = 1.0
+@export var hitbox_active_time: float = 0.12
+@export_range(-1, 99, 1) var attack_hitbox_start_frame: int = -1
+@export_range(-1, 99, 1) var attack_hitbox_end_frame: int = -1
+
+@export_group("Projectile Attack")
+@export var projectile_attack_scene: PackedScene = preload("res://Cenas/boss_projectile.tscn")
+@export_range(0.0, 1.0, 0.05) var projectile_attack_chance: float = 0.35
+@export var projectile_attack_range: float = 240.0
+@export var projectile_min_range: float = 42.0
+@export var projectile_chase_distance: float = 150.0
+@export var projectile_attack_animation: StringName = &"attack2"
+@export var projectile_super_attack_animation: StringName = &"attack_super2"
+@export_range(0, 99, 1) var projectile_attack_fire_frame: int = 6
+@export var projectile_mouth_offset: Vector2 = Vector2(38.0, -27.0)
+@export var projectile_damage: int = 2
+
+@export_group("Animations")
+@export var idle_animation: StringName = &"idle"
+@export var walk_animation: StringName = &"walk"
+@export var attack_animation: StringName = &"attack"
+
+@export var idle_super_animation: StringName = &"idle_super"
+@export var walk_super_animation: StringName = &"walk_super"
+@export var attack_super_animation: StringName = &"attack_super"
+
+@export var transform_animation: StringName = &"transform"
+@export var death_animation: StringName = &"death"
+
+@export_group("Nodes")
+@export var sprite_path: NodePath = NodePath("AnimatedSprite2D")
+@export var hurtbox_path: NodePath = NodePath("Hurtbox")
+@export var hitbox_path: NodePath = NodePath("AttackHitbox")
+@export var attack_receiver_path: NodePath = NodePath("AttackReceiver")
+
+@onready var sprite: AnimatedSprite2D = get_node_or_null(sprite_path)
+@onready var hurtbox: Area2D = get_node_or_null(hurtbox_path)
+@onready var hitbox: Area2D = get_node_or_null(hitbox_path)
+@onready var hitbox_shape: CollisionShape2D = hitbox.get_node_or_null("CollisionShape2D") if hitbox else null
+@onready var attack_receiver: Area2D = get_node_or_null(attack_receiver_path)
+
+var player: Node2D
+var state: State = State.IDLE
+var form: Form = Form.NORMAL
+
+var cooldown_t := 0.0
+var facing_dir := -1
+var hud_visible := false
+var attack_hitbox_base_position: Vector2 = Vector2.ZERO
+var in_water: bool = false
+var water_zone_overlap_count: int = 0
+var rng := RandomNumberGenerator.new()
+var current_attack_animation: StringName = &""
+var time_frozen: bool = false
+var time_frozen_velocity: Vector2 = Vector2.ZERO
+var time_frozen_sprite_was_playing: bool = false
+var transform_started: bool = false
+
+# =========================================================
+
+func _ready():
+	if not is_in_group("boss"):
+		add_to_group("boss")
+	rng.randomize()
+
+	health = max_health
+	player = get_tree().get_first_node_in_group(player_group)
+
+	if hurtbox and not hurtbox.area_entered.is_connected(_on_hurtbox_area_entered):
+		hurtbox.area_entered.connect(_on_hurtbox_area_entered)
+
+	if attack_receiver and not attack_receiver.area_entered.is_connected(_on_attack_receiver_area_entered):
+		attack_receiver.area_entered.connect(_on_attack_receiver_area_entered)
+
+	if hitbox_shape:
+		attack_hitbox_base_position = hitbox_shape.position
+		hitbox_shape.disabled = true
+
+	if hitbox:
+		hitbox.body_entered.connect(_on_hitbox_body_entered)
+		if not hitbox.area_entered.is_connected(_on_hitbox_area_entered):
+			hitbox.area_entered.connect(_on_hitbox_area_entered)
+
+	update_sprite_direction(facing_dir)
+
+	emit_signal("health_changed", health, max_health)
+	emit_signal("hud_visibility_changed", false)
+
+# =========================================================
+
+func _physics_process(delta):
+	if state == State.DEAD:
+		return
+	if time_frozen:
+		velocity = Vector2.ZERO
+		return
+	if state == State.TRANSFORM:
+		velocity.x = 0.0
+		apply_gravity(delta)
+		move_and_slide()
+		return
+
+	if cooldown_t > 0:
+		cooldown_t -= delta
+
+	apply_gravity(delta)
+
+	if not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group(player_group)
+	if not is_instance_valid(player):
+		return
+
+	var dist = global_position.distance_to(player.global_position)
+	update_hud_visibility(dist <= aggro_range)
+
+	match state:
+		State.IDLE:
+			handle_idle(dist)
+
+		State.CHASE:
+			handle_chase(dist)
+
+		State.ATTACK:
+			pass
+
+		State.STUN:
+			pass
+
+	move_and_slide()
+	update_animation()
+
+# =========================================================
+
+func handle_idle(dist):
+	if dist <= aggro_range:
+		state = State.CHASE
+
+func handle_chase(dist):
+	var dir: int = get_horizontal_chase_direction()
+
+	if dir != 0:
+		facing_dir = dir
+
+	if dist <= stop_distance:
+		velocity.x = 0
+	else:
+		velocity.x = facing_dir * get_water_speed()
+		update_sprite_direction(facing_dir)
+
+	if cooldown_t <= 0 and should_start_attack(dist):
+		state = State.ATTACK
+		start_attack(dist)
+		return
+
+
+func get_horizontal_chase_direction() -> int:
+	if not is_instance_valid(player):
+		return 0
+
+	var horizontal_delta: float = player.global_position.x - global_position.x
+	if absf(horizontal_delta) < turn_horizontal_threshold:
+		return 0
+
+	return int(sign(horizontal_delta))
+
+# =========================================================
+
+func start_attack(dist: float = 0.0):
+	cooldown_t = attack_cooldown
+	velocity.x = 0
+
+	if should_use_projectile_attack(dist):
+		await start_projectile_attack()
+		return
+
+	var attack_anim: StringName = get_attack_anim()
+	current_attack_animation = attack_anim
+	restart_attack_animation()
+
+	if uses_frame_based_hitbox():
+		await run_attack_hitbox_by_frames(attack_anim)
+	else:
+		await wait_for_attack_hitbox_start()
+
+		if hitbox_shape and not time_frozen:
+			hitbox_shape.set_deferred("disabled", false)
+
+		await get_tree().create_timer(hitbox_active_time).timeout
+
+	if hitbox_shape:
+		hitbox_shape.set_deferred("disabled", true)
+
+		await wait_for_animation(attack_anim)
+
+	if state == State.DEAD or state == State.TRANSFORM:
+		return
+
+	state = State.CHASE
+	current_attack_animation = &""
+
+# =========================================================
+
+func should_start_attack(dist: float) -> bool:
+	return dist <= attack_range or can_start_long_range_projectile_attack(dist)
+
+
+func should_use_projectile_attack(dist: float) -> bool:
+	if not can_use_projectile_attack(dist):
+		return false
+	if can_start_long_range_projectile_attack(dist):
+		return true
+	if form == Form.SUPER and dist <= attack_range:
+		return rng.randf() <= projectile_attack_chance
+	return false
+
+
+func can_start_long_range_projectile_attack(dist: float) -> bool:
+	return can_use_projectile_attack(dist) and dist >= projectile_chase_distance
+
+
+func can_use_projectile_attack(dist: float) -> bool:
+	return projectile_attack_scene != null \
+		and has_animation(get_projectile_attack_anim()) \
+		and dist <= projectile_attack_range \
+		and dist >= projectile_min_range
+
+
+func start_projectile_attack() -> void:
+	var anim := get_projectile_attack_anim()
+	current_attack_animation = anim
+	if hitbox_shape:
+		hitbox_shape.set_deferred("disabled", true)
+
+	if sprite:
+		sprite.play(anim)
+
+	await fire_projectile_on_animation_frame(anim, projectile_attack_fire_frame)
+	await wait_for_animation(anim)
+
+	if state == State.DEAD or state == State.TRANSFORM:
+		return
+
+	state = State.CHASE
+	current_attack_animation = &""
+
+
+func fire_projectile_on_animation_frame(anim: StringName, target_frame: int) -> void:
+	if not sprite or not has_animation(anim):
+		spawn_projectile()
+		return
+
+	var actual_frame_count := sprite.sprite_frames.get_frame_count(anim)
+	var effective_target := mini(target_frame, actual_frame_count - 1)
+
+	var fired := false
+	var last_frame := -1
+	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing() and not time_frozen:
+		var frame := sprite.frame
+		if not fired and frame >= effective_target:
+			spawn_projectile()
+			fired = true
+			return
+		if frame < last_frame:
+			break
+		last_frame = frame
+		await get_tree().process_frame
+
+	if not fired and not time_frozen:
+		spawn_projectile()
+
+
+func spawn_projectile() -> void:
+	if projectile_attack_scene == null or time_frozen:
+		return
+
+	var projectile := projectile_attack_scene.instantiate()
+	projectile.global_position = get_projectile_spawn_position()
+	var dir := Vector2(float(facing_dir), 0.0)
+	if projectile.has_method("setup"):
+		projectile.setup(dir, projectile_damage)
+	var parent := get_tree().current_scene if get_tree().current_scene else get_parent()
+	parent.add_child(projectile)
+
+
+func get_projectile_spawn_position() -> Vector2:
+	var local_offset := Vector2(absf(projectile_mouth_offset.x) * float(facing_dir), projectile_mouth_offset.y)
+	return global_position + local_offset
+
+# =========================================================
+
+func take_damage(amount, _source: Node = null):
+	if state == State.DEAD or state == State.TRANSFORM:
+		return
+
+	health -= max(amount, 1)
+	emit_signal("health_changed", max(health, 0), max_health)
+
+	if form == Form.NORMAL and not transform_started and health <= max_health / 2:
+		health = max(health, 1)
+		emit_signal("health_changed", health, max_health)
+		if time_frozen:
+			return
+		await start_transform()
+		return
+	if health <= 0:
+		die()
+		return
+	if time_frozen:
+		return
+
+	if state == State.ATTACK and not interrupt_attack_on_damage:
+		return
+
+	state = State.STUN
+	velocity.x = 0.0
+	await get_tree().create_timer(hit_stun_time).timeout
+	if state == State.DEAD or state == State.TRANSFORM:
+		return
+	state = State.CHASE
+
+
+func set_time_frozen(frozen: bool) -> void:
+	if time_frozen == frozen or state == State.DEAD:
+		return
+	time_frozen = frozen
+
+	if frozen:
+		time_frozen_velocity = velocity
+		velocity = Vector2.ZERO
+		if hitbox_shape:
+			hitbox_shape.set_deferred("disabled", true)
+		if sprite:
+			time_frozen_sprite_was_playing = sprite.is_playing()
+			sprite.pause()
+	else:
+		velocity = time_frozen_velocity
+		if sprite and time_frozen_sprite_was_playing:
+			sprite.play()
+		if form == Form.NORMAL and health <= max_health / 2:
+			call_deferred("start_transform")
+
+# =========================================================
+
+func start_transform():
+	if transform_started or form == Form.SUPER or state == State.DEAD:
+		return
+
+	transform_started = true
+	state = State.TRANSFORM
+	velocity = Vector2.ZERO
+	current_attack_animation = &""
+	if hitbox_shape:
+		hitbox_shape.set_deferred("disabled", true)
+
+	if has_animation(transform_animation):
+		play_animation(transform_animation)
+		await wait_for_animation(transform_animation)
+
+	change_form(Form.SUPER)
+
+	state = State.CHASE
+
+func change_form(new_form: Form):
+	if form == new_form:
+		return
+
+	form = new_form
+
+	# 🔥 melhora comportamento na fase 2
+	speed *= 1.3
+	attack_cooldown *= 0.7
+
+	update_animation()
+
+# =========================================================
+
+func die():
+	state = State.DEAD
+
+	set_physics_process(false)
+	update_hud_visibility(false)
+
+	if has_animation(death_animation):
+		play_animation(death_animation)
+		await wait_for_animation(death_animation)
+
+	emit_signal("boss_defeated")
+	queue_free()
+
+# =========================================================
+
+func _on_hurtbox_area_entered(area):
+	if area == null or state == State.DEAD:
+		return
+
+	if take_stomp_damage and area.is_in_group("player_stomper"):
+		take_damage(get_damage_from_area(area, 1))
+
+
+func _on_attack_receiver_area_entered(area):
+	if area == null or state == State.DEAD:
+		return
+
+	if area.has_meta(&"projectile_direct_damage"):
+		return
+
+	if area.is_in_group("player_attack"):
+		take_damage(get_damage_from_area(area, 1))
+
+func _on_hitbox_body_entered(body):
+	var target := resolve_damage_target(body)
+	if target and target.has_method("take_damage"):
+		target.take_damage(damage, self)
+
+
+func _on_hitbox_area_entered(area):
+	var target := resolve_damage_target(area)
+	if target and target.has_method("take_damage"):
+		target.take_damage(damage, self)
+
+
+func get_damage_from_area(area: Area2D, fallback: int = 1) -> int:
+	if area and area.has_meta(ATTACK_META_DAMAGE):
+		return max(int(area.get_meta(ATTACK_META_DAMAGE)), 1)
+	return max(fallback, 1)
+
+
+func resolve_damage_target(node: Node) -> Node:
+	var current := node
+	while current != null:
+		if current.is_in_group(player_hurtbox_group):
+			return current.get_parent()
+		current = current.get_parent()
+	return null
+
+
+func deal_damage_to_player(target: Node) -> void:
+	if target and target.has_method("take_damage"):
+		target.take_damage(damage)
+
+
+func update_hud_visibility(should_show: bool) -> void:
+	if hud_visible == should_show:
+		return
+	hud_visible = should_show
+	emit_signal("hud_visibility_changed", should_show)
+
+
+func is_hud_visible() -> bool:
+	return hud_visible
+
+# =========================================================
+
+func apply_gravity(delta):
+	if not is_on_floor():
+		velocity.y += gravity * get_water_gravity_multiplier() * delta
+
+# =========================================================
+
+func enter_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count += 1
+	in_water = true
+
+
+func exit_water_zone(_water: Node = null) -> void:
+	water_zone_overlap_count = max(water_zone_overlap_count - 1, 0)
+	in_water = water_zone_overlap_count > 0
+
+
+func get_water_speed() -> float:
+	return speed * (water_speed_multiplier if in_water else 1.0)
+
+
+func get_water_gravity_multiplier() -> float:
+	return water_gravity_multiplier if in_water else 1.0
+
+# =========================================================
+
+func update_sprite_direction(dir):
+	if not sprite:
+		return
+
+	# sprite olha pra esquerda por padrão
+	sprite.flip_h = dir > 0
+	update_attack_hitbox_direction(dir)
+
+
+func update_attack_hitbox_direction(dir: int) -> void:
+	if not hitbox_shape:
+		return
+
+	hitbox_shape.position = Vector2(
+		-attack_hitbox_base_position.x if sprite and sprite.flip_h else attack_hitbox_base_position.x,
+		attack_hitbox_base_position.y
+	)
+
+
+func uses_frame_based_hitbox() -> bool:
+	return attack_hitbox_start_frame >= 0 and attack_hitbox_end_frame >= attack_hitbox_start_frame
+
+
+func run_attack_hitbox_by_frames(anim: StringName) -> void:
+	if not sprite or not has_animation(anim):
+		return
+
+	if hitbox_shape:
+		hitbox_shape.set_deferred("disabled", true)
+
+	var attack_time: float = get_animation_duration(anim)
+	var elapsed := 0.0
+	var last_frame := -1
+	while state == State.ATTACK and sprite.animation == anim and sprite.is_playing() and elapsed < attack_time:
+		var frame := sprite.frame
+		if frame != last_frame:
+			update_attack_hitbox_frame_state(frame)
+			last_frame = frame
+		await get_tree().process_frame
+		elapsed += get_process_delta_time()
+
+	if hitbox_shape:
+		hitbox_shape.set_deferred("disabled", true)
+
+
+func update_attack_hitbox_frame_state(frame: int) -> void:
+	if not hitbox_shape:
+		return
+
+	var inside_window := frame >= attack_hitbox_start_frame and frame <= attack_hitbox_end_frame
+	hitbox_shape.set_deferred("disabled", not inside_window)
+
+# =========================================================
+
+func update_animation():
+	if not sprite:
+		return
+	if state == State.TRANSFORM:
+		return
+
+	if state == State.ATTACK:
+		play_attack_animation()
+		return
+
+	if abs(velocity.x) > 5:
+		play_animation(get_walk_anim())
+	else:
+		play_animation(get_idle_anim())
+
+# =========================================================
+
+func get_idle_anim() -> StringName:
+	return idle_super_animation if form == Form.SUPER else idle_animation
+
+func get_walk_anim() -> StringName:
+	return walk_super_animation if form == Form.SUPER else walk_animation
+
+func get_attack_anim() -> StringName:
+	return attack_super_animation if form == Form.SUPER else attack_animation
+
+func get_projectile_attack_anim() -> StringName:
+	return projectile_super_attack_animation if form == Form.SUPER else projectile_attack_animation
+
+# =========================================================
+
+func play_attack_animation():
+	play_animation(get_current_attack_anim())
+
+func restart_attack_animation():
+	var anim := get_current_attack_anim()
+	if has_animation(anim):
+		sprite.play(anim)
+
+func get_current_attack_anim() -> StringName:
+	return current_attack_animation if current_attack_animation != &"" else get_attack_anim()
+
+func play_animation(anim):
+	if has_animation(anim) and sprite.animation != anim:
+		sprite.play(anim)
+
+func has_animation(anim):
+	return sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation(anim)
+
+func wait_for_animation(anim):
+	var duration = get_animation_duration(anim)
+	if duration > 0:
+		await get_tree().create_timer(duration).timeout
+
+func wait_for_attack_hitbox_start():
+	var total = get_animation_duration(get_attack_anim())
+	var delay = maxf(total - hitbox_active_time, 0)
+	if delay > 0:
+		await get_tree().create_timer(delay).timeout
+
+func get_animation_duration(anim) -> float:
+	if not has_animation(anim):
+		return 0.0
+	var frames = sprite.sprite_frames.get_frame_count(anim)
+	var speed = maxf(sprite.sprite_frames.get_animation_speed(anim), 1.0)
+	return float(frames) / speed

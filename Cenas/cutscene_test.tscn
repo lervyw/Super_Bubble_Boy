@@ -1,0 +1,143 @@
+[gd_scene load_steps=15 format=3 uid="uid://bn46vc5m2w5an"]
+
+[ext_resource type="Script" uid="uid://bftfr3cv7lh3l" path="res://Cenas/cutscene_test.gd" id="1_iqiqs"]
+[ext_resource type="Script" uid="uid://dfjhxo5k5xfq3" path="res://Cenas/control_dialog.gd" id="2_13wbg"]
+[ext_resource type="Texture2D" uid="uid://rqtenx3ou800" path="res://sprites/img/background/fundo/0.png" id="3_gfy6n"]
+[ext_resource type="Texture2D" uid="uid://cm47s6s1ij0gx" path="res://sprites/img/background/fundo/dialog.png" id="3_ugiv2"]
+[ext_resource type="Script" uid="uid://c4ws4fw1kocq0" path="res://Cenas/dialog_box.gd" id="4_5ul8x"]
+[ext_resource type="Theme" uid="uid://f3qbr13lf6l6" path="res://demo/assets/button.tres" id="5_k00w1"]
+[ext_resource type="Texture2D" uid="uid://bsv6118cqu4jx" path="res://sprites/characters/intro/Fernanda_cinematica1.png" id="6_fernanda"]
+[ext_resource type="Texture2D" uid="uid://bmh0w8eyuegul" path="res://sprites/characters/intro/face_Bubble1.png" id="7_bubbleboy"]
+[ext_resource type="Texture2D" uid="uid://dtql6nsowayv1" path="res://sprites/characters/intro/Fernanda_cinematica2.png" id="8_fernanda2"]
+[ext_resource type="Texture2D" uid="uid://jb18i42ut883" path="res://sprites/characters/intro/Fernanda_cinematica3.png" id="9_fernanda3"]
+[ext_resource type="Texture2D" uid="uid://xbw5nd6feij4" path="res://sprites/characters/intro/Fernanda_cinematica4.png" id="10_fernanda4"]
+[ext_resource type="Texture2D" uid="uid://bsxi2kw60vadr" path="res://sprites/characters/intro/face_Bubble2.png" id="11_bubbleboy2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fernanda_intro"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_fernanda")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_fernanda2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_fernanda3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_fernanda4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_fernanda3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_fernanda2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 3.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bubbleboy_intro"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_bubbleboy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_bubbleboy2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_bubbleboy")
+}],
+"loop": true,
+"name": &"default",
+"speed": 2.0
+}]
+
+[node name="Control" type="Control" node_paths=PackedStringArray("DialogBox", "advance_button")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_13wbg")
+DialogBox = NodePath("Node/CharacterNode/MarginContainer/VBoxContainer/DialogBox")
+dialogs = Array[String](["Bubbleboy, nosso reino está em perigo.", "O Sapo Maligno Sapolio se esconde no castelo e ameaça tomar tudo para si.", "O Rei Slime guarda o portão, e suas tropas bloquearam o caminho até lá.", "Precisamos de você novamente! Salve-nos, atravesse o reino e liberte todos dessa ameaça!"])
+advance_button = NodePath("Button2")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -1.0000001
+offset_right = 853.93396
+offset_bottom = 676.0
+scale = Vector2(0.494775, 0.41477522)
+texture = ExtResource("3_gfy6n")
+expand_mode = 2
+
+[node name="Border" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 27.0
+offset_right = 2208.9146
+offset_bottom = 1347.5718
+scale = Vector2(0.11737341, 0.11737341)
+texture = ExtResource("3_ugiv2")
+
+[node name="Button" type="Button" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 352.0
+offset_top = 216.00002
+offset_right = 425.92114
+offset_bottom = 266.0
+scale = Vector2(0.71698, 0.71698)
+text = "Eu sei!"
+
+[node name="Button2" type="Button" parent="."]
+layout_mode = 0
+offset_left = 184.0
+offset_top = 182.0
+offset_right = 294.0
+offset_bottom = 236.0
+scale = Vector2(0.67272073, 0.7150347)
+theme = ExtResource("5_k00w1")
+text = "Continuar"
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("1_iqiqs")
+
+[node name="CharacterNode" type="Node2D" parent="Node"]
+
+[node name="MarginContainer" type="MarginContainer" parent="Node/CharacterNode"]
+offset_left = 113.000015
+offset_top = 30.0
+offset_right = 323.0
+offset_bottom = 137.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Node/CharacterNode/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Node/CharacterNode/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Fernanda"
+
+[node name="DialogBox" type="RichTextLabel" parent="Node/CharacterNode/MarginContainer/VBoxContainer"]
+clip_contents = false
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+text = "test"
+fit_content = true
+script = ExtResource("4_5ul8x")
+
+[node name="fernanda" type="AnimatedSprite2D" parent="."]
+position = Vector2(48, 232)
+sprite_frames = SubResource("SpriteFrames_fernanda_intro")
+autoplay = "default"
+
+[node name="bubbleboy" type="AnimatedSprite2D" parent="."]
+position = Vector2(368, 232)
+sprite_frames = SubResource("SpriteFrames_bubbleboy_intro")
+autoplay = "default"
